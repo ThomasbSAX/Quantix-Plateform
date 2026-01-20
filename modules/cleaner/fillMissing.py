@@ -1,12 +1,21 @@
 import pandas as pd
 import numpy as np
 from typing import Literal, Any, Dict, List, Optional, Union, Tuple
-from sklearn.impute import KNNImputer, SimpleImputer
-from sklearn.experimental import enable_iterative_imputer
-from sklearn.impute import IterativeImputer
-from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
 import warnings
+
+# Dépendances ML optionnelles: rendre l'import résilient pour Render
+try:  # pragma: no cover - rendu optionnel
+    from sklearn.impute import KNNImputer, SimpleImputer  # type: ignore
+    from sklearn.experimental import enable_iterative_imputer  # type: ignore  # noqa: F401
+    from sklearn.impute import IterativeImputer  # type: ignore
+    from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier  # type: ignore
+    from sklearn.preprocessing import LabelEncoder  # type: ignore
+    _SKLEARN_AVAILABLE = True
+except Exception:  # pragma: no cover
+    KNNImputer = SimpleImputer = IterativeImputer = None  # type: ignore
+    RandomForestRegressor = RandomForestClassifier = None  # type: ignore
+    LabelEncoder = None  # type: ignore
+    _SKLEARN_AVAILABLE = False
 
 
 def fill_missing(
@@ -291,6 +300,29 @@ def knn_fill_missing(df: pd.DataFrame, columns: List[str], fill_info: Dict, n_ne
         DataFrame traité
     """
     df_result = df.copy()
+
+    if not _SKLEARN_AVAILABLE:
+        # Fallback immédiat si scikit-learn absent
+        for col in columns:
+            if pd.api.types.is_numeric_dtype(df[col]):
+                fill_value = df[col].median()
+                df_result[col] = df_result[col].fillna(fill_value)
+                fill_info["columns_processed"][col] = {
+                    "method": "median_fallback",
+                    "error": "scikit-learn non disponible",
+                    "fill_value": float(fill_value) if not pd.isna(fill_value) else None,
+                }
+            else:
+                mode_val = df[col].mode()
+                if len(mode_val) > 0:
+                    df_result[col] = df_result[col].fillna(mode_val[0])
+                    fill_info["columns_processed"][col] = {
+                        "method": "mode",
+                        "fill_value": str(mode_val[0]),
+                        "original_missing": int(df[col].isna().sum()),
+                        "final_missing": int(df_result[col].isna().sum()),
+                    }
+        return df_result
     
     # Séparer colonnes numériques et catégorielles
     numeric_cols = [col for col in columns if pd.api.types.is_numeric_dtype(df[col])]
@@ -355,6 +387,29 @@ def iterative_fill_missing(df: pd.DataFrame, columns: List[str], fill_info: Dict
         DataFrame traité
     """
     df_result = df.copy()
+
+    if not _SKLEARN_AVAILABLE:
+        # Fallback si scikit-learn absent
+        for col in columns:
+            if pd.api.types.is_numeric_dtype(df[col]):
+                fill_value = df[col].median()
+                df_result[col] = df_result[col].fillna(fill_value)
+                fill_info["columns_processed"][col] = {
+                    "method": "median_fallback",
+                    "error": "scikit-learn non disponible",
+                    "fill_value": float(fill_value) if not pd.isna(fill_value) else None,
+                }
+            else:
+                mode_val = df[col].mode()
+                if len(mode_val) > 0:
+                    df_result[col] = df_result[col].fillna(mode_val[0])
+                    fill_info["columns_processed"][col] = {
+                        "method": "mode",
+                        "fill_value": str(mode_val[0]),
+                        "original_missing": int(df[col].isna().sum()),
+                        "final_missing": int(df_result[col].isna().sum()),
+                    }
+        return df_result
     
     # Séparer colonnes numériques et catégorielles
     numeric_cols = [col for col in columns if pd.api.types.is_numeric_dtype(df[col])]
