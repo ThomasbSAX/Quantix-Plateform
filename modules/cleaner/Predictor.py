@@ -3,7 +3,6 @@ Predictor - Système d'auto-complétion et prédiction pour données tabulaires
 Utilise des modèles légers pour détecter patterns et suggérer valeurs
 """
 
-import pandas as pd
 import numpy as np
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.preprocessing import PolynomialFeatures

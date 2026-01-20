@@ -4,21 +4,15 @@ Style: sobre, élégant, type Palantir
 """
 
 import pandas as pd
-import numpy as np
 from datetime import datetime
-from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak, Image
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
-from reportlab.pdfgen import canvas
-from reportlab.graphics.shapes import Drawing, Rect, String
-from reportlab.graphics import renderPDF
-import matplotlib.pyplot as plt
+from reportlab.lib.enums import TA_LEFT
 import matplotlib
 matplotlib.use('Agg')
-from io import BytesIO
 
 class DataQualityReport:
     """

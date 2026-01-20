@@ -57,7 +57,7 @@ from flask import Flask, render_template, abort, redirect, url_for
 from flask import request, jsonify, session, send_from_directory
 from werkzeug.utils import secure_filename
 import os
-from datetime import datetime, timezone
+from datetime import datetime
 import tempfile
 import uuid
 import json

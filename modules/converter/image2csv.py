@@ -21,7 +21,7 @@ pip install paddlepaddle paddleocr opencv-python pandas
 from __future__ import annotations
 
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import List, Union
 import csv
 import logging
 

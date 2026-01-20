@@ -3,7 +3,6 @@ Système robuste de gestion d'erreurs pour usage scientifique
 Diagnostique les erreurs et fournit des solutions claires
 """
 
-import sys
 import traceback
 from typing import Optional, Any, Dict, Callable
 from functools import wraps

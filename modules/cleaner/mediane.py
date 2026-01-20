@@ -1,6 +1,5 @@
 from typing import Iterable, Any, Literal
 from collections import Counter
-import math
 
 
 def central_tendency(

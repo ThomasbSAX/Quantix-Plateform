@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional, Iterable, List
+from typing import Optional, List
 import csv
 
 try:

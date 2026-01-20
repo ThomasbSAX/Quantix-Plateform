@@ -6,88 +6,33 @@ Combine nettoyage classique et détection intelligente de +100 types de données
 import pandas as pd
 import numpy as np
 import re
-import os
 import json
 import csv
 import chardet
-import io
 from pathlib import Path
 from typing import Optional, List, Literal, Dict, Any, Tuple, Union
-from collections import Counter
 import warnings
 import logging
-import unicodedata
 from datetime import datetime
-from decimal import Decimal, InvalidOperation
 warnings.filterwarnings('ignore')
 
 # Import des modules de nettoyage
 from .dropMissing import drop_missing
-from .dropMissing import (
-    drop_empty_rows,
-    drop_empty_columns,
-    smart_missing_analysis,
-    detect_missing_clusters,
-    detect_systematic_missing,
-)
 from .normalizeSpace import normalize_space
-from .normalizeSpace import (
-    advanced_normalize_space,
-    fix_french_punctuation,
-    normalize_numeric_formatting,
-    normalize_dataframe_spaces,
-)
 from .normalizeTypo import normalize_typography
-from .normalizeTypo import (
-    normalize_dataframe_typography,
-    detect_typography_issues,
-    create_typography_rules,
-    normalize_with_language_rules,
-    batch_typography_analysis,
-)
 from .normalizeText import normalize_text_full
 from .normalizeScientNot import normalize_scientific_notation
-from .normalizeScientNot import to_scientific_notation
 from .normalizeContext import normalize_context
 from .removeDuplicates import remove_duplicates
-from .detectOutliers import remove_outliers, detect_outliers
-from .detectOutliers import (
-    detect_multivariate_outliers,
-    outlier_analysis_report,
-    create_outlier_plots,
-    compare_outlier_methods,
-    generate_outlier_recommendations,
-    quick_outlier_removal,
-)
-from .convertTypes import infer_and_convert_types, force_numeric
-from .convertTypes import (
-    analyze_column_content,
-    smart_numeric_conversion,
-    smart_datetime_conversion,
-    smart_boolean_conversion,
-    optimize_numeric_dtype,
-    optimize_string_dtype,
-    force_type_conversion,
-    generate_type_report,
-)
+from .detectOutliers import remove_outliers
+from .convertTypes import infer_and_convert_types
 from .fillMissing import fill_missing
-from .fillMissing import (
-    smart_fill_missing,
-    classic_fill_strategies,
-    knn_fill_missing,
-    iterative_fill_missing,
-    interpolate_missing,
-    advanced_missing_analysis,
-    create_missing_heatmap,
-)
 from .trimStrings import trim_strings, remove_empty_strings
 from .mean import mean
 from .mediane import central_tendency
-from .round import round_order
 from .logic import detect_sequence_logic_break
 
 # Utilitaires (ré-export orchestrateur)
-from .log import set_log_axis
 try:
     from .convertUnit import (
         build_unit_mapping,
@@ -108,15 +53,6 @@ except Exception:
     normalize_unit_token = None
     are_units_compatible = None
     convert_unit_multiple = None
-from .error_handler import (
-    DataQualityError,
-    ConversionError,
-    ConfigurationError,
-    ScientificErrorHandler,
-    safe_scientific_operation,
-    validate_dataframe as validate_dataframe_quality,
-    check_numeric_validity,
-)
 
 # Modules optionnels/avancés: import safe pour ne pas casser le Cleaner de base
 try:

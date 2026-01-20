@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Mapping, MutableMapping, Optional
+from typing import Any, Callable, Dict, Mapping, MutableMapping
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -74,9 +74,3 @@ def make_figure_json(df: pd.DataFrame, spec: Mapping[str, Any]) -> dict:
 
 
 # Import builders to register them.
-from . import numeric as _numeric  # noqa: E402,F401
-from . import categorical as _categorical  # noqa: E402,F401
-from . import correlation as _correlation  # noqa: E402,F401
-from . import text as _text  # noqa: E402,F401
-from . import multivariate as _multivariate  # noqa: E402,F401
-from . import advanced as _advanced  # noqa: E402,F401

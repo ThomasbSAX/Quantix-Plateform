@@ -5,13 +5,9 @@ Compatible interface web avec retour JSON et gestion d'erreurs robuste.
 """
 
 import pandas as pd
-import numpy as np
 from datetime import datetime
 import os
-import shutil
-import json
-import warnings
-from typing import Dict, List, Any, Optional, Union, Tuple, Literal
+from typing import Dict, Any, Optional, Union, Tuple
 from pathlib import Path
 import csv
 import io

@@ -1,6 +1,5 @@
 import re
 from typing import List, Dict, Any, Optional, Tuple
-from fractions import Fraction
 
 
 def detect_sequence_logic_break(
