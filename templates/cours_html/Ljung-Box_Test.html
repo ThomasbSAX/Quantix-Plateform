@@ -1,0 +1,354 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Ljung-Box Test : Un Outils Statistique pour la Détection de Corrélation Sérielle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Ljung-Box Test : Un Outils Statistique pour la
+Détection de Corrélation Sérielle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le Ljung-Box Test, développé par Gregoire Ljung et George Box en
+1978, est un test statistique utilisé pour détecter la présence de
+corrélation sérielle dans une série temporelle. La corrélation sérielle
+se produit lorsque les valeurs passées d’une série influencent ses
+valeurs futures. Ce phénomène est crucial dans l’analyse des séries
+temporelles car il peut indiquer des modèles sous-jacents ou des
+structures qui ne sont pas immédiatement évidentes.</p>
+<p>L’importance du Ljung-Box Test réside dans sa capacité à identifier
+ces corrélations, ce qui est essentiel pour la modélisation et la
+prévision des séries temporelles. Par exemple, en économie, la détection
+de corrélation sérielle peut révéler des tendances ou des cycles dans
+les données financières, permettant ainsi une meilleure compréhension
+des marchés. De même, en ingénierie, ce test peut aider à détecter des
+anomalies ou des défauts dans les processus de production.</p>
+<p>Dans ce qui suit, nous explorerons les définitions, les théorèmes, et
+les propriétés du Ljung-Box Test, en fournissant des preuves détaillées
+et des exemples pour illustrer son utilisation.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre le Ljung-Box Test, il est essentiel de définir
+quelques concepts clés. Supposons que nous avons une série temporelle
+<span class="math inline">\(\{X_t\}\)</span> avec des résidus <span
+class="math inline">\(\{e_t\}\)</span>. Les résidus sont les différences
+entre les valeurs observées et les valeurs prédites par un modèle.</p>
+<p>Nous cherchons à tester l’hypothèse nulle <span
+class="math inline">\(H_0\)</span> selon laquelle les résidus sont
+indépendants et identiquement distribués (i.i.d.). Cela signifie que les
+résidus ne présentent pas de corrélation sérielle.</p>
+<p>La statistique du Ljung-Box Test est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\{e_t\}\)</span> une série de
+résidus avec <span class="math inline">\(t = 1, \ldots, n\)</span>. La
+statistique du Ljung-Box Test est donnée par : <span
+class="math display">\[Q = n(n+2) \sum_{k=1}^h
+\frac{\hat{\rho}_k^2}{n-k}\]</span> où <span
+class="math inline">\(n\)</span> est le nombre de résidus, <span
+class="math inline">\(h\)</span> est le nombre de lags considérés, et
+<span class="math inline">\(\hat{\rho}_k\)</span> est le coefficient
+d’autocorrélation échantillonné pour le lag <span
+class="math inline">\(k\)</span>.</p>
+</div>
+<p>Pour calculer les coefficients d’autocorrélation <span
+class="math inline">\(\hat{\rho}_k\)</span>, nous utilisons la formule
+suivante :</p>
+<p><span class="math display">\[\hat{\rho}_k = \frac{\sum_{t=k+1}^n (e_t
+- \bar{e})(e_{t-k} - \bar{e})}{\sum_{t=1}^n (e_t -
+\bar{e})^2}\]</span></p>
+<p>où <span class="math inline">\(\bar{e}\)</span> est la moyenne des
+résidus.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le Ljung-Box Test repose sur plusieurs théorèmes et propriétés
+statistiques. L’un des plus importants est le théorème suivant, qui
+décrit la distribution de la statistique <span
+class="math inline">\(Q\)</span> sous l’hypothèse nulle.</p>
+<div class="theorem">
+<p>Sous l’hypothèse nulle <span class="math inline">\(H_0\)</span> que
+les résidus sont i.i.d., la statistique <span
+class="math inline">\(Q\)</span> suit une distribution du chi-carré avec
+<span class="math inline">\(h\)</span> degrés de liberté, c’est-à-dire :
+<span class="math display">\[Q \sim \chi^2_h\]</span></p>
+</div>
+<p>Pour prouver ce théorème, nous devons d’abord établir quelques
+lemmes.</p>
+<div class="lemma">
+<p>Sous l’hypothèse nulle <span class="math inline">\(H_0\)</span>, les
+coefficients d’autocorrélation <span
+class="math inline">\(\hat{\rho}_k\)</span> sont asymptotiquement
+normaux avec une moyenne de zéro et une variance de <span
+class="math inline">\(\frac{1}{n}\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Sous <span class="math inline">\(H_0\)</span>, les
+résidus <span class="math inline">\(\{e_t\}\)</span> sont i.i.d. avec
+une moyenne de zéro et une variance de <span
+class="math inline">\(\sigma^2\)</span>. Le coefficient
+d’autocorrélation <span class="math inline">\(\hat{\rho}_k\)</span> peut
+être écrit comme une somme de produits de résidus centrés. Par le
+théorème central limite, <span
+class="math inline">\(\hat{\rho}_k\)</span> est asymptotiquement normal
+avec une moyenne de zéro et une variance de <span
+class="math inline">\(\frac{1}{n}\)</span>. ◻</p>
+</div>
+<div class="lemma">
+<p>La somme des carrés des coefficients d’autocorrélation <span
+class="math inline">\(\sum_{k=1}^h \hat{\rho}_k^2\)</span> est
+asymptotiquement distribuée comme une distribution du chi-carré avec
+<span class="math inline">\(h\)</span> degrés de liberté.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Ce lemme découle du fait que les <span
+class="math inline">\(\hat{\rho}_k\)</span> sont asymptotiquement
+indépendants et normalement distribués sous <span
+class="math inline">\(H_0\)</span>. La somme des carrés de variables
+normales indépendantes suit une distribution du chi-carré. ◻</p>
+</div>
+<p>Avec ces lemmes en main, nous pouvons maintenant prouver le théorème
+principal.</p>
+<div class="proof">
+<p><em>Proof.</em> La statistique <span class="math inline">\(Q\)</span>
+est une transformation linéaire de la somme des carrés des coefficients
+d’autocorrélation. En utilisant le lemme précédent, nous savons que
+<span class="math inline">\(\sum_{k=1}^h \hat{\rho}_k^2\)</span> suit
+une distribution du chi-carré avec <span
+class="math inline">\(h\)</span> degrés de liberté. Par conséquent,
+<span class="math inline">\(Q\)</span> suit également une distribution
+du chi-carré avec <span class="math inline">\(h\)</span> degrés de
+liberté. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le Ljung-Box Test possède plusieurs propriétés importantes qui en
+font un outil puissant pour l’analyse des séries temporelles.</p>
+<div class="corollary">
+<p>Si la statistique <span class="math inline">\(Q\)</span> est
+supérieure à la valeur critique du chi-carré avec <span
+class="math inline">\(h\)</span> degrés de liberté à un niveau de
+signification donné, nous rejetons l’hypothèse nulle <span
+class="math inline">\(H_0\)</span> et concluons qu’il existe une
+corrélation sérielle significative dans les résidus.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Ceci découle directement du théorème principal. Si
+<span class="math inline">\(Q\)</span> est supérieur à la valeur
+critique, cela indique que les résidus ne sont pas i.i.d., et donc qu’il
+existe une corrélation sérielle. ◻</p>
+</div>
+<div class="corollary">
+<p>Le Ljung-Box Test est sensible au choix du nombre de lags <span
+class="math inline">\(h\)</span>. Un choix trop petit peut manquer des
+corrélations importantes, tandis qu’un choix trop grand peut augmenter
+la probabilité de fausses détections.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Le nombre de lags <span
+class="math inline">\(h\)</span> détermine le nombre de degrés de
+liberté de la distribution du chi-carré. Un choix approprié de <span
+class="math inline">\(h\)</span> est crucial pour équilibrer la
+puissance du test et le taux de fausses alarmes. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Ljung-Box Test est un outil statistique essentiel pour la
+détection de corrélation sérielle dans les séries temporelles. Sa
+capacité à identifier des modèles sous-jacents et des structures dans
+les données en fait un instrument précieux pour les chercheurs et les
+praticiens dans divers domaines. En comprenant les définitions, les
+théorèmes, et les propriétés du Ljung-Box Test, nous pouvons mieux
+apprécier son importance et son utilité dans l’analyse des séries
+temporelles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

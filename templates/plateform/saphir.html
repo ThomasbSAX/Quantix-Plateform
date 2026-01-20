@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quantix Nettoyeur — Nettoyage de Données</title>
+  <meta name="description" content="Nettoyage automatique et préparation intelligente de données avec Quantix Nettoyeur">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS global -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  
+  <style>
+    .main-container {
+      min-height: calc(100vh - 80px);
+      padding: 120px 40px 60px;
+      background: #ffffff;
+      color: #212121;
+    }
+    
+    .saphir-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    
+    .saphir-title {
+      font-size: 2.5rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      opacity: 0;
+    }
+    
+    .saphir-subtitle {
+      font-size: 0.95rem;
+      color: #565869;
+      font-weight: 300;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    .upload-section {
+      max-width: 900px;
+      margin: 0 auto 40px;
+    }
+    
+    .drop-zone {
+      border: 1px solid #e5e5e5;
+      background: #fafafa;
+      border-radius: 4px;
+      padding: 80px 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .drop-zone:hover {
+      border-color: #0066ff;
+      background: #f7f7f8;
+    }
+    
+    .drop-zone.active {
+      border-color: #0066ff;
+      background: rgba(0, 102, 255, 0.05);
+    }
+    
+    .drop-icon {
+      font-size: 32px;
+      color: #8e8ea0;
+      margin-bottom: 20px;
+    }
+    
+    .drop-text {
+      font-size: 0.95rem;
+      color: #565869;
+      margin-bottom: 8px;
+    }
+    
+    .drop-subtext {
+      font-size: 0.85rem;
+      color: #8e8ea0;
+    }
+    
+    .file-info {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto 30px;
+      padding: 20px;
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+    }
+    
+    .file-info.active {
+      display: block;
+    }
+    
+    .file-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    
+    .file-icon-display {
+      width: 40px;
+      height: 40px;
+      background: #0066ff;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+    }
+    
+    .file-details {
+      flex: 1;
+    }
+    
+    .file-name {
+      font-size: 0.95rem;
+      color: #212121;
+      margin-bottom: 4px;
+    }
+    
+    .file-meta {
+      font-size: 0.85rem;
+      color: #8e8ea0;
+    }
+
+    .config-section {
+      max-width: 900px;
+      margin: 0 auto 30px;
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+      padding: 20px;
+    }
+
+    .config-header {
+      font-size: 0.95rem;
+      color: #212121;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .preset-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .preset-card {
+      padding: 16px;
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .preset-card:hover {
+      border-color: #0066ff;
+      background: rgba(0, 102, 255, 0.05);
+    }
+
+    .preset-card.selected {
+      border-color: #0066ff;
+      background: rgba(0, 102, 255, 0.1);
+    }
+
+    .preset-title {
+      font-size: 0.9rem;
+      color: #212121;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .preset-desc {
+      font-size: 0.8rem;
+      color: #8e8ea0;
+      line-height: 1.4;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .option-checkbox {
+      width: 16px;
+      height: 16px;
+    }
+
+    .option-label {
+      font-size: 0.85rem;
+      color: #565869;
+    }
+
+    .format-selector {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .format-label {
+      font-size: 0.85rem;
+      color: #565869;
+    }
+
+    .format-select {
+      padding: 8px 12px;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+      background: #ffffff;
+      color: #212121;
+      font-size: 0.85rem;
+    }
+    
+    .operations-section {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto 30px;
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+      padding: 20px;
+    }
+
+    .operations-section.active {
+      display: block;
+    }
+
+    .operations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    
+    .operation-btn {
+      padding: 16px 20px;
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+      color: #212121;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    
+    .operation-btn:hover {
+      border-color: #0066ff;
+      background: rgba(0, 102, 255, 0.05);
+    }
+    
+    .operation-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .operation-btn.primary {
+      background: #0066ff;
+      color: white;
+      font-weight: 500;
+    }
+
+    .operation-btn.primary:hover {
+      background: #0052cc;
+    }
+    
+    .operation-title {
+      font-weight: 500;
+      color: #212121;
+    }
+
+    .operation-btn.primary .operation-title {
+      color: white;
+    }
+    
+    .operation-desc {
+      font-size: 0.8rem;
+      color: #8e8ea0;
+      line-height: 1.4;
+    }
+
+    .operation-btn.primary .operation-desc {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .processing-status {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto 30px;
+      padding: 20px;
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+    }
+    
+    .processing-status.active {
+      display: block;
+    }
+
+    .progress-content {
+      text-align: center;
+    }
+
+    .progress-icon {
+      font-size: 24px;
+      color: #0066ff;
+      margin-bottom: 16px;
+    }
+
+    .progress-text {
+      font-size: 0.95rem;
+      color: #212121;
+      margin-bottom: 8px;
+    }
+
+    .progress-subtext {
+      font-size: 0.85rem;
+      color: #8e8ea0;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #e5e5e5;
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: #0066ff;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+    
+    .results-section {
+      display: none;
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
+      border-radius: 4px;
+      padding: 20px;
+    }
+    
+    .results-section.active {
+      display: block;
+    }
+    
+    .result-header {
+      font-size: 0.95rem;
+      color: #212121;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-card {
+      text-align: center;
+      padding: 16px;
+      background: #fafafa;
+      border-radius: 4px;
+    }
+
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #0066ff;
+      margin-bottom: 4px;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      color: #8e8ea0;
+    }
+
+    .quality-comparison {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .quality-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .quality-label {
+      font-size: 0.85rem;
+      color: #565869;
+      min-width: 60px;
+    }
+
+    .quality-bar {
+      flex: 1;
+      height: 8px;
+      background: #e5e5e5;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .quality-fill {
+      height: 100%;
+      background: #0066ff;
+      transition: width 1s ease;
+    }
+
+    .quality-value {
+      font-size: 0.8rem;
+      color: #212121;
+      min-width: 40px;
+      text-align: right;
+    }
+
+    .operations-list {
+      margin-bottom: 24px;
+    }
+
+    .operations-title {
+      font-size: 0.9rem;
+      color: #212121;
+      margin-bottom: 12px;
+    }
+
+    .operation-item {
+      padding: 8px 0;
+      font-size: 0.85rem;
+      color: #565869;
+      border-left: 2px solid #0066ff;
+      padding-left: 12px;
+      margin-bottom: 6px;
+    }
+    
+    .download-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .download-btn {
+      padding: 12px 24px;
+      background: #0066ff;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .download-btn:hover {
+      background: #0052cc;
+      color: white;
+    }
+    
+    .download-btn.secondary {
+      background: #ffffff;
+      border: 1px solid #e5e5e5;
+      color: #212121;
+    }
+    
+    .download-btn.secondary:hover {
+      border-color: #0066ff;
+      color: #212121;
+    }
+
+    .warnings-section {
+      display: none;
+      margin-bottom: 24px;
+    }
+
+    .warnings-section.active {
+      display: block;
+    }
+
+    .warnings-title {
+      font-size: 0.9rem;
+      color: #d97706;
+      margin-bottom: 12px;
+    }
+
+    .warning-item {
+      padding: 8px 12px;
+      background: rgba(217, 119, 6, 0.1);
+      border-left: 2px solid #d97706;
+      font-size: 0.85rem;
+      color: #92400e;
+      margin-bottom: 6px;
+      border-radius: 0 4px 4px 0;
+    }
+  </style>
+</head>
+
+<body>
+  {% include 'header.html' %}
+
+  <div class="main-container">
+    <div class="saphir-header">
+      <h1 class="saphir-title">NETTOYEUR</h1>
+      <p class="saphir-subtitle">Nettoyage et standardisation de données</p>
+    </div>
+
+    <!-- Upload Zone -->
+    <div class="upload-section">
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">
+          <i class="fas fa-file-arrow-up"></i>
+        </div>
+        <div class="drop-text">Déposer un fichier de données</div>
+        <div class="drop-subtext">CSV, JSON, XLSX formats supportés</div>
+        <input type="file" id="fileInput" accept=".csv,.json,.xlsx,.xls" style="display: none;">
+      </div>
+    </div>
+
+    <!-- File Info -->
+    <div class="file-info" id="fileInfo">
+      <div class="file-header">
+        <div class="file-icon-display">
+          <i class="fas fa-file" id="fileIconType"></i>
+        </div>
+        <div class="file-details">
+          <div class="file-name" id="fileName"></div>
+          <div class="file-meta">
+            <span id="fileSize"></span> · <span id="fileType"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Configuration Section -->
+    <div class="config-section" id="configSection" style="display: none;">
+      <div class="config-header">Options de nettoyage</div>
+
+      <div class="options-grid">
+        <div class="option-item">
+          <input type="checkbox" id="normalizeSpaces" class="option-checkbox" checked>
+          <label for="normalizeSpaces" class="option-label">Supprimer les espaces inutiles (trim + espaces multiples)</label>
+        </div>
+        <div class="option-item">
+          <input type="checkbox" id="lowercaseStrings" class="option-checkbox" checked>
+          <label for="lowercaseStrings" class="option-label">Mettre le texte en minuscule</label>
+        </div>
+        <div class="option-item">
+          <input type="checkbox" id="removeEmptyStrings" class="option-checkbox" checked>
+          <label for="removeEmptyStrings" class="option-label">Convertir vides/NA/NULL/N/A en manquants</label>
+        </div>
+        <div class="option-item">
+          <input type="checkbox" id="autoDetectTypes" class="option-checkbox" checked>
+          <label for="autoDetectTypes" class="option-label">Détection et optimisation des types</label>
+        </div>
+        <div class="option-item">
+          <input type="checkbox" id="correctTypos" class="option-checkbox" checked>
+          <label for="correctTypos" class="option-label">Normaliser la typographie (guillemets, tirets, apostrophes)</label>
+        </div>
+        <div class="option-item">
+          <input type="checkbox" id="removeDuplicates" class="option-checkbox">
+          <label for="removeDuplicates" class="option-label">Supprimer les doublons (lignes identiques)</label>
+        </div>
+        <div class="option-item">
+          <input type="checkbox" id="normalizeTextAdvanced" class="option-checkbox">
+          <label for="normalizeTextAdvanced" class="option-label">Normalisation avancée (accents/emoji) — optionnel</label>
+        </div>
+        <div class="option-item">
+          <input type="checkbox" id="detectOutliers" class="option-checkbox">
+          <label for="detectOutliers" class="option-label">Traitement d'outliers (IQR) — optionnel</label>
+        </div>
+        <div class="option-item">
+          <div class="format-selector">
+            <label class="format-label">Format de sortie</label>
+            <select id="outputFormat" class="format-select">
+              <option value="csv">CSV</option>
+              <option value="excel">Excel</option>
+              <option value="json">JSON</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Operations -->
+    <div class="operations-section" id="operationsSection">
+      <div class="operations-grid">
+        <button class="operation-btn primary" id="runCleanBtn">
+          <span class="operation-title">Lancer le nettoyage</span>
+          <span class="operation-desc">Appliquer les options sélectionnées</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Processing Status -->
+    <div class="processing-status" id="processingStatus">
+      <div class="progress-content">
+        <div class="progress-icon">
+          <i class="fas fa-cog fa-spin"></i>
+        </div>
+        <div class="progress-text" id="progressText">Traitement en cours</div>
+        <div class="progress-subtext" id="progressSubtext">Analyse des données</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="results-section" id="resultsSection">
+      <div class="result-header">Traitement terminé</div>
+      
+      <div class="metrics-grid" id="metricsGrid">
+        <!-- Métriques générées dynamiquement -->
+      </div>
+
+      <div class="quality-comparison" id="qualityComparison" style="display: none;">
+        <div class="quality-item">
+          <div class="quality-label">Avant</div>
+          <div class="quality-bar">
+            <div class="quality-fill" id="qualityBefore"></div>
+          </div>
+          <div class="quality-value" id="qualityBeforeText"></div>
+        </div>
+        <div class="quality-item">
+          <div class="quality-label">Après</div>
+          <div class="quality-bar">
+            <div class="quality-fill" id="qualityAfter"></div>
+          </div>
+          <div class="quality-value" id="qualityAfterText"></div>
+        </div>
+      </div>
+
+      <div class="operations-list" id="operationsList" style="display: none;">
+        <div class="operations-title">Opérations effectuées</div>
+        <div id="operationsContent">
+          <!-- Liste générée dynamiquement -->
+        </div>
+      </div>
+
+      <div class="warnings-section" id="warningsSection">
+        <div class="warnings-title">Avertissements</div>
+        <div id="warningsContent">
+          <!-- Warnings générés dynamiquement -->
+        </div>
+      </div>
+      
+      <div class="download-actions">
+        <a href="#" class="download-btn" id="downloadProcessedBtn">
+          Télécharger le fichier traité
+        </a>
+        <a href="#" class="download-btn secondary" id="downloadReportBtn">
+          Rapport détaillé
+        </a>
+        <button class="download-btn secondary" onclick="location.reload()">
+          Nouveau fichier
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {% include 'footer.html' %}
+
+  <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const configSection = document.getElementById('configSection');
+    const operationsSection = document.getElementById('operationsSection');
+    const processingStatus = document.getElementById('processingStatus');
+    const resultsSection = document.getElementById('resultsSection');
+    
+    let currentFile = null;
+    // UI simplifiée: pas de preset, uniquement des options.
+
+    // Drag and drop handlers
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('active');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('active');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('active');
+      if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      currentFile = file;
+      
+      // Update file info display
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileSize').textContent = formatFileSize(file.size);
+      document.getElementById('fileType').textContent = file.type || 'Type inconnu';
+      
+      // Update icon based on file type
+      const ext = file.name.split('.').pop().toLowerCase();
+      const iconMap = {
+        'csv': 'fa-file-csv',
+        'json': 'fa-file-code',
+        'xlsx': 'fa-file-excel',
+        'xls': 'fa-file-excel'
+      };
+      document.getElementById('fileIconType').className = 'fas ' + (iconMap[ext] || 'fa-file');
+      
+      // Show file info and config
+      fileInfo.classList.add('active');
+      configSection.style.display = 'block';
+      operationsSection.classList.add('active');
+      dropZone.style.display = 'none';
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    // Action principale
+    document.getElementById('runCleanBtn').addEventListener('click', () => performAutoCleaning());
+
+    async function performAutoCleaning() {
+      if (!currentFile) return;
+      
+      showProgress('Nettoyage en cours', 'Standardisation des champs et des types');
+      
+      const formData = new FormData();
+      formData.append('file', currentFile);
+      formData.append('output_format', document.getElementById('outputFormat').value);
+      // Toggles (cases à cocher)
+      formData.append('trim_strings', document.getElementById('normalizeSpaces').checked);
+      formData.append('normalize_spaces', document.getElementById('normalizeSpaces').checked);
+      formData.append('lowercase_strings', document.getElementById('lowercaseStrings').checked);
+      formData.append('remove_empty', document.getElementById('removeEmptyStrings').checked);
+      formData.append('auto_detect_types', document.getElementById('autoDetectTypes').checked);
+      formData.append('correct_typos', document.getElementById('correctTypos').checked);
+      formData.append('remove_duplicates', document.getElementById('removeDuplicates').checked);
+      formData.append('normalize_text', document.getElementById('normalizeTextAdvanced').checked);
+      formData.append('detect_outliers', document.getElementById('detectOutliers').checked);
+      
+      try {
+        const response = await fetch('/api/clean', {
+          method: 'POST',
+          body: formData
+        });
+        
+        if (!response.ok) throw new Error('Erreur de traitement');
+        
+        const data = await response.json();
+        hideProgress();
+        
+        if (data.success) {
+          displayCleaningResults(data);
+        } else {
+          alert('Erreur: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Erreur:', error);
+        alert('Erreur lors du nettoyage: ' + error.message);
+        hideProgress();
+      }
+    }
+
+    // Conversion et analyse retirées de cette UI simplifiée.
+
+    function showProgress(title, subtitle) {
+      document.getElementById('progressText').textContent = title;
+      document.getElementById('progressSubtext').textContent = subtitle;
+      
+      fileInfo.classList.remove('active');
+      configSection.style.display = 'none';
+      operationsSection.classList.remove('active');
+      processingStatus.classList.add('active');
+      resultsSection.classList.remove('active');
+      
+      // Animation de la barre de progression
+      const progressFill = document.getElementById('progressFill');
+      let width = 0;
+      const interval = setInterval(() => {
+        if (width >= 90) {
+          clearInterval(interval);
+        } else {
+          width += Math.random() * 10;
+          progressFill.style.width = Math.min(width, 90) + '%';
+        }
+      }, 300);
+      
+      window.progressInterval = interval;
+    }
+
+    function hideProgress() {
+      if (window.progressInterval) {
+        clearInterval(window.progressInterval);
+      }
+      document.getElementById('progressFill').style.width = '100%';
+      setTimeout(() => {
+        processingStatus.classList.remove('active');
+      }, 200);
+    }
+
+    function displayPreviewResults(data) {
+      const metricsGrid = document.getElementById('metricsGrid');
+      metricsGrid.innerHTML = `
+        <div class="metric-card">
+          <div class="metric-value">${data.shape[0].toLocaleString()}</div>
+          <div class="metric-label">Lignes</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">${data.shape[1]}</div>
+          <div class="metric-label">Colonnes</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">${data.total_nulls.toLocaleString()}</div>
+          <div class="metric-label">Valeurs manquantes</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">${data.quality_score}</div>
+          <div class="metric-label">Score qualité</div>
+        </div>
+      `;
+      
+      // Afficher les warnings si il y en a
+      if (data.recommendations && data.recommendations.critical_issues && data.recommendations.critical_issues.length > 0) {
+        const warningsSection = document.getElementById('warningsSection');
+        const warningsContent = document.getElementById('warningsContent');
+        warningsContent.innerHTML = data.recommendations.critical_issues.map(issue => 
+          `<div class="warning-item">${issue}</div>`
+        ).join('');
+        warningsSection.classList.add('active');
+      }
+      
+      resultsSection.classList.add('active');
+    }
+
+    function displayCleaningResults(data) {
+      const metricsGrid = document.getElementById('metricsGrid');
+      metricsGrid.innerHTML = `
+        <div class="metric-card">
+          <div class="metric-value">${data.operations_count}</div>
+          <div class="metric-label">Opérations</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">${data.final_shape[0].toLocaleString()}</div>
+          <div class="metric-label">Lignes finales</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">${data.quality_improvement.improvement}</div>
+          <div class="metric-label">Amélioration</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">${data.processing_time}</div>
+          <div class="metric-label">Temps</div>
+        </div>
+      `;
+
+      // Afficher la comparaison de qualité
+      const qualityComparison = document.getElementById('qualityComparison');
+      const qualityBefore = parseFloat(data.quality_improvement.before.replace('%', ''));
+      const qualityAfter = parseFloat(data.quality_improvement.after.replace('%', ''));
+      
+      document.getElementById('qualityBefore').style.width = qualityBefore + '%';
+      document.getElementById('qualityAfter').style.width = qualityAfter + '%';
+      document.getElementById('qualityBeforeText').textContent = data.quality_improvement.before;
+      document.getElementById('qualityAfterText').textContent = data.quality_improvement.after;
+      
+      qualityComparison.style.display = 'grid';
+
+      // Afficher les opérations
+      if (data.operations && data.operations.length > 0) {
+        const operationsList = document.getElementById('operationsList');
+        const operationsContent = document.getElementById('operationsContent');
+        operationsContent.innerHTML = data.operations.map(op => 
+          `<div class="operation-item">${op}</div>`
+        ).join('');
+        operationsList.style.display = 'block';
+      }
+
+      // Afficher les warnings
+      if (data.warnings && data.warnings.length > 0) {
+        const warningsSection = document.getElementById('warningsSection');
+        const warningsContent = document.getElementById('warningsContent');
+        warningsContent.innerHTML = data.warnings.map(warning => 
+          `<div class="warning-item">${warning}</div>`
+        ).join('');
+        warningsSection.classList.add('active');
+      }
+
+      // Configurer les boutons de téléchargement
+      document.getElementById('downloadProcessedBtn').href = data.download_url;
+
+      const reportBtn = document.getElementById('downloadReportBtn');
+      if (data.report_download_url) {
+        reportBtn.href = data.report_download_url;
+        reportBtn.style.display = 'inline-flex';
+      } else {
+        reportBtn.style.display = 'none';
+      }
+      
+      resultsSection.classList.add('active');
+    }
+
+    function displaySimpleResult(title, filename) {
+      document.getElementById('resultsSection').querySelector('.result-header').textContent = title;
+      document.getElementById('metricsGrid').innerHTML = '';
+      document.getElementById('qualityComparison').style.display = 'none';
+      document.getElementById('operationsList').style.display = 'none';
+      document.getElementById('warningsSection').classList.remove('active');
+      
+      document.getElementById('downloadProcessedBtn').href = '/download/' + filename;
+      document.getElementById('downloadReportBtn').style.display = 'none';
+      
+      resultsSection.classList.add('active');
+    }
+
+    function displayAnalysisResults(data) {
+      // Implémenter l'affichage des résultats d'analyse
+      displaySimpleResult('Analyse terminée', 'analysis_report.json');
+    }
+
+    // Effet typewriter pour le titre
+    function typeWriter(element, text, speed, callback) {
+      let i = 0;
+      element.textContent = '';
+      element.style.opacity = '1';
+      
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else if (callback) {
+          setTimeout(callback, 300);
+        }
+      }
+      type();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const title = document.querySelector('.saphir-title');
+      if (title) {
+        typeWriter(title, 'NETTOYEUR', 120);
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,299 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de binning par différence</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de binning
+par différence</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques de binning par
+différence est une technique puissante dans le domaine du traitement du
+signal et des communications numériques. Cette méthode émerge de la
+nécessité de compresser et de transmettre efficacement des données tout
+en préservant leur intégrité. Le binning par différence permet de
+réduire la redondance dans les données en utilisant des différences
+entre valeurs successives, ce qui est particulièrement utile pour les
+signaux corrélés.</p>
+<p>Cette technique est indispensable dans les systèmes où la bande
+passante est limitée et où la précision des données est cruciale. Par
+exemple, dans les systèmes de communication sans fil, l’encodage par
+extraction de caractéristiques permet de transmettre des informations
+avec une moindre consommation d’énergie et une meilleure résistance aux
+interférences.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement l’encodage par extraction de
+caractéristiques de binning par différence, il est essentiel de
+comprendre le concept de base. Supposons que nous ayons une séquence de
+données <span class="math inline">\(x_1, x_2, \ldots, x_n\)</span>.
+L’idée est de transformer ces données en une forme plus compacte en
+utilisant des différences entre valeurs successives.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(x_1, x_2, \ldots, x_n\)</span> une
+séquence de données. Le binning par différence consiste à définir une
+nouvelle séquence <span class="math inline">\(d_1, d_2, \ldots,
+d_{n-1}\)</span> où chaque élément est la différence entre deux valeurs
+successives : <span class="math display">\[d_i = x_{i+1} - x_i \quad
+\text{pour} \quad i = 1, 2, \ldots, n-1.\]</span></p>
+</div>
+<div class="definition">
+<p>L’extraction de caractéristiques consiste à transformer la séquence
+de différences <span class="math inline">\(d_1, d_2, \ldots,
+d_{n-1}\)</span> en un ensemble de caractéristiques <span
+class="math inline">\(f_1, f_2, \ldots, f_m\)</span> qui capturent les
+propriétés essentielles des données originales. Par exemple, on peut
+utiliser la moyenne, l’écart-type, ou d’autres statistiques
+descriptives.</p>
+</div>
+<h1 id="théorèmes-et-propriétés">Théorèmes et Propriétés</h1>
+<p>Dans cette section, nous présentons quelques théorèmes et propriétés
+liés à l’encodage par extraction de caractéristiques de binning par
+différence.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(x_1, x_2, \ldots, x_n\)</span> une
+séquence de données et <span class="math inline">\(d_1, d_2, \ldots,
+d_{n-1}\)</span> la séquence de différences correspondante. Si les
+différences <span class="math inline">\(d_i\)</span> sont utilisées pour
+reconstruire la séquence originale, alors l’information est
+conservée.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour reconstruire la séquence originale à partir des
+différences, nous pouvons utiliser la relation suivante : <span
+class="math display">\[x_{i+1} = x_i + d_i \quad \text{pour} \quad i =
+1, 2, \ldots, n-1.\]</span> En appliquant cette relation de manière
+itérative, nous obtenons : <span class="math display">\[x_n = x_1 +
+\sum_{i=1}^{n-1} d_i.\]</span> Ainsi, la séquence originale peut être
+entièrement reconstruite à partir des différences, ce qui prouve que
+l’information est conservée. ◻</p>
+</div>
+<div class="corollaire">
+<p>L’encodage par extraction de caractéristiques de binning par
+différence permet de réduire la redondance dans les données, ce qui est
+particulièrement utile pour la compression des données.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La réduction de la redondance est une conséquence
+directe du fait que les différences <span
+class="math inline">\(d_i\)</span> sont souvent plus petites en
+magnitude que les valeurs originales <span
+class="math inline">\(x_i\)</span>. Cela signifie que les différences
+peuvent être encodées avec moins de bits, ce qui réduit la taille
+globale des données. ◻</p>
+</div>
+<h1 id="applications">Applications</h1>
+<p>L’encodage par extraction de caractéristiques de binning par
+différence trouve des applications dans divers domaines, notamment :</p>
+<ul>
+<li><p><strong>Communications numériques</strong> : Pour compresser et
+transmettre des données de manière efficace.</p></li>
+<li><p><strong>Traitement du signal</strong> : Pour réduire le bruit et
+améliorer la qualité des signaux.</p></li>
+<li><p><strong>Analyse de données</strong> : Pour extraire des
+caractéristiques pertinentes à partir de grandes quantités de
+données.</p></li>
+</ul>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de binning par
+différence est une technique puissante et polyvalente qui trouve des
+applications dans divers domaines. En utilisant des différences entre
+valeurs successives, cette méthode permet de réduire la redondance et de
+préserver l’information, ce qui en fait un outil précieux pour le
+traitement du signal et les communications numériques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

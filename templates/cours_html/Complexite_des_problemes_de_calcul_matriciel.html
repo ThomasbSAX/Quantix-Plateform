@@ -1,0 +1,389 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de calcul matriciel</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de calcul matriciel</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les matrices, ces tableaux rectangulaires de nombres, sont
+omniprésentes en mathématiques appliquées et en informatique. Elles
+modélisent des systèmes linéaires, des transformations géométriques, des
+graphes, et bien d’autres structures. Le calcul matriciel est donc au
+cœur de nombreuses applications pratiques, allant de la physique à
+l’intelligence artificielle.</p>
+<p>L’étude de la complexité des problèmes de calcul matriciel est
+cruciale pour plusieurs raisons. Tout d’abord, elle permet de comprendre
+les limites algorithmiques des opérations matricielles fondamentales.
+Ensuite, elle guide le développement d’algorithmes plus efficaces et
+adaptés aux contraintes matérielles. Enfin, elle fournit des outils
+théoriques pour comparer différentes approches de résolution.</p>
+<p>Dans ce chapitre, nous explorerons les notions de complexité
+temporelle et spatiale des opérations matricielles. Nous verrons comment
+ces concepts permettent d’analyser et d’optimiser les algorithmes de
+calcul matriciel.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour aborder la complexité des problèmes de calcul matriciel, il est
+essentiel de définir précisément les notions clés.</p>
+<h2 id="complexité-temporelle">Complexité temporelle</h2>
+<p>La complexité temporelle d’un algorithme mesure le nombre
+d’opérations élémentaires nécessaires pour résoudre un problème en
+fonction de la taille des données d’entrée. Pour les matrices, cette
+taille est généralement donnée par le nombre de lignes et de
+colonnes.</p>
+<p>Considérons une matrice <span class="math inline">\(A\)</span> de
+taille <span class="math inline">\(n \times m\)</span>. Nous cherchons à
+déterminer le nombre d’opérations nécessaires pour effectuer une
+opération donnée sur <span class="math inline">\(A\)</span>, par
+exemple, la multiplication de deux matrices.</p>
+<div class="definition">
+<p>La complexité temporelle d’un algorithme est une fonction <span
+class="math inline">\(T(n)\)</span> qui compte le nombre maximal
+d’opérations élémentaires nécessaires pour résoudre un problème de
+taille <span class="math inline">\(n\)</span>.</p>
+<p>Formellement, pour une matrice <span class="math inline">\(A\)</span>
+de taille <span class="math inline">\(n \times m\)</span>, la complexité
+temporelle est donnée par : <span class="math display">\[T(n, m) =
+\max_{A \in \mathbb{R}^{n \times m}} \{ \text{nombre d&#39;opérations
+pour résoudre le problème sur } A \}\]</span></p>
+</div>
+<h2 id="complexité-spatiale">Complexité spatiale</h2>
+<p>La complexité spatiale d’un algorithme mesure la quantité de mémoire
+nécessaire pour stocker les données et les résultats intermédiaires.</p>
+<div class="definition">
+<p>La complexité spatiale d’un algorithme est une fonction <span
+class="math inline">\(S(n)\)</span> qui compte le nombre maximal de
+cellules mémoire nécessaires pour résoudre un problème de taille <span
+class="math inline">\(n\)</span>.</p>
+<p>Formellement, pour une matrice <span class="math inline">\(A\)</span>
+de taille <span class="math inline">\(n \times m\)</span>, la complexité
+spatiale est donnée par : <span class="math display">\[S(n, m) = \max_{A
+\in \mathbb{R}^{n \times m}} \{ \text{nombre de cellules mémoire
+nécessaires pour résoudre le problème sur } A \}\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons quelques théorèmes fondamentaux
+concernant la complexité des problèmes de calcul matriciel.</p>
+<h2 id="théorème-de-strassen">Théorème de Strassen</h2>
+<p>Le théorème de Strassen donne une borne supérieure sur la complexité
+de la multiplication de deux matrices.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices de taille <span
+class="math inline">\(n \times n\)</span>. La complexité temporelle de
+la multiplication de <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est au plus <span
+class="math inline">\(O(n^{\log_2 7})\)</span>.</p>
+<p>Formellement, il existe un algorithme tel que : <span
+class="math display">\[T(n) = O(n^{\log_2 7})\]</span></p>
+</div>
+<h2 id="démonstration-du-théorème-de-strassen">Démonstration du théorème
+de Strassen</h2>
+<p>La démonstration du théorème de Strassen repose sur une méthode de
+division et de reconquête. L’idée est de diviser les matrices en
+sous-matrices plus petites, de multiplier ces sous-matrices
+récursivement, et enfin de combiner les résultats.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux matrices <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> de taille <span class="math inline">\(n
+\times n\)</span>. Nous pouvons les diviser en quatre sous-matrices de
+taille <span class="math inline">\(n/2 \times n/2\)</span> : <span
+class="math display">\[A = \begin{pmatrix} A_{11} &amp; A_{12} \\ A_{21}
+&amp; A_{22} \end{pmatrix}, \quad B = \begin{pmatrix} B_{11} &amp;
+B_{12} \\ B_{21} &amp; B_{22} \end{pmatrix}\]</span></p>
+<p>Le produit <span class="math inline">\(C = AB\)</span> peut être
+exprimé en termes des sous-matrices de <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> : <span class="math display">\[C_{11} =
+A_{11}B_{11} + A_{12}B_{21}\]</span> <span class="math display">\[C_{12}
+= A_{11}B_{12} + A_{12}B_{22}\]</span> <span
+class="math display">\[C_{21} = A_{21}B_{11} + A_{22}B_{21}\]</span>
+<span class="math display">\[C_{22} = A_{21}B_{12} +
+A_{22}B_{22}\]</span></p>
+<p>En utilisant la méthode de Strassen, nous pouvons calculer les
+produits <span class="math inline">\(A_{11}B_{11}\)</span> et <span
+class="math inline">\(A_{22}B_{22}\)</span> directement, mais nous
+devons calculer les autres produits en utilisant des combinaisons
+linéaires des sous-matrices. Cela permet de réduire le nombre total
+d’opérations nécessaires.</p>
+<p>La complexité temporelle récursive est donnée par : <span
+class="math display">\[T(n) = 7T\left(\frac{n}{2}\right) +
+O(n^2)\]</span></p>
+<p>En résolvant cette équation de récurrence, nous obtenons : <span
+class="math display">\[T(n) = O(n^{\log_2 7})\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Dans cette section, nous présentons quelques propriétés et
+corollaires importants concernant la complexité des problèmes de calcul
+matriciel.</p>
+<h2 id="propriété-1">Propriété 1</h2>
+<p>La complexité temporelle de la multiplication de deux matrices est au
+moins <span class="math inline">\(O(n^2)\)</span>.</p>
+<div class="corollary">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices de taille <span
+class="math inline">\(n \times n\)</span>. La complexité temporelle de
+la multiplication de <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est au moins <span
+class="math inline">\(O(n^2)\)</span>.</p>
+<p>Formellement, pour tout algorithme de multiplication matricielle :
+<span class="math display">\[T(n) = \Omega(n^2)\]</span></p>
+</div>
+<h2 id="démonstration-de-la-propriété-1">Démonstration de la propriété
+1</h2>
+<p>La démonstration de cette propriété repose sur le fait que chaque
+élément du produit <span class="math inline">\(C = AB\)</span> dépend
+d’au moins <span class="math inline">\(n\)</span> éléments de <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux matrices <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> de taille <span class="math inline">\(n
+\times n\)</span>. Le produit <span class="math inline">\(C =
+AB\)</span> est une matrice de taille <span class="math inline">\(n
+\times n\)</span>, où chaque élément <span
+class="math inline">\(C_{ij}\)</span> est donné par : <span
+class="math display">\[C_{ij} = \sum_{k=1}^n A_{ik}B_{kj}\]</span></p>
+<p>Pour calculer chaque élément <span
+class="math inline">\(C_{ij}\)</span>, nous devons effectuer au moins
+<span class="math inline">\(n\)</span> multiplications et <span
+class="math inline">\(n-1\)</span> additions. Par conséquent, la
+complexité temporelle minimale est : <span class="math display">\[T(n) =
+\Omega(n^2)\]</span> ◻</p>
+</div>
+<h2 id="propriété-2">Propriété 2</h2>
+<p>La complexité spatiale de la multiplication de deux matrices est
+<span class="math inline">\(O(n^2)\)</span>.</p>
+<div class="corollary">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices de taille <span
+class="math inline">\(n \times n\)</span>. La complexité spatiale de la
+multiplication de <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est <span
+class="math inline">\(O(n^2)\)</span>.</p>
+<p>Formellement : <span class="math display">\[S(n) =
+O(n^2)\]</span></p>
+</div>
+<h2 id="démonstration-de-la-propriété-2">Démonstration de la propriété
+2</h2>
+<p>La démonstration de cette propriété repose sur le fait que nous
+devons stocker les matrices <span class="math inline">\(A\)</span>,
+<span class="math inline">\(B\)</span> et <span
+class="math inline">\(C\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux matrices <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> de taille <span class="math inline">\(n
+\times n\)</span>. Le produit <span class="math inline">\(C =
+AB\)</span> est une matrice de taille <span class="math inline">\(n
+\times n\)</span>. Nous devons stocker les matrices <span
+class="math inline">\(A\)</span>, <span class="math inline">\(B\)</span>
+et <span class="math inline">\(C\)</span>, ce qui nécessite : <span
+class="math display">\[S(n) = O(n^2)\]</span> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Dans ce chapitre, nous avons exploré les notions de complexité
+temporelle et spatiale des problèmes de calcul matriciel. Nous avons vu
+comment ces concepts permettent d’analyser et d’optimiser les
+algorithmes de calcul matriciel. Les théorèmes et propriétés présentés
+fournissent des outils théoriques pour comprendre les limites
+algorithmiques des opérations matricielles fondamentales.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

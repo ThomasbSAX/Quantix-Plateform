@@ -1,0 +1,365 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Poisson Loss: Une Exploration Mathématique et Statistique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Poisson Loss: Une Exploration Mathématique et
+Statistique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’émergence de la notion de <em>Poisson Loss</em> trouve ses racines
+dans les besoins croissants des modèles statistiques pour capturer des
+phénomènes discrets et comptables. Historiquement, la distribution de
+Poisson a été introduite par Siméon Denis Poisson en 1837 pour modéliser
+des événements rares et indépendants dans le temps ou l’espace.
+Cependant, son utilisation s’est étendue bien au-delà de ce cadre
+initial, notamment dans les domaines de l’apprentissage automatique et
+des réseaux de neurones.</p>
+<p>Le <em>Poisson Loss</em> est une fonction de perte qui émerge
+naturellement lorsque l’on souhaite modéliser des données comptables à
+l’aide d’un modèle prédictif. Elle est particulièrement utile dans les
+contextes où les sorties sont des nombres entiers non négatifs, comme le
+nombre de clics sur une publicité ou le nombre d’appels reçus par un
+centre d’appels.</p>
+<p>Dans ce chapitre, nous explorerons les fondements mathématiques du
+<em>Poisson Loss</em>, ses définitions formelles, et ses propriétés.
+Nous verrons également comment cette fonction de perte peut être
+utilisée dans des algorithmes d’optimisation pour améliorer la précision
+des modèles prédictifs.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le <em>Poisson Loss</em>, il est essentiel de
+commencer par la distribution de Poisson elle-même. Supposons que nous
+ayons un phénomène aléatoire où des événements se produisent
+indépendamment et à une certaine intensité moyenne <span
+class="math inline">\(\lambda\)</span>. La probabilité d’observer <span
+class="math inline">\(k\)</span> événements dans un intervalle de temps
+donné est donnée par la fonction de masse de probabilité suivante:</p>
+<p><span class="math display">\[P(X = k) = \frac{e^{-\lambda}
+\lambda^k}{k!}\]</span></p>
+<p>où <span class="math inline">\(k\)</span> est un nombre entier non
+négatif.</p>
+<p>Le <em>Poisson Loss</em> est une mesure de la différence entre une
+valeur observée <span class="math inline">\(y\)</span> et une valeur
+prédite <span class="math inline">\(\hat{y}\)</span>. Formellement, nous
+pouvons le définir comme suit:</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(y \in \mathbb{N}\)</span> une valeur
+observée et <span class="math inline">\(\hat{y} &gt; 0\)</span> une
+valeur prédite. Le <em>Poisson Loss</em> est défini par:</p>
+<p><span class="math display">\[L(y, \hat{y}) = y \log(\hat{y}) -
+\hat{y} + \log(y!)\]</span></p>
+<p>Cette fonction de perte peut également être exprimée en termes
+d’entropie croisée négative pondérée:</p>
+<p><span class="math display">\[L(y, \hat{y}) = -\sum_{k=0}^{\infty} P(X
+= k) \log(P(Y = k))\]</span></p>
+<p>où <span class="math inline">\(P(X = k)\)</span> est la probabilité
+de Poisson et <span class="math inline">\(P(Y = k)\)</span> est la
+probabilité prédite.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié au <em>Poisson Loss</em> est le
+suivant:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{L}(\hat{y}) =
+\mathbb{E}[L(Y, \hat{y})]\)</span> la perte attendue sous la
+distribution de Poisson. Alors, le minimum de <span
+class="math inline">\(\mathcal{L}(\hat{y})\)</span> est atteint lorsque
+<span class="math inline">\(\hat{y} = \mathbb{E}[Y]\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver ce théorème, nous commençons par
+exprimer la perte attendue:</p>
+<p><span class="math display">\[\mathcal{L}(\hat{y}) =
+\sum_{k=0}^{\infty} P(Y = k) L(k, \hat{y})\]</span></p>
+<p>En utilisant la définition du <em>Poisson Loss</em>, nous avons:</p>
+<p><span class="math display">\[\mathcal{L}(\hat{y}) =
+\sum_{k=0}^{\infty} P(Y = k) (k \log(\hat{y}) - \hat{y} +
+\log(k!))\]</span></p>
+<p>Nous pouvons séparer cette somme en trois termes:</p>
+<p><span class="math display">\[\mathcal{L}(\hat{y}) = \log(\hat{y})
+\sum_{k=0}^{\infty} k P(Y = k) - \hat{y} + \sum_{k=0}^{\infty} P(Y = k)
+\log(k!)\]</span></p>
+<p>Le premier terme est <span class="math inline">\(\log(\hat{y})
+\mathbb{E}[Y]\)</span>, le deuxième terme est <span
+class="math inline">\(-\hat{y}\)</span>, et le troisième terme est
+constant par rapport à <span class="math inline">\(\hat{y}\)</span>. Par
+conséquent, nous pouvons écrire:</p>
+<p><span class="math display">\[\mathcal{L}(\hat{y}) = \log(\hat{y})
+\mathbb{E}[Y] - \hat{y} + C\]</span></p>
+<p>où <span class="math inline">\(C\)</span> est une constante. Pour
+trouver le minimum de <span
+class="math inline">\(\mathcal{L}(\hat{y})\)</span>, nous prenons la
+dérivée par rapport à <span class="math inline">\(\hat{y}\)</span> et
+nous égalisons à zéro:</p>
+<p><span class="math display">\[\frac{d\mathcal{L}(\hat{y})}{d\hat{y}} =
+\frac{\mathbb{E}[Y]}{\hat{y}} - 1 = 0\]</span></p>
+<p>En résolvant cette équation, nous obtenons:</p>
+<p><span class="math display">\[\hat{y} = \mathbb{E}[Y]\]</span></p>
+<p>Ainsi, le minimum de la perte attendue est atteint lorsque la valeur
+prédite <span class="math inline">\(\hat{y}\)</span> est égale à
+l’espérance de <span class="math inline">\(Y\)</span>. ◻</p>
+</div>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer l’utilisation du <em>Poisson Loss</em>, considérons un
+exemple simple. Supposons que nous ayons un modèle qui prédit le nombre
+de clics sur une publicité. Nous voulons évaluer la performance de ce
+modèle en utilisant le <em>Poisson Loss</em>.</p>
+<p>Soit <span class="math inline">\(y\)</span> le nombre réel de clics
+et <span class="math inline">\(\hat{y}\)</span> le nombre prédit. Le
+<em>Poisson Loss</em> est donné par:</p>
+<p><span class="math display">\[L(y, \hat{y}) = y \log(\hat{y}) -
+\hat{y} + \log(y!)\]</span></p>
+<p>Pour calculer cette perte, nous devons d’abord estimer <span
+class="math inline">\(\hat{y}\)</span>. Supposons que notre modèle
+prédise <span class="math inline">\(\hat{y} = 5\)</span> et que le
+nombre réel de clics soit <span class="math inline">\(y = 3\)</span>.
+Alors, la perte est:</p>
+<p><span class="math display">\[L(3, 5) = 3 \log(5) - 5 +
+\log(6)\]</span></p>
+<p>Nous pouvons calculer cette valeur numériquement:</p>
+<p><span class="math display">\[L(3, 5) \approx 3 \times 1.6094 - 5 +
+1.7918 \approx 4.8282 - 5 + 1.7918 \approx 1.6199\]</span></p>
+<p>Cette valeur nous donne une mesure de la performance du modèle. Plus
+la perte est faible, meilleure est la prédiction.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le <em>Poisson Loss</em> possède plusieurs propriétés
+intéressantes:</p>
+<ol>
+<li><p><strong>Convexité</strong>: Le <em>Poisson Loss</em> est une
+fonction convexe de <span class="math inline">\(\hat{y}\)</span> pour
+<span class="math inline">\(y\)</span> fixé. Cela signifie que toute
+méthode d’optimisation convexe peut être utilisée pour minimiser cette
+fonction de perte.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver la convexité, nous calculons la seconde
+dérivée de <span class="math inline">\(L(y, \hat{y})\)</span> par
+rapport à <span class="math inline">\(\hat{y}\)</span>:</p>
+<p><span class="math display">\[\frac{d^2 L(y, \hat{y})}{d\hat{y}^2} =
+-\frac{y}{\hat{y}^2}\]</span></p>
+<p>Puisque <span class="math inline">\(y \geq 0\)</span> et <span
+class="math inline">\(\hat{y} &gt; 0\)</span>, la seconde dérivée est
+négative, ce qui prouve que <span class="math inline">\(L(y,
+\hat{y})\)</span> est convexe. ◻</p>
+</div></li>
+<li><p><strong>Sensibilité</strong>: Le <em>Poisson Loss</em> est
+sensible aux erreurs de prédiction. Plus la différence entre <span
+class="math inline">\(y\)</span> et <span
+class="math inline">\(\hat{y}\)</span> est grande, plus la perte est
+élevée.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour illustrer cette propriété, considérons deux cas:
+<span class="math inline">\(\hat{y} = y\)</span> et <span
+class="math inline">\(\hat{y} \neq y\)</span>. Si <span
+class="math inline">\(\hat{y} = y\)</span>, alors <span
+class="math inline">\(L(y, \hat{y}) = 0\)</span>. Si <span
+class="math inline">\(\hat{y} \neq y\)</span>, alors <span
+class="math inline">\(L(y, \hat{y}) &gt; 0\)</span>. De plus, la perte
+augmente lorsque la différence entre <span
+class="math inline">\(y\)</span> et <span
+class="math inline">\(\hat{y}\)</span> augmente. ◻</p>
+</div></li>
+<li><p><strong>Robustesse</strong>: Le <em>Poisson Loss</em> est robuste
+aux valeurs aberrantes. Même si une prédiction est très éloignée de la
+valeur observée, la perte reste finie et interprétable.</p></li>
+</ol>
+<p>En conclusion, le <em>Poisson Loss</em> est une fonction de perte
+puissante et flexible qui trouve des applications dans divers domaines.
+Ses propriétés mathématiques en font un outil précieux pour l’évaluation
+et l’optimisation des modèles prédictifs.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

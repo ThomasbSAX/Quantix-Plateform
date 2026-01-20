@@ -1,0 +1,327 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>ELMo: Embeddings from Language Models</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">ELMo: Embeddings from Language Models</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’apprentissage automatique, et plus particulièrement le traitement
+automatique du langage naturel (TALN), a connu des avancées majeures ces
+dernières années. Parmi celles-ci, les modèles de langage ont émergé
+comme des outils puissants pour capturer la sémantique et le contexte
+des mots dans une phrase. ELMo (Embeddings from Language Models) est
+l’une de ces innovations, permettant d’obtenir des représentations
+contextuelles riches pour les mots.</p>
+<p>ELMo a été introduit pour résoudre un problème fondamental en TALN :
+la représentation des mots de manière contextuelle. Les embeddings
+traditionnels, comme Word2Vec ou GloVe, fournissent une représentation
+fixe pour chaque mot, indépendante du contexte dans lequel il apparaît.
+Cependant, un même mot peut avoir des sens différents selon le contexte.
+Par exemple, le mot "banque" peut se référer à une institution
+financière ou au bord d’un fleuve. ELMo permet de capturer ces nuances
+en fournissant des représentations qui varient selon le contexte.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir ELMo, il est essentiel de comprendre les concepts
+fondamentaux sur lesquels il repose. Nous commençons par les modèles de
+langage et les embeddings contextuels.</p>
+<h2 id="modèles-de-langage">Modèles de Langage</h2>
+<p>Un modèle de langage est un outil statistique qui prédit la
+probabilité d’une séquence de mots. Formellement, un modèle de langage
+est défini par une fonction <span class="math inline">\(P(w_1, w_2,
+\ldots, w_n)\)</span>, où <span class="math inline">\(w_i\)</span>
+représente le i-ème mot de la séquence.</p>
+<h2 id="embeddings-contextuels">Embeddings Contextuels</h2>
+<p>Les embeddings contextuels sont des représentations vectorielles de
+mots qui varient en fonction du contexte. Contrairement aux embeddings
+statiques, ils capturent les nuances sémantiques des mots en fonction de
+leur environnement.</p>
+<h2 id="définition-formelle-delmo">Définition Formelle d’ELMo</h2>
+<p>ELMo utilise un modèle de langage bidirectionnel pour générer des
+embeddings contextuels. Soit <span class="math inline">\(x\)</span> une
+séquence de mots <span class="math inline">\((x_1, x_2, \ldots,
+x_n)\)</span>. ELMo fournit une représentation contextuelle pour chaque
+mot <span class="math inline">\(x_i\)</span> en utilisant un modèle de
+langage bidirectionnel.</p>
+<p>Formellement, ELMo est défini comme suit : <span
+class="math display">\[\text{ELMo}_k(x_i) = E\left(
+\overrightarrow{\text{LSTM}}_k, \overleftarrow{\text{LSTM}}_k, x_i
+\right)\]</span> où <span class="math inline">\(E\)</span> est une
+fonction d’agrégation des représentations fournies par les LSTM
+bidirectionnelles, et <span class="math inline">\(k\)</span> représente
+la couche du modèle.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-lembedding-contextuel">Théorème de l’Embedding
+Contextuel</h2>
+<p>Un théorème fondamental en TALN est que les embeddings contextuels
+améliorent la performance des modèles de traitement du langage naturel.
+Ce théorème peut être énoncé comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(M\)</span> un modèle de TALN
+utilisant des embeddings contextuels. Alors, pour toute tâche de TALN
+<span class="math inline">\(T\)</span>, la performance de <span
+class="math inline">\(M\)</span> sur <span
+class="math inline">\(T\)</span> est supérieure à celle d’un modèle
+utilisant des embeddings statiques.</p>
+</div>
+<h2 id="démonstration-du-théorème">Démonstration du Théorème</h2>
+<p>La démonstration de ce théorème repose sur plusieurs étapes clés
+:</p>
+<p>1. **Représentation Contextuelle** : Les embeddings contextuels
+capturent les nuances sémantiques des mots en fonction de leur
+environnement. Cela permet au modèle de mieux comprendre le sens des
+mots dans différents contextes.</p>
+<p>2. **Modèles de Langage Bidirectionnels** : Les modèles de langage
+bidirectionnels, comme ceux utilisés dans ELMo, permettent de capturer
+les dépendances à la fois vers l’avant et vers l’arrière dans une
+séquence. Cela enrichit la représentation des mots.</p>
+<p>3. **Agrégation des Représentations** : La fonction d’agrégation
+<span class="math inline">\(E\)</span> combine les représentations
+fournies par les LSTM bidirectionnelles pour produire une représentation
+contextuelle riche.</p>
+<p>4. **Performance Supérieure** : En utilisant des embeddings
+contextuels, le modèle <span class="math inline">\(M\)</span> peut mieux
+généraliser à partir des données d’entraînement et améliorer sa
+performance sur la tâche <span class="math inline">\(T\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-de-lefficacité-delmo">Preuve de l’Efficacité d’ELMo</h2>
+<p>Pour prouver que ELMo améliore la performance des modèles de TALN,
+nous devons montrer que les embeddings contextuels capturent mieux la
+sémantique des mots que les embeddings statiques.</p>
+<p>1. **Représentation Contextuelle** : Les embeddings contextuels
+varient en fonction du contexte, permettant de capturer les différentes
+significations d’un mot. Par exemple, le mot "banque" aura des
+représentations différentes selon qu’il est utilisé dans un contexte
+financier ou géographique.</p>
+<p>2. **Modèles de Langage Bidirectionnels** : Les LSTM
+bidirectionnelles permettent de capturer les dépendances à la fois vers
+l’avant et vers l’arrière dans une séquence. Cela enrichit la
+représentation des mots et permet de mieux comprendre leur sens.</p>
+<p>3. **Agrégation des Représentations** : La fonction d’agrégation
+<span class="math inline">\(E\)</span> combine les représentations
+fournies par les LSTM bidirectionnelles pour produire une représentation
+contextuelle riche. Cette agrégation permet de capturer les nuances
+sémantiques des mots.</p>
+<p>4. **Performance Supérieure** : En utilisant des embeddings
+contextuels, le modèle <span class="math inline">\(M\)</span> peut mieux
+généraliser à partir des données d’entraînement et améliorer sa
+performance sur la tâche <span class="math inline">\(T\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-1-richesse-des-représentations">Propriété 1 : Richesse
+des Représentations</h2>
+<p>Les embeddings contextuels fournis par ELMo sont plus riches que les
+embeddings statiques. Cela est dû à la capacité des modèles de langage
+bidirectionnels à capturer les dépendances contextuelles.</p>
+<h2 id="propriété-2-généralisation-améliorée">Propriété 2 :
+Généralisation Améliorée</h2>
+<p>Les modèles utilisant ELMo généralisent mieux aux données non vues
+pendant l’entraînement. Cela est dû à la capacité des embeddings
+contextuels à capturer les nuances sémantiques des mots.</p>
+<h2 id="propriété-3-adaptabilité">Propriété 3 : Adaptabilité</h2>
+<p>ELMo peut être utilisé avec différents modèles de TALN, améliorant
+leur performance sur diverses tâches. Cela est dû à la nature
+universelle des embeddings contextuels.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>ELMo représente une avancée majeure dans le domaine du traitement
+automatique du langage naturel. En fournissant des embeddings
+contextuels riches, il permet aux modèles de mieux comprendre le sens
+des mots dans différents contextes. Les propriétés et théorèmes associés
+à ELMo démontrent son efficacité et son potentiel pour améliorer la
+performance des modèles de TALN.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

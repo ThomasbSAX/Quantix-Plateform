@@ -1,0 +1,358 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de factorisation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de factorisation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La factorisation des entiers est un problème ancien qui remonte à
+l’Antiquité. Les Babyloniens, par exemple, savaient factoriser des
+nombres entiers il y a plus de 4000 ans. Cependant, ce n’est qu’avec
+l’avènement de la cryptographie moderne que ce problème a pris une
+importance capitale. En effet, la sécurité de nombreux protocoles
+cryptographiques repose sur la difficulté présumée de factoriser de
+grands nombres entiers.</p>
+<p>Le problème de factorisation peut être énoncé simplement : étant
+donné un entier <span class="math inline">\(n\)</span>, trouver deux
+entiers <span class="math inline">\(d\)</span> et <span
+class="math inline">\(m\)</span> tels que <span class="math inline">\(n
+= d \times m\)</span>. Cependant, la simplicité de l’énoncé cache une
+complexité algorithmique profonde. En effet, bien que la factorisation
+soit facile pour de petits nombres, elle devient extrêmement difficile
+pour des grands nombres. Cette difficulté est à la base de la sécurité
+de protocoles comme RSA, l’un des systèmes de cryptographie les plus
+utilisés aujourd’hui.</p>
+<p>Dans cet article, nous explorerons la complexité des problèmes de
+factorisation, en commençant par les définitions fondamentales, puis en
+passant par les théorèmes et propriétés clés. Nous terminerons par une
+discussion sur les implications pratiques de ces résultats.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’aborder la complexité des problèmes de factorisation, il est
+essentiel de définir précisément ce que nous entendons par "problème de
+factorisation".</p>
+<h4 class="unnumbered" id="factorisation-dun-entier">Factorisation d’un
+entier</h4>
+<p>Soit <span class="math inline">\(n\)</span> un entier strictement
+positif. On cherche à exprimer <span class="math inline">\(n\)</span>
+comme un produit de deux entiers <span class="math inline">\(d\)</span>
+et <span class="math inline">\(m\)</span>, c’est-à-dire trouver <span
+class="math inline">\(d, m \in \mathbb{Z}\)</span> tels que : <span
+class="math display">\[n = d \times m\]</span></p>
+<p>Pour un entier <span class="math inline">\(n\)</span>, on peut aussi
+chercher à le décomposer en facteurs premiers, c’est-à-dire trouver des
+entiers <span class="math inline">\(p_1, p_2, \ldots, p_k\)</span>
+premiers tels que : <span class="math display">\[n = \prod_{i=1}^k
+p_i^{e_i}\]</span> où <span class="math inline">\(e_i\)</span> sont les
+exposants des facteurs premiers.</p>
+<h4 class="unnumbered"
+id="problème-de-factorisation-en-nombres-premiers">Problème de
+factorisation en nombres premiers</h4>
+<p>Formellement, le problème de factorisation en nombres premiers peut
+être défini comme suit : <span class="math display">\[\text{Pour tout }
+n \in \mathbb{Z}^+, \exists p_1, p_2, \ldots, p_k \text{ premiers et }
+e_1, e_2, \ldots, e_k \in \mathbb{Z}^+ \text{ tels que } n =
+\prod_{i=1}^k p_i^{e_i}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h4 class="unnumbered"
+id="théorème-de-lunicité-de-la-factorisation-en-nombres-premiers">Théorème
+de l’unicité de la factorisation en nombres premiers</h4>
+<p>Ce théorème, également connu sous le nom de théorème fondamental de
+l’arithmétique, stipule que tout entier strictement positif admet une
+décomposition en facteurs premiers unique à l’ordre près des
+facteurs.</p>
+<h4 class="unnumbered" id="énoncé-du-théorème">Énoncé du théorème</h4>
+<p>Soit <span class="math inline">\(n\)</span> un entier strictement
+positif. Il existe une unique suite de nombres premiers <span
+class="math inline">\(p_1, p_2, \ldots, p_k\)</span> et d’exposants
+<span class="math inline">\(e_1, e_2, \ldots, e_k\)</span> tels que :
+<span class="math display">\[n = \prod_{i=1}^k p_i^{e_i}\]</span></p>
+<h4 class="unnumbered" id="preuve-du-théorème">Preuve du théorème</h4>
+<p>La preuve de ce théorème repose sur le principe de récurrence forte
+et l’utilisation du lemme d’Euclide. Voici une esquisse de la preuve
+:</p>
+<p>1. **Initialisation** : Pour <span class="math inline">\(n =
+1\)</span>, la décomposition est triviale. 2. **Hérédité** : Supposons
+que tout entier <span class="math inline">\(m\)</span> inférieur ou égal
+à <span class="math inline">\(n-1\)</span> admet une décomposition en
+facteurs premiers unique. Montrons que <span
+class="math inline">\(n\)</span> admet également une telle
+décomposition. - Si <span class="math inline">\(n\)</span> est premier,
+alors sa décomposition est triviale. - Sinon, <span
+class="math inline">\(n\)</span> peut être écrit comme un produit de
+deux entiers <span class="math inline">\(d\)</span> et <span
+class="math inline">\(m\)</span> strictement inférieurs à <span
+class="math inline">\(n\)</span>. Par hypothèse de récurrence, <span
+class="math inline">\(d\)</span> et <span
+class="math inline">\(m\)</span> admettent des décompositions en
+facteurs premiers uniques. La décomposition de <span
+class="math inline">\(n\)</span> est alors obtenue en combinant ces deux
+décompositions.</p>
+<h4 class="unnumbered"
+id="théorème-de-la-complexité-de-la-factorisation">Théorème de la
+complexité de la factorisation</h4>
+<p>La factorisation des entiers est un problème difficile du point de
+vue algorithmique. Plus précisément, le problème de factorisation en
+nombres premiers est dans la classe de complexité NP et est conjecturé
+être difficile pour les algorithmes classiques.</p>
+<h4 class="unnumbered" id="énoncé-du-théorème-1">Énoncé du théorème</h4>
+<p>Soit <span class="math inline">\(n\)</span> un entier strictement
+positif. Le problème de trouver une factorisation non triviale de <span
+class="math inline">\(n\)</span> est dans la classe NP et est conjecturé
+être difficile pour les algorithmes classiques.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h4 class="unnumbered"
+id="preuve-du-théorème-de-la-complexité-de-la-factorisation">Preuve du
+théorème de la complexité de la factorisation</h4>
+<p>Pour prouver que le problème de factorisation est dans NP, nous
+devons montrer qu’une solution putative peut être vérifiée en temps
+polynomial.</p>
+<p>1. **Vérification de la solution** : Soit <span
+class="math inline">\(n\)</span> un entier et <span
+class="math inline">\(d\)</span> une factorisation putative de <span
+class="math inline">\(n\)</span>. Pour vérifier que <span
+class="math inline">\(d\)</span> est bien une factorisation non triviale
+de <span class="math inline">\(n\)</span>, il suffit de calculer <span
+class="math inline">\(d \times m\)</span> et de vérifier que le résultat
+est égal à <span class="math inline">\(n\)</span>. Ce calcul peut être
+effectué en temps polynomial. 2. **Difficulté conjecturée** : Bien que
+le problème de factorisation soit dans NP, il est conjecturé être
+difficile pour les algorithmes classiques. Cela signifie qu’il n’existe
+pas d’algorithme connu capable de factoriser efficacement des grands
+nombres entiers en temps polynomial.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h4 class="unnumbered" id="propriété-i">Propriété (i)</h4>
+<p>La factorisation en nombres premiers est unique à l’ordre près des
+facteurs.</p>
+<h4 class="unnumbered" id="preuve-de-la-propriété-i">Preuve de la
+propriété (i)</h4>
+<p>Cette propriété découle directement du théorème fondamental de
+l’arithmétique. En effet, si <span class="math inline">\(n\)</span>
+admet deux décompositions en facteurs premiers distinctes, alors ces
+décompositions doivent être identiques à l’ordre près des facteurs.</p>
+<h4 class="unnumbered" id="propriété-ii">Propriété (ii)</h4>
+<p>Le problème de factorisation est dans la classe NP.</p>
+<h4 class="unnumbered" id="preuve-de-la-propriété-ii">Preuve de la
+propriété (ii)</h4>
+<p>Comme mentionné précédemment, une solution putative peut être
+vérifiée en temps polynomial. Par conséquent, le problème de
+factorisation est dans la classe NP.</p>
+<h4 class="unnumbered" id="propriété-iii">Propriété (iii)</h4>
+<p>La factorisation des entiers est un problème difficile du point de
+vue algorithmique.</p>
+<h4 class="unnumbered" id="preuve-de-la-propriété-iii">Preuve de la
+propriété (iii)</h4>
+<p>Bien que le problème de factorisation soit dans NP, il est conjecturé
+être difficile pour les algorithmes classiques. Cela signifie qu’il
+n’existe pas d’algorithme connu capable de factoriser efficacement des
+grands nombres entiers en temps polynomial.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Dans cet article, nous avons exploré la complexité des problèmes de
+factorisation. Nous avons commencé par définir précisément ce que nous
+entendons par "problème de factorisation", puis nous avons présenté les
+théorèmes et propriétés clés liés à ce problème. Enfin, nous avons
+discuté des implications pratiques de ces résultats.</p>
+<p>La factorisation des entiers est un problème ancien qui a pris une
+importance capitale avec l’avènement de la cryptographie moderne. Bien
+que ce problème soit dans la classe NP, il est conjecturé être difficile
+pour les algorithmes classiques. Cette difficulté est à la base de la
+sécurité de nombreux protocoles cryptographiques, comme RSA.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

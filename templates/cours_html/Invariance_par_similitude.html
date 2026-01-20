@@ -1,0 +1,343 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Invariance par similitude : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Invariance par similitude : Une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’invariance par similitude est un concept fondamental en
+mathématiques, particulièrement dans les domaines de la géométrie et de
+l’analyse. Ce principe émerge naturellement lorsque l’on cherche à
+comprendre les propriétés des objets géométriques qui restent inchangées
+sous des transformations de similitude. Une transformation de similitude
+est une combinaison d’une homothétie, d’une rotation et éventuellement
+d’une translation. L’étude de l’invariance par similitude permet de
+généraliser des propriétés locales à des échelles plus larges, offrant
+ainsi une compréhension plus profonde de la structure sous-jacente des
+objets géométriques.</p>
+<p>L’origine historique de ce concept remonte aux travaux des anciens
+Grecs, notamment Euclide, qui a étudié les propriétés des figures
+géométriques sous des transformations. Cependant, c’est au XIXe siècle
+que le concept de similitude a été formalisé et généralisé, notamment
+par les travaux de Felix Klein dans le cadre de son programme
+d’Erlangen. Ce programme a permis de classer les géométries en fonction
+des transformations qui laissent invariantes certaines propriétés.</p>
+<p>L’invariance par similitude est indispensable dans de nombreux
+domaines, notamment en géométrie différentielle, en théorie des
+fractales et en physique théorique. Elle permet de comprendre les
+propriétés d’échelle des objets, ce qui est crucial pour l’étude des
+phénomènes naturels et des structures complexes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’invariance par similitude, commençons par définir
+ce qu’est une transformation de similitude. Imaginons que nous ayons
+deux figures géométriques qui se ressemblent, mais dont les tailles
+diffèrent. Une transformation de similitude permet de passer d’une
+figure à l’autre en changeant uniquement leur taille, sans altérer leur
+forme. Cela implique une combinaison de mise à l’échelle (homothétie),
+de rotation et éventuellement de translation.</p>
+<p>Formellement, une transformation de similitude <span
+class="math inline">\(S\)</span> dans le plan peut être définie comme
+suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((E, d)\)</span> un espace métrique.
+Une transformation de similitude est une application <span
+class="math inline">\(S: E \rightarrow E\)</span> telle que pour tout
+couple <span class="math inline">\((x, y) \in E^2\)</span>, il existe
+une constante <span class="math inline">\(k &gt; 0\)</span> vérifiant :
+<span class="math display">\[d(S(x), S(y)) = k \cdot d(x,
+y).\]</span></p>
+</div>
+<p>De manière plus précise, dans le plan euclidien <span
+class="math inline">\(\mathbb{R}^2\)</span>, une transformation de
+similitude peut être exprimée par la matrice suivante :</p>
+<p><span class="math display">\[S(x, y) = (k \cdot (a x - b y) + c, k
+\cdot (b x + a y) + d),\]</span></p>
+<p>où <span class="math inline">\(k &gt; 0\)</span> est le facteur
+d’échelle, <span class="math inline">\((a, b)\)</span> et <span
+class="math inline">\((c, d)\)</span> représentent respectivement les
+coefficients de rotation et de translation.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’invariance par similitude est le
+théorème de Menger. Ce théorème établit une relation entre la dimension
+d’un espace métrique et les distances entre ses points.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((E, d)\)</span> un espace métrique.
+La dimension de <span class="math inline">\(E\)</span> est inférieure ou
+égale à <span class="math inline">\(n\)</span> si et seulement s’il
+existe une constante <span class="math inline">\(D &gt; 0\)</span> telle
+que pour tout ensemble de <span class="math inline">\(n+2\)</span>
+points distincts <span class="math inline">\(\{x_0, x_1, \dots,
+x_{n+1}\}\)</span> dans <span class="math inline">\(E\)</span>, il
+existe un point <span class="math inline">\(y \in \{x_0, x_1, \dots,
+x_{n+1}\}\)</span> vérifiant : <span class="math display">\[d(y, x_i)
+\leq D \cdot d(x_j, x_k)\]</span> pour tout <span
+class="math inline">\(i, j, k \in \{0, 1, \dots, n+1\}\)</span> avec
+<span class="math inline">\(j \neq k\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Menger, nous devons montrer que la
+dimension d’un espace métrique est liée aux distances entre ses points.
+Commençons par supposer que la dimension de <span
+class="math inline">\(E\)</span> est inférieure ou égale à <span
+class="math inline">\(n\)</span>. Nous devons alors montrer qu’il existe
+une constante <span class="math inline">\(D &gt; 0\)</span> telle que
+pour tout ensemble de <span class="math inline">\(n+2\)</span> points
+distincts, il existe un point central dont les distances aux autres
+points sont bornées.</p>
+<p>Supposons que <span class="math inline">\(E\)</span> soit un espace
+métrique de dimension <span class="math inline">\(n\)</span>. Par
+définition, pour tout ensemble de <span
+class="math inline">\(n+2\)</span> points distincts, il existe un point
+central <span class="math inline">\(y\)</span> tel que les distances de
+<span class="math inline">\(y\)</span> aux autres points sont bornées.
+Cela découle du fait que dans un espace de dimension <span
+class="math inline">\(n\)</span>, il est toujours possible de trouver un
+point central qui minimise les distances maximales aux autres
+points.</p>
+<p>Réciproquement, supposons qu’il existe une constante <span
+class="math inline">\(D &gt; 0\)</span> telle que pour tout ensemble de
+<span class="math inline">\(n+2\)</span> points distincts, il existe un
+point central vérifiant la condition donnée. Nous devons montrer que la
+dimension de <span class="math inline">\(E\)</span> est inférieure ou
+égale à <span class="math inline">\(n\)</span>. Cela peut être fait en
+utilisant des arguments de compacité et de recouvrement, montrant que
+l’espace ne peut pas avoir une dimension supérieure à <span
+class="math inline">\(n\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’invariance par similitude possède plusieurs propriétés
+intéressantes, que nous allons énumérer et démontrer.</p>
+<ol>
+<li><p><strong>Propriété de l’invariance des angles</strong> : Les
+transformations de similitude préservent les angles entre les courbes.
+Cela signifie que si deux courbes se coupent à un angle donné avant la
+transformation, elles se couperont au même angle après la
+transformation.</p></li>
+<li><p><strong>Propriété de l’invariance des rapports</strong> : Les
+transformations de similitude préservent les rapports de longueurs. Cela
+signifie que si deux segments ont un certain rapport de longueurs avant
+la transformation, ils auront le même rapport après la
+transformation.</p></li>
+<li><p><strong>Propriété de l’invariance des aires</strong> : Les
+transformations de similitude transforment les aires selon le carré du
+facteur d’échelle. Cela signifie que si une figure a une aire <span
+class="math inline">\(A\)</span> avant la transformation, elle aura une
+aire <span class="math inline">\(k^2 A\)</span> après la transformation,
+où <span class="math inline">\(k\)</span> est le facteur
+d’échelle.</p></li>
+</ol>
+<p>Pour démontrer ces propriétés, nous utilisons les définitions des
+transformations de similitude et les propriétés des espaces métriques.
+Par exemple, pour la propriété de l’invariance des angles, nous
+utilisons le fait que les transformations de similitude sont des
+isométries locales, ce qui signifie qu’elles préservent les angles
+locaux. Pour la propriété de l’invariance des rapports, nous utilisons
+le fait que les transformations de similitude sont linéaires, ce qui
+signifie qu’elles préservent les rapports de longueurs.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’invariance par similitude est un concept puissant et élégant qui
+permet de comprendre les propriétés des objets géométriques à
+différentes échelles. En étudiant ce concept, nous avons vu comment les
+transformations de similitude préservent certaines propriétés
+géométriques tout en modifiant d’autres. Ce principe est non seulement
+fondamental en mathématiques, mais aussi en physique et en ingénierie,
+où il permet de modéliser des phénomènes complexes à différentes
+échelles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

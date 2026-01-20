@@ -1,0 +1,351 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Russell-Rao : Une mesure de la divergence entre distributions</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Russell-Rao : Une mesure de la divergence
+entre distributions</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Russell-Rao émerge dans le cadre de la théorie des
+probabilités et de l’analyse des données. Son origine remonte aux
+travaux de Bertrand Russell et C.R. Rao, qui ont cherché à quantifier la
+divergence entre deux distributions de probabilité. Cette notion est
+indispensable pour comparer des modèles statistiques, évaluer la
+similarité entre des ensembles de données, et mesurer l’incertitude dans
+les processus stochastiques.</p>
+<p>La distance de Russell-Rao résout le problème de la quantification de
+la divergence entre deux distributions, en fournissant une mesure qui
+capture à la fois la différence de forme et la différence de masse. Elle
+est particulièrement utile dans les domaines où la comparaison des
+distributions est cruciale, tels que l’apprentissage automatique, la
+statistique bayésienne, et la théorie de l’information.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Russell-Rao, nous cherchons à mesurer la
+divergence entre deux distributions de probabilité. Imaginons que nous
+avons deux ensembles de données, et nous voulons quantifier à quel point
+ces ensembles diffèrent en termes de probabilité. La distance de
+Russell-Rao capture cette idée en utilisant une intégrale qui compare
+les deux distributions.</p>
+<p>Formellement, soit <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité sur
+un espace mesurable <span class="math inline">\((X,
+\mathcal{A})\)</span>. La distance de Russell-Rao entre <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est définie comme suit :</p>
+<p><span class="math display">\[d_{\text{RR}}(P, Q) = \int_X \left(
+\sqrt{\frac{dP}{d\mu}} - \sqrt{\frac{dQ}{d\mu}} \right)^2
+d\mu\]</span></p>
+<p>où <span class="math inline">\(\mu\)</span> est une mesure de
+référence telle que <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> soient absolument continues par rapport
+à <span class="math inline">\(\mu\)</span>, et <span
+class="math inline">\(\frac{dP}{d\mu}\)</span> et <span
+class="math inline">\(\frac{dQ}{d\mu}\)</span> sont les densités de
+<span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> par rapport à <span
+class="math inline">\(\mu\)</span>.</p>
+<p>Une autre formulation de la distance de Russell-Rao est :</p>
+<p><span class="math display">\[d_{\text{RR}}(P, Q) = 2 - 2 \int_X
+\sqrt{\frac{dP}{d\mu} \cdot \frac{dQ}{d\mu}} d\mu\]</span></p>
+<p>Cette formulation montre que la distance de Russell-Rao est liée à la
+similarité entre les densités des deux distributions.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la distance de Russell-Rao est le
+théorème de Cramér-Rao, qui établit une limite inférieure sur la
+variance d’un estimateur sans biais. Ce théorème est utilisé dans la
+démonstration de plusieurs propriétés de la distance de Russell-Rao.</p>
+<p>Considérons le théorème suivant, qui montre que la distance de
+Russell-Rao est une mesure de divergence :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité sur
+un espace mesurable <span class="math inline">\((X,
+\mathcal{A})\)</span>. La distance de Russell-Rao <span
+class="math inline">\(d_{\text{RR}}(P, Q)\)</span> satisfait les
+propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(d_{\text{RR}}(P, Q) \geq
+0\)</span></p></li>
+<li><p><span class="math inline">\(d_{\text{RR}}(P, Q) = 0\)</span> si
+et seulement si <span class="math inline">\(P = Q\)</span></p></li>
+<li><p><span class="math inline">\(d_{\text{RR}}(P, Q) =
+d_{\text{RR}}(Q, P)\)</span></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous procédons comme suit
+:</p>
+<p>1. **Non-négativité** : La distance de Russell-Rao est définie comme
+une intégrale de carrés, donc <span
+class="math inline">\(d_{\text{RR}}(P, Q) \geq 0\)</span>.</p>
+<p>2. **Identité de l’égalité** : Si <span class="math inline">\(P =
+Q\)</span>, alors <span class="math inline">\(\frac{dP}{d\mu} =
+\frac{dQ}{d\mu}\)</span> presque partout par rapport à <span
+class="math inline">\(\mu\)</span>, et donc <span
+class="math inline">\(d_{\text{RR}}(P, Q) = 0\)</span>. Réciproquement,
+si <span class="math inline">\(d_{\text{RR}}(P, Q) = 0\)</span>, alors
+<span class="math inline">\(\sqrt{\frac{dP}{d\mu}} =
+\sqrt{\frac{dQ}{d\mu}}\)</span> presque partout par rapport à <span
+class="math inline">\(\mu\)</span>, ce qui implique <span
+class="math inline">\(P = Q\)</span>.</p>
+<p>3. **Symétrie** : La distance de Russell-Rao est symétrique car <span
+class="math inline">\(\left( \sqrt{\frac{dP}{d\mu}} -
+\sqrt{\frac{dQ}{d\mu}} \right)^2 = \left( \sqrt{\frac{dQ}{d\mu}} -
+\sqrt{\frac{dP}{d\mu}} \right)^2\)</span>. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver les propriétés de la distance de Russell-Rao, nous
+utilisons des techniques d’analyse et de théorie des probabilités. Par
+exemple, pour montrer que la distance de Russell-Rao est une mesure de
+divergence, nous utilisons les propriétés des intégrales et des densités
+de probabilité.</p>
+<p>Considérons la preuve de la non-négativité :</p>
+<p><span class="math display">\[d_{\text{RR}}(P, Q) = \int_X \left(
+\sqrt{\frac{dP}{d\mu}} - \sqrt{\frac{dQ}{d\mu}} \right)^2 d\mu \geq
+0\]</span></p>
+<p>Cette intégrale est non négative car le carré de toute fonction
+réelle est non négatif.</p>
+<p>Pour la preuve de l’identité de l’égalité, nous utilisons le fait que
+<span class="math inline">\(P = Q\)</span> implique <span
+class="math inline">\(\frac{dP}{d\mu} = \frac{dQ}{d\mu}\)</span> presque
+partout par rapport à <span class="math inline">\(\mu\)</span>, et donc
+:</p>
+<p><span class="math display">\[d_{\text{RR}}(P, Q) = \int_X \left(
+\sqrt{\frac{dP}{d\mu}} - \sqrt{\frac{dQ}{d\mu}} \right)^2 d\mu =
+0\]</span></p>
+<p>Réciproquement, si <span class="math inline">\(d_{\text{RR}}(P, Q) =
+0\)</span>, alors <span class="math inline">\(\sqrt{\frac{dP}{d\mu}} =
+\sqrt{\frac{dQ}{d\mu}}\)</span> presque partout par rapport à <span
+class="math inline">\(\mu\)</span>, ce qui implique <span
+class="math inline">\(P = Q\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+distance de Russell-Rao :</p>
+<ol>
+<li><p>**Invariance par transformation** : La distance de Russell-Rao
+est invariante par transformations mesurables. Si <span
+class="math inline">\(T: X \rightarrow Y\)</span> est une transformation
+mesurable, alors : <span class="math display">\[d_{\text{RR}}(P \circ
+T^{-1}, Q \circ T^{-1}) = d_{\text{RR}}(P, Q)\]</span></p></li>
+<li><p>**Loi des grands nombres** : La distance de Russell-Rao satisfait
+la loi des grands nombres. Pour deux suites de variables aléatoires
+<span class="math inline">\(\{X_n\}\)</span> et <span
+class="math inline">\(\{Y_n\}\)</span> indépendantes et identiquement
+distribuées selon <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> respectivement, nous avons : <span
+class="math display">\[\lim_{n \rightarrow \infty} d_{\text{RR}}(P_n,
+Q_n) = d_{\text{RR}}(P, Q)\]</span> où <span
+class="math inline">\(P_n\)</span> et <span
+class="math inline">\(Q_n\)</span> sont les distributions empiriques de
+<span class="math inline">\(\{X_n\}\)</span> et <span
+class="math inline">\(\{Y_n\}\)</span>.</p></li>
+<li><p>**Inégalité de Jensen** : La distance de Russell-Rao satisfait
+l’inégalité de Jensen. Pour toute fonction convexe <span
+class="math inline">\(\phi\)</span>, nous avons : <span
+class="math display">\[\phi\left( \int_X \sqrt{\frac{dP}{d\mu} \cdot
+\frac{dQ}{d\mu}} d\mu \right) \leq \int_X \phi\left(
+\sqrt{\frac{dP}{d\mu} \cdot \frac{dQ}{d\mu}} \right)
+d\mu\]</span></p></li>
+</ol>
+<p>Les preuves de ces propriétés utilisent des techniques avancées
+d’analyse et de théorie des probabilités, telles que les inégalités de
+concentration, les théorèmes de convergence, et les propriétés des
+fonctions convexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

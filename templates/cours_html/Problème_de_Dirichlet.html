@@ -1,0 +1,369 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Problème de Dirichlet : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Problème de Dirichlet : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le problème de Dirichlet, du nom du mathématicien allemand Peter
+Gustav Lejeune Dirichlet (1805–1859), est un pilier fondamental en
+analyse mathématique et en physique mathématique. Ce problème émerge
+naturellement dans l’étude des équations aux dérivées partielles (EDP),
+particulièrement celles qui décrivent des phénomènes de diffusion, de
+chaleur ou d’équilibre électrostatique.</p>
+<p>Historiquement, Dirichlet a formulé ce problème pour résoudre des
+questions de physique mathématique, notamment celles liées à la
+distribution de température dans un corps conducteur. Le problème
+consiste à déterminer une fonction harmonique (c’est-à-dire solution de
+l’équation de Laplace) dans un domaine donné, qui prend des valeurs
+prescrites sur la frontière de ce domaine.</p>
+<p>Le problème de Dirichlet est indispensable dans de nombreux domaines
+scientifiques, notamment en mécanique quantique, en électromagnétisme et
+en théorie du potentiel. Sa résolution permet de comprendre le
+comportement des systèmes physiques dans des conditions aux limites
+spécifiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour aborder le problème de Dirichlet, commençons par définir les
+concepts clés.</p>
+<h2 id="fonction-harmonique">Fonction Harmonique</h2>
+<p>Une fonction harmonique est une fonction qui satisfait l’équation de
+Laplace. Prenons un domaine <span class="math inline">\(\Omega \subset
+\mathbb{R}^n\)</span> ouvert et borné, avec une frontière <span
+class="math inline">\(\partial \Omega\)</span> suffisamment régulière.
+Une fonction <span class="math inline">\(u: \Omega \rightarrow
+\mathbb{R}\)</span> est dite harmonique si elle vérifie l’équation de
+Laplace :</p>
+<p><span class="math display">\[\Delta u = 0 \quad \text{dans} \quad
+\Omega,\]</span></p>
+<p>où <span class="math inline">\(\Delta\)</span> est l’opérateur
+laplacien défini par :</p>
+<p><span class="math display">\[\Delta u = \sum_{i=1}^n \frac{\partial^2
+u}{\partial x_i^2}.\]</span></p>
+<h2 id="problème-de-dirichlet">Problème de Dirichlet</h2>
+<p>Le problème de Dirichlet consiste à trouver une fonction <span
+class="math inline">\(u\)</span> harmonique dans un domaine <span
+class="math inline">\(\Omega\)</span> qui prend des valeurs prescrites
+sur la frontière <span class="math inline">\(\partial \Omega\)</span>.
+Formellement, on cherche <span class="math inline">\(u\)</span> telle
+que :</p>
+<p><span class="math display">\[\begin{cases}
+\Delta u = 0 &amp; \text{dans } \Omega, \\
+u = f &amp; \text{sur } \partial \Omega,
+\end{cases}\]</span></p>
+<p>où <span class="math inline">\(f: \partial \Omega \rightarrow
+\mathbb{R}\)</span> est une fonction donnée.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-lunicité">Théorème de l’Unicité</h2>
+<p>Un résultat fondamental lié au problème de Dirichlet est le théorème
+de l’unicité, qui stipule que la solution du problème de Dirichlet est
+unique sous certaines conditions.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\Omega\)</span> un domaine borné
+avec une frontière suffisamment régulière. Supposons que <span
+class="math inline">\(u_1\)</span> et <span
+class="math inline">\(u_2\)</span> soient deux fonctions harmoniques
+dans <span class="math inline">\(\Omega\)</span> qui coïncident sur la
+frontière <span class="math inline">\(\partial \Omega\)</span>. Alors
+<span class="math inline">\(u_1 = u_2\)</span> dans tout <span
+class="math inline">\(\Omega\)</span>.</p>
+</div>
+<h2 id="démonstration-du-théorème-de-lunicité">Démonstration du Théorème
+de l’Unicité</h2>
+<p>Pour démontrer ce théorème, nous utilisons le principe du maximum.
+Soit <span class="math inline">\(v = u_1 - u_2\)</span>. Alors <span
+class="math inline">\(v\)</span> est harmonique dans <span
+class="math inline">\(\Omega\)</span> et <span class="math inline">\(v =
+0\)</span> sur <span class="math inline">\(\partial \Omega\)</span>.</p>
+<p>Par le principe du maximum, <span class="math inline">\(v\)</span>
+atteint son maximum et son minimum sur la frontière <span
+class="math inline">\(\partial \Omega\)</span>. Comme <span
+class="math inline">\(v = 0\)</span> sur <span
+class="math inline">\(\partial \Omega\)</span>, il s’ensuit que <span
+class="math inline">\(v \leq 0\)</span> et <span class="math inline">\(v
+\geq 0\)</span> dans <span class="math inline">\(\Omega\)</span>. Par
+conséquent, <span class="math inline">\(v = 0\)</span> dans <span
+class="math inline">\(\Omega\)</span>, ce qui implique que <span
+class="math inline">\(u_1 = u_2\)</span> dans <span
+class="math inline">\(\Omega\)</span>.</p>
+<h2 id="théorème-de-lexistence">Théorème de l’Existence</h2>
+<p>L’existence d’une solution au problème de Dirichlet est garantie sous
+certaines conditions, notamment lorsque la frontière <span
+class="math inline">\(\partial \Omega\)</span> est suffisamment
+régulière et que la fonction <span class="math inline">\(f\)</span> est
+continue.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\Omega\)</span> un domaine borné
+avec une frontière suffisamment régulière et <span
+class="math inline">\(f: \partial \Omega \rightarrow \mathbb{R}\)</span>
+une fonction continue. Alors il existe une fonction <span
+class="math inline">\(u\)</span> harmonique dans <span
+class="math inline">\(\Omega\)</span> telle que :</p>
+<p><span class="math display">\[u = f \quad \text{sur} \quad \partial
+\Omega.\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="démonstration-du-théorème-de-lexistence">Démonstration du
+Théorème de l’Existence</h2>
+<p>La démonstration du théorème de l’existence repose sur des méthodes
+d’analyse fonctionnelle et de théorie du potentiel. Une approche
+courante est l’utilisation des fonctions de Green et des inégalités de
+Poincaré.</p>
+<p>Soit <span class="math inline">\(G(x, y)\)</span> la fonction de
+Green du domaine <span class="math inline">\(\Omega\)</span>. La
+solution <span class="math inline">\(u\)</span> peut être exprimée comme
+une intégrale de potentiel simple :</p>
+<p><span class="math display">\[u(x) = \int_{\partial \Omega} f(y)
+\frac{\partial G(x, y)}{\partial n_y} \, dS(y),\]</span></p>
+<p>où <span class="math inline">\(\frac{\partial G(x, y)}{\partial
+n_y}\)</span> est la dérivée normale de <span
+class="math inline">\(G\)</span> par rapport à <span
+class="math inline">\(y\)</span> sur <span
+class="math inline">\(\partial \Omega\)</span>.</p>
+<p>Pour montrer que cette intégrale définit bien une fonction harmonique
+dans <span class="math inline">\(\Omega\)</span>, nous utilisons le fait
+que <span class="math inline">\(G(x, y)\)</span> est harmonique en <span
+class="math inline">\(x\)</span> pour <span class="math inline">\(x \neq
+y\)</span>. En outre, la dérivée normale <span
+class="math inline">\(\frac{\partial G(x, y)}{\partial n_y}\)</span> est
+liée à la mesure harmonique de <span class="math inline">\(\partial
+\Omega\)</span> par rapport à <span
+class="math inline">\(x\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-régularité">Propriété de Régularité</h2>
+<div class="proposition">
+<p>Soit <span class="math inline">\(u\)</span> une solution du problème
+de Dirichlet dans un domaine <span class="math inline">\(\Omega\)</span>
+avec une frontière suffisamment régulière. Si <span
+class="math inline">\(f\)</span> est de classe <span
+class="math inline">\(C^k\)</span> sur <span
+class="math inline">\(\partial \Omega\)</span>, alors <span
+class="math inline">\(u\)</span> est de classe <span
+class="math inline">\(C^k\)</span> dans un voisinage de <span
+class="math inline">\(\partial \Omega\)</span>.</p>
+</div>
+<h2 id="démonstration-de-la-propriété-de-régularité">Démonstration de la
+Propriété de Régularité</h2>
+<p>La démonstration repose sur des estimations a priori et des théorèmes
+de régularité pour les équations elliptiques. En utilisant des
+estimations de Calderón-Zygmund et des théorèmes de régularité
+intérieure et frontière, on peut montrer que la solution <span
+class="math inline">\(u\)</span> hérite de la régularité de la donnée
+frontière <span class="math inline">\(f\)</span>.</p>
+<h2 id="corollaire">Corollaire</h2>
+<div class="corollary">
+<p>Si <span class="math inline">\(\Omega\)</span> est un domaine borné
+avec une frontière de classe <span
+class="math inline">\(C^\infty\)</span> et <span
+class="math inline">\(f: \partial \Omega \rightarrow \mathbb{R}\)</span>
+est une fonction de classe <span
+class="math inline">\(C^\infty\)</span>, alors la solution <span
+class="math inline">\(u\)</span> du problème de Dirichlet est de classe
+<span class="math inline">\(C^\infty\)</span> dans <span
+class="math inline">\(\Omega\)</span>.</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le problème de Dirichlet est un sujet riche et profond en analyse
+mathématique, avec des applications dans de nombreux domaines
+scientifiques. Les théorèmes d’unicité et d’existence, ainsi que les
+propriétés de régularité des solutions, sont des résultats fondamentaux
+qui continuent d’inspirer des recherches en mathématiques pures et
+appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

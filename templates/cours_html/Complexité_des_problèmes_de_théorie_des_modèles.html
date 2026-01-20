@@ -1,0 +1,381 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de théorie des modèles</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de théorie des modèles</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La théorie des modèles, branche fondamentale des mathématiques,
+trouve ses racines dans les travaux pionniers de Thoralf Skolem et
+Alfred Tarski au début du XXe siècle. Cette discipline, à l’intersection
+de la logique mathématique et de l’algèbre, étudie les structures
+mathématiques à travers le prisme des théories formelles. L’émergence de
+la notion de complexité dans ce contexte répond à un besoin crucial :
+quantifier et classifier la difficulté des problèmes décisionnels
+associés aux théories.</p>
+<p>Pourquoi cette classification est-elle indispensable ? Parce que les
+problèmes de théorie des modèles, bien qu’abstraits, trouvent des
+applications concrètes en informatique théorique, notamment dans la
+vérification de programmes et l’analyse de bases de données. Par
+exemple, le problème de satisfiabilité d’une formule logique, central en
+théorie des modèles, est à la base de nombreux algorithmes de résolution
+de contraintes.</p>
+<p>Dans ce chapitre, nous explorons la complexité des problèmes de
+théorie des modèles, en mettant l’accent sur les outils et les résultats
+qui permettent de comprendre et de maîtriser cette complexité. Nous
+verrons comment des notions comme la décidabilité, la complexité en
+temps et en espace, ainsi que les hiérarchies de complexité, jouent un
+rôle clé dans cette analyse.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’aborder les théorèmes, il est essentiel de définir
+rigoureusement les concepts fondamentaux. Commençons par le problème de
+satisfiabilité.</p>
+<h4 id="problème-de-satisfiabilité">Problème de Satisfiabilité</h4>
+<p>Supposons que nous ayons une théorie <span
+class="math inline">\(T\)</span> et une formule <span
+class="math inline">\(\phi\)</span>. Nous voulons savoir si <span
+class="math inline">\(\phi\)</span> est satisfiable dans une structure
+modèle de <span class="math inline">\(T\)</span>. Autrement dit,
+existe-t-il un modèle <span class="math inline">\(M\)</span> de <span
+class="math inline">\(T\)</span> tel que <span class="math inline">\(M
+\models \phi\)</span>?</p>
+<p>Formellement, le problème de satisfiabilité pour une théorie <span
+class="math inline">\(T\)</span> est défini comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(T\)</span> une théorie et <span
+class="math inline">\(\phi\)</span> une formule. Le problème de
+satisfiabilité pour <span class="math inline">\(T\)</span>, noté <span
+class="math inline">\(\text{SAT}(T)\)</span>, est l’ensemble des
+formules <span class="math inline">\(\phi\)</span> telles qu’il existe
+un modèle <span class="math inline">\(M\)</span> de <span
+class="math inline">\(T\)</span> avec <span class="math inline">\(M
+\models \phi\)</span>.</p>
+<p>Matériellement, cela s’écrit : <span
+class="math display">\[\text{SAT}(T) = \{ \phi \mid \exists M \text{
+modèle de } T, M \models \phi \}\]</span></p>
+</div>
+<h4 id="décidabilité">Décidabilité</h4>
+<p>Un problème est dit décidable si nous pouvons construire un
+algorithme qui, pour toute entrée, décide en temps fini si cette entrée
+appartient au problème.</p>
+<div class="definition">
+<p>Un ensemble <span class="math inline">\(S\)</span> est décidable s’il
+existe une fonction calculable <span class="math inline">\(f : \Sigma^*
+\to \{0, 1\}\)</span> telle que pour tout <span class="math inline">\(x
+\in \Sigma^*\)</span>, <span class="math inline">\(f(x) = 1\)</span> si
+et seulement si <span class="math inline">\(x \in S\)</span>.</p>
+<p>Formellement : <span class="math display">\[\exists f \text{
+calculable}, \forall x \in \Sigma^*, (x \in S \Leftrightarrow f(x) =
+1)\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Passons maintenant aux théorèmes fondamentaux qui structurent notre
+compréhension de la complexité en théorie des modèles.</p>
+<h4 id="théorème-de-church">Théorème de Church</h4>
+<p>Le théorème de Church, dû à Alonzo Church et Kurt Gödel, établit une
+frontière fondamentale entre les problèmes décidables et
+indécidables.</p>
+<div class="theorem">
+<p>Un problème est décidable si et seulement s’il peut être reconnu par
+une machine de Turing.</p>
+<p>Formellement : <span class="math display">\[\forall S \subseteq
+\Sigma^*, (S \text{ est décidable} \Leftrightarrow \exists M \text{
+machine de Turing}, L(M) = S)\]</span></p>
+</div>
+<h4 id="théorème-de-löwenheim-skolem">Théorème de Löwenheim-Skolem</h4>
+<p>Ce théorème, attribué à Leopold Löwenheim et Thoralf Skolem, est un
+résultat central en théorie des modèles.</p>
+<div class="theorem">
+<p>Toute théorie première-ordre non vide ayant un modèle infini a des
+modèles de toute cardinalité infinie.</p>
+<p>Formellement : <span class="math display">\[\forall T \text{ théorie
+première-ordre}, (\exists M \text{ modèle infini de } T) \Rightarrow
+(\forall \kappa \geq \aleph_0, \exists M&#39; \text{ modèle de } T
+\text{ avec } |M&#39;| = \kappa)\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h4 id="preuve-du-théorème-de-church">Preuve du Théorème de Church</h4>
+<p>Pour prouver le théorème de Church, nous devons montrer que tout
+problème décidable peut être reconnu par une machine de Turing et vice
+versa.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(S\)</span> un
+problème décidable. Par définition, il existe une fonction calculable
+<span class="math inline">\(f : \Sigma^* \to \{0, 1\}\)</span> telle que
+pour tout <span class="math inline">\(x \in \Sigma^*\)</span>, <span
+class="math inline">\(f(x) = 1\)</span> si et seulement si <span
+class="math inline">\(x \in S\)</span>.</p>
+<p>Nous pouvons construire une machine de Turing <span
+class="math inline">\(M\)</span> qui, sur entrée <span
+class="math inline">\(x\)</span>, simule le calcul de <span
+class="math inline">\(f(x)\)</span>. Si <span class="math inline">\(f(x)
+= 1\)</span>, <span class="math inline">\(M\)</span> accepte ; sinon,
+elle rejette.</p>
+<p>Réciproquement, soit <span class="math inline">\(M\)</span> une
+machine de Turing qui reconnaît un ensemble <span
+class="math inline">\(S\)</span>. Nous pouvons construire une fonction
+calculable <span class="math inline">\(f\)</span> qui simule <span
+class="math inline">\(M\)</span> sur toute entrée <span
+class="math inline">\(x\)</span>. Si <span
+class="math inline">\(M\)</span> accepte <span
+class="math inline">\(x\)</span>, alors <span class="math inline">\(f(x)
+= 1\)</span>; sinon, <span class="math inline">\(f(x) = 0\)</span>.</p>
+<p>Ainsi, <span class="math inline">\(S\)</span> est décidable. ◻</p>
+</div>
+<h4 id="preuve-du-théorème-de-löwenheim-skolem">Preuve du Théorème de
+Löwenheim-Skolem</h4>
+<p>La preuve de ce théorème repose sur des techniques de construction de
+modèles.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(T\)</span> une
+théorie première-ordre ayant un modèle infini <span
+class="math inline">\(M\)</span>. Nous devons construire un modèle de
+<span class="math inline">\(T\)</span> de cardinalité <span
+class="math inline">\(\kappa\)</span>, pour tout <span
+class="math inline">\(\kappa \geq \aleph_0\)</span>.</p>
+<p>Considérons un ensemble de constantes <span
+class="math inline">\(C\)</span> de cardinalité <span
+class="math inline">\(\kappa\)</span>. Nous construisons une extension
+élémentaire <span class="math inline">\(M&#39;\)</span> de <span
+class="math inline">\(M\)</span> en ajoutant les éléments de <span
+class="math inline">\(C\)</span> comme nouveaux éléments. Par le
+théorème de compacité, cette extension existe et a la cardinalité
+souhaitée.</p>
+<p>Ainsi, <span class="math inline">\(T\)</span> a des modèles de toute
+cardinalité infinie. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h4 id="propriétés-du-problème-de-satisfiabilité">Propriétés du Problème
+de Satisfiabilité</h4>
+<ul>
+<li><p>Le problème <span class="math inline">\(\text{SAT}(T)\)</span>
+est indécidable pour certaines théories <span
+class="math inline">\(T\)</span>. Par exemple, le problème de
+satisfiabilité pour la théorie des groupes est indécidable.</p></li>
+<li><p>Pour certaines théories <span class="math inline">\(T\)</span>,
+le problème <span class="math inline">\(\text{SAT}(T)\)</span> est
+NP-complet. C’est le cas de la théorie des graphes.</p></li>
+<li><p>Le problème <span class="math inline">\(\text{SAT}(T)\)</span>
+est décidable pour les théories stables. Cela découle du théorème de
+stabilité.</p></li>
+</ul>
+<h4 id="corollaires-du-théorème-de-löwenheim-skolem">Corollaires du
+Théorème de Löwenheim-Skolem</h4>
+<ul>
+<li><p>Toute théorie première-ordre ayant un modèle infini a un modèle
+dénombrable.</p></li>
+<li><p>Si une théorie première-ordre est catégoriquement <span
+class="math inline">\(\kappa\)</span>-saturée pour un certain <span
+class="math inline">\(\kappa\)</span>, alors tous ses modèles de
+cardinalité <span class="math inline">\(\kappa\)</span> sont
+isomorphes.</p></li>
+<li><p>Le théorème de Löwenheim-Skolem implique que la cardinalité des
+modèles d’une théorie première-ordre n’est pas une propriété intrinsèque
+de la théorie.</p></li>
+</ul>
+<h1 id="conclusion">Conclusion</h1>
+<p>Dans ce chapitre, nous avons exploré les notions fondamentales de
+complexité en théorie des modèles. Nous avons vu comment les problèmes
+de satisfiabilité, la décidabilité et les théorèmes classiques comme
+ceux de Church et Löwenheim-Skolem structurent notre compréhension de
+cette discipline. Les preuves détaillées et les propriétés énumérées
+illustrent la richesse et la profondeur de ces concepts, ouvrant la voie
+à des recherches plus approfondies dans ce domaine fascinant.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,372 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Théorème de Donsker : Un Pont entre les Processus Empiriques et le Mouvement Brownien</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Théorème de Donsker : Un Pont entre les Processus
+Empiriques et le Mouvement Brownien</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le théorème de Donsker, également connu sous le nom d’invariance de
+Donsker ou théorème fonctionnel central limite, est un résultat
+fondamental en théorie des probabilités. Il établit une connexion
+profonde entre les processus empiriques, qui sont des objets discrets
+construits à partir d’échantillons indépendants et identiquement
+distribués (i.i.d.), et le mouvement brownien, un processus continu
+stochastique. Ce théorème est non seulement d’une importance théorique
+majeure, mais il trouve également des applications pratiques dans divers
+domaines tels que la statistique mathématique, l’analyse financière et
+les sciences de l’ingénieur.</p>
+<p>L’émergence du théorème de Donsker est étroitement liée au
+développement de la théorie des processus stochastiques et à l’étude des
+propriétés asymptotiques des estimateurs statistiques. Il généralise le
+théorème central limite, qui décrit la convergence en loi d’une somme
+normalisée de variables aléatoires i.i.d. vers une distribution normale,
+à des contextes plus généraux où l’on considère des processus
+empiriques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour formuler le théorème de Donsker, nous avons besoin de plusieurs
+définitions clés.</p>
+<h2 class="unnumbered" id="processus-empirique">Processus empirique</h2>
+<p>Considérons une suite <span class="math inline">\((X_n)_{n \geq
+1}\)</span> de variables aléatoires réelles indépendantes et
+identiquement distribuées (i.i.d.) définies sur un espace de probabilité
+<span class="math inline">\((\Omega, \mathcal{F}, P)\)</span>. Pour
+chaque <span class="math inline">\(n \geq 1\)</span>, définissons le
+processus empirique <span class="math inline">\(E_n\)</span> par :</p>
+<p><span class="math display">\[E_n(t) = \frac{1}{\sqrt{n}}
+\sum_{i=1}^{[nt]} (X_i - \mathbb{E}[X_1]), \quad t \in [0,
+1],\]</span></p>
+<p>où <span class="math inline">\([nt]\)</span> désigne la partie
+entière de <span class="math inline">\(nt\)</span>.</p>
+<h2 class="unnumbered" id="mouvement-brownien">Mouvement brownien</h2>
+<p>Un mouvement brownien standard <span class="math inline">\(W =
+(W(t))_{t \geq 0}\)</span> est un processus stochastique défini sur un
+espace de probabilité <span class="math inline">\((\Omega, \mathcal{F},
+P)\)</span> avec les propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(W(0) = 0\)</span> presque
+sûrement.</p></li>
+<li><p>Pour tout <span class="math inline">\(t \geq 0\)</span>, la
+variable aléatoire <span class="math inline">\(W(t)\)</span> suit une
+loi normale centrée réduite.</p></li>
+<li><p>Pour tout <span class="math inline">\(0 \leq s &lt; t\)</span>,
+la variable aléatoire <span class="math inline">\(W(t) - W(s)\)</span>
+suit une loi normale de moyenne nulle et de variance <span
+class="math inline">\(t - s\)</span>, et est indépendante de <span
+class="math inline">\(\mathcal{F}_s = \sigma(W(u) : u \leq
+s)\)</span>.</p></li>
+</ol>
+<h2 class="unnumbered"
+id="convergence-en-loi-dans-lespace-d01">Convergence en loi dans
+l’espace <span class="math inline">\(D[0,1]\)</span></h2>
+<p>Soit <span class="math inline">\(D[0,1]\)</span> l’espace des
+fonctions cadlag (continues à droite et limites à gauche) définies sur
+<span class="math inline">\([0,1]\)</span>, munie de la topologie de
+Skorokhod. On dit qu’une suite <span class="math inline">\((X_n)_{n \geq
+1}\)</span> de processus stochastiques converge en loi vers un processus
+<span class="math inline">\(X\)</span> dans <span
+class="math inline">\(D[0,1]\)</span> si les lois de <span
+class="math inline">\((X_n)\)</span> convergent faiblement vers la loi
+de <span class="math inline">\(X\)</span> dans cet espace.</p>
+<h1 class="unnumbered" id="théorème-de-donsker">Théorème de Donsker</h1>
+<p>Nous sommes maintenant prêts à énoncer le théorème de Donsker.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((X_n)_{n \geq 1}\)</span> une suite
+de variables aléatoires réelles i.i.d. de moyenne nulle et de variance
+finie <span class="math inline">\(\sigma^2 &gt; 0\)</span>. Pour chaque
+<span class="math inline">\(n \geq 1\)</span>, définissons le processus
+empirique <span class="math inline">\(E_n\)</span> par :</p>
+<p><span class="math display">\[E_n(t) = \frac{1}{\sqrt{n}}
+\sum_{i=1}^{[nt]} X_i, \quad t \in [0, 1].\]</span></p>
+<p>Alors, la suite <span class="math inline">\((E_n)_{n \geq 1}\)</span>
+converge en loi dans <span class="math inline">\(D[0,1]\)</span> vers le
+processus <span class="math inline">\(\sigma W\)</span>, où <span
+class="math inline">\(W\)</span> est un mouvement brownien standard.</p>
+</div>
+<h1 class="unnumbered" id="preuve-du-théorème-de-donsker">Preuve du
+Théorème de Donsker</h1>
+<p>La preuve du théorème de Donsker repose sur plusieurs étapes clés,
+notamment l’utilisation du théorème central limite et des propriétés de
+convergence en loi dans les espaces fonctionnels. Nous allons détailler
+chaque étape de manière rigoureuse.</p>
+<h2 class="unnumbered" id="étape-1-normalisation-des-variables">Étape 1
+: Normalisation des variables</h2>
+<p>Sans perte de généralité, nous pouvons supposer que les variables
+<span class="math inline">\(X_i\)</span> sont centrées et normalisées.
+En effet, en posant <span class="math inline">\(Y_i = \frac{X_i -
+\mathbb{E}[X_1]}{\sigma}\)</span>, nous obtenons une nouvelle suite de
+variables i.i.d. centrées et de variance 1. Le processus empirique
+correspondant est alors donné par :</p>
+<p><span class="math display">\[E_n(t) = \sigma \frac{1}{\sqrt{n}}
+\sum_{i=1}^{[nt]} Y_i, \quad t \in [0, 1].\]</span></p>
+<h2 class="unnumbered"
+id="étape-2-application-du-théorème-central-limite">Étape 2 :
+Application du théorème central limite</h2>
+<p>Pour chaque <span class="math inline">\(t \in [0,1]\)</span>,
+considérons la somme normalisée :</p>
+<p><span class="math display">\[S_n(t) = \frac{1}{\sqrt{n}}
+\sum_{i=1}^{[nt]} Y_i.\]</span></p>
+<p>D’après le théorème central limite, pour chaque <span
+class="math inline">\(t \in [0,1]\)</span>, la variable aléatoire <span
+class="math inline">\(S_n(t)\)</span> converge en loi vers une variable
+aléatoire normale centrée de variance <span
+class="math inline">\(t\)</span>. Cependant, cette convergence
+ponctuelle ne suffit pas pour obtenir la convergence en loi dans
+l’espace <span class="math inline">\(D[0,1]\)</span>.</p>
+<h2 class="unnumbered" id="étape-3-convergence-en-loi-dans-d01">Étape 3
+: Convergence en loi dans <span
+class="math inline">\(D[0,1]\)</span></h2>
+<p>Pour obtenir la convergence en loi dans l’espace <span
+class="math inline">\(D[0,1]\)</span>, nous devons montrer que les
+processus empiriques <span class="math inline">\((E_n)_{n \geq
+1}\)</span> satisfont les conditions de la méthode des fonctions
+caractéristiques. Plus précisément, nous devons prouver que pour toute
+fonction test <span class="math inline">\(\phi \in
+C_b^\infty(\mathbb{R})\)</span>, l’espérance de <span
+class="math inline">\(\phi(E_n(t))\)</span> converge vers l’espérance de
+<span class="math inline">\(\phi(\sigma W(t))\)</span>.</p>
+<p>Cette étape repose sur des techniques d’analyse fonctionnelle et des
+propriétés de régularité des processus stochastiques. En utilisant les
+résultats de Billingsley sur la convergence en loi dans les espaces
+métriques, nous pouvons conclure que <span
+class="math inline">\((E_n)_{n \geq 1}\)</span> converge en loi vers
+<span class="math inline">\(\sigma W\)</span> dans <span
+class="math inline">\(D[0,1]\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le théorème de Donsker a de nombreuses conséquences importantes en
+théorie des probabilités et en statistique mathématique. Nous en
+présentons quelques-unes ci-dessous.</p>
+<h2 class="unnumbered"
+id="propriété-i-convergence-des-moments">Propriété (i) : Convergence des
+moments</h2>
+<p>Soit <span class="math inline">\(f : [0,1] \rightarrow
+\mathbb{R}\)</span> une fonction continue bornée. Alors, pour tout <span
+class="math inline">\(p \geq 1\)</span>, nous avons :</p>
+<p><span class="math display">\[\lim_{n \rightarrow \infty}
+\mathbb{E}\left[\left|\int_0^1 f(t) dE_n(t)\right|^p\right] =
+\mathbb{E}\left[\left|\int_0^1 f(t) d(\sigma
+W(t))\right|^p\right].\]</span></p>
+<h2 class="unnumbered"
+id="propriété-ii-convergence-des-trajectoires">Propriété (ii) :
+Convergence des trajectoires</h2>
+<p>Avec une probabilité tendant vers 1 lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini, les trajectoires
+des processus empiriques <span class="math inline">\(E_n\)</span>
+deviennent uniformément proches des trajectoires du mouvement brownien
+<span class="math inline">\(\sigma W\)</span>.</p>
+<h2 class="unnumbered"
+id="propriété-iii-applications-statistiques">Propriété (iii) :
+Applications statistiques</h2>
+<p>Le théorème de Donsker est utilisé pour établir la convergence
+asymptotique des estimateurs statistiques, tels que les estimateurs par
+maximum de vraisemblance et les tests d’hypothèses. Il permet de déduire
+des propriétés de ces estimateurs à partir des propriétés du mouvement
+brownien.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le théorème de Donsker est un résultat profond et puissant qui relie
+les processus empiriques aux mouvements browniens. Il a des applications
+vastes et variées, allant de la théorie des probabilités à la
+statistique mathématique. La preuve de ce théorème repose sur des
+techniques avancées d’analyse stochastique et d’analyse fonctionnelle,
+et elle illustre la beauté et la richesse des mathématiques
+modernes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

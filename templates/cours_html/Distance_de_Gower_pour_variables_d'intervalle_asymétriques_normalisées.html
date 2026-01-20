@@ -1,0 +1,432 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Gower pour variables d’intervalle asymétriques normalisées</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Gower pour variables d’intervalle
+asymétriques normalisées</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des données multidimensionnelles est un pilier fondamental
+de la statistique moderne. Parmi les défis rencontrés, l’évaluation des
+distances entre observations prend une place prépondérante. La distance
+de Gower, introduite par Gower en 1971, offre une solution élégante pour
+mesurer la dissimilarité entre objets décrits par des variables de
+différents types. Cependant, son application aux variables d’intervalle
+asymétriques normalisées reste peu explorée.</p>
+<p>Les variables d’intervalle, définies sur un domaine borné mais non
+nécessairement symétrique, sont omniprésentes en sciences sociales et
+économiques. Leur normalisation asymétrique permet de préserver
+l’information tout en standardisant les échelles. La distance de Gower,
+par sa capacité à intégrer divers types de variables, se révèle alors
+particulièrement adaptée.</p>
+<p>Ce chapitre explore la généralisation de la distance de Gower aux
+variables d’intervalle asymétriques normalisées. Nous commencerons par
+définir rigoureusement ces concepts, avant d’établir les propriétés
+mathématiques de cette nouvelle distance. Des exemples concrets
+illustreront son utilité dans l’analyse des données.</p>
+<h1 id="définitions">Définitions</h1>
+<h2 id="variables-dintervalle-asymétriques-normalisées">Variables
+d’intervalle asymétriques normalisées</h2>
+<p>Considérons un ensemble de variables <span class="math inline">\(X_1,
+\ldots, X_p\)</span> définies sur des intervalles bornés. Chaque
+variable <span class="math inline">\(X_j\)</span> prend ses valeurs dans
+un intervalle <span class="math inline">\([a_j, b_j]\)</span>, où <span
+class="math inline">\(a_j\)</span> et <span
+class="math inline">\(b_j\)</span> sont les bornes inférieures et
+supérieures respectives.</p>
+<p>Pour normaliser ces variables de manière asymétrique, nous
+introduisons une transformation qui préserve la structure asymétrique
+des intervalles. Intuitivement, cette normalisation doit permettre de
+comparer les observations sur une échelle commune tout en tenant compte
+des différences d’échelle et de position des intervalles.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X_j\)</span> une variable définie
+sur <span class="math inline">\([a_j, b_j]\)</span>. La normalisation
+asymétrique de <span class="math inline">\(X_j\)</span> est définie par
+la transformation : <span class="math display">\[T_j: [a_j, b_j]
+\rightarrow [0, 1], \quad x \mapsto T_j(x) = \frac{x - a_j}{b_j -
+a_j}\]</span></p>
+</div>
+<p>Cette transformation linéaire préserve l’ordre des valeurs tout en
+normalisant l’intervalle sur <span class="math inline">\([0,
+1]\)</span>. La distance entre deux observations <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> pour la variable <span
+class="math inline">\(X_j\)</span> peut alors être définie comme : <span
+class="math display">\[d_j(x, y) = |T_j(x) - T_j(y)| = \left| \frac{x -
+a_j}{b_j - a_j} - \frac{y - a_j}{b_j - a_j} \right| = \frac{|x - y|}{b_j
+- a_j}\]</span></p>
+<h2 id="distance-de-gower">Distance de Gower</h2>
+<p>La distance de Gower est une mesure de dissimilarité qui combine
+plusieurs types de variables. Pour des variables d’intervalle, elle est
+définie comme la somme pondérée des distances normalisées.</p>
+<p>Intuitivement, cette distance doit permettre de comparer deux
+observations en tenant compte de toutes les variables disponibles, tout
+en normalisant l’influence de chaque variable.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathbf{X} = (X_1, \ldots,
+X_p)\)</span> un ensemble de variables d’intervalle. La distance de
+Gower entre deux observations <span class="math inline">\(\mathbf{x} =
+(x_1, \ldots, x_p)\)</span> et <span class="math inline">\(\mathbf{y} =
+(y_1, \ldots, y_p)\)</span> est définie par : <span
+class="math display">\[d_G(\mathbf{x}, \mathbf{y}) = \frac{1}{p}
+\sum_{j=1}^p w_j d_j(x_j, y_j)\]</span> où <span
+class="math inline">\(w_j\)</span> est le poids associé à la variable
+<span class="math inline">\(X_j\)</span>, et <span
+class="math inline">\(d_j(x_j, y_j)\)</span> est la distance normalisée
+pour la variable <span class="math inline">\(X_j\)</span>.</p>
+</div>
+<p>Pour des variables d’intervalle asymétriques normalisées, la distance
+<span class="math inline">\(d_j(x_j, y_j)\)</span> est donnée par :
+<span class="math display">\[d_j(x_j, y_j) = \frac{|x_j - y_j|}{b_j -
+a_j}\]</span> Ainsi, la distance de Gower devient : <span
+class="math display">\[d_G(\mathbf{x}, \mathbf{y}) = \frac{1}{p}
+\sum_{j=1}^p w_j \frac{|x_j - y_j|}{b_j - a_j}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="propriétés-de-la-distance-de-gower">Propriétés de la distance de
+Gower</h2>
+<p>La distance de Gower doit satisfaire certaines propriétés
+fondamentales pour être une mesure de dissimilarité valide. Nous
+établissons ici ces propriétés pour les variables d’intervalle
+asymétriques normalisées.</p>
+<div class="theorem">
+<p>La distance de Gower <span class="math inline">\(d_G\)</span> définie
+par : <span class="math display">\[d_G(\mathbf{x}, \mathbf{y}) =
+\frac{1}{p} \sum_{j=1}^p w_j \frac{|x_j - y_j|}{b_j - a_j}\]</span>
+satisfait les propriétés suivantes :</p>
+<ol>
+<li><p><strong>Non-négativité</strong> : <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{y}) \geq 0\)</span> pour
+tout <span class="math inline">\(\mathbf{x},
+\mathbf{y}\)</span>.</p></li>
+<li><p><strong>Identité des indiscernables</strong> : <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{y}) = 0\)</span> si et
+seulement si <span class="math inline">\(\mathbf{x} =
+\mathbf{y}\)</span>.</p></li>
+<li><p><strong>Symétrie</strong> : <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{y}) = d_G(\mathbf{y},
+\mathbf{x})\)</span>.</p></li>
+<li><p><strong>Inégalité triangulaire</strong> : <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{z}) \leq d_G(\mathbf{x},
+\mathbf{y}) + d_G(\mathbf{y}, \mathbf{z})\)</span>.</p></li>
+</ol>
+</div>
+<h2 id="démonstration-des-propriétés">Démonstration des propriétés</h2>
+<p>Nous démontrons chacune de ces propriétés en détail.</p>
+<div class="proof">
+<p><em>Preuve des propriétés.</em> <strong>1. Non-négativité</strong> :
+Par définition, <span class="math inline">\(|x_j - y_j| \geq 0\)</span>
+et <span class="math inline">\(b_j - a_j &gt; 0\)</span>. Ainsi, chaque
+terme <span class="math inline">\(w_j \frac{|x_j - y_j|}{b_j -
+a_j}\)</span> est non-négatif. La somme de termes non-négatifs est
+également non-négative.</p>
+<p><strong>2. Identité des indiscernables</strong> : <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{y}) = 0\)</span> implique
+que chaque terme <span class="math inline">\(w_j \frac{|x_j - y_j|}{b_j
+- a_j} = 0\)</span>. Puisque <span class="math inline">\(w_j &gt;
+0\)</span> et <span class="math inline">\(b_j - a_j &gt; 0\)</span>,
+cela implique <span class="math inline">\(|x_j - y_j| = 0\)</span>,
+c’est-à-dire <span class="math inline">\(x_j = y_j\)</span> pour tout
+<span class="math inline">\(j\)</span>. Réciproquement, si <span
+class="math inline">\(\mathbf{x} = \mathbf{y}\)</span>, alors <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{y}) = 0\)</span>.</p>
+<p><strong>3. Symétrie</strong> : Par la symétrie de la valeur absolue,
+<span class="math inline">\(|x_j - y_j| = |y_j - x_j|\)</span>. Ainsi,
+<span class="math display">\[d_G(\mathbf{x}, \mathbf{y}) = \frac{1}{p}
+\sum_{j=1}^p w_j \frac{|x_j - y_j|}{b_j - a_j} = \frac{1}{p}
+\sum_{j=1}^p w_j \frac{|y_j - x_j|}{b_j - a_j} = d_G(\mathbf{y},
+\mathbf{x})\]</span></p>
+<p><strong>4. Inégalité triangulaire</strong> : Pour chaque variable
+<span class="math inline">\(X_j\)</span>, nous avons : <span
+class="math display">\[\frac{|x_j - z_j|}{b_j - a_j} \leq \frac{|x_j -
+y_j|}{b_j - a_j} + \frac{|y_j - z_j|}{b_j - a_j}\]</span> En multipliant
+par <span class="math inline">\(w_j\)</span> et en sommant sur <span
+class="math inline">\(j\)</span>, nous obtenons : <span
+class="math display">\[\sum_{j=1}^p w_j \frac{|x_j - z_j|}{b_j - a_j}
+\leq \sum_{j=1}^p w_j \frac{|x_j - y_j|}{b_j - a_j} + \sum_{j=1}^p w_j
+\frac{|y_j - z_j|}{b_j - a_j}\]</span> En divisant par <span
+class="math inline">\(p\)</span>, nous avons : <span
+class="math display">\[d_G(\mathbf{x}, \mathbf{z}) \leq d_G(\mathbf{x},
+\mathbf{y}) + d_G(\mathbf{y}, \mathbf{z})\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriétés-supplémentaires">Propriétés supplémentaires</h2>
+<p>Nous listons ici quelques propriétés supplémentaires de la distance
+de Gower pour les variables d’intervalle asymétriques normalisées.</p>
+<div class="proposition">
+<p>La distance de Gower <span class="math inline">\(d_G\)</span>
+satisfait les propriétés suivantes :</p>
+<ol>
+<li><p>Si toutes les variables <span class="math inline">\(X_j\)</span>
+ont le même intervalle <span class="math inline">\([a, b]\)</span>,
+alors la distance de Gower se simplifie en : <span
+class="math display">\[d_G(\mathbf{x}, \mathbf{y}) = \frac{1}{p}
+\sum_{j=1}^p w_j |x_j - y_j|\]</span></p></li>
+<li><p>Si toutes les variables <span class="math inline">\(X_j\)</span>
+ont le même poids <span class="math inline">\(w_j = 1\)</span>, alors la
+distance de Gower est la moyenne des distances normalisées : <span
+class="math display">\[d_G(\mathbf{x}, \mathbf{y}) = \frac{1}{p}
+\sum_{j=1}^p \frac{|x_j - y_j|}{b_j - a_j}\]</span></p></li>
+<li><p>La distance de Gower est invariante par translation et homothétie
+des variables. Plus précisément, si <span class="math inline">\(X_j&#39;
+= c_j + d_j X_j\)</span> avec <span class="math inline">\(d_j &gt;
+0\)</span>, alors la distance de Gower entre <span
+class="math inline">\(\mathbf{x}&#39;\)</span> et <span
+class="math inline">\(\mathbf{y}&#39;\)</span> est égale à la distance
+de Gower entre <span class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span>.</p></li>
+</ol>
+</div>
+<h2 id="démonstration-des-propriétés-supplémentaires">Démonstration des
+propriétés supplémentaires</h2>
+<p>Nous démontrons chacune de ces propriétés en détail.</p>
+<div class="proof">
+<p><em>Preuve des propriétés supplémentaires.</em> <strong>(i)</strong>
+Si toutes les variables <span class="math inline">\(X_j\)</span> ont le
+même intervalle <span class="math inline">\([a, b]\)</span>, alors <span
+class="math inline">\(b_j - a_j = b - a\)</span> pour tout <span
+class="math inline">\(j\)</span>. Ainsi, <span
+class="math display">\[d_G(\mathbf{x}, \mathbf{y}) = \frac{1}{p}
+\sum_{j=1}^p w_j \frac{|x_j - y_j|}{b - a} = \frac{1}{p(b - a)}
+\sum_{j=1}^p w_j |x_j - y_j|\]</span> Cependant, si nous choisissons
+<span class="math inline">\(w_j = b - a\)</span> pour tout <span
+class="math inline">\(j\)</span>, alors la distance de Gower se
+simplifie en : <span class="math display">\[d_G(\mathbf{x}, \mathbf{y})
+= \frac{1}{p} \sum_{j=1}^p |x_j - y_j|\]</span></p>
+<p><strong>(ii)</strong> Si toutes les variables <span
+class="math inline">\(X_j\)</span> ont le même poids <span
+class="math inline">\(w_j = 1\)</span>, alors la distance de Gower est
+simplement la moyenne des distances normalisées : <span
+class="math display">\[d_G(\mathbf{x}, \mathbf{y}) = \frac{1}{p}
+\sum_{j=1}^p \frac{|x_j - y_j|}{b_j - a_j}\]</span></p>
+<p><strong>(iii)</strong> Considérons une transformation linéaire <span
+class="math inline">\(X_j&#39; = c_j + d_j X_j\)</span> avec <span
+class="math inline">\(d_j &gt; 0\)</span>. La distance de Gower entre
+<span class="math inline">\(\mathbf{x}&#39;\)</span> et <span
+class="math inline">\(\mathbf{y}&#39;\)</span> est : <span
+class="math display">\[d_G(\mathbf{x}&#39;, \mathbf{y}&#39;) =
+\frac{1}{p} \sum_{j=1}^p w_j \frac{|x_j&#39; - y_j&#39;|}{b_j&#39; -
+a_j&#39;}\]</span> En utilisant <span class="math inline">\(x_j&#39; =
+c_j + d_j x_j\)</span> et <span class="math inline">\(y_j&#39; = c_j +
+d_j y_j\)</span>, nous avons : <span class="math display">\[|x_j&#39; -
+y_j&#39;| = d_j |x_j - y_j|\]</span> De plus, <span
+class="math inline">\(b_j&#39; - a_j&#39; = d_j (b_j - a_j)\)</span>.
+Ainsi, <span class="math display">\[d_G(\mathbf{x}&#39;,
+\mathbf{y}&#39;) = \frac{1}{p} \sum_{j=1}^p w_j \frac{d_j |x_j -
+y_j|}{d_j (b_j - a_j)} = \frac{1}{p} \sum_{j=1}^p w_j \frac{|x_j -
+y_j|}{b_j - a_j} = d_G(\mathbf{x}, \mathbf{y})\]</span> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Gower pour variables d’intervalle asymétriques
+normalisées offre une solution robuste et flexible pour l’analyse des
+données multidimensionnelles. En intégrant les propriétés de
+normalisation asymétrique, cette distance permet de comparer des
+observations sur des échelles différentes tout en préservant
+l’information contenue dans les intervalles.</p>
+<p>Les propriétés mathématiques établies dans ce chapitre garantissent
+que la distance de Gower est une mesure valide de dissimilarité. Les
+applications potentielles sont nombreuses, allant de l’analyse des
+données économiques aux études sociales.</p>
+<p>Pour les recherches futures, il serait intéressant d’explorer des
+extensions de cette distance à d’autres types de variables ou à des
+contextes plus complexes. L’intégration de méthodes d’apprentissage
+automatique pourrait également enrichir les applications pratiques de
+cette distance.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

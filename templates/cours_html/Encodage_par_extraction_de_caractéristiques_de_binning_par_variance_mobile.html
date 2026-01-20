@@ -1,0 +1,324 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de binning par variance mobile</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de binning
+par variance mobile</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’encodage par extraction de caractéristiques est une technique
+fondamentale en traitement du signal et des données. Elle permet de
+transformer des données brutes en informations significatives,
+facilitant ainsi l’analyse et la prise de décision. Parmi les méthodes
+d’extraction de caractéristiques, le binning par variance mobile se
+distingue par sa capacité à capturer les variations locales dans les
+données. Cette technique est particulièrement utile dans des domaines
+tels que la finance, où les variations de prix peuvent être très
+volatiles, ou en bioinformatique, où les signaux biologiques peuvent
+présenter des motifs complexes.</p>
+<p>L’idée sous-jacente au binning par variance mobile est de diviser les
+données en intervalles (ou bins) et de calculer une mesure de variance
+pour chaque intervalle. Cette approche permet de détecter les zones où
+la variance est élevée, indiquant une forte variabilité dans les
+données. En utilisant cette information, on peut encoder les données de
+manière à mettre en évidence ces variations locales.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’encodage par extraction de caractéristiques de
+binning par variance mobile, il est essentiel de définir quelques
+concepts clés.</p>
+<h2 class="unnumbered" id="binning">Binning</h2>
+<p>Le binning est une technique qui consiste à diviser un ensemble de
+données en intervalles disjoints. Chaque intervalle est appelé un bin.
+Formellement, soit <span class="math inline">\(X\)</span> un ensemble de
+données ordonné, et <span class="math inline">\(n\)</span> le nombre de
+bins souhaité. Nous définissons une fonction de binning <span
+class="math inline">\(B: X \rightarrow \{1, 2, \dots, n\}\)</span> telle
+que:</p>
+<p><span class="math display">\[B(x_i) = k \quad \text{si} \quad x_i \in
+[a_k, a_{k+1})\]</span></p>
+<p>où <span class="math inline">\(a_1, a_2, \dots, a_{n+1}\)</span> sont
+les bornes des bins.</p>
+<h2 class="unnumbered" id="variance-mobile">Variance Mobile</h2>
+<p>La variance mobile est une mesure de la variabilité locale dans les
+données. Pour un bin <span class="math inline">\(k\)</span>, la variance
+mobile <span class="math inline">\(V_k\)</span> est définie comme:</p>
+<p><span class="math display">\[V_k = \frac{1}{|B_k|} \sum_{i: B(x_i) =
+k} (x_i - \mu_k)^2\]</span></p>
+<p>où <span class="math inline">\(\mu_k\)</span> est la moyenne des
+données dans le bin <span class="math inline">\(k\)</span>, et <span
+class="math inline">\(|B_k|\)</span> est le nombre de points dans le bin
+<span class="math inline">\(k\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-la-variance-totale">Théorème de
+la Variance Totale</h2>
+<p>Un théorème fondamental en statistique est le théorème de la variance
+totale, qui relie la variance globale à la variance intra-bins et
+inter-bins. Ce théorème est particulièrement utile pour comprendre
+comment la variance mobile contribue à la variance totale des
+données.</p>
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données,
+et <span class="math inline">\(B\)</span> une fonction de binning. La
+variance totale <span class="math inline">\(\sigma^2\)</span> des
+données peut être décomposée comme suit:</p>
+<p><span class="math display">\[\sigma^2 = \sum_{k=1}^n p_k \sigma_k^2 +
+\sum_{k=1}^n p_k (\mu_k - \mu)^2\]</span></p>
+<p>où <span class="math inline">\(p_k\)</span> est la proportion de
+points dans le bin <span class="math inline">\(k\)</span>, <span
+class="math inline">\(\sigma_k^2\)</span> est la variance intra-bin pour
+le bin <span class="math inline">\(k\)</span>, et <span
+class="math inline">\(\mu_k\)</span> est la moyenne du bin <span
+class="math inline">\(k\)</span>.</p>
+<h2 class="unnumbered" id="preuve">Preuve</h2>
+<p>La preuve de ce théorème repose sur la décomposition de la variance
+en deux composantes: la variance intra-bins et la variance inter-bins.
+Nous commençons par exprimer la variance totale en termes des moyennes
+et variances des bins:</p>
+<p><span class="math display">\[\sigma^2 = \frac{1}{N} \sum_{i=1}^N (x_i
+- \mu)^2\]</span></p>
+<p>où <span class="math inline">\(N\)</span> est le nombre total de
+points dans les données. En utilisant la décomposition des carrés, nous
+pouvons écrire:</p>
+<p><span class="math display">\[(x_i - \mu)^2 = (x_i - \mu_k + \mu_k -
+\mu)^2 = (x_i - \mu_k)^2 + 2(x_i - \mu_k)(\mu_k - \mu) + (\mu_k -
+\mu)^2\]</span></p>
+<p>En sommant sur tous les points, nous obtenons:</p>
+<p><span class="math display">\[N\sigma^2 = \sum_{k=1}^n \sum_{i: B(x_i)
+= k} (x_i - \mu_k)^2 + 2\sum_{k=1}^n \sum_{i: B(x_i) = k} (x_i -
+\mu_k)(\mu_k - \mu) + \sum_{k=1}^n |B_k| (\mu_k - \mu)^2\]</span></p>
+<p>Le deuxième terme est nul car <span class="math inline">\(\sum_{i:
+B(x_i) = k} (x_i - \mu_k) = 0\)</span>. Ainsi, nous avons:</p>
+<p><span class="math display">\[N\sigma^2 = \sum_{k=1}^n |B_k|
+\sigma_k^2 + \sum_{k=1}^n |B_k| (\mu_k - \mu)^2\]</span></p>
+<p>En divisant par <span class="math inline">\(N\)</span> et en notant
+que <span class="math inline">\(p_k = \frac{|B_k|}{N}\)</span>, nous
+obtenons le résultat souhaité.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-de-la-variance-mobile">Propriété de
+la Variance Mobile</h2>
+<p>Une propriété importante de la variance mobile est qu’elle permet de
+capturer les variations locales dans les données. Plus précisément, si
+la variance mobile est élevée dans un bin, cela indique une forte
+variabilité locale.</p>
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données,
+et <span class="math inline">\(B\)</span> une fonction de binning. Si la
+variance mobile <span class="math inline">\(V_k\)</span> est élevée pour
+un bin <span class="math inline">\(k\)</span>, alors il y a une forte
+variabilité locale dans ce bin.</p>
+<h2 class="unnumbered" id="preuve-1">Preuve</h2>
+<p>La preuve de cette propriété repose sur la définition même de la
+variance mobile. La variance mobile <span
+class="math inline">\(V_k\)</span> mesure la dispersion des points dans
+le bin <span class="math inline">\(k\)</span> par rapport à la moyenne
+du bin. Si <span class="math inline">\(V_k\)</span> est élevé, cela
+signifie que les points dans le bin <span
+class="math inline">\(k\)</span> sont fortement dispersés autour de la
+moyenne du bin, indiquant une forte variabilité locale.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de binning par variance
+mobile est une technique puissante pour capturer les variations locales
+dans les données. En divisant les données en bins et en calculant la
+variance mobile pour chaque bin, nous pouvons détecter les zones de
+forte variabilité et encoder les données de manière à mettre en évidence
+ces variations. Cette approche est particulièrement utile dans des
+domaines tels que la finance et la bioinformatique, où les variations
+locales peuvent être très significatives.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

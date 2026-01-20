@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Équation de Cahn-Hilliard : Modélisation des Phénomènes de Séparation de Phase</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Équation de Cahn-Hilliard : Modélisation des
+Phénomènes de Séparation de Phase</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’équation de Cahn-Hilliard émerge dans le cadre de la modélisation
+des phénomènes de séparation de phase, un processus fondamental en
+science des matériaux et en physique statistique. Introduite par John W.
+Cahn et John E. Hilliard dans les années 1950, cette équation décrit
+l’évolution de la concentration d’une espèce dans un mélange binaire,
+prenant en compte les effets de diffusion et d’énergie libre.</p>
+<p>L’importance de cette équation réside dans sa capacité à capturer les
+dynamiques complexes des systèmes hors équilibre, où les fluctuations
+locales de concentration conduisent à la formation de domaines riches en
+une espèce ou l’autre. Ce modèle est indispensable pour comprendre les
+processus de nucléation, de croissance et de coalescence observés dans
+divers systèmes physiques, allant des alliages métalliques aux
+polymères.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’équation de Cahn-Hilliard, commençons par définir
+les concepts clés. Nous cherchons à modéliser l’évolution temporelle de
+la concentration <span class="math inline">\(c(\mathbf{x}, t)\)</span>
+d’une espèce dans un mélange binaire. Cette concentration varie
+spatialement et temporellement en réponse à des gradients de potentiel
+chimique.</p>
+<div class="definition">
+<p>L’énergie libre <span class="math inline">\(F\)</span> d’un système
+est donnée par une fonctionnelle de la concentration <span
+class="math inline">\(c(\mathbf{x})\)</span>. Pour un mélange binaire,
+cette énergie libre est souvent exprimée comme : <span
+class="math display">\[F[c] = \int_{\Omega} \left( f(c) +
+\frac{\kappa}{2} |\nabla c|^2 \right) d\mathbf{x},\]</span> où <span
+class="math inline">\(f(c)\)</span> est l’énergie libre volumique, <span
+class="math inline">\(\kappa\)</span> est un coefficient positif lié à
+la mobilité, et <span class="math inline">\(\Omega\)</span> est le
+domaine spatial considéré.</p>
+</div>
+<div class="definition">
+<p>Le potentiel chimique <span class="math inline">\(\mu\)</span> est
+défini comme la dérivée fonctionnelle de l’énergie libre par rapport à
+la concentration : <span class="math display">\[\mu = \frac{\delta
+F}{\delta c} = f&#39;(c) - \kappa \nabla^2 c.\]</span></p>
+</div>
+<h1 id="équation-de-cahn-hilliard">Équation de Cahn-Hilliard</h1>
+<p>L’équation de Cahn-Hilliard elle-même décrit l’évolution temporelle
+de la concentration <span class="math inline">\(c\)</span> en fonction
+du potentiel chimique. Nous cherchons une équation qui relie le taux de
+changement de la concentration à un terme de diffusion non linéaire.</p>
+<div class="theorem">
+<p>L’évolution temporelle de la concentration <span
+class="math inline">\(c(\mathbf{x}, t)\)</span> est donnée par : <span
+class="math display">\[\frac{\partial c}{\partial t} = \nabla \cdot
+\left( M \nabla \mu \right),\]</span> où <span
+class="math inline">\(M\)</span> est la mobilité, et <span
+class="math inline">\(\mu\)</span> le potentiel chimique défini
+précédemment.</p>
+</div>
+<p>En substituant l’expression du potentiel chimique, nous obtenons :
+<span class="math display">\[\frac{\partial c}{\partial t} = M \nabla^2
+\left( f&#39;(c) - \kappa \nabla^2 c \right).\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer l’équation de Cahn-Hilliard, nous partons du principe
+de minimisation de l’énergie libre sous contrainte de conservation de la
+masse.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons le taux de changement de l’énergie libre
+<span class="math inline">\(F\)</span> : <span
+class="math display">\[\frac{dF}{dt} = \int_{\Omega} \left( f&#39;(c) -
+\kappa \nabla^2 c \right) \frac{\partial c}{\partial t}
+d\mathbf{x}.\]</span></p>
+<p>En utilisant la relation de conservation de la masse : <span
+class="math display">\[\frac{\partial c}{\partial t} = -\nabla \cdot
+\mathbf{J},\]</span> où <span class="math inline">\(\mathbf{J}\)</span>
+est le flux de matière.</p>
+<p>En intégrant par parties et en appliquant les conditions aux limites
+appropriées, nous obtenons : <span class="math display">\[\frac{dF}{dt}
+= -\int_{\Omega} \left( f&#39;(c) - \kappa \nabla^2 c \right) \nabla
+\cdot \mathbf{J} d\mathbf{x}.\]</span></p>
+<p>En supposant que le flux <span
+class="math inline">\(\mathbf{J}\)</span> est proportionnel au gradient
+du potentiel chimique : <span class="math display">\[\mathbf{J} = -M
+\nabla \mu,\]</span> nous retrouvons l’équation de Cahn-Hilliard : <span
+class="math display">\[\frac{\partial c}{\partial t} = M \nabla^2 \left(
+f&#39;(c) - \kappa \nabla^2 c \right).\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’équation de Cahn-Hilliard possède plusieurs propriétés importantes
+qui en font un outil puissant pour la modélisation des phénomènes de
+séparation de phase.</p>
+<div class="corollaire">
+<p>L’équation de Cahn-Hilliard conserve la masse totale du système. En
+intégrant sur le domaine <span class="math inline">\(\Omega\)</span>,
+nous avons : <span class="math display">\[\frac{d}{dt} \int_{\Omega}
+c(\mathbf{x}, t) d\mathbf{x} = 0.\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> En intégrant l’équation de Cahn-Hilliard sur <span
+class="math inline">\(\Omega\)</span> et en appliquant le théorème de la
+divergence, nous obtenons : <span class="math display">\[\int_{\Omega}
+\frac{\partial c}{\partial t} d\mathbf{x} = M \int_{\partial \Omega}
+\nabla \mu \cdot \mathbf{n} dS,\]</span> où <span
+class="math inline">\(\mathbf{n}\)</span> est le vecteur normal à la
+frontière <span class="math inline">\(\partial \Omega\)</span>. En
+supposant des conditions aux limites appropriées (par exemple, flux nul
+à la frontière), nous trouvons que le terme de droite s’annule, ce qui
+prouve la conservation de la masse. ◻</p>
+</div>
+<div class="corollaire">
+<p>Pour une énergie libre <span class="math inline">\(f(c)\)</span>
+convexe, l’équation de Cahn-Hilliard est linéairement stable autour des
+états d’équilibre homogènes.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Considérons une petite perturbation <span
+class="math inline">\(\delta c\)</span> autour d’un état d’équilibre
+homogène <span class="math inline">\(c_0\)</span>. En linéarisant
+l’équation de Cahn-Hilliard autour de <span
+class="math inline">\(c_0\)</span>, nous obtenons : <span
+class="math display">\[\frac{\partial (\delta c)}{\partial t} = M
+\nabla^2 \left( f&#39;&#39;(c_0) \delta c - \kappa \nabla^2 (\delta c)
+\right).\]</span></p>
+<p>En supposant une solution de la forme <span
+class="math inline">\(\delta c = A e^{i\mathbf{k} \cdot \mathbf{x} +
+\lambda t}\)</span>, nous trouvons que la croissance exponentielle <span
+class="math inline">\(\lambda\)</span> est donnée par : <span
+class="math display">\[\lambda = -M |\mathbf{k}|^2 (f&#39;&#39;(c_0) +
+\kappa |\mathbf{k}|^2).\]</span></p>
+<p>Pour une énergie libre convexe, <span
+class="math inline">\(f&#39;&#39;(c_0) \geq 0\)</span>, ce qui implique
+que <span class="math inline">\(\lambda \leq 0\)</span>. Ainsi, les
+perturbations décroissent exponentiellement, ce qui prouve la stabilité
+linéaire. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’équation de Cahn-Hilliard est un modèle fondamental pour la
+description des phénomènes de séparation de phase. Son pouvoir prédictif
+et sa capacité à capturer les dynamiques complexes des systèmes hors
+équilibre en font un outil indispensable en science des matériaux et en
+physique statistique. Les propriétés de conservation de la masse et de
+stabilité linéaire en font un modèle robuste pour l’étude des processus
+de nucléation, de croissance et de coalescence.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

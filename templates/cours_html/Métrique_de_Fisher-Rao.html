@@ -1,0 +1,328 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Métrique de Fisher-Rao : Une Géométrie des Distributions de Probabilités</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Métrique de Fisher-Rao : Une Géométrie des
+Distributions de Probabilités</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La métrique de Fisher-Rao émerge comme une structure géométrique
+fondamentale dans l’étude des distributions de probabilités. Son origine
+remonte aux travaux pionniers de Ronald Aylmer Fisher dans les années
+1920, où il introduisit l’idée de distance informationnelle pour
+quantifier la sensibilité d’un modèle statistique à des variations de
+paramètres. Cette notion fut ensuite formalisée par Calyampudi
+Radhakrishna Rao, donnant naissance à la métrique que nous connaissons
+aujourd’hui.</p>
+<p>L’importance de cette métrique réside dans sa capacité à capturer
+l’information intrinsèque contenue dans une distribution de
+probabilités. Elle permet de définir des notions de distance, de
+courbure et de géodésique dans l’espace des distributions, ouvrant ainsi
+la voie à une compréhension plus profonde de la théorie statistique et
+de l’apprentissage automatique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la métrique de Fisher-Rao, commençons par considérer
+une famille paramétrée de distributions de probabilités. Supposons que
+nous ayons un ensemble de paramètres <span class="math inline">\(\theta
+\in \Theta\)</span> et une distribution de probabilités <span
+class="math inline">\(p(x|\theta)\)</span> pour chaque <span
+class="math inline">\(\theta\)</span>.</p>
+<p>Nous cherchons à quantifier la sensibilité de cette distribution aux
+variations infinitésimales des paramètres. Intuitivement, nous voulons
+mesurer à quel point la distribution change lorsque <span
+class="math inline">\(\theta\)</span> est légèrement modifié.</p>
+<p>Formellement, la métrique de Fisher-Rao est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(p(x|\theta)\)</span> une famille
+paramétrée de distributions de probabilités, où <span
+class="math inline">\(\theta = (\theta^1, \ldots, \theta^n) \in
+\Theta\)</span>. La métrique de Fisher-Rao est donnée par : <span
+class="math display">\[g_{ij}(\theta) = \int p(x|\theta) \left(
+\frac{\partial}{\partial \theta^i} \log p(x|\theta) \right) \left(
+\frac{\partial}{\partial \theta^j} \log p(x|\theta) \right)
+dx\]</span></p>
+</div>
+<p>Cette définition peut être réécrite en utilisant des quantificateurs
+: <span class="math display">\[g_{ij}(\theta) = \int_{\mathcal{X}}
+p(x|\theta) \left( \frac{\partial}{\partial \theta^i} \log p(x|\theta)
+\right) \left( \frac{\partial}{\partial \theta^j} \log p(x|\theta)
+\right) dx\]</span> où <span class="math inline">\(\mathcal{X}\)</span>
+est l’espace des observations.</p>
+<h1 class="unnumbered" id="propriétés">Propriétés</h1>
+<p>La métrique de Fisher-Rao possède plusieurs propriétés remarquables
+:</p>
+<ol>
+<li><p>**Positivité** : Pour tout vecteur <span class="math inline">\(v
+\in \mathbb{R}^n\)</span> et pour tout <span
+class="math inline">\(\theta \in \Theta\)</span>, nous avons : <span
+class="math display">\[g_{ij}(\theta) v^i v^j \geq 0\]</span> avec
+égalité si et seulement si <span class="math inline">\(v =
+0\)</span>.</p></li>
+<li><p>**Symétrie** : La métrique est symétrique, c’est-à-dire : <span
+class="math display">\[g_{ij}(\theta) = g_{ji}(\theta)\]</span></p></li>
+<li><p>**Invariance par réparamétrisation** : Si nous changeons de
+paramètres <span class="math inline">\(\theta\)</span> en <span
+class="math inline">\(\phi(\theta)\)</span>, la métrique transforme
+comme suit : <span class="math display">\[\tilde{g}_{ij}(\phi) =
+g_{kl}(\theta) \frac{\partial \theta^k}{\partial \phi^i} \frac{\partial
+\theta^l}{\partial \phi^j}\]</span> où <span
+class="math inline">\(\tilde{g}_{ij}(\phi)\)</span> est la métrique
+exprimée en termes des nouveaux paramètres.</p></li>
+</ol>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un résultat fondamental concernant la métrique de Fisher-Rao est le
+théorème suivant, dû à Rao :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(p(x|\theta)\)</span> une famille
+paramétrée de distributions de probabilités. La métrique de Fisher-Rao
+<span class="math inline">\(g_{ij}(\theta)\)</span> est une métrique
+riemannienne sur l’espace des paramètres <span
+class="math inline">\(\Theta\)</span>.</p>
+</div>
+<p>La preuve de ce théorème repose sur les propriétés de positivité et
+de symétrie de la métrique. En effet, ces propriétés garantissent que
+<span class="math inline">\(g_{ij}(\theta)\)</span> définit une
+structure riemannienne sur <span
+class="math inline">\(\Theta\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer la positivité de la métrique, nous procédons comme
+suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un vecteur <span class="math inline">\(v
+\in \mathbb{R}^n\)</span> et définissons : <span
+class="math display">\[I(v) = g_{ij}(\theta) v^i v^j\]</span></p>
+<p>En utilisant la définition de la métrique, nous avons : <span
+class="math display">\[I(v) = \int p(x|\theta) \left( v^i
+\frac{\partial}{\partial \theta^i} \log p(x|\theta) \right)^2
+dx\]</span></p>
+<p>Puisque <span class="math inline">\(p(x|\theta) \geq 0\)</span> et
+que le carré d’une fonction réelle est toujours non négatif, nous avons
+<span class="math inline">\(I(v) \geq 0\)</span>. De plus, si <span
+class="math inline">\(I(v) = 0\)</span>, alors nécessairement <span
+class="math inline">\(v^i \frac{\partial}{\partial \theta^i} \log
+p(x|\theta) = 0\)</span> presque partout. Cela implique que <span
+class="math inline">\(v = 0\)</span>, car sinon, la dérivée de <span
+class="math inline">\(\log p(x|\theta)\)</span> serait nulle pour tout
+<span class="math inline">\(x\)</span>, ce qui contredit l’hypothèse que
+<span class="math inline">\(\theta\)</span> est un paramètre de la
+distribution. ◻</p>
+</div>
+<h1 class="unnumbered" id="applications">Applications</h1>
+<p>La métrique de Fisher-Rao trouve des applications dans divers
+domaines, notamment :</p>
+<ul>
+<li><p>**Théorie de l’information** : Elle permet de quantifier
+l’information contenue dans une distribution de probabilités.</p></li>
+<li><p>**Apprentissage automatique** : Elle est utilisée pour définir
+des distances entre distributions dans les algorithmes
+d’apprentissage.</p></li>
+<li><p>**Biologie évolutive** : Elle permet de modéliser les changements
+dans les distributions génétiques au cours du temps.</p></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La métrique de Fisher-Rao est une notion centrale en théorie
+statistique et en géométrie différentielle. Ses propriétés remarquables
+et ses applications variées en font un outil indispensable pour l’étude
+des distributions de probabilités. En approfondissant notre
+compréhension de cette métrique, nous ouvrons la voie à de nouvelles
+avancées dans les domaines de l’apprentissage automatique et de la
+théorie de l’information.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

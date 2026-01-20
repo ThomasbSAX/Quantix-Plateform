@@ -1,0 +1,325 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Fréquence : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Fréquence : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’Encodage par Fréquence (EF) est une technique fondamentale en
+théorie de l’information et en cryptographie. Son origine remonte aux
+travaux pionniers de Claude Shannon dans les années 1940, où il a posé
+les bases de la théorie de l’information. L’EF émerge comme une réponse
+aux besoins croissants en compression de données et en sécurité des
+communications. En effet, dans un monde où la quantité d’informations à
+transmettre et stocker ne cesse de croître, il est indispensable de
+disposer de méthodes efficaces pour réduire la redondance et protéger
+les données.</p>
+<p>L’EF est indispensable dans de nombreux domaines, notamment la
+compression de fichiers multimédias (images, vidéos), les systèmes de
+cryptographie, et les protocoles de transmission de données. Son
+importance réside dans sa capacité à exploiter la distribution
+statistique des symboles pour optimiser l’utilisation de l’espace et du
+temps de transmission.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’EF, commençons par définir ce que nous cherchons à
+accomplir. Imaginez que vous avez un texte composé de plusieurs symboles
+(lettres, chiffres, etc.). Certains symboles apparaissent plus
+fréquemment que d’autres. L’idée de l’EF est de représenter ces symboles
+de manière à ce que les symboles fréquents soient encodés avec moins de
+bits que les symboles rares. Cela permet de réduire la taille globale du
+texte encodé.</p>
+<p>Formellement, considérons un alphabet <span
+class="math inline">\(\Sigma = \{s_1, s_2, \ldots, s_n\}\)</span> et une
+fonction de fréquence <span class="math inline">\(f: \Sigma \rightarrow
+\mathbb{R}^+\)</span> qui associe à chaque symbole sa fréquence
+d’apparition. L’objectif est de définir une fonction d’encodage <span
+class="math inline">\(E: \Sigma \rightarrow \{0,1\}^*\)</span> telle
+que:</p>
+<p><span class="math display">\[E(s_i) = b_{i_1}b_{i_2}\ldots
+b_{i_k}\]</span></p>
+<p>où <span class="math inline">\(k\)</span> est le nombre de bits
+nécessaires pour encoder le symbole <span
+class="math inline">\(s_i\)</span>, et <span
+class="math inline">\(b_{i_j} \in \{0,1\}\)</span>.</p>
+<p>Une autre manière de formuler cette définition est la suivante:</p>
+<p><span class="math display">\[\forall s_i, s_j \in \Sigma, \quad
+f(s_i) &gt; f(s_j) \Rightarrow |E(s_i)| &lt; |E(s_j)|\]</span></p>
+<p>où <span class="math inline">\(|E(s_i)|\)</span> désigne la longueur
+en bits de l’encodage du symbole <span
+class="math inline">\(s_i\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux liés à l’EF est le théorème de
+Kraft-McMillan, qui donne une condition nécessaire et suffisante pour
+qu’un ensemble de longueurs d’encodage soit réalisable.</p>
+<p>Commençons par expliquer ce que nous cherchons à accomplir. Supposons
+que nous ayons un ensemble de longueurs d’encodage <span
+class="math inline">\(\{l_1, l_2, \ldots, l_n\}\)</span>. Nous voulons
+savoir si ces longueurs peuvent être utilisées pour encoder un ensemble
+de symboles sans ambiguïté.</p>
+<p>Formellement, le théorème de Kraft-McMillan s’énonce comme suit:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\{l_1, l_2, \ldots, l_n\}\)</span>
+un ensemble de longueurs d’encodage. Il existe un encodage binaire
+préfixe pour ces longueurs si et seulement si:</p>
+<p><span class="math display">\[\sum_{i=1}^n \frac{1}{2^{l_i}} \leq
+1\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Kraft-McMillan, nous allons procéder par
+double implication.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Nécessité:</strong> Supposons qu’il existe un
+encodage binaire préfixe pour les longueurs <span
+class="math inline">\(\{l_1, l_2, \ldots, l_n\}\)</span>. Considérons un
+arbre binaire où chaque chemin de la racine à une feuille représente un
+code. Chaque feuille est associée à un symbole et a une profondeur égale
+à la longueur de son encodage. L’ensemble des codes forme un ensemble
+d’arbres binaires complets et disjoints. La somme des poids des feuilles
+de ces arbres est égale à 1, ce qui donne la condition nécessaire:</p>
+<p><span class="math display">\[\sum_{i=1}^n \frac{1}{2^{l_i}} \leq
+1\]</span></p>
+<p><strong>Suffisance:</strong> Réciproquement, supposons que la
+condition <span class="math inline">\(\sum_{i=1}^n \frac{1}{2^{l_i}}
+\leq 1\)</span> est satisfaite. Nous allons construire un encodage
+binaire préfixe en utilisant un algorithme glouton. À chaque étape, nous
+choisissons le code de longueur minimale disponible et nous ajoutons ce
+code à notre ensemble. La condition garantit que cet algorithme ne peut
+pas échouer, car il reste toujours suffisamment de codes disponibles
+pour encoder tous les symboles. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Voici quelques propriétés et corollaires importants liés à l’EF:</p>
+<ol>
+<li><p><strong>Propriété de Préfixe:</strong> Un encodage est dit
+préfixe si aucun code n’est le préfixe d’un autre. Cette propriété
+garantit que l’encodage est sans ambiguïté.</p></li>
+<li><p><strong>Corollaire du Théorème de Kraft-McMillan:</strong> Si un
+ensemble de longueurs satisfait la condition de Kraft-McMillan, alors il
+existe un encodage préfixe pour ces longueurs.</p></li>
+<li><p><strong>Propriété de Minimalité:</strong> L’encodage par
+fréquence minimal est obtenu en attribuant les codes les plus courts aux
+symboles les plus fréquents.</p></li>
+</ol>
+<p>Pour prouver la propriété de minimalité, nous allons montrer que tout
+autre encodage non minimal violerait la condition de Kraft-McMillan.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons qu’il existe un encodage non minimal où un
+symbole fréquent <span class="math inline">\(s_i\)</span> a une longueur
+de code plus grande que nécessaire. Cela signifie qu’il existe un
+symbole moins fréquent <span class="math inline">\(s_j\)</span> avec une
+longueur de code plus petite. En échangeant les longueurs de code de
+<span class="math inline">\(s_i\)</span> et <span
+class="math inline">\(s_j\)</span>, nous obtenons un nouvel ensemble de
+longueurs qui satisfait toujours la condition de Kraft-McMillan, mais
+avec une longueur totale plus petite. Par conséquent, l’encodage initial
+n’était pas minimal. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’Encodage par Fréquence est une technique puissante et polyvalente
+qui trouve des applications dans de nombreux domaines. Son importance
+réside dans sa capacité à optimiser l’utilisation de l’espace et du
+temps de transmission en exploitant la distribution statistique des
+symboles. Les théorèmes et propriétés présentés dans cet article
+fournissent les bases théoriques nécessaires pour comprendre et
+appliquer cette technique de manière efficace.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

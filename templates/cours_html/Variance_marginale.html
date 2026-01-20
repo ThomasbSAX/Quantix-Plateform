@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance marginale</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance marginale</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>En théorie des probabilités, la variance est une mesure de dispersion
+qui quantifie l’écart d’une variable aléatoire par rapport à son
+espérance. Cependant, dans le cas de variables aléatoires
+multidimensionnelles, il est souvent nécessaire d’étudier la variance
+d’une seule composante, indépendamment des autres. Cette notion est
+appelée <em>variance marginale</em>.</p>
+<p>L’étude de la variance marginale émerge naturellement dans l’analyse
+des données multidimensionnelles, où chaque dimension peut représenter
+une variable distincte. Comprendre la variance marginale permet de
+déterminer l’importance relative de chaque variable et d’identifier les
+dimensions les plus influentes dans un ensemble de données.</p>
+<p>La variance marginale est indispensable dans divers domaines, tels
+que l’apprentissage automatique, la finance et la biologie. Par exemple,
+en apprentissage automatique, elle peut aider à sélectionner les
+caractéristiques les plus pertinentes pour un modèle prédictif. En
+finance, elle peut être utilisée pour évaluer le risque associé à
+différents actifs.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Considérons une variable aléatoire multidimensionnelle <span
+class="math inline">\(\mathbf{X} = (X_1, X_2, \ldots, X_n)\)</span> avec
+une fonction de densité de probabilité conjointe <span
+class="math inline">\(f_{\mathbf{X}}(\mathbf{x})\)</span>. Nous
+cherchons à mesurer la dispersion de <span
+class="math inline">\(X_i\)</span> indépendamment des autres
+composantes.</p>
+<p>Pour ce faire, nous devons d’abord comprendre la notion de densité
+marginale. La densité marginale de <span
+class="math inline">\(X_i\)</span> est obtenue en intégrant la densité
+conjointe sur toutes les autres variables :</p>
+<p><span class="math display">\[f_{X_i}(x_i) = \int_{\mathbb{R}^{n-1}}
+f_{\mathbf{X}}(x_1, x_2, \ldots, x_n) \, dx_1 \cdots dx_{i-1} \,
+dx_{i+1} \cdots dx_n\]</span></p>
+<p>La variance marginale de <span class="math inline">\(X_i\)</span> est
+alors définie comme la variance de la variable aléatoire marginale <span
+class="math inline">\(X_i\)</span>. Formellement, nous avons :</p>
+<p><span class="math display">\[\text{Var}(X_i) = \mathbb{E}[(X_i -
+\mathbb{E}[X_i])^2]\]</span></p>
+<p>où <span class="math inline">\(\mathbb{E}[X_i]\)</span> est
+l’espérance marginale de <span class="math inline">\(X_i\)</span>,
+donnée par :</p>
+<p><span class="math display">\[\mathbb{E}[X_i] =
+\int_{-\infty}^{\infty} x_i f_{X_i}(x_i) \, dx_i\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la variance marginale est le
+<em>théorème de décomposition de la variance</em>, qui exprime la
+variance d’une variable aléatoire multidimensionnelle en termes de ses
+variances marginales et des covariances entre les composantes.</p>
+<p>Pour une variable aléatoire <span class="math inline">\(\mathbf{X} =
+(X_1, X_2, \ldots, X_n)\)</span>, la variance totale est donnée par
+:</p>
+<p><span class="math display">\[\text{Var}(\mathbf{X}) = \sum_{i=1}^n
+\text{Var}(X_i) + 2 \sum_{1 \leq i &lt; j \leq n} \text{Cov}(X_i,
+X_j)\]</span></p>
+<p>où <span class="math inline">\(\text{Cov}(X_i, X_j)\)</span> est la
+covariance entre <span class="math inline">\(X_i\)</span> et <span
+class="math inline">\(X_j\)</span>, définie par :</p>
+<p><span class="math display">\[\text{Cov}(X_i, X_j) = \mathbb{E}[(X_i -
+\mathbb{E}[X_i])(X_j - \mathbb{E}[X_j])]\]</span></p>
+<p>Ce théorème montre que la variance totale est la somme des variances
+marginales et des covariances entre les composantes. Il permet de
+comprendre comment la variance marginale contribue à la dispersion
+globale d’une variable aléatoire multidimensionnelle.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de décomposition de la variance, nous
+commençons par exprimer la variance totale en termes des moments d’ordre
+deux :</p>
+<p><span class="math display">\[\text{Var}(\mathbf{X}) =
+\mathbb{E}[\|\mathbf{X} - \mathbb{E}[\mathbf{X}]\|^2] =
+\mathbb{E}\left[\sum_{i=1}^n (X_i - \mathbb{E}[X_i])^2\right] =
+\sum_{i=1}^n \mathbb{E}[(X_i - \mathbb{E}[X_i])^2] = \sum_{i=1}^n
+\text{Var}(X_i)\]</span></p>
+<p>Cependant, cette expression ne tient pas compte des covariances entre
+les composantes. Pour inclure ces termes, nous développons le carré du
+vecteur <span class="math inline">\(\mathbf{X} -
+\mathbb{E}[\mathbf{X}]\)</span> :</p>
+<p><span class="math display">\[\|\mathbf{X} -
+\mathbb{E}[\mathbf{X}]\|^2 = \sum_{i=1}^n (X_i - \mathbb{E}[X_i])^2 + 2
+\sum_{1 \leq i &lt; j \leq n} (X_i - \mathbb{E}[X_i])(X_j -
+\mathbb{E}[X_j])\]</span></p>
+<p>En prenant l’espérance de chaque côté, nous obtenons :</p>
+<p><span class="math display">\[\mathbb{E}[\|\mathbf{X} -
+\mathbb{E}[\mathbf{X}]\|^2] = \sum_{i=1}^n \mathbb{E}[(X_i -
+\mathbb{E}[X_i])^2] + 2 \sum_{1 \leq i &lt; j \leq n} \mathbb{E}[(X_i -
+\mathbb{E}[X_i])(X_j - \mathbb{E}[X_j])]\]</span></p>
+<p>En utilisant les définitions de la variance et de la covariance, nous
+arrivons finalement à :</p>
+<p><span class="math display">\[\text{Var}(\mathbf{X}) = \sum_{i=1}^n
+\text{Var}(X_i) + 2 \sum_{1 \leq i &lt; j \leq n} \text{Cov}(X_i,
+X_j)\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+variance marginale :</p>
+<ol>
+<li><p>La variance marginale est toujours non négative, c’est-à-dire que
+pour toute variable aléatoire <span class="math inline">\(X_i\)</span>,
+nous avons :</p>
+<p><span class="math display">\[\text{Var}(X_i) \geq 0\]</span></p>
+<p>De plus, <span class="math inline">\(\text{Var}(X_i) = 0\)</span> si
+et seulement si <span class="math inline">\(X_i\)</span> est une
+constante presque sûrement.</p></li>
+<li><p>La variance marginale est invariante par translation. Plus
+précisément, pour toute constante <span
+class="math inline">\(c\)</span>, nous avons :</p>
+<p><span class="math display">\[\text{Var}(X_i + c) =
+\text{Var}(X_i)\]</span></p></li>
+<li><p>La variance marginale est homogène de degré deux. Pour tout
+scalaire <span class="math inline">\(\lambda\)</span>, nous avons :</p>
+<p><span class="math display">\[\text{Var}(\lambda X_i) = \lambda^2
+\text{Var}(X_i)\]</span></p></li>
+<li><p>La variance marginale satisfait l’inégalité de Cauchy-Schwarz.
+Pour toute paire de variables aléatoires <span
+class="math inline">\(X_i\)</span> et <span
+class="math inline">\(X_j\)</span>, nous avons :</p>
+<p><span class="math display">\[(\text{Cov}(X_i, X_j))^2 \leq
+\text{Var}(X_i) \text{Var}(X_j)\]</span></p>
+<p>Cette inégalité montre que la covariance entre deux variables est
+bornée par le produit de leurs variances marginales.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La variance marginale est une notion fondamentale en théorie des
+probabilités et en statistique. Elle permet de mesurer la dispersion
+d’une variable aléatoire indépendamment des autres composantes dans un
+contexte multidimensionnel. Le théorème de décomposition de la variance
+montre comment la variance marginale contribue à la dispersion globale
+d’une variable aléatoire multidimensionnelle. Les propriétés de la
+variance marginale, telles que sa non-négativité et son invariance par
+translation, en font un outil puissant pour l’analyse des données
+multidimensionnelles.</p>
+<p>En conclusion, la variance marginale est une notion indispensable
+dans divers domaines, tels que l’apprentissage automatique, la finance
+et la biologie. Sa compréhension approfondie permet de mieux analyser et
+interpréter les données multidimensionnelles, ce qui est crucial pour la
+prise de décision dans des contextes complexes et incertains.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

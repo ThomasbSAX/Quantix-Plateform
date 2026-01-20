@@ -1,0 +1,354 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Coefficient de corrélation de Pearson : Une mesure fondamentale des relations linéaires</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Coefficient de corrélation de Pearson : Une mesure
+fondamentale des relations linéaires</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des relations entre variables quantitatives est un pilier
+de la statistique descriptive et inférentielle. Parmi les outils les
+plus emblématiques pour capturer ces relations, le coefficient de
+corrélation de Pearson occupe une place centrale. Introduit par Karl
+Pearson en 1896, ce coefficient mesure l’intensité et la direction d’une
+relation linéaire entre deux variables aléatoires. Son émergence
+historique coïncide avec le développement des méthodes statistiques
+modernes, répondant à un besoin croissant d’outils quantitatifs pour
+décrire les phénomènes complexes observés en sciences sociales,
+biologiques et physiques.</p>
+<p>Le coefficient de Pearson est indispensable dans le cadre de
+l’analyse des données, où il permet de quantifier la force d’une
+relation linéaire et d’évaluer l’adéquation des modèles de régression.
+Son universalité réside dans sa capacité à fournir une mesure
+normalisée, comprise entre -1 et 1, indépendante des unités de mesure
+des variables. Cette propriété en fait un outil précieux pour comparer
+les relations entre différentes paires de variables dans des contextes
+variés.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire le coefficient de corrélation de Pearson, considérons
+deux variables aléatoires <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span>. Nous cherchons à mesurer dans
+quelle mesure ces variables varient ensemble de manière linéaire.
+Intuitivement, si <span class="math inline">\(X\)</span> augmente
+lorsque <span class="math inline">\(Y\)</span> augmente, et vice versa,
+nous nous attendons à une corrélation positive. Inversement, si <span
+class="math inline">\(X\)</span> diminue lorsque <span
+class="math inline">\(Y\)</span> augmente, la corrélation sera négative.
+La force de cette relation dépendra de l’étendue des variations
+conjointes.</p>
+<p>Formellement, le coefficient de corrélation de Pearson <span
+class="math inline">\(\rho(X, Y)\)</span> est défini comme suit :</p>
+<p><span class="math display">\[\rho(X, Y) = \frac{\text{Cov}(X,
+Y)}{\sigma_X \sigma_Y}\]</span></p>
+<p>où <span class="math inline">\(\text{Cov}(X, Y)\)</span> représente
+la covariance entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, et <span
+class="math inline">\(\sigma_X\)</span> et <span
+class="math inline">\(\sigma_Y\)</span> sont les écarts-types respectifs
+de <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+<p>En termes d’espérances mathématiques, cette définition peut être
+réécrite comme :</p>
+<p><span class="math display">\[\rho(X, Y) = \frac{\mathbb{E}[(X -
+\mu_X)(Y - \mu_Y)]}{\sigma_X \sigma_Y}\]</span></p>
+<p>où <span class="math inline">\(\mu_X = \mathbb{E}[X]\)</span> et
+<span class="math inline">\(\mu_Y = \mathbb{E}[Y]\)</span> sont les
+espérances des variables <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+<p>Une autre formulation, souvent utilisée en pratique pour des
+échantillons finis, est :</p>
+<p><span class="math display">\[r = \frac{\sum_{i=1}^n (x_i -
+\bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^n (x_i - \bar{x})^2}
+\sqrt{\sum_{i=1}^n (y_i - \bar{y})^2}}\]</span></p>
+<p>où <span class="math inline">\(x_i\)</span> et <span
+class="math inline">\(y_i\)</span> sont les observations des variables
+<span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, et <span
+class="math inline">\(\bar{x}\)</span> et <span
+class="math inline">\(\bar{y}\)</span> sont les moyennes empiriques.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié au coefficient de corrélation de Pearson
+est celui de la limite de convergence. Ce théorème établit que, sous
+certaines conditions, le coefficient de corrélation empirique converge
+vers le coefficient de corrélation théorique lorsque la taille de
+l’échantillon tend vers l’infini.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables aléatoires admissibles.
+Si les moments d’ordre deux existent et sont finis, alors :</p>
+<p><span class="math display">\[\lim_{n \to \infty} r = \rho(X, Y) \quad
+\text{presque sûrement}\]</span></p>
+<p>où <span class="math inline">\(r\)</span> est le coefficient de
+corrélation empirique calculé à partir d’un échantillon de taille <span
+class="math inline">\(n\)</span>.</p>
+</div>
+<p>La démonstration de ce théorème repose sur le théorème central limite
+et les propriétés des estimateurs consistants. En effet, la covariance
+empirique et les variances empiriques convergent respectivement vers la
+covariance théorique et les variances théoriques, garantissant ainsi la
+convergence du coefficient de corrélation empirique.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de la limite de convergence, nous
+procédons comme suit :</p>
+<p>1. **Convergence des moyennes empiriques** : Par le théorème central
+limite, les moyennes empiriques <span
+class="math inline">\(\bar{x}\)</span> et <span
+class="math inline">\(\bar{y}\)</span> convergent presque sûrement vers
+les espérances théoriques <span class="math inline">\(\mu_X\)</span> et
+<span class="math inline">\(\mu_Y\)</span>.</p>
+<p>2. **Convergence des covariances empiriques** : La covariance
+empirique <span class="math inline">\(\text{Cov}_n(X, Y) = \frac{1}{n}
+\sum_{i=1}^n (x_i - \bar{x})(y_i - \bar{y})\)</span> converge vers la
+covariance théorique <span class="math inline">\(\text{Cov}(X,
+Y)\)</span>.</p>
+<p>3. **Convergence des variances empiriques** : De même, les variances
+empiriques <span class="math inline">\(\text{Var}_n(X) = \frac{1}{n}
+\sum_{i=1}^n (x_i - \bar{x})^2\)</span> et <span
+class="math inline">\(\text{Var}_n(Y) = \frac{1}{n} \sum_{i=1}^n (y_i -
+\bar{y})^2\)</span> convergent respectivement vers les variances
+théoriques <span class="math inline">\(\text{Var}(X)\)</span> et <span
+class="math inline">\(\text{Var}(Y)\)</span>.</p>
+<p>En combinant ces résultats, nous obtenons :</p>
+<p><span class="math display">\[r = \frac{\text{Cov}_n(X,
+Y)}{\sqrt{\text{Var}_n(X) \text{Var}_n(Y)}} \to \frac{\text{Cov}(X,
+Y)}{\sqrt{\text{Var}(X) \text{Var}(Y)}} = \rho(X, Y)\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le coefficient de corrélation de Pearson possède plusieurs propriétés
+importantes :</p>
+<ol>
+<li><p>**Symétrie** : <span class="math inline">\(\rho(X, Y) = \rho(Y,
+X)\)</span>. Cette propriété découle directement de la définition de la
+covariance.</p></li>
+<li><p>**Bornes** : <span class="math inline">\(-1 \leq \rho(X, Y) \leq
+1\)</span>. Cette propriété est une conséquence du fait que la
+covariance est bornée par le produit des écarts-types.</p></li>
+<li><p>**Interprétation géométrique** : <span
+class="math inline">\(|\rho(X, Y)|\)</span> mesure l’angle entre les
+vecteurs centrés des observations de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Une corrélation de 1 ou -1 indique une
+colinéarité parfaite.</p></li>
+</ol>
+<p>Pour démontrer la propriété des bornes, nous utilisons l’inégalité de
+Cauchy-Schwarz :</p>
+<p><span class="math display">\[|\text{Cov}(X, Y)| \leq \sigma_X
+\sigma_Y\]</span></p>
+<p>En divisant par <span class="math inline">\(\sigma_X
+\sigma_Y\)</span>, nous obtenons :</p>
+<p><span class="math display">\[|\rho(X, Y)| \leq 1\]</span></p>
+<p>Cette inégalité est atteinte lorsque <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont linéairement dépendants,
+c’est-à-dire lorsqu’il existe des constantes <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> telles que <span
+class="math inline">\(Y = aX + b\)</span>.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le coefficient de corrélation de Pearson est un outil fondamental
+pour l’analyse des relations linéaires entre variables quantitatives.
+Son introduction historique, ses définitions rigoureuses et ses
+propriétés théoriques en font un pilier de la statistique moderne. Les
+théorèmes et preuves associés soulignent son importance dans l’inférence
+statistique et l’analyse des données. En comprenant profondément ce
+coefficient, les chercheurs et praticiens peuvent mieux interpréter les
+relations entre variables et construire des modèles plus robustes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

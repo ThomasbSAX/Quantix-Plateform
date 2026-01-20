@@ -1,0 +1,346 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Hamming Loss: Mesure de Performance pour l’Apprentissage Multiclasse</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Hamming Loss: Mesure de Performance pour
+l’Apprentissage Multiclasse</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’apprentissage multiclasse est un domaine central de l’intelligence
+artificielle où les modèles prédictifs doivent classer des instances
+dans plusieurs catégories. La mesure de performance est cruciale pour
+évaluer l’efficacité de ces modèles. Parmi les métriques disponibles, le
+Hamming Loss se distingue par sa simplicité et son utilité dans
+l’évaluation des erreurs de classification.</p>
+<p>Le Hamming Loss émerge comme une réponse aux limites des métriques
+traditionnelles telles que l’erreur de classification globale. Il permet
+d’évaluer finement les erreurs commises sur chaque étiquette
+individuelle dans un cadre multiclasse, offrant ainsi une vision plus
+granular des performances du modèle.</p>
+<p>Ce chapitre explore en profondeur la notion de Hamming Loss, ses
+définitions, ses théorèmes associés et ses propriétés. Nous mettrons en
+lumière son importance dans l’évaluation des modèles d’apprentissage
+multiclasse et ses applications pratiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre le Hamming Loss, commençons par définir les concepts
+fondamentaux nécessaires.</p>
+<h2 class="unnumbered" id="ensemble-détiquettes-et-prédictions">Ensemble
+d’étiquettes et Prédictions</h2>
+<p>Considérons un ensemble de <span class="math inline">\(N\)</span>
+instances à classer, chacune pouvant appartenir à plusieurs catégories
+parmi un ensemble d’étiquettes <span class="math inline">\(L = \{l_1,
+l_2, \ldots, l_m\}\)</span>.</p>
+<p>Pour chaque instance <span class="math inline">\(i\)</span>,
+notons:</p>
+<ul>
+<li><p><span class="math inline">\(Y_i\)</span> l’ensemble des
+étiquettes réelles.</p></li>
+<li><p><span class="math inline">\(\hat{Y}_i\)</span> l’ensemble des
+étiquettes prédites par le modèle.</p></li>
+</ul>
+<h2 class="unnumbered" id="hamming-loss">Hamming Loss</h2>
+<p>Le Hamming Loss mesure la proportion d’étiquettes incorrectement
+prédites par rapport au nombre total d’étiquettes possibles.</p>
+<p>Formellement, le Hamming Loss <span class="math inline">\(H\)</span>
+est défini comme: <span class="math display">\[H = \frac{1}{N \cdot m}
+\sum_{i=1}^{N} \sum_{j=1}^{m} \mathbb{I}(Y_i(j) \neq
+\hat{Y}_i(j))\]</span> où <span
+class="math inline">\(\mathbb{I}\)</span> est l’indicatrice qui vaut 1
+si les étiquettes réelles et prédites diffèrent pour l’étiquette <span
+class="math inline">\(j\)</span>, et 0 sinon.</p>
+<p>En termes de quantificateurs, cela s’écrit: <span
+class="math display">\[H = \frac{1}{N \cdot m} \sum_{i=1}^{N}
+\sum_{j=1}^{m} \mathbb{I}\left(\forall l_j \in L, Y_i(l_j) \neq
+\hat{Y}_i(l_j)\right)\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Plusieurs théorèmes et propriétés sont associés au Hamming Loss,
+permettant de mieux comprendre son comportement et ses implications.</p>
+<h2 class="unnumbered" id="théorème-de-normalisation">Théorème de
+Normalisation</h2>
+<p>Le Hamming Loss est normalisé entre 0 et 1, où 0 indique une
+classification parfaite et 1 indique la pire performance possible.</p>
+<div class="theorem">
+<p>Pour tout ensemble de prédictions <span
+class="math inline">\(\hat{Y}_i\)</span> et d’étiquettes réelles <span
+class="math inline">\(Y_i\)</span>, le Hamming Loss satisfait: <span
+class="math display">\[0 \leq H \leq 1\]</span></p>
+</div>
+<h2 class="unnumbered" id="preuve-du-théorème-de-normalisation">Preuve
+du Théorème de Normalisation</h2>
+<p>Pour prouver ce théorème, considérons les bornes inférieures et
+supérieures du Hamming Loss.</p>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ul>
+<li><p><strong>Borne inférieure:</strong> Si toutes les prédictions sont
+correctes, alors <span class="math inline">\(\mathbb{I}(Y_i(j) \neq
+\hat{Y}_i(j)) = 0\)</span> pour tout <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>. Ainsi, <span class="math inline">\(H =
+0\)</span>.</p></li>
+<li><p><strong>Borne supérieure:</strong> Si toutes les prédictions sont
+incorrectes, alors <span class="math inline">\(\mathbb{I}(Y_i(j) \neq
+\hat{Y}_i(j)) = 1\)</span> pour tout <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>. Ainsi, <span class="math inline">\(H =
+\frac{N \cdot m}{N \cdot m} = 1\)</span>.</p></li>
+</ul>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le Hamming Loss possède plusieurs propriétés intéressantes qui en
+font une métrique robuste pour l’évaluation des modèles multiclasse.</p>
+<h2 class="unnumbered" id="propriété-de-symétrie">Propriété de
+Symétrie</h2>
+<p>Le Hamming Loss est symétrique par rapport aux étiquettes réelles et
+prédites.</p>
+<div class="proposition">
+<p>Pour tout ensemble de prédictions <span
+class="math inline">\(\hat{Y}_i\)</span> et d’étiquettes réelles <span
+class="math inline">\(Y_i\)</span>, le Hamming Loss satisfait: <span
+class="math display">\[H(Y, \hat{Y}) = H(\hat{Y}, Y)\]</span></p>
+</div>
+<h2 class="unnumbered" id="preuve-de-la-symétrie-du-hamming-loss">Preuve
+de la Symétrie du Hamming Loss</h2>
+<p>La preuve de cette propriété découle directement de la définition du
+Hamming Loss.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons l’indicatrice <span
+class="math inline">\(\mathbb{I}(Y_i(j) \neq \hat{Y}_i(j))\)</span>.
+Cette indicatrice est symétrique par rapport à <span
+class="math inline">\(Y_i(j)\)</span> et <span
+class="math inline">\(\hat{Y}_i(j)\)</span>. Par conséquent, le Hamming
+Loss est également symétrique: <span class="math display">\[H(Y,
+\hat{Y}) = \frac{1}{N \cdot m} \sum_{i=1}^{N} \sum_{j=1}^{m}
+\mathbb{I}(Y_i(j) \neq \hat{Y}_i(j)) = H(\hat{Y}, Y)\]</span> ◻</p>
+</div>
+<h2 class="unnumbered" id="propriété-de-monotonie">Propriété de
+Monotonie</h2>
+<p>Le Hamming Loss est monotone en fonction du nombre d’erreurs de
+prédiction.</p>
+<div class="proposition">
+<p>Si le nombre d’erreurs de prédiction augmente, alors le Hamming Loss
+augmente également.</p>
+</div>
+<h2 class="unnumbered"
+id="preuve-de-la-monotonie-du-hamming-loss">Preuve de la Monotonie du
+Hamming Loss</h2>
+<p>La preuve de cette propriété suit directement de la définition du
+Hamming Loss.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que le nombre d’erreurs de prédiction
+augmente. Cela signifie que <span
+class="math inline">\(\mathbb{I}(Y_i(j) \neq \hat{Y}_i(j))\)</span>
+augmente pour certains <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>. Par conséquent, la somme <span
+class="math inline">\(\sum_{i=1}^{N} \sum_{j=1}^{m} \mathbb{I}(Y_i(j)
+\neq \hat{Y}_i(j))\)</span> augmente, ce qui entraîne une augmentation
+du Hamming Loss <span class="math inline">\(H\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Hamming Loss est une métrique essentielle pour l’évaluation des
+modèles d’apprentissage multiclasse. Sa simplicité et sa robustesse en
+font un outil précieux pour les chercheurs et les praticiens dans le
+domaine de l’intelligence artificielle. En comprenant ses définitions,
+théorèmes et propriétés, nous pouvons mieux évaluer et améliorer les
+performances des modèles de classification multiclasse.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

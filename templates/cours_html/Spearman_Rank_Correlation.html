@@ -1,0 +1,316 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Analyse de la Corrélation par Rangs de Spearman</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Analyse de la Corrélation par Rangs de Spearman</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des corrélations entre variables quantitatives est un
+pilier fondamental de l’inférence statistique. Cependant, lorsque les
+hypothèses classiques de normalité et de linéarité sont violées, les
+méthodes traditionnelles telles que le coefficient de corrélation de
+Pearson deviennent inadéquates. C’est dans ce contexte que l’analyse par
+rangs de Spearman émerge comme une alternative robuste, particulièrement
+adaptée aux données ordinales ou non linéaires.</p>
+<p>Le coefficient de corrélation de Spearman, introduit par Charles
+Edward Spearman en 1904, mesure la force et la direction d’une relation
+monotone entre deux variables. Contrairement à Pearson qui évalue
+uniquement les relations linéaires, Spearman capture une variété plus
+large de dépendances, y compris les relations non linéaires et
+monotones.</p>
+<p>Cette méthode est indispensable dans des domaines aussi variés que la
+psychologie, l’économie et les sciences sociales, où les données sont
+souvent de nature ordinale ou présentent des distributions non normales.
+De plus, sa résistance aux valeurs aberrantes en fait un outil précieux
+pour l’analyse de données réelles et bruitées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le coefficient de corrélation de Spearman, commençons
+par définir ce que nous cherchons à mesurer. Supposons que nous ayons
+deux ensembles de données, <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span>, chacun contenant <span
+class="math inline">\(n\)</span> observations. Nous voulons quantifier
+la tendance selon laquelle les rangs des observations dans <span
+class="math inline">\(X\)</span> sont associés aux rangs des
+observations correspondantes dans <span
+class="math inline">\(Y\)</span>.</p>
+<p>Formellement, le coefficient de corrélation de Spearman est défini
+comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(X = (x_1, x_2, \ldots,
+x_n)\)</span> et <span class="math inline">\(Y = (y_1, y_2, \ldots,
+y_n)\)</span> deux ensembles de données. Les rangs des observations
+<span class="math inline">\(x_i\)</span> et <span
+class="math inline">\(y_i\)</span> sont notés respectivement <span
+class="math inline">\(R(X)_i\)</span> et <span
+class="math inline">\(R(Y)_i\)</span>. Le coefficient de corrélation de
+Spearman, noté <span class="math inline">\(\rho_s\)</span>, est défini
+par : <span class="math display">\[\rho_s = 1 - \frac{6 \sum_{i=1}^n
+(R(X)_i - R(Y)_i)^2}{n(n^2 - 1)}\]</span></p>
+</div>
+<p>Une autre formulation équivalente est : <span
+class="math display">\[\rho_s = \frac{\text{Cov}(R(X),
+R(Y))}{\sqrt{\text{Var}(R(X)) \cdot \text{Var}(R(Y))}}\]</span> où <span
+class="math inline">\(\text{Cov}\)</span> et <span
+class="math inline">\(\text{Var}\)</span> désignent respectivement la
+covariance et la variance.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié au coefficient de corrélation de Spearman
+est le suivant :</p>
+<div class="theorem">
+<p>Le coefficient de corrélation de Spearman <span
+class="math inline">\(\rho_s\)</span> satisfait les propriétés suivantes
+:</p>
+<ol>
+<li><p><span class="math inline">\(-1 \leq \rho_s \leq
+1\)</span></p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont strictement monotones l’une par
+rapport à l’autre, alors <span class="math inline">\(|\rho_s| =
+1\)</span></p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendants, alors <span
+class="math inline">\(\rho_s = 0\)</span></p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer la première propriété du théorème, nous procédons
+comme suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la définition de <span
+class="math inline">\(\rho_s\)</span> : <span
+class="math display">\[\rho_s = 1 - \frac{6 \sum_{i=1}^n (R(X)_i -
+R(Y)_i)^2}{n(n^2 - 1)}\]</span> Puisque <span
+class="math inline">\((R(X)_i - R(Y)_i)^2 \geq 0\)</span> pour tout
+<span class="math inline">\(i\)</span>, il s’ensuit que : <span
+class="math display">\[\sum_{i=1}^n (R(X)_i - R(Y)_i)^2 \geq 0\]</span>
+Ainsi, <span class="math display">\[\rho_s \leq 1 - \frac{6 \cdot
+0}{n(n^2 - 1)} = 1\]</span> De même, en utilisant l’inégalité de
+Cauchy-Schwarz sur les rangs normalisés, on peut montrer que <span
+class="math inline">\(\rho_s \geq -1\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes du
+coefficient de corrélation de Spearman :</p>
+<ol>
+<li><p><strong>Robustesse aux Valeurs Aberrantes</strong> : Le
+coefficient de Spearman est moins sensible aux valeurs aberrantes que le
+coefficient de Pearson, car il repose sur les rangs plutôt que sur les
+valeurs brutes.</p></li>
+<li><p><strong>Interprétation</strong> : Une valeur de <span
+class="math inline">\(\rho_s\)</span> proche de 1 indique une relation
+monotone croissante, tandis qu’une valeur proche de -1 indique une
+relation monotone décroissante.</p></li>
+<li><p><strong>Test d’Hypothèses</strong> : Pour tester l’hypothèse
+nulle selon laquelle <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendants, on peut utiliser le
+test de Spearman. Sous l’hypothèse nulle, la statistique <span
+class="math inline">\(\rho_s\)</span> suit une distribution
+asymptotiquement normale.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le coefficient de corrélation de Spearman est un outil puissant pour
+l’analyse des relations monotones entre variables. Sa simplicité et sa
+robustesse en font un choix privilégié dans de nombreuses applications
+pratiques, notamment lorsque les données ne satisfont pas les hypothèses
+requises par les méthodes traditionnelles.</p>
+<p>En conclusion, l’analyse par rangs de Spearman offre une alternative
+flexible et robuste pour l’étude des corrélations, ouvrant ainsi de
+nouvelles perspectives dans le domaine de l’inférence statistique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

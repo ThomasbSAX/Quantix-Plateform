@@ -1,0 +1,349 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de BM25 : Mesure d’Information et Rétroaction dans la Recherche Documentaire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de BM25 : Mesure d’Information et Rétroaction
+dans la Recherche Documentaire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de BM25, ou modèle probabiliste de langage pour la
+recherche d’information, émerge dans les années 1970-1980 comme une
+réponse sophistiquée aux limites des modèles booléens et vectoriels. Ces
+derniers, bien que révolutionnaires pour leur époque, peinent à capturer
+la nuance des requêtes utilisateur et l’hétérogénéité des documents.
+BM25, développé par Robertson et Walker (1976), s’inscrit dans une
+approche probabiliste où chaque document est évalué par la probabilité
+qu’il soit pertinent à une requête donnée.</p>
+<p>Cette notion devient indispensable dans le cadre de la recherche
+d’information moderne, où l’on cherche à optimiser la pertinence des
+résultats tout en tenant compte de la fréquence des termes et de leur
+distribution dans les documents. Contrairement aux modèles précédents,
+BM25 intègre une rétroaction implicite via un paramètre de saturation
+qui modère l’impact des termes très fréquents.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de BM25, commençons par définir les
+concepts fondamentaux. Supposons que nous ayons un corpus de documents,
+et une requête composée de termes. Nous cherchons à mesurer la
+pertinence d’un document par rapport à cette requête.</p>
+<p>La première notion clé est celle de fréquence des termes. Pour un
+terme <span class="math inline">\(t\)</span> dans le document <span
+class="math inline">\(d\)</span>, notons <span
+class="math inline">\(f_{t,d}\)</span> sa fréquence. La fréquence
+maximale possible pour un terme dans un document est notée <span
+class="math inline">\(f_{t,d}^{\max}\)</span>.</p>
+<p>Nous cherchons à mesurer l’importance d’un terme dans un document, en
+tenant compte de sa rareté. Intuitivement, plus un terme est rare dans
+l’ensemble du corpus, plus il devrait être pertinent s’il apparaît dans
+le document.</p>
+<p>Formellement, la fréquence inverse de document pour un terme <span
+class="math inline">\(t\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(N\)</span> le nombre total de
+documents dans le corpus, et <span class="math inline">\(n_t\)</span> le
+nombre de documents contenant le terme <span
+class="math inline">\(t\)</span>. La fréquence inverse de document (IDF)
+est donnée par : <span class="math display">\[\text{idf}(t) = \log
+\left( \frac{N - n_t + 0.5}{n_t + 0.5} \right) + 1\]</span></p>
+</div>
+<p>La distance de BM25 elle-même est une fonction qui combine la
+fréquence des termes dans le document et leur rareté dans le corpus.
+Elle est définie pour une requête <span class="math inline">\(Q\)</span>
+composée de termes <span class="math inline">\(\{t_1, t_2, \ldots,
+t_k\}\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(Q\)</span> une requête composée des
+termes <span class="math inline">\(\{t_1, t_2, \ldots, t_k\}\)</span>,
+et <span class="math inline">\(d\)</span> un document. La distance de
+BM25 est définie par : <span class="math display">\[\text{BM25}(Q, d) =
+\sum_{i=1}^{k} \text{idf}(t_i) \cdot \frac{f_{t_i,d} \cdot (k_1 +
+1)}{f_{t_i,d} + k_1 \cdot (1 - b + b \cdot
+\frac{|d|}{\text{avgdl}})}\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(f_{t_i,d}\)</span> est la fréquence
+du terme <span class="math inline">\(t_i\)</span> dans le document <span
+class="math inline">\(d\)</span>,</p></li>
+<li><p><span class="math inline">\(|d|\)</span> est la longueur du
+document <span class="math inline">\(d\)</span>,</p></li>
+<li><p><span class="math inline">\(\text{avgdl}\)</span> est la longueur
+moyenne des documents dans le corpus,</p></li>
+<li><p><span class="math inline">\(k_1\)</span> et <span
+class="math inline">\(b\)</span> sont des paramètres
+empiriques.</p></li>
+</ul>
+</div>
+<h1 id="théorèmes-et-propriétés">Théorèmes et Propriétés</h1>
+<p>Un théorème central lié à BM25 est celui de la normalisation des
+scores. Ce théorème montre que les scores BM25 peuvent être normalisés
+pour comparer la pertinence des documents indépendamment de leur
+longueur.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\text{BM25}(Q, d)\)</span> le score
+BM25 pour la requête <span class="math inline">\(Q\)</span> et le
+document <span class="math inline">\(d\)</span>. Le score normalisé est
+donné par : <span class="math display">\[\text{BM25}_{\text{norm}}(Q, d)
+= \frac{\text{BM25}(Q, d)}{\sqrt{\sum_{t \in Q}
+(\text{idf}(t))^2}}\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la normalisation des scores BM25, nous
+procédons comme suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux documents <span
+class="math inline">\(d_1\)</span> et <span
+class="math inline">\(d_2\)</span>. Nous voulons montrer que les scores
+normalisés sont comparables indépendamment de la longueur des
+documents.</p>
+<p>Le score BM25 pour <span class="math inline">\(d_1\)</span> est :
+<span class="math display">\[\text{BM25}(Q, d_1) = \sum_{i=1}^{k}
+\text{idf}(t_i) \cdot \frac{f_{t_i,d_1} \cdot (k_1 + 1)}{f_{t_i,d_1} +
+k_1 \cdot (1 - b + b \cdot \frac{|d_1|}{\text{avgdl}})}\]</span></p>
+<p>De même, pour <span class="math inline">\(d_2\)</span> : <span
+class="math display">\[\text{BM25}(Q, d_2) = \sum_{i=1}^{k}
+\text{idf}(t_i) \cdot \frac{f_{t_i,d_2} \cdot (k_1 + 1)}{f_{t_i,d_2} +
+k_1 \cdot (1 - b + b \cdot \frac{|d_2|}{\text{avgdl}})}\]</span></p>
+<p>En normalisant les scores, nous obtenons : <span
+class="math display">\[\text{BM25}_{\text{norm}}(Q, d_1) =
+\frac{\text{BM25}(Q, d_1)}{\sqrt{\sum_{t \in Q}
+(\text{idf}(t))^2}}\]</span> <span
+class="math display">\[\text{BM25}_{\text{norm}}(Q, d_2) =
+\frac{\text{BM25}(Q, d_2)}{\sqrt{\sum_{t \in Q}
+(\text{idf}(t))^2}}\]</span></p>
+<p>Ainsi, les scores normalisés sont comparables car le dénominateur est
+identique pour tous les documents. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Plusieurs propriétés importantes découlent du modèle BM25 :</p>
+<ol>
+<li><p><strong>Propriété de Saturation</strong> : Le score BM25 pour un
+terme donné dans un document atteint un plateau lorsque la fréquence du
+terme devient très élevée. Cela est dû au paramètre <span
+class="math inline">\(k_1\)</span> qui modère l’impact des termes très
+fréquents.</p></li>
+<li><p><strong>Corollaire de la Rareté</strong> : Plus un terme est rare
+dans le corpus, plus son IDF est élevé, et donc plus il contribue au
+score BM25. Cela reflète l’intuition que les termes rares sont plus
+informatifs.</p></li>
+<li><p><strong>Propriété de Longueur</strong> : Le paramètre <span
+class="math inline">\(b\)</span> permet d’ajuster l’impact de la
+longueur du document sur le score. Un <span
+class="math inline">\(b\)</span> élevé donne plus de poids aux documents
+courts, tandis qu’un <span class="math inline">\(b\)</span> faible
+atténue cet effet.</p></li>
+</ol>
+<p>Pour prouver la propriété de saturation, considérons un terme <span
+class="math inline">\(t\)</span> dans un document <span
+class="math inline">\(d\)</span>. Lorsque <span
+class="math inline">\(f_{t,d}\)</span> devient très grand, le score BM25
+pour ce terme tend vers une valeur limite :</p>
+<p><span class="math display">\[\lim_{f_{t,d} \to \infty} \frac{f_{t,d}
+\cdot (k_1 + 1)}{f_{t,d} + k_1 \cdot (1 - b + b \cdot
+\frac{|d|}{\text{avgdl}})} = k_1 + 1\]</span></p>
+<p>Ainsi, le score BM25 pour ce terme ne peut pas dépasser <span
+class="math inline">\((k_1 + 1) \cdot \text{idf}(t)\)</span>.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de BM25 représente une avancée significative dans le
+domaine de la recherche d’information, combinant élégamment la fréquence
+des termes et leur rareté dans le corpus. Son approche probabiliste et
+sa capacité à modérer l’impact des termes fréquents en font un outil
+indispensable pour les systèmes de recherche modernes. Les propriétés et
+théorèmes associés à BM25 offrent une compréhension profonde de son
+comportement et de ses limites, ouvrant la voie à des améliorations et
+extensions futures.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

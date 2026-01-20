@@ -1,0 +1,365 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes NP-complets</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes NP-complets</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’étude de la complexité des problèmes NP-complets constitue un
+pilier fondamental en informatique théorique. Historiquement, cette
+notion émerge dans les années 1970 avec les travaux de Stephen Cook et
+Leonid Levin, qui formalisent la classe NP et identifient des problèmes
+particuliers dont la résolution semble particulièrement ardue. Ces
+problèmes, qualifiés de NP-complets, se caractérisent par leur capacité
+à encapsuler une difficulté universelle au sein de la classe NP.</p>
+<p>Pourquoi cette notion est-elle indispensable ? Parce qu’elle permet
+de catégoriser et de comprendre les limites des algorithmes connus. Un
+problème NP-complet est tel que, s’il existe un algorithme polynomial
+pour l’un d’entre eux, alors tous les problèmes dans NP peuvent être
+résolus en temps polynomial. Cette propriété en fait des candidats
+privilégiés pour explorer les frontières entre P et NP, l’une des
+questions centrales en théorie de la complexité.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement un problème NP-complet, il est
+essentiel de comprendre les notions sous-jacentes. Imaginons que nous
+cherchions à résoudre un problème pour lequel une solution proposée peut
+être vérifiée rapidement, mais où trouver cette solution semble
+extrêmement difficile. Par exemple, le problème du voyageur de commerce
+consiste à trouver le plus court chemin passant par un ensemble de
+villes, sans repasser par la même ville. Vérifier qu’un chemin donné est
+optimal est aisé, mais le trouver l’est beaucoup moins.</p>
+<div class="definition">
+<p>Un problème de décision est un problème pour lequel il existe un
+ensemble fini d’instances et, pour chaque instance, une réponse binaire
+(oui ou non). Formellement, un problème de décision peut être défini
+comme une relation <span class="math inline">\(L \subseteq
+\{0,1\}^*\)</span> où chaque élément de <span
+class="math inline">\(L\)</span> représente une instance acceptée.</p>
+</div>
+<div class="definition">
+<p>La classe P est l’ensemble des problèmes de décision pour lesquels il
+existe un algorithme déterministe qui, étant donné une instance <span
+class="math inline">\(x\)</span>, décide si <span
+class="math inline">\(x \in L\)</span> en temps polynomial.
+Formellement, <span class="math display">\[P = \{ L \subseteq \{0,1\}^*
+\mid \exists \text{ algorithme } A \text{ et polynôme } p \text{ tels
+que } \forall x \in \{0,1\}^*, A(x) \text{ termine en } O(p(|x|)) \text{
+étapes et décide si } x \in L \}.\]</span></p>
+</div>
+<div class="definition">
+<p>La classe NP est l’ensemble des problèmes de décision pour lesquels
+une solution proposée peut être vérifiée en temps polynomial par un
+algorithme déterministe. Formellement, <span class="math display">\[NP =
+\{ L \subseteq \{0,1\}^* \mid \exists \text{ relation } R \text{ et
+polynôme } p \text{ tels que } \forall x, y, (x,y) \in R \Leftrightarrow
+|y| \leq p(|x|) \text{ et } x \in L \}.\]</span></p>
+</div>
+<div class="definition">
+<p>Un problème <span class="math inline">\(L\)</span> est NP-complet
+s’il appartient à la classe NP et s’il est NP-difficile, c’est-à-dire
+que tout problème dans NP peut être réduit à <span
+class="math inline">\(L\)</span> en temps polynomial. Formellement,
+<span class="math inline">\(L\)</span> est NP-complet si :</p>
+<ol>
+<li><p><span class="math inline">\(L \in NP\)</span>.</p></li>
+<li><p><span class="math inline">\(\forall L&#39; \in NP,
+\exists\)</span> réduction polynomiale <span class="math inline">\(f :
+\{0,1\}^* \rightarrow \{0,1\}^*\)</span> telle que <span
+class="math inline">\(\forall x, x \in L&#39; \Leftrightarrow f(x) \in
+L\)</span>.</p></li>
+</ol>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour illustrer l’importance des problèmes NP-complets, considérons le
+théorème de Cook-Levin. Ce théorème montre que le problème de la
+satisfaction booléenne (SAT) est NP-complet, ce qui en fait un problème
+central dans l’étude de la complexité.</p>
+<div class="theorem">
+<p>Le problème de la satisfaction booléenne (SAT) est NP-complet.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous devons montrer que
+SAT appartient à NP et qu’il est NP-difficile.</p>
+<ol>
+<li><p><strong>SAT appartient à NP</strong> : Étant donné une formule
+booléenne <span class="math inline">\(\phi\)</span> et une affectation
+des variables <span class="math inline">\(y\)</span>, il est possible de
+vérifier en temps polynomial si <span class="math inline">\(y\)</span>
+satisfait <span class="math inline">\(\phi\)</span>. Ainsi, SAT <span
+class="math inline">\(\in\)</span> NP.</p></li>
+<li><p><strong>SAT est NP-difficile</strong> : Pour tout problème <span
+class="math inline">\(L&#39; \in\)</span> NP, il existe une réduction
+polynomiale de <span class="math inline">\(L&#39;\)</span> à SAT. Cela
+signifie que nous pouvons transformer toute instance de <span
+class="math inline">\(L&#39;\)</span> en une instance de SAT en temps
+polynomial, préservant la réponse.</p></li>
+</ol>
+<p>La réduction polynomiale est généralement construite en utilisant une
+machine de Turing non déterministique qui reconnaît <span
+class="math inline">\(L&#39;\)</span>. Nous pouvons alors encoder cette
+machine et son comportement en une formule booléenne <span
+class="math inline">\(\phi\)</span> telle que <span
+class="math inline">\(\phi\)</span> est satisfiable si et seulement si
+la machine accepte l’instance de <span
+class="math inline">\(L&#39;\)</span>. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer davantage, considérons la preuve que le problème du
+sac à dos (Knapsack) est NP-complet.</p>
+<div class="theorem">
+<p>Le problème du sac à dos est NP-complet.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Nous devons montrer que le problème du sac à dos
+appartient à NP et qu’il est NP-difficile.</p>
+<ol>
+<li><p><strong>Le problème du sac à dos appartient à NP</strong> : Étant
+donné une instance <span class="math inline">\((S, T, W)\)</span> où
+<span class="math inline">\(S\)</span> est un ensemble d’objets avec des
+poids et des valeurs, <span class="math inline">\(T\)</span> est le
+poids maximal du sac, et <span class="math inline">\(W\)</span> est la
+valeur cible, nous pouvons vérifier en temps polynomial si un
+sous-ensemble d’objets atteint exactement <span
+class="math inline">\(W\)</span> sans dépasser <span
+class="math inline">\(T\)</span>. Ainsi, le problème du sac à dos <span
+class="math inline">\(\in\)</span> NP.</p></li>
+<li><p><strong>Le problème du sac à dos est NP-difficile</strong> : Nous
+devons montrer une réduction polynomiale de SAT au problème du sac à
+dos. Pour cela, nous transformons chaque variable et chaque clause de la
+formule booléenne en objets du sac à dos. Les poids et les valeurs sont
+choisis de manière à ce que la formule soit satisfiable si et seulement
+si le sac à dos peut atteindre la valeur cible sans dépasser le poids
+maximal.</p></li>
+</ol>
+<p>La réduction polynomiale est construite en associant à chaque
+variable deux objets : un pour la valeur vraie et un pour la valeur
+fausse. Les clauses sont encodées comme des contraintes supplémentaires
+sur les objets. Ainsi, la satisfaction de la formule correspond à un
+sous-ensemble d’objets atteignant la valeur cible. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les problèmes NP-complets possèdent plusieurs propriétés
+intéressantes, qui en font des outils puissants pour l’étude de la
+complexité.</p>
+<ol>
+<li><p><strong>Propriété de réduction</strong> : Si un problème
+NP-complet peut être résolu en temps polynomial, alors tous les
+problèmes dans NP peuvent l’être. Cela découle du fait que tout problème
+dans NP peut être réduit à un problème NP-complet en temps
+polynomial.</p></li>
+<li><p><strong>Propriété de fermeture</strong> : L’ensemble des
+problèmes NP-complets est fermé sous réduction polynomiale. Cela
+signifie que si un problème <span class="math inline">\(L\)</span> est
+NP-complet et qu’un autre problème <span
+class="math inline">\(L&#39;\)</span> peut être réduit à <span
+class="math inline">\(L\)</span> en temps polynomial, alors <span
+class="math inline">\(L&#39;\)</span> est également NP-complet.</p></li>
+<li><p><strong>Propriété de l’approximation</strong> : De nombreux
+problèmes NP-complets admettent des algorithmes d’approximation
+efficaces. Ces algorithmes fournissent des solutions qui sont "proches"
+de l’optimum, même si trouver la solution exacte est difficile.</p></li>
+</ol>
+<p>En conclusion, l’étude des problèmes NP-complets offre une riche
+palette d’outils et de concepts pour comprendre les limites des
+algorithmes et explorer les frontières de la complexité
+computationnelle. Ces problèmes, par leur nature universelle, continuent
+d’inspirer des recherches en algorithmes, en optimisation et en théorie
+de la complexité.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

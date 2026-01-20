@@ -1,0 +1,319 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance hiérarchique bayésienne : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance hiérarchique bayésienne : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La variance hiérarchique bayésienne émerge comme un cadre puissant
+pour modéliser la variabilité dans les données tout en intégrant des
+informations a priori. Son origine remonte aux travaux fondateurs de
+Thomas Bayes, mais c’est avec l’avènement des méthodes computationnelles
+modernes que cette approche a trouvé son plein épanouissement. La
+variance hiérarchique bayésienne est indispensable dans les contextes où
+les données présentent une structure hiérarchique, permettant ainsi de
+capturer des dépendances complexes tout en respectant le principe de
+parcimonie.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Nous cherchons à modéliser une situation où les données sont
+organisées en plusieurs niveaux hiérarchiques. Par exemple, des élèves
+dans des classes, elles-mêmes dans des écoles. La variance hiérarchique
+bayésienne permet de capturer la variabilité à chaque niveau de cette
+hiérarchie.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(Y_{ij}\)</span> la donnée observée
+pour l’unité <span class="math inline">\(i\)</span> dans le groupe <span
+class="math inline">\(j\)</span>. Nous supposons que : <span
+class="math display">\[Y_{ij} | \mu_j, \sigma^2 \sim \mathcal{N}(\mu_j,
+\sigma^2)\]</span> où <span class="math inline">\(\mu_j\)</span> est la
+moyenne du groupe <span class="math inline">\(j\)</span>, et <span
+class="math inline">\(\sigma^2\)</span> est la variance commune à tous
+les groupes. La variance hiérarchique bayésienne se réfère à la
+variabilité des <span class="math inline">\(\mu_j\)</span> autour de la
+moyenne globale <span class="math inline">\(\mu\)</span>.</p>
+</div>
+<p>La définition formelle peut être étendue à plusieurs niveaux
+hiérarchiques. Par exemple, pour un modèle à trois niveaux : <span
+class="math display">\[Y_{ijk} | \mu_{ij}, \sigma^2_{ij} \sim
+\mathcal{N}(\mu_{ij}, \sigma^2_{ij})\]</span> <span
+class="math display">\[\mu_{ij} | \mu_j, \tau^2_j \sim
+\mathcal{N}(\mu_j, \tau^2_j)\]</span> <span class="math display">\[\mu_j
+| \mu, \tau^2 \sim \mathcal{N}(\mu, \tau^2)\]</span> où <span
+class="math inline">\(\tau^2\)</span> et <span
+class="math inline">\(\tau^2_j\)</span> représentent les variances
+hiérarchiques.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Nous présentons ici un théorème fondamental concernant l’estimation
+de la variance hiérarchique bayésienne.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mu_j \sim \mathcal{N}(\mu,
+\tau^2)\)</span> pour <span class="math inline">\(j = 1, \ldots,
+J\)</span>. L’estimateur bayésien de la variance hiérarchique <span
+class="math inline">\(\tau^2\)</span> est donné par : <span
+class="math display">\[\tau^2 = \frac{1}{J-1} \sum_{j=1}^J (\mu_j -
+\bar{\mu})^2\]</span> où <span class="math inline">\(\bar{\mu} =
+\frac{1}{J} \sum_{j=1}^J \mu_j\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous utilisons les propriétés des
+distributions normales et des estimateurs bayésiens.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous commençons par rappeler que <span
+class="math inline">\(\mu_j\)</span> suit une distribution normale
+centrée en <span class="math inline">\(\mu\)</span> avec une variance
+<span class="math inline">\(\tau^2\)</span>. L’estimateur bayésien de
+<span class="math inline">\(\mu\)</span> est la moyenne empirique des
+<span class="math inline">\(\mu_j\)</span>, soit : <span
+class="math display">\[\bar{\mu} = \frac{1}{J} \sum_{j=1}^J
+\mu_j\]</span></p>
+<p>Ensuite, nous calculons la variance empirique des <span
+class="math inline">\(\mu_j\)</span> autour de <span
+class="math inline">\(\bar{\mu}\)</span> : <span
+class="math display">\[\frac{1}{J-1} \sum_{j=1}^J (\mu_j -
+\bar{\mu})^2\]</span></p>
+<p>Par les propriétés des distributions normales, cette quantité est un
+estimateur non biaisé de <span class="math inline">\(\tau^2\)</span>. En
+effet, pour une distribution normale, la variance est donnée par : <span
+class="math display">\[\tau^2 = \mathbb{E}[(\mu_j - \mu)^2]\]</span></p>
+<p>En remplaçant <span class="math inline">\(\mu\)</span> par son
+estimateur <span class="math inline">\(\bar{\mu}\)</span>, nous obtenons
+l’estimateur bayésien de la variance hiérarchique. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ici quelques propriétés importantes de la variance
+hiérarchique bayésienne.</p>
+<ol>
+<li><p>La variance hiérarchique bayésienne permet de borner l’estimation
+des paramètres individuels, évitant ainsi le surajustement
+(overfitting).</p>
+<div class="proof">
+<p><em>Proof.</em> En intégrant les informations a priori, la variance
+hiérarchique bayésienne contraint les estimations des <span
+class="math inline">\(\mu_j\)</span> à rester proches de la moyenne
+globale <span class="math inline">\(\mu\)</span>. Cela réduit la
+variabilité des estimations et prévient le surajustement. ◻</p>
+</div></li>
+<li><p>La variance hiérarchique bayésienne est particulièrement utile
+dans les contextes où le nombre de groupes est grand et le nombre
+d’observations par groupe est petit.</p>
+<div class="proof">
+<p><em>Proof.</em> Dans de tels contextes, les estimations des <span
+class="math inline">\(\mu_j\)</span> basées uniquement sur les données
+seraient très bruitées. L’intégration des informations a priori permet
+d’obtenir des estimations plus stables et précises. ◻</p>
+</div></li>
+<li><p>La variance hiérarchique bayésienne peut être généralisée à des
+modèles non normaux.</p>
+<div class="proof">
+<p><em>Proof.</em> Bien que nous ayons présenté le cas normal pour
+simplifier l’exposition, la variance hiérarchique bayésienne peut être
+appliquée à d’autres distributions, comme les distributions de Poisson
+ou bêta, en adaptant les priors et les likelihoods. ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La variance hiérarchique bayésienne offre un cadre puissant et
+flexible pour modéliser la variabilité dans les données hiérarchiques.
+Ses applications sont nombreuses, allant de l’analyse des données
+éducatives à la génomique. En intégrant des informations a priori, elle
+permet d’obtenir des estimations plus précises et robustes, tout en
+évitant le surajustement.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

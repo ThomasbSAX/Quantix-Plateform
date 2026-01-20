@@ -1,0 +1,348 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La matrice nulle : une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La matrice nulle : une exploration mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Dans le vaste paysage des mathématiques, les matrices occupent une
+place centrale, notamment en algèbre linéaire. Parmi ces objets
+mathématiques, la matrice nulle se distingue par sa simplicité apparente
+et son rôle fondamental. Mais derrière cette simplicité se cache une
+puissance conceptuelle qui mérite d’être explorée.</p>
+<p>La matrice nulle émerge naturellement comme l’élément neutre dans
+l’addition des matrices. Elle est indispensable pour définir
+rigoureusement les espaces vectoriels de matrices et pour comprendre les
+propriétés des transformations linéaires. Son étude permet également
+d’illustrer des concepts plus généraux, tels que les éléments neutres
+dans les structures algébriques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre ce qu’est une matrice nulle, commençons par nous
+interroger sur l’élément neutre dans l’addition des matrices. Si nous
+avons une matrice <span class="math inline">\(A\)</span> et que nous
+l’ajoutons à une autre matrice qui ne change pas <span
+class="math inline">\(A\)</span>, quelle est cette matrice ?</p>
+<p>Formellement, nous définissons la matrice nulle comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(m\)</span> et <span
+class="math inline">\(n\)</span> deux entiers naturels non nuls. La
+matrice nulle de taille <span class="math inline">\(m \times n\)</span>,
+notée <span class="math inline">\(0_{m,n}\)</span> ou simplement <span
+class="math inline">\(0\)</span> lorsque la taille est implicite, est la
+matrice dont tous les coefficients sont nuls. En d’autres termes, <span
+class="math display">\[0_{m,n} = \begin{pmatrix}
+0 &amp; 0 &amp; \cdots &amp; 0 \\
+0 &amp; 0 &amp; \cdots &amp; 0 \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; \cdots &amp; 0
+\end{pmatrix}\]</span> où chaque entrée <span
+class="math inline">\((0_{m,n})_{i,j} = 0\)</span> pour tout <span
+class="math inline">\(i \in \{1, \ldots, m\}\)</span> et <span
+class="math inline">\(j \in \{1, \ldots, n\}\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>La matrice nulle possède plusieurs propriétés intéressantes qui la
+rendent fondamentale en algèbre linéaire. Explorons quelques-unes de ces
+propriétés.</p>
+<h2 class="unnumbered"
+id="théorème-1-propriété-de-lélément-neutre">Théorème 1 : Propriété de
+l’élément neutre</h2>
+<p>Commençons par comprendre pourquoi la matrice nulle est l’élément
+neutre dans l’addition des matrices. Si nous ajoutons la matrice nulle à
+une autre matrice, nous obtenons la même matrice.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> une matrice de taille
+<span class="math inline">\(m \times n\)</span>. Alors, <span
+class="math display">\[A + 0 = A.\]</span></p>
+</div>
+<h2 class="unnumbered" id="preuve-du-théorème-1">Preuve du Théorème
+1</h2>
+<p>Pour démontrer ce théorème, considérons une matrice <span
+class="math inline">\(A\)</span> de taille <span class="math inline">\(m
+\times n\)</span>. La matrice nulle <span
+class="math inline">\(0_{m,n}\)</span> est définie comme la matrice dont
+tous les coefficients sont nuls. L’addition de deux matrices se fait en
+additionnant leurs coefficients correspondants.</p>
+<p>Ainsi, pour tout <span class="math inline">\(i \in \{1, \ldots,
+m\}\)</span> et <span class="math inline">\(j \in \{1, \ldots,
+n\}\)</span>, nous avons <span class="math display">\[(A +
+0_{m,n})_{i,j} = A_{i,j} + (0_{m,n})_{i,j} = A_{i,j} + 0 =
+A_{i,j}.\]</span> Par conséquent, <span class="math display">\[A + 0 =
+A.\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La matrice nulle possède plusieurs propriétés qui en font un outil
+puissant en algèbre linéaire. Explorons quelques-unes de ces
+propriétés.</p>
+<h2 class="unnumbered"
+id="propriété-1-multiplication-par-un-scalaire">Propriété 1 :
+Multiplication par un scalaire</h2>
+<p>La multiplication de la matrice nulle par un scalaire quelconque
+donne toujours la matrice nulle.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\(\lambda\)</span> un scalaire et
+<span class="math inline">\(0_{m,n}\)</span> la matrice nulle de taille
+<span class="math inline">\(m \times n\)</span>. Alors, <span
+class="math display">\[\lambda 0_{m,n} = 0_{m,n}.\]</span></p>
+</div>
+<h2 class="unnumbered" id="preuve-de-la-proposition-1">Preuve de la
+Proposition 1</h2>
+<p>Considérons un scalaire <span class="math inline">\(\lambda\)</span>
+et la matrice nulle <span class="math inline">\(0_{m,n}\)</span>. La
+multiplication d’une matrice par un scalaire se fait en multipliant
+chaque coefficient de la matrice par ce scalaire.</p>
+<p>Ainsi, pour tout <span class="math inline">\(i \in \{1, \ldots,
+m\}\)</span> et <span class="math inline">\(j \in \{1, \ldots,
+n\}\)</span>, nous avons <span class="math display">\[(\lambda
+0_{m,n})_{i,j} = \lambda (0_{m,n})_{i,j} = \lambda \cdot 0 = 0.\]</span>
+Par conséquent, <span class="math display">\[\lambda 0_{m,n} =
+0_{m,n}.\]</span></p>
+<h2 class="unnumbered"
+id="propriété-2-multiplication-de-matrices">Propriété 2 : Multiplication
+de matrices</h2>
+<p>La multiplication de la matrice nulle par une autre matrice donne
+toujours la matrice nulle.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice de taille
+<span class="math inline">\(m \times n\)</span>. Alors, <span
+class="math display">\[0_{m,p} A = 0_{m,n} \quad \text{et} \quad A
+0_{n,p} = 0_{m,p}\]</span> pour toute matrice <span
+class="math inline">\(0_{m,p}\)</span> de taille <span
+class="math inline">\(m \times p\)</span> et toute matrice <span
+class="math inline">\(0_{n,p}\)</span> de taille <span
+class="math inline">\(n \times p\)</span>.</p>
+</div>
+<h2 class="unnumbered" id="preuve-de-la-proposition-2">Preuve de la
+Proposition 2</h2>
+<p>Considérons une matrice <span class="math inline">\(A\)</span> de
+taille <span class="math inline">\(m \times n\)</span>. La
+multiplication de matrices se fait en utilisant la somme des produits
+des coefficients correspondants.</p>
+<p>Pour la première partie, considérons <span
+class="math inline">\(0_{m,p}\)</span> de taille <span
+class="math inline">\(m \times p\)</span>. Pour tout <span
+class="math inline">\(i \in \{1, \ldots, m\}\)</span> et <span
+class="math inline">\(j \in \{1, \ldots, n\}\)</span>, nous avons <span
+class="math display">\[(0_{m,p} A)_{i,j} = \sum_{k=1}^{p}
+(0_{m,p})_{i,k} A_{k,j} = \sum_{k=1}^{p} 0 \cdot A_{k,j} = 0.\]</span>
+Par conséquent, <span class="math display">\[0_{m,p} A =
+0_{m,n}.\]</span></p>
+<p>Pour la deuxième partie, considérons <span
+class="math inline">\(0_{n,p}\)</span> de taille <span
+class="math inline">\(n \times p\)</span>. Pour tout <span
+class="math inline">\(i \in \{1, \ldots, m\}\)</span> et <span
+class="math inline">\(j \in \{1, \ldots, p\}\)</span>, nous avons <span
+class="math display">\[(A 0_{n,p})_{i,j} = \sum_{k=1}^{n} A_{i,k}
+(0_{n,p})_{k,j} = \sum_{k=1}^{n} A_{i,k} \cdot 0 = 0.\]</span> Par
+conséquent, <span class="math display">\[A 0_{n,p} =
+0_{m,p}.\]</span></p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La matrice nulle, bien que simple en apparence, joue un rôle
+fondamental en algèbre linéaire. Elle est l’élément neutre dans
+l’addition des matrices et possède plusieurs propriétés intéressantes
+qui la rendent indispensable pour comprendre les structures algébriques
+plus complexes. Son étude permet également d’illustrer des concepts plus
+généraux, tels que les éléments neutres dans les structures
+algébriques.</p>
+<p>En explorant la matrice nulle, nous avons non seulement approfondi
+notre compréhension des matrices, mais aussi jeté les bases pour des
+concepts plus avancés en algèbre linéaire et au-delà.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

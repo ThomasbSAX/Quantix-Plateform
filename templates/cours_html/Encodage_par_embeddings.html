@@ -1,0 +1,332 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Embeddings : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Embeddings : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par embeddings, ou représentation vectorielle de données,
+est une technique fondamentale en apprentissage automatique et
+traitement du langage naturel. Cette approche permet de transformer des
+données complexes, comme des mots ou des images, en vecteurs dans un
+espace euclidien de dimension finie. L’origine de cette méthode remonte
+aux années 1980 avec les travaux de Rumelhart, Hinton et Williams sur
+les réseaux de neurones. L’émergence des embeddings a été motivée par le
+besoin de capturer les relations sémantiques entre les données, comme la
+similarité entre des mots ou des concepts.</p>
+<p>Les embeddings sont indispensables dans de nombreux domaines,
+notamment le traitement automatique du langage (NLP), la vision par
+ordinateur et les systèmes de recommandation. Ils permettent de
+représenter des données non structurées dans un format exploitable par
+les algorithmes d’apprentissage automatique. Par exemple, en NLP, les
+embeddings de mots permettent de capturer des relations sémantiques et
+syntaxiques, facilitant ainsi des tâches comme la traduction automatique
+ou l’analyse de sentiments.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les embeddings, commençons par définir ce que nous
+cherchons à obtenir. Supposons que nous avons un ensemble de données,
+par exemple des mots dans un corpus. Nous voulons représenter chaque mot
+par un vecteur dans un espace euclidien de dimension <span
+class="math inline">\(d\)</span>, tel que des mots similaires aient des
+vecteurs proches.</p>
+<p>Formellement, un embedding est une fonction <span
+class="math inline">\(\phi : X \rightarrow \mathbb{R}^d\)</span>, où
+<span class="math inline">\(X\)</span> est l’ensemble des données à
+encoder. Pour chaque élément <span class="math inline">\(x \in
+X\)</span>, <span class="math inline">\(\phi(x)\)</span> est un vecteur
+de dimension <span class="math inline">\(d\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données et
+<span class="math inline">\(d \in \mathbb{N}^*\)</span>. Une fonction
+<span class="math inline">\(\phi : X \rightarrow \mathbb{R}^d\)</span>
+est appelée un embedding de dimension <span
+class="math inline">\(d\)</span> si elle satisfait les conditions
+suivantes :</p>
+<ol>
+<li><p>Pour tout <span class="math inline">\(x \in X\)</span>, <span
+class="math inline">\(\phi(x)\)</span> est un vecteur de dimension <span
+class="math inline">\(d\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(x, y \in X\)</span>, si
+<span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> sont similaires, alors <span
+class="math inline">\(\|\phi(x) - \phi(y)\|_2\)</span> est
+petit.</p></li>
+</ol>
+</div>
+<h1 id="théorèmes-et-propriétés">Théorèmes et Propriétés</h1>
+<p>Un des théorèmes fondamentaux liés aux embeddings est le théorème de
+la dimension intrinsèque, qui stipule que les données peuvent souvent
+être représentées dans un espace de dimension plus faible que leur
+dimension initiale sans perte significative d’information.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+dans <span class="math inline">\(\mathbb{R}^n\)</span>. Il existe une
+dimension <span class="math inline">\(d \leq n\)</span> telle que pour
+toute fonction de perte <span class="math inline">\(L : \mathbb{R}^n
+\times \mathbb{R}^d \rightarrow \mathbb{R}\)</span>, il existe un
+embedding <span class="math inline">\(\phi : X \rightarrow
+\mathbb{R}^d\)</span> minimisant <span
+class="math inline">\(L\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la dimension intrinsèque, nous utilisons
+des techniques d’analyse dimensionnelle et de réduction de dimension. La
+preuve repose sur le fait que les données réelles sont souvent
+concentrées dans un sous-espace de dimension plus faible.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un ensemble de données <span
+class="math inline">\(X \subset \mathbb{R}^n\)</span>. Nous voulons
+montrer qu’il existe une dimension <span class="math inline">\(d \leq
+n\)</span> telle que les données peuvent être représentées dans <span
+class="math inline">\(\mathbb{R}^d\)</span> sans perte significative
+d’information.</p>
+<p>1. **Analyse des valeurs propres** : Calculons la matrice de
+covariance <span class="math inline">\(\Sigma\)</span> des données. Les
+valeurs propres de <span class="math inline">\(\Sigma\)</span> nous
+donnent une indication sur la dimension intrinsèque des données.</p>
+<p>2. **Réduction de dimension** : Utilisons une méthode de réduction de
+dimension comme l’Analyse en Composantes Principales (PCA) pour projeter
+les données dans un espace de dimension <span
+class="math inline">\(d\)</span>.</p>
+<p>3. **Minimisation de la perte** : Montrons que pour toute fonction de
+perte <span class="math inline">\(L\)</span>, il existe un embedding
+<span class="math inline">\(\phi\)</span> qui minimise <span
+class="math inline">\(L\)</span>.</p>
+<p>En conclusion, nous avons montré qu’il existe une dimension <span
+class="math inline">\(d\)</span> telle que les données peuvent être
+représentées dans <span class="math inline">\(\mathbb{R}^d\)</span> sans
+perte significative d’information. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les embeddings ont plusieurs propriétés importantes qui les rendent
+utiles dans diverses applications.</p>
+<div class="proposition">
+<p>Les embeddings satisfont les propriétés suivantes :</p>
+<ol>
+<li><p>**Continuité** : Si deux éléments <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> sont proches dans l’espace des données,
+alors leurs embeddings <span class="math inline">\(\phi(x)\)</span> et
+<span class="math inline">\(\phi(y)\)</span> sont proches dans <span
+class="math inline">\(\mathbb{R}^d\)</span>.</p></li>
+<li><p>**Invariance** : Les embeddings sont invariants sous certaines
+transformations, comme les translations ou les rotations.</p></li>
+<li><p>**Efficacité** : Les embeddings permettent de représenter des
+données complexes dans un espace de dimension réduite, facilitant ainsi
+le traitement et l’analyse.</p></li>
+</ol>
+</div>
+<h1 id="applications">Applications</h1>
+<p>Les embeddings sont utilisés dans de nombreuses applications,
+notamment en traitement du langage naturel et en vision par ordinateur.
+Par exemple, les embeddings de mots comme Word2Vec ou GloVe permettent
+de capturer des relations sémantiques entre les mots. De même, les
+embeddings d’images permettent de représenter des images dans un espace
+où des images similaires sont proches.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’encodage par embeddings est une technique puissante et polyvalente
+qui permet de représenter des données complexes dans un espace
+vectoriel. Cette méthode est indispensable dans de nombreux domaines,
+notamment le traitement automatique du langage et la vision par
+ordinateur. Les embeddings continuent d’être un sujet de recherche
+actif, avec des applications potentielles dans des domaines tels que la
+biologie computationnelle et les systèmes de recommandation.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,402 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Sous-différentiel : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Sous-différentiel : Une exploration mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse convexe, née au milieu du XXème siècle, a révolutionné
+notre compréhension des fonctions non-lisses. Parmi ses outils les plus
+puissants, le sous-différentiel émerge comme une généralisation
+naturelle du gradient pour les fonctions convexes. Introduit par Moreau,
+Rockafellar et Fenchel dans les années 1960, cet objet mathématique
+permet d’étendre des concepts classiques de l’analyse différentielle aux
+fonctions convexes, souvent non dérivables.</p>
+<p>Le sous-différentiel répond à une question fondamentale : comment
+généraliser la notion de dérivée aux fonctions non-lisses ? Dans un
+monde où les modèles mathématiques doivent capturer des phénomènes
+complexes et discontinus, cette question devient cruciale. Le
+sous-différentiel offre une réponse élégante et puissante, permettant de
+traiter des problèmes d’optimisation non-lisse avec la même rigueur que
+les problèmes lisses.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’énoncer la définition formelle du sous-différentiel,
+explorons intuitivement ce que nous cherchons à capturer. Pour une
+fonction convexe <span class="math inline">\(f\)</span>, le gradient en
+un point <span class="math inline">\(x_0\)</span> donne la direction de
+plus grande croissance. Cependant, lorsque <span
+class="math inline">\(f\)</span> n’est pas différentiable en <span
+class="math inline">\(x_0\)</span>, le gradient n’existe pas. Le
+sous-différentiel vise à remplacer ce gradient par un ensemble de
+vecteurs qui capturent les directions de croissance possibles.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f : \mathbb{R}^n \to
+\mathbb{R}\)</span> une fonction convexe et <span
+class="math inline">\(x_0 \in \mathbb{R}^n\)</span>. Le
+sous-différentiel de <span class="math inline">\(f\)</span> en <span
+class="math inline">\(x_0\)</span>, noté <span
+class="math inline">\(\partial f(x_0)\)</span>, est défini comme
+l’ensemble des vecteurs <span class="math inline">\(\xi \in
+\mathbb{R}^n\)</span> tels que : <span class="math display">\[f(x) \geq
+f(x_0) + \langle \xi, x - x_0 \rangle \quad \forall x \in
+\mathbb{R}^n.\]</span> En d’autres termes, <span
+class="math inline">\(\xi \in \partial f(x_0)\)</span> si et seulement
+s’il existe une fonction affine <span class="math inline">\(l(x) =
+f(x_0) + \langle \xi, x - x_0 \rangle\)</span> qui est un plan tangent à
+<span class="math inline">\(f\)</span> en <span
+class="math inline">\(x_0\)</span>.</p>
+</div>
+<p>Cette définition peut être réécrite de plusieurs manières
+équivalentes. Par exemple, <span class="math inline">\(\xi \in \partial
+f(x_0)\)</span> si et seulement si : <span
+class="math display">\[\lim_{x \to x_0} \frac{f(x) - f(x_0) - \langle
+\xi, x - x_0 \rangle}{\|x - x_0\|} \geq 0.\]</span> De plus, pour une
+fonction convexe <span class="math inline">\(f\)</span>, le
+sous-différentiel peut être caractérisé par la subdifférentielle de
+Fenchel-Moreau : <span class="math display">\[\partial f(x_0) = \{ \xi
+\in \mathbb{R}^n \mid f^*(y) - f^*(y^*) - \langle x_0, y - y^* \rangle
+\leq 0 \quad \forall y \in \mathbb{R}^n \},\]</span> où <span
+class="math inline">\(f^*\)</span> est la transformée de Fenchel de
+<span class="math inline">\(f\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’un des théorèmes fondamentaux liés au sous-différentiel est le
+théorème de subdifférentiabilité, qui établit des conditions sous
+lesquelles une fonction convexe est sous-différentiable.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f : \mathbb{R}^n \to
+\mathbb{R}\)</span> une fonction convexe et <span
+class="math inline">\(x_0 \in \mathbb{R}^n\)</span>. Alors, les
+assertions suivantes sont équivalentes :</p>
+<ol>
+<li><p><span class="math inline">\(f\)</span> est sous-différentiable en
+<span class="math inline">\(x_0\)</span>, c’est-à-dire que <span
+class="math inline">\(\partial f(x_0) \neq \emptyset\)</span>.</p></li>
+<li><p><span class="math inline">\(f\)</span> est continue en <span
+class="math inline">\(x_0\)</span>.</p></li>
+<li><p><span class="math inline">\(f\)</span> est localement
+lipschitzienne en <span class="math inline">\(x_0\)</span>.</p></li>
+</ol>
+</div>
+<p>La preuve de ce théorème repose sur plusieurs lemmes et propriétés
+fondamentales de l’analyse convexe. Par exemple, le lemme de séparation
+des ensembles convexes joue un rôle crucial dans l’établissement de
+l’équivalence entre (i) et (ii).</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de subdifférentiabilité, commençons par
+montrer que (i) implique (ii). Supposons que <span
+class="math inline">\(\partial f(x_0) \neq \emptyset\)</span> et soit
+<span class="math inline">\(\xi \in \partial f(x_0)\)</span>. Par
+définition du sous-différentiel, nous avons : <span
+class="math display">\[f(x) \geq f(x_0) + \langle \xi, x - x_0 \rangle
+\quad \forall x \in \mathbb{R}^n.\]</span> En particulier, pour <span
+class="math inline">\(x\)</span> proche de <span
+class="math inline">\(x_0\)</span>, la différence <span
+class="math inline">\(f(x) - f(x_0)\)</span> est bornée par <span
+class="math inline">\(\langle \xi, x - x_0 \rangle\)</span>, ce qui
+implique que <span class="math inline">\(f\)</span> est continue en
+<span class="math inline">\(x_0\)</span>.</p>
+<p>Pour montrer que (ii) implique (iii), utilisons le fait que toute
+fonction convexe continue en un point est localement lipschitzienne. En
+effet, pour tout <span class="math inline">\(x\)</span> dans un
+voisinage de <span class="math inline">\(x_0\)</span>, nous pouvons
+écrire : <span class="math display">\[f(x) - f(x_0) \leq L \|x -
+x_0\|,\]</span> où <span class="math inline">\(L\)</span> est une
+constante dépendant de la géométrie de <span
+class="math inline">\(f\)</span>.</p>
+<p>Enfin, pour montrer que (iii) implique (i), nous utilisons le lemme
+de séparation des ensembles convexes. Considérons l’épigraphe de <span
+class="math inline">\(f\)</span>, noté <span
+class="math inline">\(\text{epi}(f)\)</span>, et le plan tangent à <span
+class="math inline">\(\text{epi}(f)\)</span> en <span
+class="math inline">\((x_0, f(x_0))\)</span>. Par le lemme de
+séparation, il existe un vecteur <span class="math inline">\((\xi,
+-1)\)</span> tel que : <span class="math display">\[\langle \xi, x - x_0
+\rangle - (f(x) - f(x_0)) \leq 0 \quad \forall (x, f(x)) \in
+\text{epi}(f).\]</span> En réarrangeant cette inégalité, nous obtenons :
+<span class="math display">\[f(x) \geq f(x_0) + \langle \xi, x - x_0
+\rangle,\]</span> ce qui montre que <span class="math inline">\(\xi \in
+\partial f(x_0)\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le sous-différentiel possède de nombreuses propriétés intéressantes,
+que nous énumérons et démontrons ci-dessous.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\(f : \mathbb{R}^n \to
+\mathbb{R}\)</span> une fonction convexe et <span
+class="math inline">\(x_0 \in \mathbb{R}^n\)</span>. Alors :</p>
+<ol>
+<li><p>Si <span class="math inline">\(f\)</span> est différentiable en
+<span class="math inline">\(x_0\)</span>, alors <span
+class="math inline">\(\partial f(x_0) = \{ \nabla f(x_0)
+\}\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est la somme de deux
+fonctions convexes <span class="math inline">\(f_1\)</span> et <span
+class="math inline">\(f_2\)</span>, alors <span
+class="math inline">\(\partial (f_1 + f_2)(x_0) = \partial f_1(x_0) +
+\partial f_2(x_0)\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est lipschitzienne de
+constante <span class="math inline">\(L\)</span>, alors <span
+class="math inline">\(\| \xi \| \leq L\)</span> pour tout <span
+class="math inline">\(\xi \in \partial f(x_0)\)</span>.</p></li>
+</ol>
+</div>
+<p>Pour prouver (i), supposons que <span
+class="math inline">\(f\)</span> est différentiable en <span
+class="math inline">\(x_0\)</span>. Par définition du gradient, nous
+avons : <span class="math display">\[\lim_{x \to x_0} \frac{f(x) -
+f(x_0) - \langle \nabla f(x_0), x - x_0 \rangle}{\|x - x_0\|} =
+0.\]</span> En particulier, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe un voisinage
+de <span class="math inline">\(x_0\)</span> tel que : <span
+class="math display">\[f(x) - f(x_0) - \langle \nabla f(x_0), x - x_0
+\rangle \leq \epsilon \|x - x_0\|.\]</span> En prenant <span
+class="math inline">\(\epsilon = 0\)</span>, nous obtenons : <span
+class="math display">\[f(x) \geq f(x_0) + \langle \nabla f(x_0), x - x_0
+\rangle,\]</span> ce qui montre que <span class="math inline">\(\nabla
+f(x_0) \in \partial f(x_0)\)</span>. De plus, comme <span
+class="math inline">\(f\)</span> est convexe, le gradient est unique en
+<span class="math inline">\(x_0\)</span>, donc <span
+class="math inline">\(\partial f(x_0) = \{ \nabla f(x_0)
+\}\)</span>.</p>
+<p>Pour prouver (ii), utilisons la définition du sous-différentiel. Soit
+<span class="math inline">\(\xi_1 \in \partial f_1(x_0)\)</span> et
+<span class="math inline">\(\xi_2 \in \partial f_2(x_0)\)</span>. Par
+définition, nous avons : <span class="math display">\[f_1(x) \geq
+f_1(x_0) + \langle \xi_1, x - x_0 \rangle \quad \forall x \in
+\mathbb{R}^n,\]</span> et <span class="math display">\[f_2(x) \geq
+f_2(x_0) + \langle \xi_2, x - x_0 \rangle \quad \forall x \in
+\mathbb{R}^n.\]</span> En additionnant ces deux inégalités, nous
+obtenons : <span class="math display">\[f_1(x) + f_2(x) \geq f_1(x_0) +
+f_2(x_0) + \langle \xi_1 + \xi_2, x - x_0 \rangle,\]</span> ce qui
+montre que <span class="math inline">\(\xi_1 + \xi_2 \in \partial (f_1 +
+f_2)(x_0)\)</span>.</p>
+<p>Pour prouver (iii), utilisons le fait que <span
+class="math inline">\(f\)</span> est lipschitzienne de constante <span
+class="math inline">\(L\)</span>. Par définition du sous-différentiel,
+pour tout <span class="math inline">\(x \in \mathbb{R}^n\)</span>, nous
+avons : <span class="math display">\[f(x) - f(x_0) \geq \langle \xi, x -
+x_0 \rangle.\]</span> En particulier, en prenant <span
+class="math inline">\(x = x_0 + t h\)</span> pour tout <span
+class="math inline">\(t &gt; 0\)</span> et <span class="math inline">\(h
+\in \mathbb{R}^n\)</span>, nous obtenons : <span
+class="math display">\[\frac{f(x_0 + t h) - f(x_0)}{t} \geq \langle \xi,
+h \rangle.\]</span> En faisant tendre <span
+class="math inline">\(t\)</span> vers 0 et en utilisant le fait que
+<span class="math inline">\(f\)</span> est lipschitzienne, nous obtenons
+: <span class="math display">\[L \|h\| \geq \langle \xi, h
+\rangle.\]</span> En prenant <span class="math inline">\(h =
+\frac{\xi}{\|\xi\|}\)</span> (si <span class="math inline">\(\xi \neq
+0\)</span>), nous obtenons : <span class="math display">\[L \geq
+\|\xi\|.\]</span> Si <span class="math inline">\(\xi = 0\)</span>,
+l’inégalité est triviale.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le sous-différentiel est un outil puissant et élégant pour l’analyse
+des fonctions convexes non-lisses. Il généralise la notion de gradient
+et permet d’étendre de nombreux résultats classiques de l’analyse
+différentielle aux fonctions convexes. Les propriétés et théorèmes
+associés au sous-différentiel ouvrent la voie à des applications dans
+divers domaines, tels que l’optimisation non-lisse, les équations aux
+dérivées partielles et l’apprentissage automatique.</p>
+<p>En conclusion, le sous-différentiel est un concept fondamental en
+analyse convexe, offrant une richesse mathématique et des perspectives
+applicatives qui continuent de captiver les chercheurs du monde
+entier.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

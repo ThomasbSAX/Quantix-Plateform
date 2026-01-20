@@ -1,0 +1,347 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Gower pour variables de ratio symétriques standardisées</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Gower pour variables de ratio symétriques
+standardisées</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des données multivariées est un domaine central en
+statistique, où la notion de distance joue un rôle fondamental. Parmi
+les nombreuses métriques proposées, la distance de Gower se distingue
+par sa capacité à traiter des variables de types différents, notamment
+les variables de ratio. Ces dernières, souvent utilisées en sciences
+sociales et économiques, nécessitent une standardisation pour permettre
+des comparaisons équitables. L’émergence de la distance de Gower répond
+à un besoin crucial : fournir une mesure de dissimilarité robuste et
+adaptable, capable d’intégrer des variables de ratio symétriques
+standardisées dans un cadre analytique cohérent.</p>
+<p>La distance de Gower, introduite par M.J. Gower en 1971, est
+indispensable dans les contextes où les données présentent une
+hétérogénéité de types. Elle permet de combiner harmonieusement des
+variables quantitatives et qualitatives, tout en respectant les
+propriétés métriques essentielles. Dans ce chapitre, nous explorerons
+cette notion passionnante, en mettant l’accent sur son application aux
+variables de ratio symétriques standardisées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Gower, commençons par comprendre ce
+que nous cherchons à mesurer. Imaginons deux individus décrits par un
+ensemble de variables de ratio. Nous voulons quantifier à quel point ces
+deux individus diffèrent, en tenant compte des variations relatives de
+chaque variable. La standardisation symétrique permet de normaliser ces
+variables, rendant les comparaisons plus équitables.</p>
+<p>Formellement, considérons un ensemble de <span
+class="math inline">\(n\)</span> individus décrits par <span
+class="math inline">\(p\)</span> variables de ratio symétriques
+standardisées. Pour chaque variable <span
+class="math inline">\(j\)</span>, notons <span
+class="math inline">\(x_{ij}\)</span> la valeur associée à l’individu
+<span class="math inline">\(i\)</span>. La standardisation symétrique
+consiste à transformer chaque variable <span
+class="math inline">\(j\)</span> en :</p>
+<p><span class="math display">\[z_{ij} = \frac{x_{ij} -
+\min_j(x_{j})}{\max_j(x_{j}) - \min_j(x_{j})}\]</span></p>
+<p>où <span class="math inline">\(\min_j(x_{j})\)</span> et <span
+class="math inline">\(\max_j(x_{j})\)</span> représentent respectivement
+le minimum et le maximum de la variable <span
+class="math inline">\(j\)</span> sur l’ensemble des individus.</p>
+<p>La distance de Gower entre deux individus <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(k\)</span> est alors définie comme la moyenne des
+différences absolues standardisées sur l’ensemble des variables :</p>
+<p><span class="math display">\[d_{ik} = \frac{1}{p} \sum_{j=1}^{p}
+|z_{ij} - z_{kj}|\]</span></p>
+<p>Cette définition peut également être exprimée en utilisant des
+quantificateurs :</p>
+<p><span class="math display">\[d_{ik} = \frac{1}{p} \sum_{j=1}^{p}
+\left| \frac{x_{ij} - \min_j(x_{j})}{\max_j(x_{j}) - \min_j(x_{j})} -
+\frac{x_{kj} - \min_j(x_{j})}{\max_j(x_{j}) - \min_j(x_{j})}
+\right|\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Gower est celui de sa
+propriété métrique. Nous cherchons à montrer que la distance de Gower
+satisfait les conditions nécessaires pour être une métrique,
+c’est-à-dire qu’elle est définie positive, symétrique et vérifie
+l’inégalité triangulaire.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(d_{ik}\)</span> la distance de Gower
+entre deux individus <span class="math inline">\(i\)</span> et <span
+class="math inline">\(k\)</span>. Alors :</p>
+<ol>
+<li><p><span class="math inline">\(d_{ik} \geq 0\)</span> et <span
+class="math inline">\(d_{ik} = 0\)</span> si et seulement si <span
+class="math inline">\(i = k\)</span>.</p></li>
+<li><p><span class="math inline">\(d_{ik} = d_{ki}\)</span>.</p></li>
+<li><p><span class="math inline">\(d_{ik} \leq d_{ij} + d_{jk}\)</span>
+pour tout individu <span class="math inline">\(j\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>La non-négativité découle directement de la définition, car la
+différence absolue est toujours non négative. L’égalité <span
+class="math inline">\(d_{ik} = 0\)</span> implique que <span
+class="math inline">\(|z_{ij} - z_{kj}| = 0\)</span> pour tout <span
+class="math inline">\(j\)</span>, ce qui signifie que <span
+class="math inline">\(z_{ij} = z_{kj}\)</span> pour tout <span
+class="math inline">\(j\)</span>, et donc <span class="math inline">\(i
+= k\)</span>.</p></li>
+<li><p>La symétrie est évidente, car <span class="math inline">\(|z_{ij}
+- z_{kj}| = |z_{kj} - z_{ij}|\)</span>.</p></li>
+<li><p>Pour l’inégalité triangulaire, nous utilisons le fait que la
+distance de Gower est une moyenne de distances absolues. Par l’inégalité
+triangulaire pour les nombres réels, nous avons <span
+class="math inline">\(|z_{ij} - z_{kj}| \leq |z_{ij} - z_{lj}| + |z_{lj}
+- z_{kj}|\)</span> pour tout <span class="math inline">\(l\)</span>. En
+prenant la moyenne sur <span class="math inline">\(j\)</span>, nous
+obtenons <span class="math inline">\(d_{ik} \leq d_{il} +
+d_{lk}\)</span>. En particulier, en choisissant <span
+class="math inline">\(l = j\)</span>, nous avons <span
+class="math inline">\(d_{ik} \leq d_{ij} + d_{jk}\)</span>.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer la puissance de la distance de Gower, considérons un
+exemple concret. Supposons que nous avons deux individus <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(k\)</span> décrits par trois variables de ratio
+symétriques standardisées :</p>
+<p><span class="math display">\[\begin{aligned}
+    z_{i1} &amp;= 0.2, &amp; z_{i2} &amp;= 0.5, &amp; z_{i3} &amp;= 0.8
+\\
+    z_{k1} &amp;= 0.4, &amp; z_{k2} &amp;= 0.3, &amp; z_{k3} &amp;= 0.6
+\end{aligned}\]</span></p>
+<p>La distance de Gower entre <span class="math inline">\(i\)</span> et
+<span class="math inline">\(k\)</span> est calculée comme suit :</p>
+<p><span class="math display">\[d_{ik} = \frac{1}{3} \left( |0.2 - 0.4|
++ |0.5 - 0.3| + |0.8 - 0.6| \right) = \frac{1}{3} (0.2 + 0.2 + 0.2) =
+\frac{0.6}{3} = 0.2\]</span></p>
+<p>Cette preuve montre comment la distance de Gower capture efficacement
+les différences relatives entre les individus.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Gower possède plusieurs propriétés intéressantes,
+notamment :</p>
+<ol>
+<li><p><strong>Invariance par translation</strong> : La distance de
+Gower est invariante par ajout d’une constante à toutes les variables.
+Cela découle du fait que la standardisation symétrique élimine les
+effets des translations.</p></li>
+<li><p><strong>Invariance par échelle</strong> : La distance de Gower
+est également invariante par multiplication de toutes les variables par
+une constante positive. Cela résulte du fait que la standardisation
+symétrique normalise les variables.</p></li>
+<li><p><strong>Compatibilité avec les variables qualitatives</strong> :
+Bien que nous nous concentrions sur les variables de ratio, la distance
+de Gower peut également être étendue aux variables qualitatives en
+utilisant des indicateurs binaires.</p></li>
+</ol>
+<p>Pour démontrer la propriété (i), considérons une constante <span
+class="math inline">\(c\)</span> ajoutée à toutes les variables. La
+standardisation symétrique devient :</p>
+<p><span class="math display">\[z_{ij}&#39; = \frac{x_{ij} + c -
+\min_j(x_{j}) - c}{\max_j(x_{j}) + c - \min_j(x_{j}) - c} = \frac{x_{ij}
+- \min_j(x_{j})}{\max_j(x_{j}) - \min_j(x_{j})} = z_{ij}\]</span></p>
+<p>Ainsi, la distance de Gower reste inchangée :</p>
+<p><span class="math display">\[d_{ik}&#39; = \frac{1}{p} \sum_{j=1}^{p}
+|z_{ij}&#39; - z_{kj}&#39;| = \frac{1}{p} \sum_{j=1}^{p} |z_{ij} -
+z_{kj}| = d_{ik}\]</span></p>
+</body>
+</html>
+{% include "footer.html" %}
+

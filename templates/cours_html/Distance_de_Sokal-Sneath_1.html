@@ -1,0 +1,380 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Sokal-Sneath : Une mesure d’association pour les données qualitatives</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Sokal-Sneath : Une mesure d’association
+pour les données qualitatives</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des données qualitatives est un champ de recherche riche et
+varié, où les méthodes statistiques doivent souvent être adaptées pour
+capturer la complexité des informations non numériques. Parmi les outils
+développés pour cette tâche, la distance de Sokal-Sneath se distingue
+par sa capacité à mesurer l’association entre des objets décrits par des
+variables qualitatives. Introduite dans les années 1960 par Robert R.
+Sokal et Peter H.A. Sneath, cette distance trouve ses racines dans la
+taxonomie numérique et l’analyse des similarités.</p>
+<p>L’émergence de cette notion est motivée par le besoin de quantifier
+les relations entre des espèces ou des individus à partir de caractères
+discrets. Contrairement aux distances euclidiennes, qui supposent des
+données continues, la distance de Sokal-Sneath est conçue pour les
+tableaux binaires ou multi-catégoriques. Elle est indispensable dans des
+domaines tels que la biologie, la génétique, et l’écologie, où les
+données sont souvent de nature qualitative.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Sokal-Sneath, considérons un ensemble
+d’objets décrits par des variables qualitatives. Nous cherchons une
+mesure qui capture le degré de similarité entre ces objets, en tenant
+compte des différences et des concordances dans leurs descriptions.</p>
+<p>Supposons que nous avons <span class="math inline">\(n\)</span>
+objets <span class="math inline">\(O_1, O_2, \ldots, O_n\)</span> et
+<span class="math inline">\(p\)</span> variables qualitatives <span
+class="math inline">\(V_1, V_2, \ldots, V_p\)</span>. Chaque variable
+<span class="math inline">\(V_j\)</span> peut prendre <span
+class="math inline">\(k_j\)</span> valeurs distinctes. Nous voulons
+définir une distance <span class="math inline">\(d(i, l)\)</span> entre
+deux objets <span class="math inline">\(O_i\)</span> et <span
+class="math inline">\(O_l\)</span>.</p>
+<p>La distance de Sokal-Sneath est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(O_i\)</span> et <span
+class="math inline">\(O_l\)</span> deux objets décrits par <span
+class="math inline">\(p\)</span> variables qualitatives. La distance de
+Sokal-Sneath entre <span class="math inline">\(O_i\)</span> et <span
+class="math inline">\(O_l\)</span> est donnée par : <span
+class="math display">\[d(i, l) = \frac{1}{p} \sum_{j=1}^{p}
+\delta(V_{ij}, V_{lj})\]</span> où <span
+class="math inline">\(\delta(V_{ij}, V_{lj})\)</span> est une fonction
+indicatrice qui vaut 1 si <span class="math inline">\(V_{ij} =
+V_{lj}\)</span> et 0 sinon.</p>
+</div>
+<p>Une autre formulation de cette distance est possible en utilisant des
+matrices de similarité. Soit <span class="math inline">\(S\)</span> une
+matrice de similarité de taille <span class="math inline">\(n \times
+n\)</span>, où <span class="math inline">\(S_{il}\)</span> représente le
+nombre de variables pour lesquelles les objets <span
+class="math inline">\(O_i\)</span> et <span
+class="math inline">\(O_l\)</span> sont identiques. La distance de
+Sokal-Sneath peut alors s’écrire : <span class="math display">\[d(i, l)
+= 1 - \frac{S_{il}}{p}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour mieux comprendre les propriétés de la distance de Sokal-Sneath,
+nous introduisons quelques théorèmes clés.</p>
+<div class="theorem">
+<p>La distance de Sokal-Sneath satisfait les propriétés suivantes :</p>
+<ul>
+<li><p><span class="math inline">\(d(i, l) \geq 0\)</span> pour tout
+<span class="math inline">\(i, l\)</span>,</p></li>
+<li><p><span class="math inline">\(d(i, l) = 0\)</span> si et seulement
+si <span class="math inline">\(O_i = O_l\)</span>,</p></li>
+<li><p><span class="math inline">\(d(i, l) = d(l, i)\)</span> pour tout
+<span class="math inline">\(i, l\)</span>,</p></li>
+<li><p><span class="math inline">\(d(i, k) \leq d(i, l) + d(l,
+k)\)</span> pour tout <span class="math inline">\(i, l,
+k\)</span>.</p></li>
+</ul>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ces propriétés, nous procédons comme
+suit :</p>
+<p>1. **Non-négativité** : Par définition, <span
+class="math inline">\(\delta(V_{ij}, V_{lj})\)</span> est une fonction
+indicatrice qui prend des valeurs dans <span class="math inline">\(\{0,
+1\}\)</span>. Ainsi, <span class="math inline">\(d(i, l)\)</span> est
+une moyenne de nombres entre 0 et 1, donc <span
+class="math inline">\(d(i, l) \geq 0\)</span>.</p>
+<p>2. **Identité** : Si <span class="math inline">\(O_i = O_l\)</span>,
+alors <span class="math inline">\(V_{ij} = V_{lj}\)</span> pour tout
+<span class="math inline">\(j\)</span>. Par conséquent, <span
+class="math inline">\(\delta(V_{ij}, V_{lj}) = 1\)</span> pour tout
+<span class="math inline">\(j\)</span>, et donc <span
+class="math inline">\(d(i, l) = 0\)</span>. Réciproquement, si <span
+class="math inline">\(d(i, l) = 0\)</span>, alors <span
+class="math inline">\(\delta(V_{ij}, V_{lj}) = 0\)</span> pour tout
+<span class="math inline">\(j\)</span>, ce qui implique que <span
+class="math inline">\(O_i = O_l\)</span>.</p>
+<p>3. **Symétrie** : La fonction indicatrice <span
+class="math inline">\(\delta(V_{ij}, V_{lj})\)</span> est symétrique en
+<span class="math inline">\(i\)</span> et <span
+class="math inline">\(l\)</span>, donc <span class="math inline">\(d(i,
+l) = d(l, i)\)</span>.</p>
+<p>4. **Inégalité triangulaire** : Pour montrer que <span
+class="math inline">\(d(i, k) \leq d(i, l) + d(l, k)\)</span>, nous
+utilisons le fait que la distance de Sokal-Sneath est une métrique.
+Cette propriété découle directement des définitions et des propriétés
+des fonctions indicatrices. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer les preuves détaillées, considérons la démonstration
+de l’inégalité triangulaire.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous voulons montrer que <span
+class="math inline">\(d(i, k) \leq d(i, l) + d(l, k)\)</span>. En
+utilisant les définitions, nous avons : <span
+class="math display">\[d(i, k) = 1 - \frac{S_{ik}}{p}\]</span> <span
+class="math display">\[d(i, l) = 1 - \frac{S_{il}}{p}\]</span> <span
+class="math display">\[d(l, k) = 1 - \frac{S_{lk}}{p}\]</span></p>
+<p>Nous devons donc prouver que : <span class="math display">\[1 -
+\frac{S_{ik}}{p} \leq \left(1 - \frac{S_{il}}{p}\right) + \left(1 -
+\frac{S_{lk}}{p}\right)\]</span></p>
+<p>En simplifiant, nous obtenons : <span class="math display">\[1 -
+\frac{S_{ik}}{p} \leq 2 - \frac{S_{il} + S_{lk}}{p}\]</span></p>
+<p>Ce qui équivaut à : <span class="math display">\[\frac{S_{ik}}{p}
+\geq \frac{S_{il} + S_{lk}}{p} - 1\]</span></p>
+<p>En multipliant par <span class="math inline">\(p\)</span>, nous avons
+: <span class="math display">\[S_{ik} \geq S_{il} + S_{lk} -
+p\]</span></p>
+<p>Cette inégalité est vraie car <span
+class="math inline">\(S_{ik}\)</span> représente le nombre de variables
+pour lesquelles <span class="math inline">\(O_i\)</span> et <span
+class="math inline">\(O_k\)</span> sont identiques, et <span
+class="math inline">\(S_{il} + S_{lk} - p\)</span> est une borne
+inférieure de ce nombre en raison des propriétés des fonctions
+indicatrices. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+distance de Sokal-Sneath.</p>
+<ul>
+<li><p>**Invariance par translation** : La distance de Sokal-Sneath est
+invariante par translation des variables qualitatives. Cela signifie que
+si nous ajoutons une constante à toutes les valeurs d’une variable, la
+distance entre deux objets reste inchangée.</p></li>
+<li><p>**Homogénéité** : La distance de Sokal-Sneath est homogène de
+degré 0. Cela signifie que si nous multiplions toutes les valeurs d’une
+variable par une constante non nulle, la distance entre deux objets
+reste inchangée.</p></li>
+<li><p>**Normalisation** : La distance de Sokal-Sneath est normalisée
+entre 0 et 1. Cela signifie que pour tout couple d’objets <span
+class="math inline">\((O_i, O_l)\)</span>, nous avons <span
+class="math inline">\(0 \leq d(i, l) \leq 1\)</span>.</p></li>
+</ul>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ces propriétés, nous procédons comme
+suit :</p>
+<p>1. **Invariance par translation** : Soit <span
+class="math inline">\(c\)</span> une constante. Si nous ajoutons <span
+class="math inline">\(c\)</span> à toutes les valeurs de la variable
+<span class="math inline">\(V_j\)</span>, alors <span
+class="math inline">\(\delta(V_{ij} + c, V_{lj} + c) = \delta(V_{ij},
+V_{lj})\)</span>. Par conséquent, <span class="math inline">\(d(i,
+l)\)</span> reste inchangé.</p>
+<p>2. **Homogénéité** : Soit <span
+class="math inline">\(\lambda\)</span> une constante non nulle. Si nous
+multiplions toutes les valeurs de la variable <span
+class="math inline">\(V_j\)</span> par <span
+class="math inline">\(\lambda\)</span>, alors <span
+class="math inline">\(\delta(\lambda V_{ij}, \lambda V_{lj}) =
+\delta(V_{ij}, V_{lj})\)</span>. Par conséquent, <span
+class="math inline">\(d(i, l)\)</span> reste inchangé.</p>
+<p>3. **Normalisation** : Par définition, <span
+class="math inline">\(d(i, l)\)</span> est une moyenne de nombres entre
+0 et 1. Par conséquent, <span class="math inline">\(d(i, l)\)</span> est
+également compris entre 0 et 1. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Sokal-Sneath est un outil puissant pour l’analyse des
+données qualitatives. Ses propriétés mathématiques et sa capacité à
+capturer les similarités entre objets en font un choix privilégié dans
+de nombreux domaines scientifiques. En comprenant ses fondements
+théoriques et ses applications pratiques, nous pouvons mieux appréhender
+la complexité des données qualitatives et tirer des conclusions
+significatives de nos analyses.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

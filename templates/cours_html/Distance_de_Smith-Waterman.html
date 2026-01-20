@@ -1,0 +1,318 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Smith-Waterman : Une Approche Mathématique pour l’Alignement de Séquences</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Smith-Waterman : Une Approche Mathématique
+pour l’Alignement de Séquences</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’alignement de séquences est un problème fondamental en
+bioinformatique, permettant de comparer des séquences d’ADN, d’ARN ou de
+protéines pour identifier des similitudes et des différences. La
+distance de Smith-Waterman, introduite par Temple F. Smith et Michael S.
+Waterman en 1981, est une méthode algorithmique puissante pour résoudre
+ce problème.</p>
+<p>Cette distance émerge de la nécessité de quantifier les similarités
+entre séquences biologiques de manière rigoureuse et mathématiquement
+solide. Elle est indispensable dans des domaines tels que la génétique,
+l’épidémiologie et la biologie évolutive, où la compréhension des
+relations entre séquences est cruciale.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Smith-Waterman, nous devons d’abord
+comprendre ce que nous cherchons à mesurer. Nous voulons une fonction
+qui, donnée deux séquences de caractères, retourne un score représentant
+leur similarité. Ce score doit prendre en compte les correspondances
+exactes, les substitutions, les insertions et les suppressions.</p>
+<p>Formellement, soit <span class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span> deux séquences de longueurs <span
+class="math inline">\(n\)</span> et <span
+class="math inline">\(m\)</span> respectivement, définies sur un
+alphabet <span class="math inline">\(\Sigma\)</span>. Nous cherchons une
+fonction <span class="math inline">\(D: \Sigma^n \times \Sigma^m
+\rightarrow \mathbb{R}\)</span> telle que :</p>
+<p><span class="math display">\[D(S_1, S_2) = \max_{i,j}
+H(i,j)\]</span></p>
+<p>où <span class="math inline">\(H(i,j)\)</span> est la valeur maximale
+de la matrice d’alignement <span class="math inline">\(H\)</span>,
+définie récursivement par :</p>
+<p><span class="math display">\[H(i,j) =
+\begin{cases}
+0 &amp; \text{si } i=0 \text{ ou } j=0, \\
+H(i-1,j-1) + s(S_1[i], S_2[j]) &amp; \text{si } i,j &gt; 0, \\
+\max(H(i-1,j) + g, H(i,j-1) + g, 0) &amp; \text{sinon.}
+\end{cases}\]</span></p>
+<p>Ici, <span class="math inline">\(s(a,b)\)</span> est la matrice de
+score de substitution, et <span class="math inline">\(g\)</span> est le
+coût de gap.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème central lié à la distance de Smith-Waterman est le
+théorème de l’alignement local optimal, qui garantit que la solution
+obtenue par l’algorithme est effectivement le meilleur alignement local
+possible.</p>
+<p>**Théorème (Alignement Local Optimal)** : Soient <span
+class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span> deux séquences de longueurs <span
+class="math inline">\(n\)</span> et <span
+class="math inline">\(m\)</span>. La distance de Smith-Waterman <span
+class="math inline">\(D(S_1, S_2)\)</span> est égale à la valeur
+maximale de la matrice <span class="math inline">\(H\)</span>, où <span
+class="math inline">\(H\)</span> est définie comme ci-dessus.</p>
+<p>**Preuve** : Nous procédons par induction sur les dimensions de la
+matrice <span class="math inline">\(H\)</span>. La base de l’induction
+est triviale, car si <span class="math inline">\(i=0\)</span> ou <span
+class="math inline">\(j=0\)</span>, <span
+class="math inline">\(H(i,j)=0\)</span>. Supposons maintenant que la
+propriété soit vraie pour toutes les sous-matrices de <span
+class="math inline">\(H\)</span> de dimensions inférieures à <span
+class="math inline">\((i,j)\)</span>. Nous devons montrer que la
+propriété est vraie pour <span
+class="math inline">\(H(i,j)\)</span>.</p>
+<p>Par définition de <span class="math inline">\(H\)</span>, nous avons
+:</p>
+<p><span class="math display">\[H(i,j) =
+\begin{cases}
+0 &amp; \text{si } i=0 \text{ ou } j=0, \\
+H(i-1,j-1) + s(S_1[i], S_2[j]) &amp; \text{si } i,j &gt; 0, \\
+\max(H(i-1,j) + g, H(i,j-1) + g, 0) &amp; \text{sinon.}
+\end{cases}\]</span></p>
+<p>Par hypothèse d’induction, <span
+class="math inline">\(H(i-1,j-1)\)</span>, <span
+class="math inline">\(H(i-1,j)\)</span> et <span
+class="math inline">\(H(i,j-1)\)</span> sont les valeurs maximales des
+sous-matrices correspondantes. Il s’ensuit que <span
+class="math inline">\(H(i,j)\)</span> est également la valeur maximale
+de la sous-matrice de dimensions <span
+class="math inline">\((i,j)\)</span>. Par conséquent, par induction, le
+théorème est prouvé.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ici quelques propriétés importantes de la distance de
+Smith-Waterman :</p>
+<p>(i) **Propriété de Non-Négativité** : Pour toute paire de séquences
+<span class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span>, nous avons <span
+class="math inline">\(D(S_1, S_2) \geq 0\)</span>.</p>
+<p>(ii) **Propriété de Symétrie** : Pour toute paire de séquences <span
+class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span>, nous avons <span
+class="math inline">\(D(S_1, S_2) = D(S_2, S_1)\)</span>.</p>
+<p>(iii) **Propriété de Triangle** : Pour toute triple de séquences
+<span class="math inline">\(S_1, S_2, S_3\)</span>, nous avons <span
+class="math inline">\(D(S_1, S_3) \leq D(S_1, S_2) + D(S_2,
+S_3)\)</span>.</p>
+<p>**Preuve de (i)** : Par définition, <span
+class="math inline">\(D(S_1, S_2)\)</span> est la valeur maximale de la
+matrice <span class="math inline">\(H\)</span>, qui est toujours non
+négative car les scores de substitution et les coûts de gap sont non
+négatifs.</p>
+<p>**Preuve de (ii)** : La symétrie découle du fait que l’algorithme de
+Smith-Waterman traite les deux séquences de manière symétrique. Ainsi,
+l’ordre des séquences n’affecte pas le résultat.</p>
+<p>**Preuve de (iii)** : La propriété du triangle peut être démontrée en
+utilisant la définition récursive de <span
+class="math inline">\(H\)</span> et les propriétés des opérations
+maximales.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Smith-Waterman est une méthode puissante et élégante
+pour l’alignement de séquences. Son formalisme mathématique rigoureux en
+fait un outil indispensable en bioinformatique. Les théorèmes et
+propriétés présentés ici montrent la solidité de cette approche et
+ouvrent la voie à des applications plus larges dans l’analyse des
+séquences biologiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

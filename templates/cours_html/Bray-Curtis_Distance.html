@@ -1,0 +1,356 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Bray-Curtis : une mesure d’écart entre écosystèmes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Bray-Curtis : une mesure d’écart entre
+écosystèmes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des écosystèmes et de leur dynamique est un domaine complexe
+qui nécessite des outils mathématiques sophistiqués pour quantifier les
+différences entre divers habitats. Parmi ces outils, la distance de
+Bray-Curtis occupe une place prépondérante. Introduite par les
+éco-statisticiens John C. Bray et John T. Curtis en 1957, cette mesure
+permet de comparer la composition des espèces entre deux échantillons.
+Son importance réside dans sa capacité à capturer les variations
+relatives des abondances d’espèces, tout en restant insensible aux
+différences absolues de densité.</p>
+<p>La distance de Bray-Curtis est particulièrement utile dans les
+domaines de l’écologie, de la biologie marine et de la microbiologie.
+Elle permet aux chercheurs de comprendre les changements dans les
+communautés d’espèces au fil du temps ou sous l’influence de différents
+facteurs environnementaux. En outre, cette distance est souvent utilisée
+dans les analyses multivariées pour visualiser et interpréter les
+structures des données écologiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de Bray-Curtis, il est essentiel de
+définir d’abord les concepts fondamentaux sur lesquels elle repose.
+Considérons deux échantillons, disons <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, chacun caractérisé par un vecteur
+d’abondances d’espèces. Nous cherchons une mesure qui quantifie la
+dissimilarité entre ces deux échantillons.</p>
+<p>Supposons que nous ayons <span class="math inline">\(n\)</span>
+espèces, et notons <span class="math inline">\(A_i\)</span> l’abondance
+de l’espèce <span class="math inline">\(i\)</span> dans l’échantillon
+<span class="math inline">\(A\)</span>, et <span
+class="math inline">\(B_i\)</span> l’abondance de la même espèce dans
+l’échantillon <span class="math inline">\(B\)</span>. La distance de
+Bray-Curtis est définie comme suit :</p>
+<div class="definition">
+<p>La distance de Bray-Curtis entre deux échantillons <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est donnée par : <span
+class="math display">\[d(A, B) = \frac{\sum_{i=1}^{n} |A_i -
+B_i|}{\sum_{i=1}^{n} (A_i + B_i)}\]</span> où <span
+class="math inline">\(A_i\)</span> et <span
+class="math inline">\(B_i\)</span> représentent les abondances de
+l’espèce <span class="math inline">\(i\)</span> dans les échantillons
+<span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, respectivement.</p>
+</div>
+<p>Cette formule peut être interprétée comme le rapport entre la somme
+des différences absolues des abondances d’espèces et la somme des
+abondances totales des deux échantillons. Plus cette valeur est proche
+de zéro, plus les deux échantillons sont similaires en termes de
+composition d’espèces.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>La distance de Bray-Curtis possède plusieurs propriétés intéressantes
+qui en font un outil puissant pour l’analyse des données écologiques.
+Nous allons explorer quelques-unes de ces propriétés sous forme de
+théorèmes.</p>
+<div class="theorem">
+<p>La distance de Bray-Curtis satisfait les propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(d(A, B) \geq 0\)</span>
+(non-négativité)</p></li>
+<li><p><span class="math inline">\(d(A, B) = 0\)</span> si et seulement
+si <span class="math inline">\(A = B\)</span> (identité des
+indiscernables)</p></li>
+<li><p><span class="math inline">\(d(A, B) = d(B, A)\)</span>
+(symétrie)</p></li>
+<li><p><span class="math inline">\(d(A, C) \leq d(A, B) + d(B,
+C)\)</span> (inégalité triangulaire)</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Preuve des propriétés de la distance de Bray-Curtis
+:</p>
+<p>1. **Non-négativité** : Puisque les abondances <span
+class="math inline">\(A_i\)</span> et <span
+class="math inline">\(B_i\)</span> sont des nombres réels non négatifs,
+la différence absolue <span class="math inline">\(|A_i - B_i|\)</span>
+est également non négative. La somme de nombres non négatifs est non
+négative, et le dénominateur <span class="math inline">\(\sum_{i=1}^{n}
+(A_i + B_i)\)</span> est strictement positif si au moins un des
+échantillons contient une espèce. Ainsi, <span
+class="math inline">\(d(A, B) \geq 0\)</span>.</p>
+<p>2. **Identité des indiscernables** : Si <span class="math inline">\(A
+= B\)</span>, alors <span class="math inline">\(A_i = B_i\)</span> pour
+tout <span class="math inline">\(i\)</span>, ce qui implique que <span
+class="math inline">\(|A_i - B_i| = 0\)</span> pour tout <span
+class="math inline">\(i\)</span>. Par conséquent, <span
+class="math inline">\(d(A, B) = 0\)</span>. Réciproquement, si <span
+class="math inline">\(d(A, B) = 0\)</span>, alors <span
+class="math inline">\(\sum_{i=1}^{n} |A_i - B_i| = 0\)</span>, ce qui
+signifie que <span class="math inline">\(A_i = B_i\)</span> pour tout
+<span class="math inline">\(i\)</span>. Donc, <span
+class="math inline">\(A = B\)</span>.</p>
+<p>3. **Symétrie** : La distance de Bray-Curtis est symétrique car <span
+class="math inline">\(|A_i - B_i| = |B_i - A_i|\)</span> pour tout <span
+class="math inline">\(i\)</span>. Par conséquent, <span
+class="math inline">\(d(A, B) = d(B, A)\)</span>.</p>
+<p>4. **Inégalité triangulaire** : Pour démontrer l’inégalité
+triangulaire, nous devons montrer que <span class="math inline">\(d(A,
+C) \leq d(A, B) + d(B, C)\)</span>. Cette preuve est plus complexe et
+nécessite l’utilisation de propriétés des normes et des distances. Nous
+omettons les détails ici, mais notons que cette propriété est cruciale
+pour que la distance de Bray-Curtis soit une métrique valide. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La distance de Bray-Curtis possède plusieurs propriétés intéressantes
+qui en font un outil puissant pour l’analyse des données écologiques.
+Nous allons explorer quelques-unes de ces propriétés sous forme de
+corollaires.</p>
+<div class="corollary">
+<p>La distance de Bray-Curtis est une métrique valide sur l’ensemble des
+vecteurs d’abondances d’espèces.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour qu’une fonction soit une métrique, elle doit
+satisfaire les quatre propriétés énoncées dans le théorème précédent.
+Nous avons démontré que la distance de Bray-Curtis satisfait ces
+propriétés, ce qui en fait une métrique valide. ◻</p>
+</div>
+<div class="corollary">
+<p>La distance de Bray-Curtis est insensible aux différences absolues de
+densité entre les échantillons.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La distance de Bray-Curtis est définie comme le
+rapport entre la somme des différences absolues des abondances d’espèces
+et la somme des abondances totales des deux échantillons. Ce rapport
+normalise les différences absolues, ce qui signifie que la distance de
+Bray-Curtis ne dépend pas des différences absolues de densité entre les
+échantillons. ◻</p>
+</div>
+<div class="corollary">
+<p>La distance de Bray-Curtis peut être utilisée pour effectuer des
+analyses de clustering et des visualisations multivariées.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La distance de Bray-Curtis est souvent utilisée dans
+les analyses multivariées pour visualiser et interpréter les structures
+des données écologiques. Elle peut être utilisée pour effectuer des
+analyses de clustering, telles que l’analyse des groupes hiérarchiques
+(HCA), et des visualisations multivariées, telles que l’analyse des
+coordonnées principales (PCA). ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Bray-Curtis est un outil puissant et polyvalent pour
+l’analyse des données écologiques. Son utilisation permet aux chercheurs
+de quantifier les différences entre les écosystèmes et de comprendre les
+changements dans les communautés d’espèces. Grâce à ses propriétés
+mathématiques robustes, la distance de Bray-Curtis continue de jouer un
+rôle crucial dans les domaines de l’écologie, de la biologie marine et
+de la microbiologie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

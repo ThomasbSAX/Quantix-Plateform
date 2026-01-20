@@ -1,0 +1,387 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode des Rectangles : Approximation Numérique des Intégrales</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode des Rectangles : Approximation Numérique des
+Intégrales</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’intégration numérique est une branche fondamentale de l’analyse
+numérique, permettant d’approximer des intégrales définies lorsque les
+primitives exactes sont inconnues ou difficiles à calculer. Parmi les
+méthodes d’intégration numérique, la méthode des rectangles se distingue
+par sa simplicité et son efficacité pour les fonctions continues.</p>
+<p>Historiquement, cette méthode trouve ses racines dans les travaux des
+mathématiciens du XVIIe siècle, tels que Newton et Leibniz, qui ont posé
+les bases du calcul intégral. La méthode des rectangles est une
+application directe de l’idée d’approximation locale d’une fonction par
+des valeurs discrètes. Elle est particulièrement utile dans les domaines
+de la physique, de l’ingénierie et des sciences appliquées, où les
+intégrales représentent souvent des quantités physiques telles que
+l’aire sous une courbe, le travail effectué par une force ou la charge
+d’un système.</p>
+<p>Dans cet article, nous explorerons en détail la méthode des
+rectangles, ses définitions, ses théorèmes associés et ses preuves. Nous
+verrons comment cette méthode permet d’approximer des intégrales avec
+une précision contrôlée et comment elle peut être améliorée pour obtenir
+des résultats plus précis.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails techniques, il est essentiel de
+comprendre ce que nous cherchons à accomplir avec la méthode des
+rectangles. Supposons que nous ayons une fonction <span
+class="math inline">\(f\)</span> continue sur un intervalle <span
+class="math inline">\([a, b]\)</span>. Nous voulons approximer
+l’intégrale définie de <span class="math inline">\(f\)</span> sur cet
+intervalle, notée <span class="math inline">\(\int_a^b f(x) \,
+dx\)</span>.</p>
+<p>Pour ce faire, nous divisons l’intervalle <span
+class="math inline">\([a, b]\)</span> en <span
+class="math inline">\(n\)</span> sous-intervalles de longueur égale
+<span class="math inline">\(\Delta x = \frac{b - a}{n}\)</span>. Sur
+chaque sous-intervalle <span class="math inline">\([x_i,
+x_{i+1}]\)</span>, nous approximons la fonction <span
+class="math inline">\(f\)</span> par une valeur constante, généralement
+prise à l’extrémité gauche ou droite du sous-intervalle. Cette
+approximation est représentée par un rectangle dont la hauteur est cette
+valeur constante et la largeur est <span class="math inline">\(\Delta
+x\)</span>.</p>
+<p>Formellement, la méthode des rectangles peut être définie de
+plusieurs manières. Nous présentons ici deux versions courantes : la
+méthode des rectangles à gauche et la méthode des rectangles à
+droite.</p>
+<h2 class="unnumbered" id="méthode-des-rectangles-à-gauche">Méthode des
+Rectangles à Gauche</h2>
+<p>La méthode des rectangles à gauche consiste à approximer la fonction
+<span class="math inline">\(f\)</span> sur chaque sous-intervalle par sa
+valeur en l’extrémité gauche du sous-intervalle. Mathématiquement, cette
+approximation est donnée par :</p>
+<p><span class="math display">\[R_n^{\text{gauche}}(f) =
+\sum_{i=0}^{n-1} f(x_i) \Delta x\]</span></p>
+<p>où <span class="math inline">\(x_i = a + i \Delta x\)</span> pour
+<span class="math inline">\(i = 0, 1, \ldots, n-1\)</span>.</p>
+<h2 class="unnumbered" id="méthode-des-rectangles-à-droite">Méthode des
+Rectangles à Droite</h2>
+<p>La méthode des rectangles à droite, quant à elle, utilise la valeur
+de la fonction en l’extrémité droite du sous-intervalle pour approximer
+<span class="math inline">\(f\)</span>. Cette approximation est donnée
+par :</p>
+<p><span class="math display">\[R_n^{\text{droite}}(f) = \sum_{i=1}^{n}
+f(x_i) \Delta x\]</span></p>
+<p>où <span class="math inline">\(x_i = a + i \Delta x\)</span> pour
+<span class="math inline">\(i = 1, 2, \ldots, n\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre la précision de la méthode des rectangles, nous
+devons examiner les théorèmes qui gouvernent son comportement
+asymptotique. Le théorème suivant est fondamental pour évaluer l’erreur
+d’approximation.</p>
+<h2 class="unnumbered"
+id="théorème-de-lerreur-pour-la-méthode-des-rectangles">Théorème de
+l’Erreur pour la Méthode des Rectangles</h2>
+<p>Supposons que <span class="math inline">\(f\)</span> soit une
+fonction continue sur <span class="math inline">\([a, b]\)</span> et
+deux fois dérivable sur cet intervalle. Alors, l’erreur commise en
+utilisant la méthode des rectangles à gauche ou à droite pour approximer
+<span class="math inline">\(\int_a^b f(x) \, dx\)</span> est donnée par
+:</p>
+<p><span class="math display">\[\left| \int_a^b f(x) \, dx -
+R_n^{\text{gauche/droite}}(f) \right| \leq \frac{(b - a)^3}{8n^2}
+\max_{x \in [a, b]} |f&#39;&#39;(x)|\]</span></p>
+<p>Ce théorème montre que l’erreur d’approximation diminue
+quadratiquement avec le nombre de sous-intervalles <span
+class="math inline">\(n\)</span>, ce qui est une propriété très
+souhaitable pour une méthode numérique.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de l’erreur, nous utilisons le théorème du
+reste de Taylor. Supposons que <span class="math inline">\(f\)</span>
+soit deux fois dérivable sur <span class="math inline">\([a,
+b]\)</span>. Alors, pour chaque sous-intervalle <span
+class="math inline">\([x_i, x_{i+1}]\)</span>, nous pouvons écrire :</p>
+<p><span class="math display">\[f(x) = f(x_i) + f&#39;(x_i)(x - x_i) +
+\frac{f&#39;&#39;(\xi)}{2}(x - x_i)^2\]</span></p>
+<p>pour un certain <span class="math inline">\(\xi \in [x_i,
+x_{i+1}]\)</span>. En intégrant cette expression sur <span
+class="math inline">\([x_i, x_{i+1}]\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\int_{x_i}^{x_{i+1}} f(x) \, dx = f(x_i)
+\Delta x + \frac{f&#39;&#39;(\xi)}{2} \int_{x_i}^{x_{i+1}} (x - x_i)^2
+\, dx\]</span></p>
+<p>Le terme d’erreur est donc :</p>
+<p><span class="math display">\[\left| \int_{x_i}^{x_{i+1}} f(x) \, dx -
+f(x_i) \Delta x \right| = \frac{|f&#39;&#39;(\xi)|}{2}
+\int_{x_i}^{x_{i+1}} (x - x_i)^2 \, dx\]</span></p>
+<p>En sommant sur tous les sous-intervalles, nous obtenons l’erreur
+totale :</p>
+<p><span class="math display">\[\left| \int_a^b f(x) \, dx -
+R_n^{\text{gauche}}(f) \right| = \frac{1}{2} \sum_{i=0}^{n-1}
+|f&#39;&#39;(\xi_i)| \int_{x_i}^{x_{i+1}} (x - x_i)^2 \, dx\]</span></p>
+<p>En utilisant le fait que <span
+class="math inline">\(\int_{x_i}^{x_{i+1}} (x - x_i)^2 \, dx =
+\frac{\Delta x^3}{3}\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\left| \int_a^b f(x) \, dx -
+R_n^{\text{gauche}}(f) \right| \leq \frac{\Delta x^3}{6}
+\sum_{i=0}^{n-1} |f&#39;&#39;(\xi_i)| \leq \frac{(b - a)^3}{6n^2}
+\max_{x \in [a, b]} |f&#39;&#39;(x)|\]</span></p>
+<p>En multipliant par 4 pour obtenir une majoration plus stricte, nous
+obtenons le résultat souhaité.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La méthode des rectangles possède plusieurs propriétés intéressantes
+qui en font un outil puissant pour l’intégration numérique. Nous en
+présentons quelques-unes ci-dessous.</p>
+<h2 class="unnumbered" id="propriété-i-convergence">Propriété (i) :
+Convergence</h2>
+<p>Si <span class="math inline">\(f\)</span> est continue sur <span
+class="math inline">\([a, b]\)</span>, alors les approximations <span
+class="math inline">\(R_n^{\text{gauche}}(f)\)</span> et <span
+class="math inline">\(R_n^{\text{droite}}(f)\)</span> convergent vers
+<span class="math inline">\(\int_a^b f(x) \, dx\)</span> lorsque <span
+class="math inline">\(n \to \infty\)</span>.</p>
+<p><em>Preuve.</em> Puisque <span class="math inline">\(f\)</span> est
+continue sur <span class="math inline">\([a, b]\)</span>, elle est
+uniformément continue. Par conséquent, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe un <span
+class="math inline">\(n_0\)</span> tel que pour tout <span
+class="math inline">\(n \geq n_0\)</span>, nous avons :</p>
+<p><span class="math display">\[\left| f(x) - f(x_i) \right| &lt;
+\epsilon \quad \forall x \in [x_i, x_{i+1}]\]</span></p>
+<p>En intégrant cette inégalité sur <span class="math inline">\([x_i,
+x_{i+1}]\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\left| \int_{x_i}^{x_{i+1}} f(x) \, dx -
+f(x_i) \Delta x \right| &lt; \epsilon \Delta x\]</span></p>
+<p>En sommant sur tous les sous-intervalles, nous obtenons :</p>
+<p><span class="math display">\[\left| \int_a^b f(x) \, dx -
+R_n^{\text{gauche}}(f) \right| &lt; \epsilon (b - a)\]</span></p>
+<p>Puisque <span class="math inline">\(\epsilon\)</span> est arbitraire,
+cela prouve la convergence.</p>
+<h2 class="unnumbered" id="propriété-ii-ordre-de-convergence">Propriété
+(ii) : Ordre de Convergence</h2>
+<p>L’erreur d’approximation pour la méthode des rectangles est de
+l’ordre <span class="math inline">\(O(n^{-2})\)</span>. Cela signifie
+que si nous doublons le nombre de sous-intervalles, l’erreur est divisée
+par 4.</p>
+<p><em>Preuve.</em> Cela découle directement du théorème de l’erreur,
+qui montre que l’erreur est proportionnelle à <span
+class="math inline">\(n^{-2}\)</span>.</p>
+<h2 class="unnumbered"
+id="propriété-iii-amélioration-par-la-méthode-du-point-milieu">Propriété
+(iii) : Amélioration par la Méthode du Point Milieu</h2>
+<p>Une alternative à la méthode des rectangles est la méthode du point
+milieu, qui utilise la valeur de la fonction en le milieu de chaque
+sous-intervalle pour l’approximation. Cette méthode a un ordre de
+convergence plus élevé, <span class="math inline">\(O(n^{-2})\)</span>,
+ce qui la rend souvent plus précise que la méthode des rectangles.</p>
+<p><em>Preuve.</em> La preuve est similaire à celle du théorème de
+l’erreur pour la méthode des rectangles, mais en utilisant le
+développement de Taylor autour du point milieu.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La méthode des rectangles est un outil fondamental pour l’intégration
+numérique, offrant une approximation simple et efficace des intégrales
+définies. Bien que sa précision soit limitée par son ordre de
+convergence, elle reste largement utilisée en raison de sa simplicité et
+de sa robustesse. Les théorèmes et propriétés présentés dans cet article
+fournissent une base solide pour comprendre et appliquer cette méthode
+dans divers contextes pratiques.</p>
+<p>En conclusion, la méthode des rectangles illustre parfaitement
+comment des concepts mathématiques simples peuvent être transformés en
+outils puissants pour résoudre des problèmes complexes. Son étude
+approfondie permet non seulement de mieux comprendre l’intégration
+numérique, mais aussi d’apprécier la beauté et l’utilité des
+mathématiques appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

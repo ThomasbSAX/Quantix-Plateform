@@ -1,0 +1,331 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Sanov : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Sanov : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La divergence de Sanov émerge dans le cadre de la théorie des grandes
+déviations, un domaine des mathématiques appliquées qui étudie les
+probabilités de phénomènes rares mais significatifs. Cette divergence
+est nommée en l’honneur du mathématicien russe Igor Sanov, qui a
+contribué de manière significative à ce domaine. La théorie des grandes
+déviations est cruciale dans divers domaines, notamment la physique
+statistique, l’apprentissage automatique et les télécommunications.</p>
+<p>La divergence de Sanov est une mesure de la distance entre deux
+distributions de probabilité. Elle est particulièrement utile pour
+quantifier la probabilité d’observer une séquence d’événements qui
+s’écarte significativement de ce que l’on attendrait selon un modèle
+donné. Cette divergence est donc indispensable pour comprendre et
+analyser les comportements extrêmes dans des systèmes complexes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la divergence de Sanov, commençons par rappeler
+quelques concepts fondamentaux. Supposons que nous avons une séquence de
+variables aléatoires indépendantes et identiquement distribuées (i.i.d.)
+<span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> prenant leurs
+valeurs dans un espace mesurable <span
+class="math inline">\(\mathcal{X}\)</span>. Soit <span
+class="math inline">\(P\)</span> la distribution de probabilité commune
+de ces variables.</p>
+<p>Nous cherchons à mesurer la distance entre la distribution empirique
+<span class="math inline">\(\hat{P}_n\)</span> définie par : <span
+class="math display">\[\hat{P}_n(A) = \frac{1}{n} \sum_{i=1}^n
+\mathbb{I}_{X_i \in A},\]</span> pour tout ensemble mesurable <span
+class="math inline">\(A \subseteq \mathcal{X}\)</span>, et une
+distribution de probabilité fixe <span
+class="math inline">\(Q\)</span>.</p>
+<p>La divergence de Sanov quantifie cette distance. Pour ce faire, nous
+introduisons la fonction de log-vraisemblance relative <span
+class="math inline">\(D(Q \| P)\)</span>, définie par : <span
+class="math display">\[D(Q \| P) = \int_{\mathcal{X}}
+\log\left(\frac{dQ}{dP}\right) dQ,\]</span> où <span
+class="math inline">\(\frac{dQ}{dP}\)</span> est la dérivée de
+Radon-Nikodym de <span class="math inline">\(Q\)</span> par rapport à
+<span class="math inline">\(P\)</span>.</p>
+<p>Nous pouvons maintenant définir formellement la divergence de Sanov.
+Pour deux distributions de probabilité <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>, la divergence de Sanov est donnée par
+: <span class="math display">\[D_{\text{Sanov}}(Q \| P) = \sup_{f:
+\mathcal{X} \to \mathbb{R}} \left\{ \int_{\mathcal{X}} f dQ -
+\log\left(\int_{\mathcal{X}} e^f dP\right) \right\}.\]</span></p>
+<p>Cette définition peut être réécrite de manière équivalente en
+utilisant la fonction de log-vraisemblance relative : <span
+class="math display">\[D_{\text{Sanov}}(Q \| P) = \sup_{f: \mathcal{X}
+\to \mathbb{R}} \left\{ \int_{\mathcal{X}} f dQ -
+\log\left(\int_{\mathcal{X}} e^f dP\right) \right\} = D(Q \|
+P).\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la divergence de Sanov est le théorème
+de Sanov. Ce théorème fournit une estimation de la probabilité que la
+distribution empirique <span class="math inline">\(\hat{P}_n\)</span>
+s’écarte d’une distribution de probabilité fixe <span
+class="math inline">\(Q\)</span>.</p>
+<p><strong>Théorème (Sanov)</strong>: Soit <span
+class="math inline">\(P\)</span> une distribution de probabilité sur un
+espace mesurable <span class="math inline">\(\mathcal{X}\)</span>. Soit
+<span class="math inline">\(Q\)</span> une autre distribution de
+probabilité sur <span class="math inline">\(\mathcal{X}\)</span>,
+absolument continue par rapport à <span
+class="math inline">\(P\)</span>. Alors, pour tout ensemble mesurable
+<span class="math inline">\(A \subseteq
+\mathcal{P}(\mathcal{X})\)</span>, nous avons : <span
+class="math display">\[-\inf_{Q&#39; \in A} D(Q&#39; \| P) \leq \lim_{n
+\to \infty} \frac{1}{n} \log P^*(\hat{P}_n \in A) \leq -\inf_{Q&#39; \in
+\overline{A}} D(Q&#39; \| P),\]</span> où <span
+class="math inline">\(P^*\)</span> est la mesure de probabilité induite
+par les variables aléatoires i.i.d. <span class="math inline">\(X_1,
+X_2, \ldots, X_n\)</span>, et <span
+class="math inline">\(\overline{A}\)</span> est l’adhérence de <span
+class="math inline">\(A\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Sanov, nous suivons une approche en
+plusieurs étapes. Tout d’abord, nous utilisons le théorème de Cramér,
+qui fournit un résultat similaire pour des variables aléatoires à
+valeurs réelles. Ensuite, nous généralisons ce résultat à des espaces
+plus généraux en utilisant des techniques de théorie des grandes
+déviations.</p>
+<p><strong>Preuve du Théorème de Sanov</strong>:</p>
+<p>1. **Application du Théorème de Cramér**: Le théorème de Cramér
+fournit une estimation de la probabilité que la moyenne empirique d’une
+séquence de variables aléatoires i.i.d. s’écarte d’une valeur fixe. En
+utilisant ce théorème, nous pouvons obtenir une estimation similaire
+pour la distribution empirique.</p>
+<p>2. **Généralisation à des Espaces Mesurables**: Nous utilisons des
+techniques de théorie des grandes déviations pour généraliser le
+résultat du théorème de Cramér à des espaces mesurables plus généraux.
+Cela implique l’utilisation de la fonction de taux <span
+class="math inline">\(I(Q)\)</span>, qui est définie comme la divergence
+de Kullback-Leibler entre <span class="math inline">\(Q\)</span> et
+<span class="math inline">\(P\)</span>.</p>
+<p>3. **Estimation de la Probabilité**: En utilisant les résultats des
+étapes précédentes, nous pouvons estimer la probabilité que la
+distribution empirique <span class="math inline">\(\hat{P}_n\)</span>
+appartienne à un ensemble mesurable <span
+class="math inline">\(A\)</span>. Cette estimation est donnée par :
+<span class="math display">\[P^*(\hat{P}_n \in A) \approx e^{-n
+\inf_{Q&#39; \in A} D(Q&#39; \| P)}.\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+divergence de Sanov.</p>
+<ol>
+<li><p>**Symétrie**: La divergence de Sanov n’est pas symétrique,
+c’est-à-dire que <span class="math inline">\(D_{\text{Sanov}}(Q \| P)
+\neq D_{\text{Sanov}}(P \| Q)\)</span> en général.</p></li>
+<li><p>**Positivité**: La divergence de Sanov est toujours non négative,
+c’est-à-dire <span class="math inline">\(D_{\text{Sanov}}(Q \| P) \geq
+0\)</span>, avec égalité si et seulement si <span
+class="math inline">\(Q = P\)</span>.</p></li>
+<li><p>**Convexité**: La divergence de Sanov est une fonction convexe de
+<span class="math inline">\(Q\)</span> pour un <span
+class="math inline">\(P\)</span> fixe.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La divergence de Sanov est un outil puissant pour quantifier la
+distance entre deux distributions de probabilité. Elle joue un rôle
+crucial dans la théorie des grandes déviations et trouve des
+applications dans divers domaines. En comprenant cette divergence, nous
+pouvons mieux analyser les comportements extrêmes dans des systèmes
+complexes et améliorer notre compréhension des phénomènes rares mais
+significatifs.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

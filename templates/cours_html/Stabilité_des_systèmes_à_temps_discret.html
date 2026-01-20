@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Stabilité des systèmes à temps discret</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Stabilité des systèmes à temps discret</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude de la stabilité des systèmes à temps discret est un pilier
+fondamental en théorie du contrôle et en traitement du signal. Ces
+systèmes, modélisés par des équations aux différences, sont omniprésents
+dans les applications numériques où le temps est discrétisé. L’origine
+de cette notion remonte aux travaux pionniers de Richard Bellman et
+Rudolf E. Kalman dans les années 1950-60, qui ont jeté les bases de la
+théorie moderne du contrôle. La stabilité d’un système discret est
+cruciale pour garantir que les erreurs ou perturbations initiales ne se
+propagent pas de manière incontrôlée, assurant ainsi le bon
+fonctionnement des systèmes automatisés.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour aborder la stabilité, commençons par définir ce que nous
+entendons par système à temps discret. Imaginons un processus dynamique
+où l’état du système évolue à des instants spécifiques, appelés pas de
+temps. Nous cherchons à comprendre comment cet état évolue au fil du
+temps et sous quelles conditions il reste borné.</p>
+<div class="definition">
+<p>Un système à temps discret est défini par une équation de récurrence
+de la forme : <span class="math display">\[x_{k+1} = f(x_k,
+u_k),\]</span> où <span class="math inline">\(x_k \in
+\mathbb{R}^n\)</span> représente l’état du système à l’instant <span
+class="math inline">\(k\)</span>, <span class="math inline">\(u_k \in
+\mathbb{R}^m\)</span> est l’entrée de contrôle, et <span
+class="math inline">\(f: \mathbb{R}^n \times \mathbb{R}^m \rightarrow
+\mathbb{R}^n\)</span> est une fonction continue.</p>
+</div>
+<p>La stabilité d’un tel système peut être définie de plusieurs
+manières. Une première approche est la stabilité asymptotique, qui
+garantit que l’état du système converge vers un point d’équilibre.</p>
+<div class="definition">
+<p>Un système à temps discret est dit asymptotiquement stable si, pour
+tout <span class="math inline">\(\epsilon &gt; 0\)</span>, il existe un
+<span class="math inline">\(\delta &gt; 0\)</span> tel que pour toute
+condition initiale <span class="math inline">\(x_0\)</span> vérifiant
+<span class="math inline">\(\|x_0\| &lt; \delta\)</span>, on a : <span
+class="math display">\[\lim_{k \rightarrow +\infty} \|x_k\| =
+0.\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes-de-stabilité">Théorèmes de
+stabilité</h1>
+<p>Un des résultats fondamentaux en théorie des systèmes discrets est le
+théorème de Lyapunov, qui fournit une condition nécessaire et suffisante
+pour la stabilité asymptotique.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(x^*\)</span> un point d’équilibre du
+système <span class="math inline">\(x_{k+1} = f(x_k)\)</span>. Si il
+existe une fonction de Lyapunov <span class="math inline">\(V:
+\mathbb{R}^n \rightarrow \mathbb{R}\)</span> telle que :</p>
+<ul>
+<li><p><span class="math inline">\(V(x) &gt; 0\)</span> pour tout <span
+class="math inline">\(x \neq x^*\)</span>,</p></li>
+<li><p><span class="math inline">\(V(x^*) = 0\)</span>,</p></li>
+<li><p><span class="math inline">\(V(f(x)) - V(x) &lt; 0\)</span> pour
+tout <span class="math inline">\(x \neq x^*\)</span>,</p></li>
+</ul>
+<p>alors le système est asymptotiquement stable.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Lyapunov, nous procédons par l’analyse
+de la fonction <span class="math inline">\(V\)</span>. Supposons que
+<span class="math inline">\(x^* = 0\)</span> pour simplifier les
+notations.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la suite <span
+class="math inline">\(\{x_k\}\)</span> définie par <span
+class="math inline">\(x_{k+1} = f(x_k)\)</span>. La fonction <span
+class="math inline">\(V\)</span> est positive définie, ce qui implique
+que <span class="math inline">\(V(x_k) &gt; 0\)</span> pour tout <span
+class="math inline">\(k\)</span> tant que <span
+class="math inline">\(x_k \neq 0\)</span>. De plus, la condition <span
+class="math inline">\(V(f(x)) - V(x) &lt; 0\)</span> garantit que <span
+class="math inline">\(V(x_k)\)</span> est strictement décroissante. Par
+le principe de la descente, <span class="math inline">\(V(x_k)\)</span>
+converge vers une limite <span class="math inline">\(L \geq 0\)</span>.
+Si <span class="math inline">\(L &gt; 0\)</span>, alors <span
+class="math inline">\(x_k\)</span> reste borné et ne peut pas converger
+vers zéro, ce qui contredit la définition de <span
+class="math inline">\(V\)</span>. Donc <span class="math inline">\(L =
+0\)</span>, et par continuité, <span class="math inline">\(x_k\)</span>
+converge vers zéro. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+corollaires</h1>
+<p>Plusieurs propriétés découlent du théorème de Lyapunov. En voici
+quelques-unes :</p>
+<ul>
+<li><p>Si <span class="math inline">\(V\)</span> est radiale,
+c’est-à-dire <span class="math inline">\(V(x) = x^T P x\)</span> pour
+une matrice symétrique définie positive <span
+class="math inline">\(P\)</span>, alors la condition <span
+class="math inline">\(V(f(x)) - V(x) &lt; 0\)</span> peut être réécrite
+en termes de la matrice jacobienne <span class="math inline">\(A =
+\frac{\partial f}{\partial x}(x^*)\)</span>. Plus précisément, la
+stabilité est garantie si <span class="math inline">\(A^T P A - P &lt;
+0\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> En linéarisant autour de <span
+class="math inline">\(x^* = 0\)</span>, on obtient <span
+class="math inline">\(f(x) \approx A x\)</span>. La condition devient :
+<span class="math display">\[(A x)^T P (A x) - x^T P x &lt; 0,\]</span>
+ce qui équivaut à <span class="math inline">\(x^T (A^T P A - P) x &lt;
+0\)</span>. Par définition de <span class="math inline">\(P\)</span>,
+cela implique que <span class="math inline">\(A^T P A - P &lt;
+0\)</span>. ◻</p>
+</div></li>
+<li><p>La stabilité est une propriété locale. Si le système est
+asymptotiquement stable, alors il existe un voisinage de <span
+class="math inline">\(x^*\)</span> où la stabilité est garantie.</p>
+<div class="proof">
+<p><em>Proof.</em> Cela découle directement de la définition de <span
+class="math inline">\(\delta\)</span> dans la condition de stabilité
+asymptotique. Pour tout <span class="math inline">\(x_0\)</span>
+suffisamment proche de <span class="math inline">\(x^*\)</span>, le
+système reste stable. ◻</p>
+</div></li>
+<li><p>Si <span class="math inline">\(f\)</span> est globalement
+Lipschitzienne, alors la stabilité locale implique la stabilité
+globale.</p>
+<div class="proof">
+<p><em>Proof.</em> La condition Lipschitzienne garantit que les
+trajectoires du système ne divergent pas. Par conséquent, si le système
+est stable localement, il l’est également globalement. ◻</p>
+</div></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La stabilité des systèmes à temps discret est un sujet riche et
+complexe, avec des applications dans de nombreux domaines. Les outils
+théoriques, comme le théorème de Lyapunov, fournissent des conditions
+puissantes pour analyser et garantir la stabilité. Les développements
+récents en théorie du contrôle, notamment l’intégration de méthodes
+numériques et d’intelligence artificielle, ouvrent de nouvelles
+perspectives pour l’étude des systèmes dynamiques discrets.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

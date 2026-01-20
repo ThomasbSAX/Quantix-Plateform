@@ -1,0 +1,367 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Max Error: A Comprehensive Study of Maximum Absolute Error in Numerical Analysis</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Max Error: A Comprehensive Study of Maximum Absolute
+Error in Numerical Analysis</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-and-motivations">Introduction
+and Motivations</h1>
+<p>In the realm of numerical analysis, the concept of error is
+ubiquitous. As we strive to approximate solutions to mathematical
+problems that may not have analytical solutions, or whose exact
+solutions are prohibitively complex to compute, we must contend with the
+inevitability of error. Among the various metrics used to quantify this
+error, the maximum absolute error, or "max error," stands out for its
+simplicity and intuitive interpretation.</p>
+<p>The max error provides a straightforward measure of the worst-case
+scenario in our approximations. It tells us the largest absolute
+difference between an approximate value and its true counterpart,
+offering a clear and concise indication of the reliability of our
+numerical methods. This notion is indispensable in fields such as
+scientific computing, engineering, and economics, where the accuracy of
+numerical results can have significant real-world implications.</p>
+<p>In this article, we delve into the concept of max error, exploring
+its definitions, properties, and theorems. We will see how it is
+formally defined, how it behaves under various operations, and what
+guarantees we can make about its magnitude. Through this exploration, we
+aim to provide a comprehensive understanding of max error and its role
+in numerical analysis.</p>
+<h1 class="unnumbered" id="definitions">Definitions</h1>
+<p>To understand the max error, let us first consider what we are trying
+to achieve. Suppose we have a true value <span
+class="math inline">\(y\)</span> and an approximate value <span
+class="math inline">\(\tilde{y}\)</span>. We want to quantify how far
+apart these two values are, in the worst case. This leads us naturally
+to the concept of absolute error.</p>
+<p>The <strong>absolute error</strong> between <span
+class="math inline">\(y\)</span> and <span
+class="math inline">\(\tilde{y}\)</span> is defined as: <span
+class="math display">\[|y - \tilde{y}|\]</span> This measures the
+distance between the true value and the approximate value. However, when
+dealing with multiple approximations or functions, we are often
+interested in the largest such error.</p>
+<p>The <strong>max error</strong> is then defined as the maximum
+absolute error over a set of values or a domain. Formally, for a
+function <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> and an approximation <span
+class="math inline">\(\tilde{f}: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span>, the max error is: <span
+class="math display">\[\max_{x \in D} |f(x) - \tilde{f}(x)|\]</span>
+where <span class="math inline">\(D \subseteq \mathbb{R}^n\)</span> is
+the domain of interest.</p>
+<p>In the case where <span class="math inline">\(f\)</span> and <span
+class="math inline">\(\tilde{f}\)</span> are vectors, say <span
+class="math inline">\(f, \tilde{f}: \mathbb{R}^n \rightarrow
+\mathbb{R}^m\)</span>, the max error can be defined component-wise:
+<span class="math display">\[\max_{x \in D} \max_{1 \leq i \leq m}
+|f_i(x) - \tilde{f}_i(x)|\]</span> Here, <span
+class="math inline">\(f_i\)</span> and <span
+class="math inline">\(\tilde{f}_i\)</span> denote the <span
+class="math inline">\(i\)</span>-th components of <span
+class="math inline">\(f\)</span> and <span
+class="math inline">\(\tilde{f}\)</span>, respectively.</p>
+<h1 class="unnumbered" id="theorems">Theorems</h1>
+<p>One of the fundamental theorems related to max error is the
+<strong>Weierstrass Approximation Theorem</strong>, which guarantees
+that continuous functions can be uniformly approximated by polynomials.
+This theorem has implications for the max error, as it tells us that for
+any continuous function and any desired accuracy, there exists a
+polynomial approximation whose max error is less than that accuracy.</p>
+<div class="theorem">
+<p>Let <span class="math inline">\(f\)</span> be a continuous function
+on the closed interval <span class="math inline">\([a, b]\)</span>.
+Then, for any <span class="math inline">\(\epsilon &gt; 0\)</span>,
+there exists a polynomial <span class="math inline">\(P\)</span> such
+that: <span class="math display">\[\max_{x \in [a, b]} |f(x) - P(x)|
+&lt; \epsilon\]</span></p>
+</div>
+<p>Another important theorem is the <strong>Taylor’s Theorem</strong>,
+which provides an estimate of the error when approximating a function
+using its Taylor series.</p>
+<div class="theorem">
+<p>Let <span class="math inline">\(f\)</span> be a function that is
+<span class="math inline">\(n+1\)</span> times differentiable on an open
+interval containing <span class="math inline">\(a\)</span>. Then, for
+any <span class="math inline">\(x\)</span> in that interval, there
+exists a <span class="math inline">\(c\)</span> between <span
+class="math inline">\(a\)</span> and <span
+class="math inline">\(x\)</span> such that: <span
+class="math display">\[f(x) = \sum_{k=0}^n \frac{f^{(k)}(a)}{k!} (x -
+a)^k + \frac{f^{(n+1)}(c)}{(n+1)!} (x - a)^{n+1}\]</span> The max error
+of the Taylor approximation can be bounded by: <span
+class="math display">\[\max_{x \in [a, b]} |f(x) - P_n(x)| \leq \max_{c
+\in [a, b]} \left| \frac{f^{(n+1)}(c)}{(n+1)!} \right| \max_{x \in [a,
+b]} |x - a|^{n+1}\]</span> where <span
+class="math inline">\(P_n\)</span> is the <span
+class="math inline">\(n\)</span>-th degree Taylor polynomial centered at
+<span class="math inline">\(a\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="proofs">Proofs</h1>
+<p>Let us now turn to the proof of Taylor’s Theorem, as it provides
+insight into how max error can be bounded.</p>
+<div class="proof">
+<p><em>Proof.</em> We start by considering the integral form of the
+remainder term in Taylor’s Theorem. For any <span
+class="math inline">\(x\)</span> in the interval <span
+class="math inline">\([a, b]\)</span>, we have: <span
+class="math display">\[f(x) = P_n(x) + \frac{1}{n!} \int_a^x
+f^{(n+1)}(t) (x - t)^n \, dt\]</span> Here, <span
+class="math inline">\(P_n\)</span> is the <span
+class="math inline">\(n\)</span>-th degree Taylor polynomial centered at
+<span class="math inline">\(a\)</span>. The error term is given by:
+<span class="math display">\[R_n(x) = \frac{1}{n!} \int_a^x f^{(n+1)}(t)
+(x - t)^n \, dt\]</span> To bound the max error, we consider the maximum
+absolute value of <span class="math inline">\(R_n(x)\)</span> over <span
+class="math inline">\([a, b]\)</span>. By the Mean Value Theorem for
+Integrals, there exists a <span class="math inline">\(c\)</span> in
+<span class="math inline">\([a, b]\)</span> such that: <span
+class="math display">\[|R_n(x)| = \left| \frac{f^{(n+1)}(c)}{n!} \right|
+\int_a^x |x - t|^n \, dt\]</span> The integral <span
+class="math inline">\(\int_a^x |x - t|^n \, dt\)</span> can be bounded
+by <span class="math inline">\(\max_{t \in [a, b]} |x - t|^n\)</span>,
+which is <span class="math inline">\((b - a)^n\)</span> if <span
+class="math inline">\(x\)</span> is at the endpoint <span
+class="math inline">\(b\)</span>. Thus, we have: <span
+class="math display">\[\max_{x \in [a, b]} |R_n(x)| \leq \max_{c \in [a,
+b]} \left| \frac{f^{(n+1)}(c)}{(n+1)!} \right| (b - a)^{n+1}\]</span>
+This completes the proof. ◻</p>
+</div>
+<h1 class="unnumbered" id="properties-and-corollaries">Properties and
+Corollaries</h1>
+<p>The max error enjoys several important properties, which we list and
+prove below.</p>
+<ol>
+<li><p><strong>Non-negativity</strong>: The max error is always
+non-negative. That is, for any functions <span
+class="math inline">\(f\)</span> and <span
+class="math inline">\(\tilde{f}\)</span>, and any domain <span
+class="math inline">\(D\)</span>, <span class="math display">\[\max_{x
+\in D} |f(x) - \tilde{f}(x)| \geq 0\]</span> This follows immediately
+from the fact that absolute values are non-negative.</p></li>
+<li><p><strong>Triangle Inequality</strong>: The max error satisfies a
+form of the triangle inequality. Specifically, for any three functions
+<span class="math inline">\(f, g, h: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span>, and any domain <span
+class="math inline">\(D\)</span>, <span class="math display">\[\max_{x
+\in D} |f(x) - h(x)| \leq \max_{x \in D} |f(x) - g(x)| + \max_{x \in D}
+|g(x) - h(x)|\]</span> This can be proven by noting that for any <span
+class="math inline">\(x \in D\)</span>, we have: <span
+class="math display">\[|f(x) - h(x)| \leq |f(x) - g(x)| + |g(x) -
+h(x)|\]</span> Taking the maximum over <span
+class="math inline">\(D\)</span> preserves this inequality.</p></li>
+<li><p><strong>Linearity in Scaling</strong>: The max error is linear in
+scaling. That is, for any constant <span class="math inline">\(c \in
+\mathbb{R}\)</span>, and any functions <span class="math inline">\(f,
+\tilde{f}: \mathbb{R}^n \rightarrow \mathbb{R}\)</span>, and any domain
+<span class="math inline">\(D\)</span>, <span
+class="math display">\[\max_{x \in D} |c f(x) - c \tilde{f}(x)| = |c|
+\max_{x \in D} |f(x) - \tilde{f}(x)|\]</span> This follows from the
+linearity of absolute value and the fact that the maximum is attained at
+the same point for both sides.</p></li>
+</ol>
+<p>In conclusion, the max error is a fundamental concept in numerical
+analysis, providing a clear and intuitive measure of the worst-case
+scenario in our approximations. Through its definitions, theorems,
+proofs, and properties, we have seen how it behaves under various
+operations and what guarantees we can make about its magnitude. As we
+continue to refine our numerical methods, the max error will remain an
+indispensable tool in assessing their accuracy and reliability.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,364 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Gap de dualité en optimisation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Gap de dualité en optimisation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’optimisation est un domaine fondamental en mathématiques
+appliquées, avec des applications dans de nombreux domaines tels que
+l’économie, la physique, et l’ingénierie. Un concept central en
+optimisation est celui de dualité, qui permet de transformer un problème
+d’optimisation complexe en un problème plus simple à résoudre. Le
+<em>gap de dualité</em> est une mesure de la différence entre les
+solutions des problèmes primal et dual, et son étude est cruciale pour
+comprendre les limites et les possibilités de la théorie de la
+dualité.</p>
+<p>L’origine historique de la dualité remonte aux travaux de Joseph
+Louis Lagrange au XVIIIe siècle, avec l’introduction des multiplicateurs
+de Lagrange. Cependant, c’est avec les travaux de John von Neumann et
+George Dantzig au milieu du XXe siècle que la théorie de la dualité a
+été formalisée et appliquée systématiquement en programmation linéaire.
+Le gap de dualité émerge naturellement dans ce contexte, comme une
+mesure de l’écart entre les solutions optimales des problèmes primal et
+dual.</p>
+<p>Pourquoi le gap de dualité est-il indispensable ? Tout d’abord, il
+permet de quantifier la qualité des solutions obtenues par les méthodes
+duales. Ensuite, il fournit des informations précieuses sur la structure
+des problèmes d’optimisation et peut être utilisé pour développer de
+nouvelles méthodes de résolution. Enfin, l’étude du gap de dualité est
+essentielle pour comprendre les conditions sous lesquelles la dualité
+est forte, c’est-à-dire lorsque le gap de dualité est nul.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Commençons par comprendre ce que nous cherchons à capturer avec le
+concept de gap de dualité. Supposons que nous ayons un problème
+d’optimisation primal et son problème dual associé. Nous voulons mesurer
+l’écart entre les valeurs optimales de ces deux problèmes.</p>
+<p>Formellement, considérons un problème d’optimisation primal de la
+forme : <span class="math display">\[\min_{x \in X} f(x)\]</span> où
+<span class="math inline">\(X\)</span> est un ensemble non vide et <span
+class="math inline">\(f: X \to \mathbb{R}\)</span> est une fonction
+objectif.</p>
+<p>Le problème dual associé est généralement de la forme : <span
+class="math display">\[\max_{y \in Y} g(y)\]</span> où <span
+class="math inline">\(Y\)</span> est un ensemble non vide et <span
+class="math inline">\(g: Y \to \mathbb{R}\)</span> est une fonction
+objectif duale.</p>
+<p>Le gap de dualité mesure l’écart entre les valeurs optimales des
+problèmes primal et dual. Plus précisément, nous définissons le gap de
+dualité comme suit :</p>
+<div class="definition">
+<p>Le <em>gap de dualité</em> <span class="math inline">\(D\)</span> est
+défini par : <span class="math display">\[D = \inf_{x \in X} f(x) -
+\sup_{y \in Y} g(y)\]</span> Si <span class="math inline">\(D =
+0\)</span>, on dit que la dualité est forte, ce qui signifie que les
+valeurs optimales des problèmes primal et dual sont égales.</p>
+</div>
+<p>Une autre manière de formuler cette définition est la suivante :
+<span class="math display">\[D = \inf_{x \in X} \sup_{y \in Y} (f(x) -
+g(y))\]</span> Cette formulation met en évidence le fait que le gap de
+dualité peut être vu comme une mesure de l’écart entre les fonctions
+objectif primale et duale.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en théorie de la dualité est le théorème de
+la dualité faible, qui établit une relation entre les valeurs optimales
+des problèmes primal et dual.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f: X \to \mathbb{R}\)</span> et
+<span class="math inline">\(g: Y \to \mathbb{R}\)</span> des fonctions
+convexes, où <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont des ensembles convexes. Supposons
+que <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> soient inférentiellement liées par une
+relation de dualité. Alors, pour tout <span class="math inline">\(x \in
+X\)</span> et <span class="math inline">\(y \in Y\)</span>, nous avons :
+<span class="math display">\[f(x) - g(y) \geq 0\]</span> En d’autres
+termes, la valeur optimale du problème primal est toujours supérieure ou
+égale à la valeur optimale du problème dual.</p>
+</div>
+<p>La démonstration de ce théorème repose sur les propriétés de
+convexité des fonctions <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span>, ainsi que sur la relation de dualité
+entre elles. En particulier, nous utilisons le fait que pour des
+fonctions convexes, l’infimum de la fonction objectif primale est
+toujours supérieur ou égal au supremum de la fonction objectif
+duale.</p>
+<p>Un autre théorème important est le théorème de la dualité forte, qui
+donne des conditions sous lesquelles le gap de dualité est nul.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f: X \to \mathbb{R}\)</span> et
+<span class="math inline">\(g: Y \to \mathbb{R}\)</span> des fonctions
+convexes, où <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont des ensembles convexes. Supposons
+que <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> soient inférentiellement liées par une
+relation de dualité. Si de plus, les problèmes primal et dual ont des
+solutions optimales, alors la dualité est forte, c’est-à-dire que :
+<span class="math display">\[\inf_{x \in X} f(x) = \sup_{y \in Y}
+g(y)\]</span></p>
+</div>
+<p>La démonstration de ce théorème repose sur des arguments de
+continuité et de compacité, ainsi que sur les propriétés des fonctions
+convexes. En particulier, nous utilisons le fait que pour des fonctions
+convexes sur des ensembles compacts, l’infimum et le supremum sont
+atteints.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de la dualité faible, nous procédons comme
+suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(x \in X\)</span> et
+<span class="math inline">\(y \in Y\)</span>. Par définition de la
+relation de dualité, nous avons : <span class="math display">\[f(x) -
+g(y) \geq 0\]</span> En prenant l’infimum sur <span
+class="math inline">\(x \in X\)</span> et le supremum sur <span
+class="math inline">\(y \in Y\)</span>, nous obtenons : <span
+class="math display">\[\inf_{x \in X} f(x) - \sup_{y \in Y} g(y) \geq
+0\]</span> Ce qui montre que le gap de dualité <span
+class="math inline">\(D\)</span> est non négatif. ◻</p>
+</div>
+<p>Pour démontrer le théorème de la dualité forte, nous procédons comme
+suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que les problèmes primal et dual ont des
+solutions optimales <span class="math inline">\(x^* \in X\)</span> et
+<span class="math inline">\(y^* \in Y\)</span>. Par définition de la
+relation de dualité, nous avons : <span class="math display">\[f(x^*) -
+g(y^*) \geq 0\]</span> En prenant l’infimum sur <span
+class="math inline">\(x \in X\)</span> et le supremum sur <span
+class="math inline">\(y \in Y\)</span>, nous obtenons : <span
+class="math display">\[\inf_{x \in X} f(x) - \sup_{y \in Y} g(y) =
+0\]</span> Ce qui montre que le gap de dualité <span
+class="math inline">\(D\)</span> est nul, et donc que la dualité est
+forte. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes du gap de
+dualité.</p>
+<ol>
+<li><p>Le gap de dualité est toujours non négatif, c’est-à-dire que
+<span class="math inline">\(D \geq 0\)</span>.</p></li>
+<li><p>Si la dualité est forte, alors le gap de dualité est nul,
+c’est-à-dire que <span class="math inline">\(D = 0\)</span>.</p></li>
+<li><p>Si les problèmes primal et dual ont des solutions optimales,
+alors la dualité est forte.</p></li>
+</ol>
+<p>Nous développons maintenant ces propriétés une par une.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour la propriété (i), nous avons déjà démontré que
+le gap de dualité est non négatif en utilisant le théorème de la dualité
+faible.</p>
+<p>Pour la propriété (ii), nous avons démontré que si la dualité est
+forte, alors le gap de dualité est nul en utilisant le théorème de la
+dualité forte.</p>
+<p>Pour la propriété (iii), nous avons démontré que si les problèmes
+primal et dual ont des solutions optimales, alors la dualité est forte
+en utilisant le théorème de la dualité forte. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le gap de dualité est un concept fondamental en théorie de
+l’optimisation, qui permet de quantifier l’écart entre les solutions des
+problèmes primal et dual. Nous avons vu que le gap de dualité est
+toujours non négatif, et qu’il est nul lorsque la dualité est forte. Les
+théorèmes de la dualité faible et forte fournissent des conditions sous
+lesquelles ces propriétés sont satisfaites. L’étude du gap de dualité
+est cruciale pour comprendre les limites et les possibilités de la
+théorie de la dualité, et a des applications dans de nombreux domaines
+tels que l’économie, la physique, et l’ingénierie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

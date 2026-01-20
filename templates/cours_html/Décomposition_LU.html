@@ -1,0 +1,319 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Décomposition LU : Une Approche Fondamentale en Algèbre Linéaire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Décomposition LU : Une Approche Fondamentale en
+Algèbre Linéaire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La décomposition LU, également connue sous le nom de factorisation
+LU, est une technique fondamentale en algèbre linéaire qui permet de
+décomposer une matrice carrée inversible en le produit d’une matrice
+triangulaire inférieure (L) et d’une matrice triangulaire supérieure
+(U). Cette décomposition est particulièrement utile pour résoudre des
+systèmes d’équations linéaires, calculer les déterminants et inverses de
+matrices, ainsi que pour une multitude d’applications en analyse
+numérique.</p>
+<p>L’origine de la décomposition LU remonte aux travaux de
+mathématiciens tels que Dodgson, Crout et Doolittle au XIXe siècle.
+Cependant, c’est avec l’essor de l’informatique que cette méthode a
+trouvé son plein essor, permettant des calculs numériques efficaces et
+précis. La décomposition LU est indispensable dans de nombreux domaines,
+notamment en ingénierie, physique, économie et sciences des données, où
+la résolution de systèmes linéaires est une opération courante.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la décomposition LU, commençons par définir les
+matrices triangulaires. Une matrice <span
+class="math inline">\(A\)</span> est dite triangulaire inférieure si
+tous ses éléments situés au-dessus de la diagonale principale sont nuls.
+De même, une matrice <span class="math inline">\(A\)</span> est dite
+triangulaire supérieure si tous ses éléments situés en dessous de la
+diagonale principale sont nuls.</p>
+<p>Formellement, une matrice <span class="math inline">\(L\)</span> est
+triangulaire inférieure si : <span class="math display">\[L_{ij} = 0
+\quad \forall i &lt; j.\]</span> Une matrice <span
+class="math inline">\(U\)</span> est triangulaire supérieure si : <span
+class="math display">\[U_{ij} = 0 \quad \forall i &gt; j.\]</span></p>
+<p>La décomposition LU d’une matrice <span
+class="math inline">\(A\)</span> consiste à trouver deux matrices <span
+class="math inline">\(L\)</span> et <span
+class="math inline">\(U\)</span> telles que : <span
+class="math display">\[A = LU.\]</span> En d’autres termes, pour toute
+matrice carrée inversible <span class="math inline">\(A\)</span>, il
+existe une unique paire de matrices <span
+class="math inline">\(L\)</span> et <span
+class="math inline">\(U\)</span> vérifiant cette relation.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la décomposition LU est le suivant
+:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée
+inversible de taille <span class="math inline">\(n \times n\)</span>. Il
+existe une unique paire de matrices <span
+class="math inline">\(L\)</span> et <span
+class="math inline">\(U\)</span>, où <span
+class="math inline">\(L\)</span> est triangulaire inférieure avec des
+éléments diagonaux égaux à 1, et <span class="math inline">\(U\)</span>
+est triangulaire supérieure, telles que : <span class="math display">\[A
+= LU.\]</span></p>
+</div>
+<p>La preuve de ce théorème repose sur l’algorithme de factorisation LU,
+qui peut être implémenté de manière efficace à l’aide de la méthode de
+Doolittle ou de Crout. Ces méthodes utilisent des opérations
+élémentaires de lignes pour transformer la matrice <span
+class="math inline">\(A\)</span> en une matrice triangulaire supérieure
+<span class="math inline">\(U\)</span>, tout en enregistrant les
+opérations effectuées dans la matrice <span
+class="math inline">\(L\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer l’existence et l’unicité de la décomposition LU, nous
+procédons par récurrence sur la taille de la matrice <span
+class="math inline">\(A\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Initialisation :</strong> Pour <span
+class="math inline">\(n = 1\)</span>, la matrice <span
+class="math inline">\(A\)</span> est simplement un scalaire non nul. La
+décomposition LU est triviale : <span class="math display">\[A = 1 \cdot
+A = LU,\]</span> où <span class="math inline">\(L = 1\)</span> et <span
+class="math inline">\(U = A\)</span>.</p>
+<p><strong>Hérédité :</strong> Supposons que la décomposition LU existe
+pour toute matrice carrée inversible de taille <span
+class="math inline">\(k \times k\)</span>. Considérons une matrice <span
+class="math inline">\(A\)</span> de taille <span
+class="math inline">\((k+1) \times (k+1)\)</span>. Nous pouvons
+appliquer une opération élémentaire de ligne pour annuler le premier
+élément de la première colonne sous le pivot. Cela nous donne une
+nouvelle matrice <span class="math inline">\(A&#39;\)</span> qui est
+triangulaire supérieure. La matrice <span
+class="math inline">\(L\)</span> résultante aura des éléments non nuls
+uniquement dans la première colonne, et <span class="math inline">\(U =
+A&#39;\)</span>.</p>
+<p>En utilisant l’hypothèse de récurrence pour la sous-matrice de taille
+<span class="math inline">\(k \times k\)</span> obtenue en supprimant la
+première ligne et la première colonne de <span
+class="math inline">\(A&#39;\)</span>, nous pouvons compléter la
+décomposition LU pour <span class="math inline">\(A\)</span>.</p>
+<p><strong>Conclusion :</strong> Par récurrence, la décomposition LU
+existe pour toute matrice carrée inversible <span
+class="math inline">\(A\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La décomposition LU possède plusieurs propriétés importantes qui en
+font un outil puissant en algèbre linéaire.</p>
+<ol>
+<li><p><strong>Unicité :</strong> La décomposition LU est unique si l’on
+impose que les éléments diagonaux de <span
+class="math inline">\(L\)</span> soient égaux à 1.</p></li>
+<li><p><strong>Efficacité :</strong> La décomposition LU permet de
+résoudre des systèmes d’équations linéaires en temps <span
+class="math inline">\(O(n^3)\)</span>, ce qui est plus efficace que les
+méthodes directes telles que l’élimination de Gauss.</p></li>
+<li><p><strong>Stabilité Numérique :</strong> La décomposition LU est
+numériquement stable, ce qui signifie qu’elle minimise les erreurs
+d’arrondi lors des calculs numériques.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La décomposition LU est une technique essentielle en algèbre
+linéaire, offrant des solutions efficaces et stables pour la résolution
+de systèmes d’équations linéaires. Son importance historique et ses
+applications modernes en font un sujet d’étude passionnant et
+indispensable pour tout étudiant ou chercheur en mathématiques
+appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

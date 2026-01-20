@@ -1,0 +1,337 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Ordre de convergence</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Ordre de convergence</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des ordres de convergence est un sujet central en analyse
+numérique, en particulier dans la théorie des méthodes itératives pour
+la résolution d’équations. L’idée sous-jacente est de quantifier la
+vitesse à laquelle une suite converge vers sa limite. Cette notion
+permet non seulement de comparer l’efficacité des différentes méthodes
+numériques, mais aussi de prédire le nombre d’itérations nécessaires
+pour atteindre une précision donnée.</p>
+<p>L’ordre de convergence émerge naturellement dans le contexte des
+méthodes itératives, où l’on cherche à résoudre une équation de la forme
+<span class="math inline">\(f(x) = 0\)</span>. La question centrale est
+alors de savoir comment la suite <span
+class="math inline">\((x_n)\)</span> générée par une méthode itérative
+se rapproche de la solution <span class="math inline">\(x^*\)</span>.
+L’ordre de convergence fournit une réponse précise à cette question, en
+donnant une estimation de la vitesse de convergence.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’introduire formellement l’ordre de convergence, il est utile
+de comprendre ce que nous cherchons à capturer. Supposons que nous ayons
+une suite <span class="math inline">\((x_n)\)</span> qui converge vers
+une limite <span class="math inline">\(x^*\)</span>. Nous voulons
+mesurer à quelle vitesse les termes <span
+class="math inline">\(x_n\)</span> se rapprochent de <span
+class="math inline">\(x^*\)</span>. Intuitivement, si la suite converge
+rapidement, les termes <span class="math inline">\(x_n\)</span>
+devraient se rapprocher de <span class="math inline">\(x^*\)</span> très
+vite, tandis que si la convergence est lente, les termes <span
+class="math inline">\(x_n\)</span> mettront plus de temps à se
+rapprocher de <span class="math inline">\(x^*\)</span>.</p>
+<p>Pour formaliser cette idée, nous introduisons la notion d’ordre de
+convergence.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((x_n)\)</span> une suite qui
+converge vers <span class="math inline">\(x^*\)</span>. On dit que la
+suite <span class="math inline">\((x_n)\)</span> converge vers <span
+class="math inline">\(x^*\)</span> avec un ordre de convergence <span
+class="math inline">\(p \geq 1\)</span>, où <span
+class="math inline">\(p\)</span> est un entier, si et seulement si il
+existe une constante <span class="math inline">\(C &gt; 0\)</span> telle
+que <span class="math display">\[\lim_{n \to \infty} \frac{|x_{n+1} -
+x^*|}{|x_n - x^*|^p} = C.\]</span> Si <span class="math inline">\(p =
+1\)</span>, on dit que la convergence est linéaire. Si <span
+class="math inline">\(p = 2\)</span>, on dit que la convergence est
+quadratique, et ainsi de suite.</p>
+</div>
+<p>Une autre manière de formuler cette définition est la suivante :
+<span class="math display">\[|x_{n+1} - x^*| \leq C |x_n -
+x^*|^p\]</span> pour tout <span class="math inline">\(n\)</span>
+suffisamment grand.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un résultat fondamental concernant l’ordre de convergence est le
+théorème suivant, qui donne une condition suffisante pour qu’une méthode
+itérative ait un ordre de convergence donné.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(f : \mathbb{R} \to
+\mathbb{R}\)</span> une fonction de classe <span
+class="math inline">\(C^p\)</span> au voisinage d’un point fixe <span
+class="math inline">\(x^*\)</span>, c’est-à-dire que <span
+class="math inline">\(f(x^*) = x^*\)</span> et que la dérivée <span
+class="math inline">\(p\)</span>-ième de <span
+class="math inline">\(f\)</span> existe et est continue au voisinage de
+<span class="math inline">\(x^*\)</span>. Supposons que <span
+class="math inline">\(f&#39;(x^*) = 0\)</span> et que <span
+class="math inline">\(f^{(p)}(x^*) \neq 0\)</span>. Alors, la méthode
+itérative définie par <span class="math inline">\(x_{n+1} =
+f(x_n)\)</span> converge vers <span class="math inline">\(x^*\)</span>
+avec un ordre de convergence <span class="math inline">\(p\)</span>.</p>
+</div>
+<p>Pour démontrer ce théorème, nous utilisons le développement de Taylor
+de <span class="math inline">\(f\)</span> au voisinage de <span
+class="math inline">\(x^*\)</span>. Plus précisément, nous avons <span
+class="math display">\[f(x) = f(x^*) + f&#39;(x^*)(x - x^*) +
+\frac{f&#39;&#39;(x^*)}{2!}(x - x^*)^2 + \cdots +
+\frac{f^{(p)}(x^*)}{p!}(x - x^*)^p + o((x - x^*)^p).\]</span> En
+utilisant cette expansion, nous pouvons montrer que <span
+class="math display">\[|x_{n+1} - x^*| \leq C |x_n - x^*|^p\]</span>
+pour tout <span class="math inline">\(n\)</span> suffisamment grand, où
+<span class="math inline">\(C\)</span> est une constante positive.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème précédent, nous procédons comme suit. Tout
+d’abord, nous remarquons que <span class="math inline">\(x^*\)</span>
+est un point fixe de <span class="math inline">\(f\)</span>,
+c’est-à-dire que <span class="math inline">\(f(x^*) = x^*\)</span>.
+Ensuite, nous utilisons le développement de Taylor de <span
+class="math inline">\(f\)</span> au voisinage de <span
+class="math inline">\(x^*\)</span> pour obtenir <span
+class="math display">\[f(x) = f(x^*) + f&#39;(x^*)(x - x^*) +
+\frac{f&#39;&#39;(x^*)}{2!}(x - x^*)^2 + \cdots +
+\frac{f^{(p)}(x^*)}{p!}(x - x^*)^p + o((x - x^*)^p).\]</span> En
+utilisant cette expansion, nous pouvons écrire <span
+class="math display">\[x_{n+1} - x^* = f(x_n) - x^* =
+\frac{f^{(p)}(x^*)}{p!}(x_n - x^*)^p + o((x_n - x^*)^p).\]</span> En
+prenant la valeur absolue, nous obtenons <span
+class="math display">\[|x_{n+1} - x^*| \leq C |x_n - x^*|^p\]</span>
+pour tout <span class="math inline">\(n\)</span> suffisamment grand, où
+<span class="math inline">\(C = \frac{|f^{(p)}(x^*)|}{p!}\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de l’ordre de
+convergence.</p>
+<ol>
+<li><p>Si une suite <span class="math inline">\((x_n)\)</span> converge
+vers <span class="math inline">\(x^*\)</span> avec un ordre de
+convergence <span class="math inline">\(p\)</span>, alors elle converge
+également avec tout ordre inférieur ou égal à <span
+class="math inline">\(p\)</span>. Plus précisément, si <span
+class="math inline">\(q &lt; p\)</span>, alors il existe une constante
+<span class="math inline">\(C&#39; &gt; 0\)</span> telle que <span
+class="math display">\[\lim_{n \to \infty} \frac{|x_{n+1} - x^*|}{|x_n -
+x^*|^q} = C&#39;.\]</span></p></li>
+<li><p>L’ordre de convergence est une propriété locale. Cela signifie
+que l’ordre de convergence peut varier en fonction du point de départ de
+la suite <span class="math inline">\((x_n)\)</span>. En particulier, une
+méthode itérative peut avoir un ordre de convergence différent pour
+différentes solutions d’une équation.</p></li>
+<li><p>L’ordre de convergence peut être utilisé pour comparer
+l’efficacité des différentes méthodes itératives. En général, une
+méthode avec un ordre de convergence plus élevé sera plus efficace pour
+atteindre une précision donnée.</p></li>
+</ol>
+<p>Pour prouver la première propriété, nous utilisons le fait que si
+<span class="math inline">\(q &lt; p\)</span>, alors <span
+class="math display">\[|x_n - x^*|^{q-p} = |x_n - x^*|^{-(p-q)} \leq
+1\]</span> pour tout <span class="math inline">\(n\)</span> suffisamment
+grand. En multipliant les deux côtés par <span
+class="math inline">\(|x_n - x^*|^p\)</span>, nous obtenons <span
+class="math display">\[|x_{n+1} - x^*| \leq C |x_n - x^*|^{q-p} |x_n -
+x^*|^p = C |x_n - x^*|^q.\]</span> En prenant la limite lorsque <span
+class="math inline">\(n \to \infty\)</span>, nous obtenons <span
+class="math display">\[\lim_{n \to \infty} \frac{|x_{n+1} - x^*|}{|x_n -
+x^*|^q} = C&#39;.\]</span> où <span
+class="math inline">\(C&#39;\)</span> est une constante positive.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

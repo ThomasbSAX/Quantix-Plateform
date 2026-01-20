@@ -1,0 +1,316 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Dimension par analyse en composantes principales</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Dimension par analyse en composantes principales</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse en composantes principales (ACP) est une technique
+statistique multicritère qui permet de réduire la dimension d’un
+ensemble de données tout en préservant autant que possible les
+variations présentes dans les données originales. Cette méthode,
+introduite par Karl Pearson en 1901 et développée par Harold Hotelling
+dans les années 1930, est devenue un outil fondamental en statistique
+exploratoire et en apprentissage automatique.</p>
+<p>L’ACP émerge comme une réponse à la nécessité de traiter des jeux de
+données de plus en plus complexes et de grande dimension. En effet, dans
+de nombreux domaines tels que la biologie, la finance ou l’ingénierie,
+les données collectées peuvent comporter un grand nombre de variables,
+rendant leur analyse directe difficile. L’ACP permet de simplifier cette
+analyse en identifiant les directions principales de variation des
+données, appelées composantes principales.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire l’ACP, considérons un ensemble de données constitué
+de <span class="math inline">\(n\)</span> observations et <span
+class="math inline">\(p\)</span> variables. Nous cherchons à représenter
+ces données dans un espace de dimension réduite, tout en conservant
+l’information essentielle.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une matrice <span
+class="math inline">\(n \times p\)</span> contenant les observations. La
+matrice des données centrées, notée <span
+class="math inline">\(C\)</span>, est obtenue en soustrayant la moyenne
+de chaque variable : <span class="math display">\[C = X - \mu
+\mathbf{1}^\top\]</span> où <span class="math inline">\(\mu\)</span> est
+le vecteur des moyennes des colonnes de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(\mathbf{1}\)</span> est un vecteur de uns de
+taille <span class="math inline">\(n\)</span>.</p>
+</div>
+<div class="definition">
+<p>La matrice de covariance <span class="math inline">\(\Sigma\)</span>
+de la matrice centrée <span class="math inline">\(C\)</span> est définie
+par : <span class="math display">\[\Sigma = \frac{1}{n-1} C^\top
+C\]</span> Cette matrice capture les relations linéaires entre les
+variables.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’ACP repose sur la décomposition en valeurs singulières (SVD) de la
+matrice des données centrées. La SVD permet d’exprimer <span
+class="math inline">\(C\)</span> comme le produit de trois matrices
+:</p>
+<p><span class="math display">\[C = U \Sigma V^\top\]</span></p>
+<p>où <span class="math inline">\(U\)</span> est une matrice orthogonale
+<span class="math inline">\(n \times p\)</span>, <span
+class="math inline">\(\Sigma\)</span> est une matrice diagonale <span
+class="math inline">\(p \times p\)</span> contenant les valeurs
+singulières, et <span class="math inline">\(V\)</span> est une matrice
+orthogonale <span class="math inline">\(p \times p\)</span>.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(C\)</span> une matrice <span
+class="math inline">\(n \times p\)</span> de rang <span
+class="math inline">\(r\)</span>. Il existe des matrices <span
+class="math inline">\(U \in \mathbb{R}^{n \times n}\)</span>, <span
+class="math inline">\(\Sigma \in \mathbb{R}^{n \times p}\)</span> et
+<span class="math inline">\(V \in \mathbb{R}^{p \times p}\)</span>
+telles que : <span class="math display">\[C = U \Sigma V^\top\]</span>
+où <span class="math inline">\(U\)</span> et <span
+class="math inline">\(V\)</span> sont orthogonales, et <span
+class="math inline">\(\Sigma\)</span> est diagonale avec des éléments
+non négatifs sur la diagonale.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve de la décomposition en valeurs singulières repose sur
+plusieurs étapes clés. Tout d’abord, nous considérons la matrice <span
+class="math inline">\(C^\top C\)</span>, qui est une matrice symétrique
+et définie positive. Par le théorème spectral, cette matrice admet une
+décomposition en valeurs propres :</p>
+<p><span class="math display">\[C^\top C = V \Lambda V^\top\]</span></p>
+<p>où <span class="math inline">\(V\)</span> est une matrice orthogonale
+et <span class="math inline">\(\Lambda\)</span> est une matrice
+diagonale contenant les valeurs propres de <span
+class="math inline">\(C^\top C\)</span>.</p>
+<p>Ensuite, nous définissons <span class="math inline">\(U\)</span>
+comme :</p>
+<p><span class="math display">\[U = C V \Lambda^{-1/2}\]</span></p>
+<p>Il est facile de vérifier que <span class="math inline">\(U\)</span>
+est une matrice orthogonale. Enfin, nous définissons <span
+class="math inline">\(\Sigma\)</span> comme :</p>
+<p><span class="math display">\[\Sigma = \Lambda^{1/2}\]</span></p>
+<p>Ainsi, nous avons bien :</p>
+<p><span class="math display">\[C = U \Sigma V^\top\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’ACP possède plusieurs propriétés importantes qui en font un outil
+puissant pour la réduction de dimension.</p>
+<ol>
+<li><p>Les composantes principales sont ordonnées par variance
+décroissante. La première composante principale capture la plus grande
+partie de la variance des données, la deuxième composante capture la
+deuxième plus grande partie de la variance, et ainsi de suite.</p></li>
+<li><p>Les composantes principales sont non corrélées. Cela signifie que
+les vecteurs propres de la matrice de covariance sont orthogonaux, ce
+qui implique que les composantes principales ne partagent pas
+d’information redondante.</p></li>
+<li><p>L’ACP est une méthode linéaire. Elle suppose que les relations
+entre les variables sont linéaires. Pour capturer des relations non
+linéaires, des méthodes alternatives telles que l’analyse en composantes
+principales non linéaire (NLPCA) peuvent être utilisées.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’analyse en composantes principales est une technique puissante et
+polyvalente pour la réduction de dimension. En identifiant les
+directions principales de variation des données, elle permet de
+simplifier l’analyse des jeux de données complexes tout en préservant
+l’information essentielle. L’ACP trouve des applications dans de
+nombreux domaines, allant de la biologie à la finance en passant par
+l’ingénierie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

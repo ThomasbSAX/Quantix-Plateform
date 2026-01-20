@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance résiduelle : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance résiduelle : Fondements et Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La variance résiduelle émerge comme un concept fondamental en
+statistique et en apprentissage automatique, particulièrement dans le
+cadre de la régression. Son origine historique remonte aux travaux
+pionniers de Francis Galton sur l’hérédité, où il a introduit la notion
+de régression vers la moyenne. La variance résiduelle quantifie l’écart
+entre les valeurs observées et celles prédites par un modèle, offrant
+ainsi une mesure de l’adéquation du modèle aux données.</p>
+<p>Dans un cadre plus moderne, la variance résiduelle est indispensable
+pour évaluer la performance des modèles de régression linéaire et non
+linéaire. Elle permet de déterminer si un modèle est sous-ajusté ou
+sur-ajjusté, et guide les choix de complexité du modèle. En outre, elle
+joue un rôle crucial dans l’analyse des résidus et la validation des
+hypothèses sous-jacentes aux modèles statistiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la variance résiduelle, considérons un ensemble de
+données <span class="math inline">\((X_i, Y_i)_{i=1}^n\)</span>, où
+<span class="math inline">\(Y_i\)</span> est la variable dépendante et
+<span class="math inline">\(X_i\)</span> est un vecteur de variables
+indépendantes. Supposons que nous ayons ajusté un modèle de régression
+<span class="math inline">\(\hat{Y}_i = f(X_i, \beta)\)</span>, où <span
+class="math inline">\(f\)</span> est une fonction de régression et <span
+class="math inline">\(\beta\)</span> un vecteur de paramètres.</p>
+<p>Nous cherchons à mesurer l’écart entre les valeurs observées <span
+class="math inline">\(Y_i\)</span> et les valeurs prédites <span
+class="math inline">\(\hat{Y}_i\)</span>. Cet écart est capturé par le
+résidu <span class="math inline">\(e_i = Y_i - \hat{Y}_i\)</span>. La
+variance des résidus, ou variance résiduelle, est alors définie comme la
+moyenne des carrés des résidus.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(e_i = Y_i - \hat{Y}_i\)</span> le
+résidu pour l’observation <span class="math inline">\(i\)</span>. La
+variance résiduelle <span class="math inline">\(\sigma^2_e\)</span> est
+donnée par : <span class="math display">\[\sigma^2_e = \frac{1}{n}
+\sum_{i=1}^n e_i^2\]</span> De manière équivalente, pour un modèle de
+régression linéaire simple <span class="math inline">\(Y_i = \beta_0 +
+\beta_1 X_i + e_i\)</span>, la variance résiduelle peut être exprimée
+comme : <span class="math display">\[\sigma^2_e = \frac{1}{n}
+\sum_{i=1}^n (Y_i - (\beta_0 + \beta_1 X_i))^2\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la variance résiduelle est le théorème
+de Gauss-Markov, qui fournit des conditions sous lesquelles les
+estimateurs des moindres carrés sont les meilleurs estimateurs linéaires
+non biaisés (BLUE).</p>
+<div class="theorem">
+<p>Supposons que le modèle de régression linéaire <span
+class="math inline">\(Y = X\beta + e\)</span> satisfait les hypothèses
+suivantes :</p>
+<ul>
+<li><p><span class="math inline">\(\mathbb{E}[e] = 0\)</span>,</p></li>
+<li><p><span class="math inline">\(\text{Var}(e) = \sigma^2
+I_n\)</span>,</p></li>
+<li><p><span class="math inline">\(X\)</span> est de rang
+plein.</p></li>
+</ul>
+<p>Alors, l’estimateur des moindres carrés <span
+class="math inline">\(\hat{\beta} = (X^T X)^{-1} X^T Y\)</span> est le
+meilleur estimateur linéaire non biaisé de <span
+class="math inline">\(\beta\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Gauss-Markov, nous devons montrer que
+l’estimateur des moindres carrés est non biaisé et qu’il minimise la
+variance parmi tous les estimateurs linéaires non biaisés.</p>
+<div class="proof">
+<p><em>Proof.</em> Tout d’abord, montrons que <span
+class="math inline">\(\hat{\beta}\)</span> est non biaisé : <span
+class="math display">\[\mathbb{E}[\hat{\beta}] = \mathbb{E}[(X^T X)^{-1}
+X^T Y] = (X^T X)^{-1} X^T \mathbb{E}[Y] = (X^T X)^{-1} X^T X \beta =
+\beta\]</span> Ensuite, considérons un autre estimateur linéaire non
+biaisé <span class="math inline">\(b = A Y\)</span>, où <span
+class="math inline">\(\mathbb{E}[A Y] = \beta\)</span>. Nous avons :
+<span class="math display">\[A X \beta = \beta \implies A X =
+I_p\]</span> où <span class="math inline">\(I_p\)</span> est la matrice
+identité de taille <span class="math inline">\(p \times p\)</span>. La
+variance de l’estimateur <span class="math inline">\(b\)</span> est
+donnée par : <span class="math display">\[\text{Var}(b) = A
+\text{Var}(Y) A^T = \sigma^2 A I_n A^T = \sigma^2 A A^T\]</span> Pour
+minimiser <span class="math inline">\(\text{Var}(b)\)</span>, nous
+devons minimiser <span class="math inline">\(A A^T\)</span> sous la
+contrainte <span class="math inline">\(A X = I_p\)</span>. En utilisant
+les multiplicateurs de Lagrange, nous trouvons que la solution optimale
+est <span class="math inline">\(A = (X^T X)^{-1} X^T\)</span>, ce qui
+correspond à l’estimateur des moindres carrés. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La variance résiduelle possède plusieurs propriétés importantes qui
+en font un outil puissant pour l’analyse des modèles de régression.</p>
+<ol>
+<li><p><strong>Propriété de minimisation</strong> : La variance
+résiduelle est minimisée par l’estimateur des moindres carrés sous les
+hypothèses du théorème de Gauss-Markov.</p></li>
+<li><p><strong>Estimation sans biais</strong> : L’estimateur de la
+variance résiduelle <span class="math inline">\(\hat{\sigma}^2_e =
+\frac{1}{n-p} \sum_{i=1}^n e_i^2\)</span> est sans biais pour <span
+class="math inline">\(\sigma^2_e\)</span>, où <span
+class="math inline">\(p\)</span> est le nombre de paramètres
+estimés.</p></li>
+<li><p><strong>Relations avec la variance totale</strong> : La variance
+résiduelle est liée à la variance totale des données par la relation
+<span class="math inline">\(\sigma^2_Y = \sigma^2_{\hat{Y}} +
+\sigma^2_e\)</span>, où <span
+class="math inline">\(\sigma^2_{\hat{Y}}\)</span> est la variance
+expliquée par le modèle.</p></li>
+</ol>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver la propriété (ii), nous utilisons
+l’identité suivante : <span class="math display">\[\sum_{i=1}^n e_i^2 =
+(Y - X \hat{\beta})^T (Y - X \hat{\beta}) = Y^T Y - 2 \hat{\beta}^T X^T
+Y + \hat{\beta}^T X^T X \hat{\beta}\]</span> En remplaçant <span
+class="math inline">\(\hat{\beta} = (X^T X)^{-1} X^T Y\)</span>, nous
+obtenons : <span class="math display">\[\sum_{i=1}^n e_i^2 = Y^T (I_n -
+X (X^T X)^{-1} X^T) Y\]</span> En prenant l’espérance conditionnelle,
+nous avons : <span class="math display">\[\mathbb{E}[\sum_{i=1}^n e_i^2]
+= \text{tr}(I_n - X (X^T X)^{-1} X^T) \sigma^2 = (n - p)
+\sigma^2\]</span> où <span
+class="math inline">\(\text{tr}(\cdot)\)</span> désigne la trace d’une
+matrice. Ainsi, l’estimateur <span
+class="math inline">\(\hat{\sigma}^2_e = \frac{1}{n-p} \sum_{i=1}^n
+e_i^2\)</span> est sans biais pour <span
+class="math inline">\(\sigma^2_e\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La variance résiduelle est un concept central en statistique et en
+apprentissage automatique, offrant des insights précieux sur la qualité
+des modèles de régression. Son étude permet non seulement d’évaluer la
+performance des modèles, mais aussi de guider les choix de modélisation
+et d’améliorer l’interprétation des résultats. Les propriétés et
+théorèmes associés à la variance résiduelle en font un outil
+indispensable pour les chercheurs et les praticiens dans divers
+domaines.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

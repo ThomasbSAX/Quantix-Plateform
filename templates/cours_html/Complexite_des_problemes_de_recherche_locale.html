@@ -1,0 +1,400 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de recherche locale</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de recherche locale</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La recherche locale est un paradigme fondamental en optimisation
+combinatoire, où l’on cherche à améliorer une solution en explorant son
+voisinage. Cette approche, inspirée des méthodes de descente et des
+algorithmes évolutionnistes, a trouvé des applications dans une
+multitude de domaines, allant de la logistique à l’apprentissage
+automatique.</p>
+<p>L’émergence des problèmes de recherche locale est motivée par la
+nécessité de traiter des problèmes NP-difficiles pour lesquels les
+méthodes exactes sont intractables. En effet, ces problèmes, bien que
+souvent formulés de manière simple, nécessitent des ressources
+computationnelles exponentielles pour être résolus exactement. La
+recherche locale offre une alternative pragmatique, permettant d’obtenir
+des solutions de qualité acceptable en un temps raisonnable.</p>
+<p>Dans ce chapitre, nous explorons la complexité des problèmes de
+recherche locale. Nous définissons rigoureusement les concepts clés,
+énonçons les théorèmes fondamentaux et fournissons des preuves
+détaillées. Notre objectif est de fournir une compréhension approfondie
+de la complexité intrinsèque de ces problèmes, ainsi que des outils
+théoriques pour analyser leur comportement.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Considérons un problème d’optimisation combinatoire <span
+class="math inline">\(\mathcal{P}\)</span> défini sur un ensemble de
+solutions <span class="math inline">\(S\)</span>. Pour chaque solution
+<span class="math inline">\(s \in S\)</span>, nous définissons un
+voisinage <span class="math inline">\(N(s)\)</span> comme un
+sous-ensemble de <span class="math inline">\(S\)</span> contenant les
+solutions "proches" de <span class="math inline">\(s\)</span>. Une
+fonction objectif <span class="math inline">\(f: S \rightarrow
+\mathbb{R}\)</span> mesure la qualité d’une solution.</p>
+<p>Nous cherchons à maximiser (ou minimiser) <span
+class="math inline">\(f\)</span> en explorant les voisinages des
+solutions. Formellement, un problème de recherche locale <span
+class="math inline">\(\mathcal{L}\)</span> est défini par le quadruplet
+<span class="math inline">\((S, N, f, \text{opt})\)</span>, où <span
+class="math inline">\(\text{opt} \in \{ \max, \min \}\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{L} = (S, N, f,
+\text{opt})\)</span> un problème de recherche locale. Une solution <span
+class="math inline">\(s^* \in S\)</span> est dite locale si et seulement
+si : <span class="math display">\[\forall s \in N(s^*), f(s^*)
+\geq_{\text{opt}} f(s)\]</span> où <span
+class="math inline">\(\geq_{\max}\)</span> signifie <span
+class="math inline">\(\geq\)</span> et <span
+class="math inline">\(\geq_{\min}\)</span> signifie <span
+class="math inline">\(\leq\)</span>.</p>
+</div>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{L} = (S, N, f,
+\text{opt})\)</span> un problème de recherche locale. La complexité de
+recherche locale est définie comme le nombre maximal d’évaluations de la
+fonction objectif nécessaires pour atteindre une solution locale, dans
+le pire des cas.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{L} = (S, N, f,
+\text{opt})\)</span> un problème de recherche locale. La complexité de
+recherche locale <span class="math inline">\(T(\mathcal{L})\)</span>
+satisfait les inégalités suivantes : <span
+class="math display">\[T(\mathcal{L}) \geq \max_{s \in S}
+|N(s)|\]</span> et <span class="math display">\[T(\mathcal{L}) \geq
+\frac{|S|}{\max_{s \in S} |N(s)|}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour la première inégalité, considérons une solution
+<span class="math inline">\(s \in S\)</span> avec un voisinage maximal.
+Dans le pire des cas, l’algorithme de recherche locale doit évaluer
+toutes les solutions du voisinage avant de trouver une solution locale.
+Ainsi, <span class="math inline">\(T(\mathcal{L}) \geq
+|N(s)|\)</span>.</p>
+<p>Pour la deuxième inégalité, notons que chaque évaluation de la
+fonction objectif peut éliminer au plus <span
+class="math inline">\(\max_{s \in S} |N(s)|\)</span> solutions du
+processus de recherche. Par conséquent, pour couvrir tout l’espace des
+solutions <span class="math inline">\(S\)</span>, nous avons besoin d’au
+moins <span class="math inline">\(\frac{|S|}{\max_{s \in S}
+|N(s)|}\)</span> évaluations. ◻</p>
+</div>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{L} = (S, N, f,
+\text{opt})\)</span> un problème de recherche locale. La complexité de
+recherche locale <span class="math inline">\(T(\mathcal{L})\)</span>
+satisfait les inégalités suivantes : <span
+class="math display">\[T(\mathcal{L}) \leq |S|\]</span> et <span
+class="math display">\[T(\mathcal{L}) \leq \frac{|S|^2}{\max_{s \in S}
+|N(s)|}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour la première inégalité, dans le pire des cas,
+l’algorithme de recherche locale peut évaluer toutes les solutions avant
+de trouver une solution locale. Ainsi, <span
+class="math inline">\(T(\mathcal{L}) \leq |S|\)</span>.</p>
+<p>Pour la deuxième inégalité, nous utilisons l’idée que chaque
+évaluation de la fonction objectif peut éliminer au plus <span
+class="math inline">\(\max_{s \in S} |N(s)|\)</span> solutions.
+Cependant, dans le pire des cas, l’algorithme peut avoir besoin de
+réévaluer certaines solutions. Ainsi, <span
+class="math inline">\(T(\mathcal{L}) \leq \frac{|S|^2}{\max_{s \in S}
+|N(s)|}\)</span>. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Nous détaillons ici les preuves des théorèmes énoncés précédemment.
+Pour cela, nous utilisons des propriétés fondamentales de la recherche
+locale et des concepts d’optimisation combinatoire.</p>
+<div class="proof">
+<p><em>Preuve du Théorème 1.</em> Considérons une solution <span
+class="math inline">\(s \in S\)</span> avec un voisinage maximal. Dans
+le pire des cas, l’algorithme de recherche locale doit évaluer toutes
+les solutions du voisinage avant de trouver une solution locale. Ainsi,
+<span class="math inline">\(T(\mathcal{L}) \geq |N(s)|\)</span>.</p>
+<p>Pour la deuxième partie de la preuve, notons que chaque évaluation de
+la fonction objectif peut éliminer au plus <span
+class="math inline">\(\max_{s \in S} |N(s)|\)</span> solutions du
+processus de recherche. Par conséquent, pour couvrir tout l’espace des
+solutions <span class="math inline">\(S\)</span>, nous avons besoin d’au
+moins <span class="math inline">\(\frac{|S|}{\max_{s \in S}
+|N(s)|}\)</span> évaluations. ◻</p>
+</div>
+<div class="proof">
+<p><em>Preuve du Théorème 2.</em> Pour la première inégalité, dans le
+pire des cas, l’algorithme de recherche locale peut évaluer toutes les
+solutions avant de trouver une solution locale. Ainsi, <span
+class="math inline">\(T(\mathcal{L}) \leq |S|\)</span>.</p>
+<p>Pour la deuxième inégalité, nous utilisons l’idée que chaque
+évaluation de la fonction objectif peut éliminer au plus <span
+class="math inline">\(\max_{s \in S} |N(s)|\)</span> solutions.
+Cependant, dans le pire des cas, l’algorithme peut avoir besoin de
+réévaluer certaines solutions. Ainsi, <span
+class="math inline">\(T(\mathcal{L}) \leq \frac{|S|^2}{\max_{s \in S}
+|N(s)|}\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous énonçons ici plusieurs propriétés et corollaires liés à la
+complexité des problèmes de recherche locale.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\mathcal{L} = (S, N, f,
+\text{opt})\)</span> un problème de recherche locale. Si <span
+class="math inline">\(\max_{s \in S} |N(s)| = O(1)\)</span>, alors la
+complexité de recherche locale <span
+class="math inline">\(T(\mathcal{L})\)</span> est bornée par : <span
+class="math display">\[T(\mathcal{L}) = O(|S|)\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Si <span class="math inline">\(\max_{s \in S} |N(s)|
+= O(1)\)</span>, alors les bornes inférieures et supérieures du Théorème
+1 et du Théorème 2 deviennent <span class="math inline">\(T(\mathcal{L})
+= O(|S|)\)</span>. Ainsi, la complexité de recherche locale est linéaire
+en la taille de l’espace des solutions. ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\mathcal{L} = (S, N, f,
+\text{opt})\)</span> un problème de recherche locale. Si le graphe de
+voisinage est connexe, alors la complexité de recherche locale <span
+class="math inline">\(T(\mathcal{L})\)</span> satisfait : <span
+class="math display">\[T(\mathcal{L}) \leq |S|\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Si le graphe de voisinage est connexe, alors il
+existe un chemin entre toute paire de solutions. Par conséquent,
+l’algorithme de recherche locale peut atteindre n’importe quelle
+solution en un nombre d’étapes borné par <span
+class="math inline">\(|S|\)</span>. ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\mathcal{L} = (S, N, f,
+\text{opt})\)</span> un problème de recherche locale. Si la fonction
+objectif <span class="math inline">\(f\)</span> est injective, alors la
+complexité de recherche locale <span
+class="math inline">\(T(\mathcal{L})\)</span> satisfait : <span
+class="math display">\[T(\mathcal{L}) \leq |S|\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Si la fonction objectif <span
+class="math inline">\(f\)</span> est injective, alors chaque solution a
+une valeur unique. Par conséquent, l’algorithme de recherche locale peut
+éliminer immédiatement les solutions non optimales, réduisant ainsi la
+complexité à <span class="math inline">\(|S|\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Dans ce chapitre, nous avons exploré la complexité des problèmes de
+recherche locale. Nous avons défini rigoureusement les concepts clés,
+énoncé les théorèmes fondamentaux et fourni des preuves détaillées. Les
+résultats obtenus offrent une compréhension approfondie de la complexité
+intrinsèque de ces problèmes, ainsi que des outils théoriques pour
+analyser leur comportement.</p>
+<p>Les bornes inférieures et supérieures sur la complexité de recherche
+locale fournissent des limites théoriques sur les performances des
+algorithmes. Les propriétés et corollaires énoncés mettent en évidence
+l’impact de la taille du voisinage, de la connectivité et de la fonction
+objectif sur la complexité.</p>
+<p>Ces résultats ouvrent la voie à de nouvelles recherches sur
+l’optimisation des algorithmes de recherche locale et leur application à
+des problèmes complexes. Ils fournissent également une base théorique
+pour le développement de nouvelles méthodes d’optimisation
+combinatoire.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

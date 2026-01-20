@@ -1,0 +1,417 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Factorisation LU : Décomposition et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Factorisation LU : Décomposition et Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La factorisation LU est une technique fondamentale en algèbre
+linéaire numérique, permettant de décomposer une matrice carrée en un
+produit de deux matrices triangulaires. Cette méthode, introduite par le
+mathématicien allemand Carl Friedrich Gauss au début du XIXe siècle, est
+devenue un outil incontournable pour la résolution de systèmes
+d’équations linéaires et le calcul des déterminants.</p>
+<p>L’intérêt principal de la factorisation LU réside dans sa capacité à
+simplifier les calculs complexes. En effet, résoudre un système linéaire
+en utilisant directement la méthode de l’élimination de Gauss peut
+s’avérer coûteux en termes de calculs. La factorisation LU permet de
+diviser ce problème en deux étapes plus simples : la résolution d’un
+système avec une matrice triangulaire inférieure (L) et la résolution
+d’un autre système avec une matrice triangulaire supérieure (U).</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement la factorisation LU, il est essentiel
+de comprendre les concepts sous-jacents. Considérons une matrice carrée
+<span class="math inline">\(A\)</span> de taille <span
+class="math inline">\(n \times n\)</span>. Nous cherchons à exprimer
+<span class="math inline">\(A\)</span> comme le produit de deux matrices
+triangulaires, l’une inférieure (L) et l’autre supérieure (U).</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span>. On dit que <span
+class="math inline">\(A\)</span> admet une factorisation LU s’il existe
+deux matrices triangulaires, <span class="math inline">\(L\)</span>
+(inférieure) et <span class="math inline">\(U\)</span> (supérieure),
+telles que : <span class="math display">\[A = LU\]</span> où</p>
+<ul>
+<li><p><span class="math inline">\(L\)</span> est une matrice
+triangulaire inférieure avec des éléments diagonaux tous égaux à 1
+(matrice unitaire),</p></li>
+<li><p><span class="math inline">\(U\)</span> est une matrice
+triangulaire supérieure.</p></li>
+</ul>
+<p>Formellement, cela s’écrit : <span class="math display">\[\exists L
+\in M_n(\mathbb{R}), U \in M_n(\mathbb{R}) \text{ telles que } L \text{
+est triangulaire inférieure unitaire}, U \text{ est triangulaire
+supérieure et } A = LU\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour établir la factorisation LU, nous avons besoin de quelques
+résultats préliminaires. Le théorème suivant est crucial pour garantir
+l’existence et l’unicité de la factorisation LU.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span>. La factorisation
+LU existe et est unique si et seulement si toutes les matrices
+principales de <span class="math inline">\(A\)</span> sont non
+singulières.</p>
+<p>Formellement, cela s’exprime comme : <span
+class="math display">\[\exists! L \in M_n(\mathbb{R}), U \in
+M_n(\mathbb{R}) \text{ telles que } L \text{ est triangulaire inférieure
+unitaire}, U \text{ est triangulaire supérieure et } A = LU\]</span> si
+et seulement si <span class="math display">\[\forall k \in \{1, \ldots,
+n\}, \det(A_k) \neq 0\]</span> où <span
+class="math inline">\(A_k\)</span> est la sous-matrice principale de
+taille <span class="math inline">\(k \times k\)</span> de <span
+class="math inline">\(A\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème d’existence et d’unicité de la
+factorisation LU, nous procédons par récurrence sur la taille de la
+matrice.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous allons montrer que pour toute matrice <span
+class="math inline">\(A\)</span> de taille <span class="math inline">\(n
+\times n\)</span>, si toutes ses matrices principales sont non
+singulières, alors la factorisation LU existe et est unique.</p>
+<p><strong>Initialisation :</strong> Pour <span class="math inline">\(n
+= 1\)</span>, la matrice <span class="math inline">\(A\)</span> est
+simplement un scalaire non nul. La factorisation LU est triviale : <span
+class="math inline">\(L = [1]\)</span> et <span class="math inline">\(U
+= A\)</span>.</p>
+<p><strong>Hérédité :</strong> Supposons que le théorème soit vrai pour
+toutes les matrices de taille <span class="math inline">\(k \times
+k\)</span> avec <span class="math inline">\(k &lt; n\)</span>.
+Considérons une matrice <span class="math inline">\(A\)</span> de taille
+<span class="math inline">\(n \times n\)</span> dont toutes les matrices
+principales sont non singulières.</p>
+<p>Nous pouvons écrire <span class="math inline">\(A\)</span> sous la
+forme : <span class="math display">\[A = \begin{pmatrix}
+A_{n-1} &amp; \mathbf{b} \\
+\mathbf{c}^T &amp; a_{nn}
+\end{pmatrix}\]</span> où <span class="math inline">\(A_{n-1}\)</span>
+est une matrice de taille <span class="math inline">\((n-1) \times
+(n-1)\)</span>, <span class="math inline">\(\mathbf{b}\)</span> et <span
+class="math inline">\(\mathbf{c}\)</span> sont des vecteurs de taille
+<span class="math inline">\(n-1\)</span>, et <span
+class="math inline">\(a_{nn}\)</span> est un scalaire.</p>
+<p>Par hypothèse de récurrence, <span
+class="math inline">\(A_{n-1}\)</span> admet une factorisation LU :
+<span class="math display">\[A_{n-1} = L_{n-1} U_{n-1}\]</span> où <span
+class="math inline">\(L_{n-1}\)</span> est triangulaire inférieure
+unitaire et <span class="math inline">\(U_{n-1}\)</span> est
+triangulaire supérieure.</p>
+<p>Nous pouvons alors écrire la factorisation LU de <span
+class="math inline">\(A\)</span> comme : <span class="math display">\[L
+= \begin{pmatrix}
+L_{n-1} &amp; 0 \\
+\mathbf{l}^T &amp; 1
+\end{pmatrix}, \quad U = \begin{pmatrix}
+U_{n-1} &amp; \mathbf{u} \\
+0 &amp; u_{nn}
+\end{pmatrix}\]</span> où <span
+class="math inline">\(\mathbf{l}\)</span>, <span
+class="math inline">\(\mathbf{u}\)</span> sont des vecteurs de taille
+<span class="math inline">\(n-1\)</span>, et <span
+class="math inline">\(u_{nn}\)</span> est un scalaire.</p>
+<p>En développant le produit <span class="math inline">\(LU\)</span>,
+nous obtenons : <span class="math display">\[LU = \begin{pmatrix}
+L_{n-1} U_{n-1} &amp; L_{n-1} \mathbf{u} \\
+\mathbf{l}^T U_{n-1} &amp; \mathbf{l}^T \mathbf{u} + u_{nn}
+\end{pmatrix} = \begin{pmatrix}
+A_{n-1} &amp; \mathbf{b} \\
+\mathbf{c}^T &amp; a_{nn}
+\end{pmatrix} = A\]</span> Ce qui nous donne les équations suivantes :
+<span class="math display">\[L_{n-1} \mathbf{u} = \mathbf{b}\]</span>
+<span class="math display">\[\mathbf{l}^T U_{n-1} =
+\mathbf{c}^T\]</span> <span class="math display">\[\mathbf{l}^T
+\mathbf{u} + u_{nn} = a_{nn}\]</span></p>
+<p>Puisque <span class="math inline">\(L_{n-1}\)</span> est inversible
+(car <span class="math inline">\(A_{n-1}\)</span> est non singulière),
+nous pouvons résoudre pour <span
+class="math inline">\(\mathbf{u}\)</span> : <span
+class="math display">\[\mathbf{u} = L_{n-1}^{-1} \mathbf{b}\]</span></p>
+<p>De même, puisque <span class="math inline">\(U_{n-1}\)</span> est
+inversible, nous pouvons résoudre pour <span
+class="math inline">\(\mathbf{l}\)</span> : <span
+class="math display">\[\mathbf{l}^T = \mathbf{c}^T
+U_{n-1}^{-1}\]</span></p>
+<p>Enfin, <span class="math inline">\(u_{nn}\)</span> est déterminé par
+: <span class="math display">\[u_{nn} = a_{nn} - \mathbf{l}^T
+\mathbf{u}\]</span></p>
+<p>Ainsi, la factorisation LU de <span class="math inline">\(A\)</span>
+existe. L’unicité découle du fait que les matrices <span
+class="math inline">\(L\)</span> et <span
+class="math inline">\(U\)</span> sont déterminées de manière unique par
+les équations ci-dessus. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La factorisation LU possède plusieurs propriétés intéressantes, que
+nous énumérons ci-dessous.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span> admettant une
+factorisation LU. Alors :</p>
+<ol>
+<li><p>La matrice <span class="math inline">\(A\)</span> est non
+singulière si et seulement si toutes ses matrices principales sont non
+singulières.</p></li>
+<li><p>La factorisation LU de <span class="math inline">\(A\)</span>
+peut être utilisée pour résoudre le système linéaire <span
+class="math inline">\(A \mathbf{x} = \mathbf{b}\)</span> en deux étapes
+:</p>
+<ol>
+<li><p>Résoudre <span class="math inline">\(L \mathbf{y} =
+\mathbf{b}\)</span> pour obtenir <span
+class="math inline">\(\mathbf{y}\)</span>,</p></li>
+<li><p>Résoudre <span class="math inline">\(U \mathbf{x} =
+\mathbf{y}\)</span> pour obtenir <span
+class="math inline">\(\mathbf{x}\)</span>.</p></li>
+</ol></li>
+<li><p>La factorisation LU de <span class="math inline">\(A\)</span>
+peut également être utilisée pour calculer le déterminant de <span
+class="math inline">\(A\)</span> comme le produit des éléments diagonaux
+de <span class="math inline">\(U\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Nous allons démontrer chacune de ces propriétés.</p>
+<p><strong>(i)</strong> La matrice <span
+class="math inline">\(A\)</span> est non singulière si et seulement si
+toutes ses matrices principales sont non singulières. Cela découle
+directement du théorème d’existence et d’unicité de la factorisation
+LU.</p>
+<p><strong>(ii)</strong> Pour résoudre le système linéaire <span
+class="math inline">\(A \mathbf{x} = \mathbf{b}\)</span>, nous utilisons
+la factorisation LU de <span class="math inline">\(A\)</span> : <span
+class="math display">\[A \mathbf{x} = LU \mathbf{x} =
+\mathbf{b}\]</span></p>
+<p>Nous pouvons alors résoudre le système en deux étapes :</p>
+<ol>
+<li><p>Résoudre <span class="math inline">\(L \mathbf{y} =
+\mathbf{b}\)</span> pour obtenir <span
+class="math inline">\(\mathbf{y}\)</span>. Puisque <span
+class="math inline">\(L\)</span> est triangulaire inférieure unitaire,
+cette résolution peut être effectuée en utilisant la substitution
+avant.</p></li>
+<li><p>Résoudre <span class="math inline">\(U \mathbf{x} =
+\mathbf{y}\)</span> pour obtenir <span
+class="math inline">\(\mathbf{x}\)</span>. Puisque <span
+class="math inline">\(U\)</span> est triangulaire supérieure, cette
+résolution peut être effectuée en utilisant la substitution
+arrière.</p></li>
+</ol>
+<p><strong>(iii)</strong> Pour calculer le déterminant de <span
+class="math inline">\(A\)</span>, nous utilisons la factorisation LU :
+<span class="math display">\[\det(A) = \det(LU) = \det(L)
+\det(U)\]</span></p>
+<p>Puisque <span class="math inline">\(L\)</span> est triangulaire
+inférieure unitaire, son déterminant est égal à 1. De plus, puisque
+<span class="math inline">\(U\)</span> est triangulaire supérieure, son
+déterminant est égal au produit de ses éléments diagonaux. Ainsi : <span
+class="math display">\[\det(A) = \prod_{i=1}^n u_{ii}\]</span> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La factorisation LU est un outil puissant et polyvalent en algèbre
+linéaire numérique. Elle permet de simplifier la résolution des systèmes
+d’équations linéaires et le calcul des déterminants, tout en offrant une
+compréhension plus profonde de la structure des matrices. Les propriétés
+et théorèmes associés à la factorisation LU en font un sujet d’étude
+essentiel pour les mathématiciens et les ingénieurs.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

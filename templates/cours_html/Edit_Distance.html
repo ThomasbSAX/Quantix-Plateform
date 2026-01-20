@@ -1,0 +1,332 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Edit Distance: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Edit Distance: A Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>The concept of Edit Distance, also known as Levenshtein Distance,
+emerged in the late 1960s through the works of Vladimir Levenshtein.
+This metric has since become indispensable in various fields such as
+bioinformatics, natural language processing, and computer science. The
+edit distance between two strings is a measure of the dissimilarity
+between them, defined as the minimum number of single-character edits
+(insertions, deletions, or substitutions) required to change one string
+into the other.</p>
+<p>The notion of edit distance is crucial in scenarios where we need to
+quantify how different two strings are. For instance, in spell-checking
+algorithms, edit distance helps in identifying the closest match for a
+misspelled word. In bioinformatics, it aids in comparing DNA sequences
+and identifying mutations.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To understand edit distance, let’s first consider two strings <span
+class="math inline">\(s\)</span> and <span
+class="math inline">\(t\)</span>. We aim to find the minimum number of
+operations required to transform <span class="math inline">\(s\)</span>
+into <span class="math inline">\(t\)</span>. The allowed operations
+are:</p>
+<ul>
+<li><p>Insertion: Adding a character to <span
+class="math inline">\(s\)</span>.</p></li>
+<li><p>Deletion: Removing a character from <span
+class="math inline">\(s\)</span>.</p></li>
+<li><p>Substitution: Replacing a character in <span
+class="math inline">\(s\)</span> with another character.</p></li>
+</ul>
+<p>Formally, the edit distance <span class="math inline">\(d(s,
+t)\)</span> between two strings <span class="math inline">\(s\)</span>
+and <span class="math inline">\(t\)</span> is defined as:</p>
+<p><span class="math display">\[d(s, t) = \min \{ |s| + |t| - |lcs(s,
+t)| \}\]</span></p>
+<p>where <span class="math inline">\(lcs(s, t)\)</span> denotes the
+longest common subsequence between <span
+class="math inline">\(s\)</span> and <span
+class="math inline">\(t\)</span>.</p>
+<p>Alternatively, we can define edit distance using dynamic programming.
+Let <span class="math inline">\(s = s_1s_2 \dots s_m\)</span> and <span
+class="math inline">\(t = t_1t_2 \dots t_n\)</span>. The edit distance
+can be computed using the following recurrence relation:</p>
+<p><span class="math display">\[d(s, t) = \begin{cases}
+m &amp; \text{if } n = 0, \\
+n &amp; \text{if } m = 0, \\
+d(s_{1..m-1}, t_{1..n-1}) &amp; \text{if } s_m = t_n, \\
+1 + \min \{ d(s_{1..m-1}, t), d(s, t_{1..n-1}), d(s_{1..m-1},
+t_{1..n-1}) \} &amp; \text{otherwise.}
+\end{cases}\]</span></p>
+<h1 id="theorems">Theorems</h1>
+<p>One of the fundamental theorems related to edit distance is the
+Levenshtein Distance Theorem, which states that the edit distance
+between two strings can be computed efficiently using dynamic
+programming.</p>
+<div class="theorem">
+<p>For any two strings <span class="math inline">\(s\)</span> and <span
+class="math inline">\(t\)</span>, the edit distance <span
+class="math inline">\(d(s, t)\)</span> can be computed in <span
+class="math inline">\(O(mn)\)</span> time and space complexity, where
+<span class="math inline">\(m\)</span> and <span
+class="math inline">\(n\)</span> are the lengths of <span
+class="math inline">\(s\)</span> and <span
+class="math inline">\(t\)</span>, respectively.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> We can construct a matrix <span
+class="math inline">\(D\)</span> of size <span
+class="math inline">\((m+1) \times (n+1)\)</span>, where each entry
+<span class="math inline">\(D[i][j]\)</span> represents the edit
+distance between the first <span class="math inline">\(i\)</span>
+characters of <span class="math inline">\(s\)</span> and the first <span
+class="math inline">\(j\)</span> characters of <span
+class="math inline">\(t\)</span>. The base cases are:</p>
+<p><span class="math display">\[D[i][0] = i \quad \text{for } 0 \leq i
+\leq m,\]</span> <span class="math display">\[D[0][j] = j \quad
+\text{for } 0 \leq j \leq n.\]</span></p>
+<p>For <span class="math inline">\(1 \leq i \leq m\)</span> and <span
+class="math inline">\(1 \leq j \leq n\)</span>, we have:</p>
+<p><span class="math display">\[D[i][j] = \begin{cases}
+D[i-1][j-1] &amp; \text{if } s_i = t_j, \\
+1 + \min \{ D[i-1][j], D[i][j-1], D[i-1][j-1] \} &amp; \text{otherwise.}
+\end{cases}\]</span></p>
+<p>The value <span class="math inline">\(D[m][n]\)</span> gives the edit
+distance between <span class="math inline">\(s\)</span> and <span
+class="math inline">\(t\)</span>. The time complexity is <span
+class="math inline">\(O(mn)\)</span> since we fill the matrix in a
+bottom-up manner. The space complexity is also <span
+class="math inline">\(O(mn)\)</span> due to the storage requirements of
+the matrix. ◻</p>
+</div>
+<h1 id="properties-and-corollaires">Properties and Corollaires</h1>
+<ol>
+<li><p>The edit distance satisfies the triangle inequality. For any
+three strings <span class="math inline">\(s\)</span>, <span
+class="math inline">\(t\)</span>, and <span
+class="math inline">\(u\)</span>, we have:</p>
+<p><span class="math display">\[d(s, u) \leq d(s, t) + d(t,
+u).\]</span></p></li>
+<li><p>The edit distance is a metric. It satisfies the following
+properties:</p>
+<ul>
+<li><p>Non-negativity: <span class="math inline">\(d(s, t) \geq
+0\)</span>.</p></li>
+<li><p>Identity of indiscernibles: <span class="math inline">\(d(s, t) =
+0\)</span> if and only if <span class="math inline">\(s =
+t\)</span>.</p></li>
+<li><p>Symmetry: <span class="math inline">\(d(s, t) = d(t,
+s)\)</span>.</p></li>
+</ul></li>
+</ol>
+<div class="corollaire">
+<p>The edit distance between two strings can be used to measure the
+similarity between them. A lower edit distance indicates higher
+similarity.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The proof follows directly from the definition of
+edit distance. If two strings have a small edit distance, it means that
+few operations are needed to transform one into the other, indicating
+that they are similar. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>The edit distance is a powerful and versatile metric with
+applications in various fields. Its efficiency and simplicity make it an
+essential tool for comparing strings and quantifying their
+dissimilarity. The dynamic programming approach provides an optimal way
+to compute the edit distance, ensuring its practical utility in
+real-world applications.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

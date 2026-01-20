@@ -1,0 +1,376 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Inversion par la Méthode de Gauss-Jordan</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Inversion par la Méthode de Gauss-Jordan</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’inversion d’une matrice est une opération fondamentale en algèbre
+linéaire, essentielle dans de nombreuses applications scientifiques et
+techniques. La méthode de Gauss-Jordan offre une approche systématique
+pour déterminer l’inverse d’une matrice carrée, lorsqu’elle existe.
+Cette méthode s’appuie sur les opérations élémentaires de lignes et
+permet non seulement d’inverser une matrice, mais aussi de résoudre des
+systèmes linéaires. Son importance réside dans sa simplicité et son
+efficacité, faisant d’elle un outil incontournable pour les
+mathématiciens et ingénieurs.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’inversion par la méthode de Gauss-Jordan,
+commençons par définir les concepts clés.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span>. On dit que <span
+class="math inline">\(A\)</span> est inversible s’il existe une matrice
+<span class="math inline">\(B\)</span> de même taille telle que : <span
+class="math display">\[A B = B A = I_n\]</span> où <span
+class="math inline">\(I_n\)</span> est la matrice identité de taille
+<span class="math inline">\(n \times n\)</span>. La matrice <span
+class="math inline">\(B\)</span> est appelée l’inverse de <span
+class="math inline">\(A\)</span>, notée <span
+class="math inline">\(A^{-1}\)</span>.</p>
+</div>
+<div class="definition">
+<p>Les opérations élémentaires de lignes sur une matrice sont les
+suivantes :</p>
+<ol>
+<li><p><strong>Permutation</strong> : Échanger deux lignes de la
+matrice.</p></li>
+<li><p><strong>Multiplication par un scalaire</strong> : Multiplier une
+ligne par un scalaire non nul.</p></li>
+<li><p><strong>Addition</strong> : Ajouter à une ligne un multiple d’une
+autre ligne.</p></li>
+</ol>
+<p>Ces opérations permettent de transformer une matrice en une autre
+matrice équivalente, c’est-à-dire ayant le même noyau et la même
+image.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le théorème suivant est central pour l’inversion par la méthode de
+Gauss-Jordan.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée
+inversible de taille <span class="math inline">\(n \times n\)</span>.
+Alors, l’inverse de <span class="math inline">\(A\)</span>, notée <span
+class="math inline">\(A^{-1}\)</span>, peut être obtenue en appliquant
+les opérations élémentaires de lignes suivantes :</p>
+<ol>
+<li><p>Former la matrice augmentée <span class="math inline">\([A \mid
+I_n]\)</span>, où <span class="math inline">\(I_n\)</span> est la
+matrice identité de taille <span class="math inline">\(n \times
+n\)</span>.</p></li>
+<li><p>Appliquer une suite d’opérations élémentaires de lignes pour
+transformer <span class="math inline">\(A\)</span> en la matrice
+identité <span class="math inline">\(I_n\)</span>.</p></li>
+<li><p>L’inverse <span class="math inline">\(A^{-1}\)</span> est alors
+obtenue dans la partie droite de la matrice augmentée.</p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer ce théorème, nous allons suivre les étapes de la
+méthode de Gauss-Jordan.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(A\)</span> une
+matrice carrée inversible de taille <span class="math inline">\(n \times
+n\)</span>. Nous formons la matrice augmentée : <span
+class="math display">\[[A \mid I_n]\]</span> L’objectif est de
+transformer <span class="math inline">\(A\)</span> en la matrice
+identité <span class="math inline">\(I_n\)</span> en utilisant des
+opérations élémentaires de lignes. À chaque étape, nous appliquons une
+opération élémentaire à la fois sur <span
+class="math inline">\(A\)</span> et sur <span
+class="math inline">\(I_n\)</span>.</p>
+<p>Supposons que nous ayons appliqué une suite d’opérations élémentaires
+de lignes <span class="math inline">\(E_1, E_2, \ldots, E_k\)</span>
+pour transformer <span class="math inline">\(A\)</span> en <span
+class="math inline">\(I_n\)</span>. Alors, nous avons : <span
+class="math display">\[E_k E_{k-1} \cdots E_2 E_1 A = I_n\]</span>
+Puisque <span class="math inline">\(A\)</span> est inversible, nous
+pouvons multiplier les deux côtés de l’équation par <span
+class="math inline">\(A^{-1}\)</span> à gauche : <span
+class="math display">\[E_k E_{k-1} \cdots E_2 E_1 = A^{-1}\]</span>
+Ainsi, l’inverse de <span class="math inline">\(A\)</span> est obtenue
+en appliquant les mêmes opérations élémentaires de lignes à la matrice
+identité <span class="math inline">\(I_n\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes liées à
+l’inversion par la méthode de Gauss-Jordan.</p>
+<ol>
+<li><p><strong>Unicité de l’Inverse</strong> : Si une matrice <span
+class="math inline">\(A\)</span> est inversible, son inverse <span
+class="math inline">\(A^{-1}\)</span> est unique.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons qu’il existe deux inverses <span
+class="math inline">\(B\)</span> et <span
+class="math inline">\(C\)</span> de <span
+class="math inline">\(A\)</span>. Alors, nous avons : <span
+class="math display">\[A B = I_n \quad \text{et} \quad A C =
+I_n\]</span> En multipliant les deux côtés de la première équation par
+<span class="math inline">\(A^{-1}\)</span> à gauche, nous obtenons :
+<span class="math display">\[A^{-1} A B = A^{-1} I_n \implies B =
+A^{-1}\]</span> De même, en multipliant les deux côtés de la deuxième
+équation par <span class="math inline">\(A^{-1}\)</span> à gauche, nous
+obtenons : <span class="math display">\[A^{-1} A C = A^{-1} I_n \implies
+C = A^{-1}\]</span> Ainsi, <span class="math inline">\(B = C\)</span>,
+ce qui prouve l’unicité de l’inverse. ◻</p>
+</div></li>
+<li><p><strong>Inverse d’une Matrice Triangulaire</strong> : Si <span
+class="math inline">\(A\)</span> est une matrice triangulaire
+inversible, alors son inverse est également triangulaire.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span class="math inline">\(A\)</span>
+soit une matrice triangulaire supérieure inversible. Nous pouvons
+appliquer la méthode de Gauss-Jordan pour trouver son inverse. À chaque
+étape, les opérations élémentaires de lignes préservent la structure
+triangulaire supérieure de <span class="math inline">\(A\)</span>. Par
+conséquent, l’inverse <span class="math inline">\(A^{-1}\)</span> est
+également triangulaire supérieure. ◻</p>
+</div></li>
+<li><p><strong>Inverse d’une Matrice Diagonale</strong> : Si <span
+class="math inline">\(A\)</span> est une matrice diagonale inversible,
+alors son inverse est obtenue en prenant l’inverse de chaque élément
+diagonal.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(A\)</span> une
+matrice diagonale inversible de taille <span class="math inline">\(n
+\times n\)</span>, avec des éléments diagonaux <span
+class="math inline">\(a_{11}, a_{22}, \ldots, a_{nn}\)</span>. Nous
+pouvons former la matrice augmentée : <span class="math display">\[[A
+\mid I_n]\]</span> En appliquant des opérations élémentaires de lignes,
+nous pouvons transformer <span class="math inline">\(A\)</span> en la
+matrice identité <span class="math inline">\(I_n\)</span>. À chaque
+étape, les opérations élémentaires de lignes ne modifient que les
+éléments diagonaux. Par conséquent, l’inverse <span
+class="math inline">\(A^{-1}\)</span> est obtenue en prenant l’inverse
+de chaque élément diagonal : <span class="math display">\[A^{-1} =
+\begin{pmatrix}
+\frac{1}{a_{11}} &amp; 0 &amp; \cdots &amp; 0 \\
+0 &amp; \frac{1}{a_{22}} &amp; \cdots &amp; 0 \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; \cdots &amp; \frac{1}{a_{nn}}
+\end{pmatrix}\]</span> ◻</p>
+</div></li>
+<li><p><strong>Inverse d’une Matrice Symétrique</strong> : Si <span
+class="math inline">\(A\)</span> est une matrice symétrique inversible,
+alors son inverse est également symétrique.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(A\)</span> une
+matrice symétrique inversible de taille <span class="math inline">\(n
+\times n\)</span>. Nous pouvons former la matrice augmentée : <span
+class="math display">\[[A \mid I_n]\]</span> En appliquant des
+opérations élémentaires de lignes, nous pouvons transformer <span
+class="math inline">\(A\)</span> en la matrice identité <span
+class="math inline">\(I_n\)</span>. À chaque étape, les opérations
+élémentaires de lignes préservent la symétrie de <span
+class="math inline">\(A\)</span>. Par conséquent, l’inverse <span
+class="math inline">\(A^{-1}\)</span> est également symétrique. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’inversion par la méthode de Gauss-Jordan est une technique
+puissante et efficace pour déterminer l’inverse d’une matrice carrée
+inversible. En s’appuyant sur les opérations élémentaires de lignes,
+cette méthode permet non seulement d’inverser une matrice, mais aussi de
+résoudre des systèmes linéaires. Les propriétés et corollaires associés
+à cette méthode en font un outil indispensable en algèbre linéaire et
+dans de nombreuses applications scientifiques et techniques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

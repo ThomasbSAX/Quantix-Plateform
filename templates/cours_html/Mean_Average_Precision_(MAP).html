@@ -1,0 +1,322 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Mean Average Precision (MAP) : Une Mesure de l’Efficacité des Systèmes de Recherche d’Information</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Mean Average Precision (MAP) : Une Mesure de
+l’Efficacité des Systèmes de Recherche d’Information</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La recherche d’information est un domaine fondamental en
+informatique, visant à retrouver des documents pertinents parmi une
+vaste collection en réponse à une requête utilisateur. L’évaluation de
+l’efficacité des systèmes de recherche d’information est cruciale pour
+mesurer leur performance et les améliorer. Parmi les nombreuses
+métriques proposées, la Mean Average Precision (MAP) se distingue comme
+une mesure robuste et informative.</p>
+<p>La MAP émerge de la nécessité d’évaluer non seulement si les
+documents pertinents sont retrouvés, mais aussi leur rang dans la liste
+des résultats. Elle combine deux aspects essentiels : la précision et le
+rappel, tout en tenant compte de l’ordre des résultats. La MAP est
+particulièrement utile dans les contextes où l’utilisateur souhaite que
+les documents les plus pertinents apparaissent en haut de la liste des
+résultats.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la MAP, il est essentiel de définir d’abord deux
+concepts fondamentaux : la précision et le rappel.</p>
+<h2 class="unnumbered" id="précision-et-rappel">Précision et Rappel</h2>
+<p>Considérons un système de recherche d’information qui retourne une
+liste ordonnée de documents en réponse à une requête. Soit <span
+class="math inline">\(R\)</span> l’ensemble des documents pertinents
+pour cette requête, et soit <span class="math inline">\(S\)</span> la
+liste ordonnée des documents retournés par le système.</p>
+<p>La précision à un certain rang <span class="math inline">\(k\)</span>
+est définie comme la proportion de documents pertinents parmi les <span
+class="math inline">\(k\)</span> premiers documents retournés.
+Formellement, la précision à <span class="math inline">\(k\)</span> est
+donnée par :</p>
+<p><span class="math display">\[P(k) = \frac{|\{d \in S[1..k] \mid d \in
+R\}|}{k}\]</span></p>
+<p>où <span class="math inline">\(S[1..k]\)</span> représente les <span
+class="math inline">\(k\)</span> premiers documents de la liste <span
+class="math inline">\(S\)</span>.</p>
+<p>Le rappel à un certain rang <span class="math inline">\(k\)</span>
+est défini comme la proportion de documents pertinents retrouvés parmi
+tous les documents pertinents. Formellement, le rappel à <span
+class="math inline">\(k\)</span> est donné par :</p>
+<p><span class="math display">\[R(k) = \frac{|\{d \in S[1..k] \mid d \in
+R\}|}{|R|}\]</span></p>
+<h2 class="unnumbered" id="average-precision-ap">Average Precision
+(AP)</h2>
+<p>L’Average Precision (AP) est une mesure qui combine la précision et
+le rappel en tenant compte de l’ordre des documents pertinents dans la
+liste des résultats. Pour une requête donnée, l’AP est calculée comme la
+moyenne des précisions aux rangs où les documents pertinents
+apparaissent.</p>
+<p>Formellement, soit <span class="math inline">\(R\)</span> l’ensemble
+des documents pertinents et <span class="math inline">\(S\)</span> la
+liste ordonnée des documents retournés par le système. L’AP pour cette
+requête est donnée par :</p>
+<p><span class="math display">\[AP = \frac{1}{|R|} \sum_{k=1}^{|S|} P(k)
+\cdot \mathbb{I}(d_k \in R)\]</span></p>
+<p>où <span class="math inline">\(\mathbb{I}(d_k \in R)\)</span> est
+l’indicatrice qui vaut 1 si le document <span
+class="math inline">\(d_k\)</span> est pertinent et 0 sinon.</p>
+<h2 class="unnumbered" id="mean-average-precision-map">Mean Average
+Precision (MAP)</h2>
+<p>La Mean Average Precision (MAP) est la moyenne de l’Average Precision
+sur un ensemble de requêtes. Formellement, soit <span
+class="math inline">\(Q\)</span> l’ensemble des requêtes et <span
+class="math inline">\(AP(q)\)</span> l’Average Precision pour la requête
+<span class="math inline">\(q\)</span>. La MAP est donnée par :</p>
+<p><span class="math display">\[MAP = \frac{1}{|Q|} \sum_{q \in Q}
+AP(q)\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-la-map">Théorème de la MAP</h2>
+<p>Un théorème important concernant la MAP est le suivant :</p>
+<p>Soit <span class="math inline">\(Q\)</span> un ensemble de requêtes
+et <span class="math inline">\(S_q\)</span> la liste ordonnée des
+documents retournés par le système pour la requête <span
+class="math inline">\(q\)</span>. La MAP est une mesure monotone
+croissante de l’efficacité du système.</p>
+<p>Pour démontrer ce théorème, nous devons montrer que si un système
+<span class="math inline">\(A\)</span> a une MAP supérieure à celle d’un
+système <span class="math inline">\(B\)</span>, alors <span
+class="math inline">\(A\)</span> est globalement plus efficace que <span
+class="math inline">\(B\)</span>.</p>
+<p>Considérons deux systèmes <span class="math inline">\(A\)</span> et
+<span class="math inline">\(B\)</span> et supposons que <span
+class="math inline">\(MAP(A) &gt; MAP(B)\)</span>. Cela signifie que
+pour la plupart des requêtes, l’Average Precision du système <span
+class="math inline">\(A\)</span> est supérieure à celle du système <span
+class="math inline">\(B\)</span>. Par conséquent, le système <span
+class="math inline">\(A\)</span> retrouve les documents pertinents à des
+rangs plus élevés en moyenne que le système <span
+class="math inline">\(B\)</span>, ce qui indique une meilleure
+performance globale.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-1-monotonicité-de-la-map">Propriété
+1 : Monotonicité de la MAP</h2>
+<p>La MAP est une mesure monotone croissante. Cela signifie que si un
+système améliore l’ordre des documents pertinents pour au moins une
+requête sans dégrader les résultats pour les autres requêtes, la MAP du
+système augmentera.</p>
+<h2 class="unnumbered" id="propriété-2-invariance-par-échelle">Propriété
+2 : Invariance par Échelle</h2>
+<p>La MAP est invariante par échelle. Cela signifie que la MAP ne dépend
+pas du nombre total de documents dans la collection, mais seulement du
+nombre de documents pertinents et de leur rang dans la liste des
+résultats.</p>
+<h2 class="unnumbered" id="propriété-3-sensibilité-à-lordre">Propriété 3
+: Sensibilité à l’Ordre</h2>
+<p>La MAP est très sensible à l’ordre des documents pertinents dans la
+liste des résultats. Un document pertinent qui apparaît plus haut dans
+la liste contribuera davantage à la MAP qu’un document pertinent qui
+apparaît plus bas.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La Mean Average Precision (MAP) est une mesure puissante et
+informative pour évaluer l’efficacité des systèmes de recherche
+d’information. En combinant la précision et le rappel tout en tenant
+compte de l’ordre des résultats, la MAP fournit une évaluation robuste
+et complète des performances d’un système. Les propriétés et théorèmes
+associés à la MAP en font un outil indispensable pour les chercheurs et
+les praticiens dans le domaine de la recherche d’information.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

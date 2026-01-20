@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Compacité de plongement</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Compacité de plongement</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La notion de compacité est omniprésente en analyse, en topologie et
+en géométrie. Elle permet de capturer des propriétés fondamentales
+d’espaces qui, bien que souvent infinis, se comportent localement comme
+des espaces finis. L’un des concepts les plus puissants et les plus
+élégants liés à la compacité est celui de <em>compacité de
+plongement</em>. Cette notion émerge naturellement dans l’étude des
+variétés différentielles, où elle permet de formuler des conditions sous
+lesquelles une variété peut être plongée dans un espace euclidien tout
+en préservant certaines propriétés topologiques ou géométriques.</p>
+<p>La compacité de plongement est indispensable dans de nombreux
+domaines, notamment en théorie des nœuds, en topologie différentielle et
+en analyse géométrique. Elle permet de résoudre des problèmes complexes
+en réduisant l’étude d’espaces infinis à celle d’espaces finis, tout en
+préservant les propriétés essentielles. Dans cet article, nous
+explorerons cette notion de manière rigoureuse et détaillée.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de compacité de plongement, commençons par
+rappeler quelques concepts préliminaires. Considérons un espace
+topologique <span class="math inline">\(X\)</span> et une application
+continue <span class="math inline">\(f : X \to Y\)</span>. Nous
+cherchons à comprendre dans quelles conditions l’image de <span
+class="math inline">\(f\)</span> est compacte dans <span
+class="math inline">\(Y\)</span>. Intuitivement, cela signifie que
+l’image de <span class="math inline">\(f\)</span> est "finie" dans un
+certain sens.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> un espace topologique et
+<span class="math inline">\(Y\)</span> un espace localement compact. Une
+application continue <span class="math inline">\(f : X \to Y\)</span>
+est dite à image compacte si l’image de <span
+class="math inline">\(f\)</span>, notée <span
+class="math inline">\(f(X)\)</span>, est un sous-ensemble compact de
+<span class="math inline">\(Y\)</span>.</p>
+<p>Formellement, cela signifie que pour toute suite <span
+class="math inline">\((x_n)\)</span> dans <span
+class="math inline">\(X\)</span>, il existe une sous-suite <span
+class="math inline">\((x_{n_k})\)</span> telle que la suite <span
+class="math inline">\(f(x_{n_k})\)</span> converge dans <span
+class="math inline">\(Y\)</span>.</p>
+</div>
+<p>Une autre manière de formuler cette définition est la suivante :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> un espace topologique et
+<span class="math inline">\(Y\)</span> un espace localement compact. Une
+application continue <span class="math inline">\(f : X \to Y\)</span>
+est dite à image compacte si pour toute suite <span
+class="math inline">\((x_n)\)</span> dans <span
+class="math inline">\(X\)</span>, il existe une sous-suite <span
+class="math inline">\((x_{n_k})\)</span> et un point <span
+class="math inline">\(y \in Y\)</span> tels que <span
+class="math display">\[\lim_{k \to \infty} f(x_{n_k}) = y.\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’un des théorèmes fondamentaux liés à la compacité de plongement est
+le suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\{X_i\}_{i \in I}\)</span> une
+famille d’espaces topologiques. Alors le produit <span
+class="math inline">\(\prod_{i \in I} X_i\)</span> est compact si et
+seulement si chaque <span class="math inline">\(X_i\)</span> est
+compact.</p>
+</div>
+<p>Ce théorème est particulièrement utile dans l’étude des espaces
+produits et permet de généraliser la notion de compacité à des espaces
+infinis. Un autre théorème important est le suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(K \subset \mathbb{R}^n\)</span> un
+sous-ensemble fermé et borné. Alors <span
+class="math inline">\(K\)</span> est compact.</p>
+</div>
+<p>Ce théorème est souvent utilisé pour établir la compacité de
+plongement dans des espaces euclidiens.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Heine-Borel, nous procédons comme suit
+:</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(K \subset
+\mathbb{R}^n\)</span> un sous-ensemble fermé et borné. Nous devons
+montrer que <span class="math inline">\(K\)</span> est compact.</p>
+<p>1. Puisque <span class="math inline">\(K\)</span> est borné, il
+existe un cube fermé <span class="math inline">\(C\)</span> tel que
+<span class="math inline">\(K \subset C\)</span>.</p>
+<p>2. Le cube <span class="math inline">\(C\)</span> peut être divisé en
+<span class="math inline">\(2^n\)</span> sous-cubes de côté moitié.</p>
+<p>3. En répétant ce processus, nous obtenons une suite décroissante de
+cubes <span class="math inline">\(C_1 \supset C_2 \supset
+\cdots\)</span> tels que <span class="math inline">\(K \subset
+C_i\)</span> pour tout <span class="math inline">\(i\)</span>.</p>
+<p>4. Par le principe des tiroirs, il existe un point <span
+class="math inline">\(x \in K\)</span> qui appartient à une infinité de
+ces cubes.</p>
+<p>5. Puisque <span class="math inline">\(K\)</span> est fermé, <span
+class="math inline">\(x \in K\)</span>. Par conséquent, toute suite dans
+<span class="math inline">\(K\)</span> admet une sous-suite convergente
+vers un point de <span class="math inline">\(K\)</span>.</p>
+<p>6. Ainsi, <span class="math inline">\(K\)</span> est compact. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Voici quelques propriétés et corollaires importants liés à la
+compacité de plongement :</p>
+<ol type="i">
+<li><p><strong>Propriété d’image réciproque</strong> : Si <span
+class="math inline">\(f : X \to Y\)</span> est une application continue
+et si <span class="math inline">\(K \subset Y\)</span> est compact,
+alors <span class="math inline">\(f^{-1}(K)\)</span> est compact dans
+<span class="math inline">\(X\)</span>.</p></li>
+<li><p><strong>Propriété d’image directe</strong> : Si <span
+class="math inline">\(f : X \to Y\)</span> est une application continue
+et si <span class="math inline">\(K \subset X\)</span> est compact,
+alors <span class="math inline">\(f(K)\)</span> est compact dans <span
+class="math inline">\(Y\)</span>.</p></li>
+<li><p><strong>Corollaire du théorème de Tychonoff</strong> : Soit <span
+class="math inline">\(\{X_i\}_{i \in I}\)</span> une famille d’espaces
+topologiques. Si chaque <span class="math inline">\(X_i\)</span> est
+compact, alors le produit <span class="math inline">\(\prod_{i \in I}
+X_i\)</span> est compact.</p></li>
+</ol>
+<p>Pour prouver la propriété d’image réciproque, nous procédons comme
+suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(f : X \to Y\)</span>
+une application continue et soit <span class="math inline">\(K \subset
+Y\)</span> compact. Nous devons montrer que <span
+class="math inline">\(f^{-1}(K)\)</span> est compact dans <span
+class="math inline">\(X\)</span>.</p>
+<p>1. Soit <span class="math inline">\((x_n)\)</span> une suite dans
+<span class="math inline">\(f^{-1}(K)\)</span>. Alors la suite <span
+class="math inline">\((f(x_n))\)</span> est dans <span
+class="math inline">\(K\)</span>.</p>
+<p>2. Puisque <span class="math inline">\(K\)</span> est compact, il
+existe une sous-suite <span class="math inline">\((f(x_{n_k}))\)</span>
+qui converge vers un point <span class="math inline">\(y \in
+K\)</span>.</p>
+<p>3. Par continuité de <span class="math inline">\(f\)</span>, la suite
+<span class="math inline">\((x_{n_k})\)</span> converge vers un point
+<span class="math inline">\(x \in X\)</span> tel que <span
+class="math inline">\(f(x) = y\)</span>.</p>
+<p>4. Ainsi, <span class="math inline">\(x \in f^{-1}(K)\)</span>, et
+donc <span class="math inline">\(f^{-1}(K)\)</span> est compact. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La notion de compacité de plongement est un outil puissant et élégant
+en analyse, topologie et géométrie. Elle permet de capturer des
+propriétés fondamentales d’espaces infinis en les réduisant à des
+espaces finis. Dans cet article, nous avons exploré cette notion de
+manière rigoureuse et détaillée, en fournissant des définitions, des
+théorèmes, des preuves et des propriétés importantes. La compacité de
+plongement continue d’être un domaine actif de recherche, avec de
+nombreuses applications en théorie des nœuds, topologie différentielle
+et analyse géométrique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

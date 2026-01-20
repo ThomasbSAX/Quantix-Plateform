@@ -1,0 +1,374 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Base d’un espace vectoriel</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Base d’un espace vectoriel</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’étude des espaces vectoriels est une branche fondamentale de
+l’algèbre linéaire. Au cœur de cette théorie se trouve la notion de
+base, qui permet de décomposer un espace vectoriel en des éléments
+fondamentaux. L’idée d’une base émerge naturellement lorsqu’on cherche à
+représenter un espace vectoriel de manière simple et efficace.
+Historiquement, cette notion a été formalisée pour généraliser les
+concepts de coordonnées et de dimensions dans des espaces plus abstraits
+que le simple <span class="math inline">\(\mathbb{R}^n\)</span>.</p>
+<p>La base d’un espace vectoriel est indispensable pour plusieurs
+raisons. Tout d’abord, elle permet de représenter les vecteurs de
+manière unique en termes de combinaisons linéaires. Ensuite, elle
+facilite l’étude des applications linéaires et des propriétés
+structurelles de l’espace vectoriel. Enfin, elle est essentielle pour
+comprendre les concepts de dimension et d’indépendance linéaire.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement une base, il est important de
+comprendre ce que nous cherchons à obtenir. Nous voulons un ensemble de
+vecteurs qui permettent de représenter tous les autres vecteurs de
+l’espace vectoriel de manière unique. Cela signifie que chaque vecteur
+doit pouvoir être exprimé comme une combinaison linéaire unique de ces
+vecteurs.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(E\)</span> un espace vectoriel sur
+un corps <span class="math inline">\(\mathbb{K}\)</span>. On appelle
+<strong>base</strong> de <span class="math inline">\(E\)</span> un
+ensemble <span class="math inline">\((e_i)_{i \in I}\)</span> d’éléments
+de <span class="math inline">\(E\)</span>, indexé par un ensemble <span
+class="math inline">\(I\)</span>, tel que :</p>
+<ol>
+<li><p>Les vecteurs <span class="math inline">\((e_i)_{i \in I}\)</span>
+sont linéairement indépendants, c’est-à-dire que pour tout ensemble fini
+d’indices <span class="math inline">\(\{i_1, \ldots, i_n\} \subseteq
+I\)</span>, on a <span class="math display">\[\sum_{k=1}^n \lambda_k
+e_{i_k} = 0 \implies \forall k, \lambda_k = 0.\]</span></p></li>
+<li><p>Les vecteurs <span class="math inline">\((e_i)_{i \in I}\)</span>
+engendrent <span class="math inline">\(E\)</span>, c’est-à-dire que pour
+tout vecteur <span class="math inline">\(v \in E\)</span>, il existe un
+ensemble fini d’indices <span class="math inline">\(\{i_1, \ldots, i_n\}
+\subseteq I\)</span> et des scalaires <span
+class="math inline">\(\lambda_1, \ldots, \lambda_n \in
+\mathbb{K}\)</span> tels que <span class="math display">\[v =
+\sum_{k=1}^n \lambda_k e_{i_k}.\]</span></p></li>
+</ol>
+</div>
+<p>Une autre manière de formuler cette définition est la suivante :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(E\)</span> un espace vectoriel sur
+un corps <span class="math inline">\(\mathbb{K}\)</span>. Un ensemble
+<span class="math inline">\((e_i)_{i \in I}\)</span> de vecteurs de
+<span class="math inline">\(E\)</span> est une base de <span
+class="math inline">\(E\)</span> si et seulement si pour tout vecteur
+<span class="math inline">\(v \in E\)</span>, il existe un unique
+ensemble fini d’indices <span class="math inline">\(\{i_1, \ldots, i_n\}
+\subseteq I\)</span> et des scalaires uniques <span
+class="math inline">\(\lambda_1, \ldots, \lambda_n \in
+\mathbb{K}\)</span> tels que <span class="math display">\[v =
+\sum_{k=1}^n \lambda_k e_{i_k}.\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant les bases est le théorème de
+la dimension, qui affirme que toutes les bases d’un espace vectoriel ont
+la même cardinalité. Ce théorème est crucial pour définir la notion de
+dimension d’un espace vectoriel.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(E\)</span> un espace vectoriel. Si
+<span class="math inline">\((e_i)_{i \in I}\)</span> et <span
+class="math inline">\((f_j)_{j \in J}\)</span> sont deux bases de <span
+class="math inline">\(E\)</span>, alors les ensembles d’indices <span
+class="math inline">\(I\)</span> et <span
+class="math inline">\(J\)</span> ont la même cardinalité.</p>
+</div>
+<p>Pour prouver ce théorème, nous avons besoin de plusieurs lemmes et
+propriétés. Tout d’abord, nous devons comprendre que si un ensemble de
+vecteurs est une base, alors tout sous-ensemble fini de ces vecteurs est
+linéairement indépendant.</p>
+<div class="lemma">
+<p>Soit <span class="math inline">\((e_i)_{i \in I}\)</span> une base de
+<span class="math inline">\(E\)</span>. Alors, pour tout ensemble fini
+d’indices <span class="math inline">\(\{i_1, \ldots, i_n\} \subseteq
+I\)</span>, les vecteurs <span class="math inline">\(e_{i_1}, \ldots,
+e_{i_n}\)</span> sont linéairement indépendants.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span
+class="math inline">\(\sum_{k=1}^n \lambda_k e_{i_k} = 0\)</span>.
+Puisque <span class="math inline">\((e_i)_{i \in I}\)</span> est une
+base, il existe des scalaires <span class="math inline">\(\mu_1, \ldots,
+\mu_n\)</span> tels que <span class="math display">\[0 = \sum_{k=1}^n
+\lambda_k e_{i_k} = \sum_{k=1}^n \mu_k e_{i_k}.\]</span> Par unicité de
+la combinaison linéaire, on a <span class="math inline">\(\lambda_k =
+\mu_k\)</span> pour tout <span class="math inline">\(k\)</span>. En
+particulier, <span class="math inline">\(\lambda_k = 0\)</span> pour
+tout <span class="math inline">\(k\)</span>, ce qui prouve
+l’indépendance linéaire. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la dimension, nous allons utiliser le
+lemme précédent ainsi que d’autres propriétés des bases.</p>
+<div class="proof">
+<p><em>Preuve du théorème de la dimension.</em> Supposons que <span
+class="math inline">\((e_i)_{i \in I}\)</span> et <span
+class="math inline">\((f_j)_{j \in J}\)</span> sont deux bases de <span
+class="math inline">\(E\)</span>. Nous devons montrer que les ensembles
+d’indices <span class="math inline">\(I\)</span> et <span
+class="math inline">\(J\)</span> ont la même cardinalité.</p>
+<p>Considérons un ensemble fini d’indices <span
+class="math inline">\(\{i_1, \ldots, i_n\} \subseteq I\)</span>. Puisque
+<span class="math inline">\((e_i)_{i \in I}\)</span> est une base, les
+vecteurs <span class="math inline">\(e_{i_1}, \ldots, e_{i_n}\)</span>
+sont linéairement indépendants. De plus, puisque <span
+class="math inline">\((f_j)_{j \in J}\)</span> est une base, il existe
+des scalaires <span class="math inline">\(\lambda_{jk} \in
+\mathbb{K}\)</span> tels que <span class="math display">\[e_{i_k} =
+\sum_{j \in J} \lambda_{jk} f_j.\]</span> En particulier, pour chaque
+<span class="math inline">\(k\)</span>, il existe un ensemble fini
+d’indices <span class="math inline">\(\{j_{k1}, \ldots, j_{km_k}\}
+\subseteq J\)</span> tels que <span class="math display">\[e_{i_k} =
+\sum_{l=1}^{m_k} \lambda_{j_{kl}} f_{j_{kl}}.\]</span> En utilisant
+l’indépendance linéaire des vecteurs <span
+class="math inline">\(e_{i_1}, \ldots, e_{i_n}\)</span>, nous pouvons
+conclure que les vecteurs <span class="math inline">\(f_j\)</span> pour
+<span class="math inline">\(j \in J\)</span> sont linéairement
+indépendants. Par conséquent, les ensembles d’indices <span
+class="math inline">\(I\)</span> et <span
+class="math inline">\(J\)</span> doivent avoir la même
+cardinalité. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant énoncer quelques propriétés importantes des
+bases.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\(E\)</span> un espace vectoriel de
+dimension finie <span class="math inline">\(n\)</span>. Alors, toute
+famille de <span class="math inline">\(n\)</span> vecteurs linéairement
+indépendants est une base de <span class="math inline">\(E\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\((e_1, \ldots,
+e_n)\)</span> une famille de <span class="math inline">\(n\)</span>
+vecteurs linéairement indépendants. Puisque <span
+class="math inline">\(E\)</span> est de dimension finie, toute famille
+génératrice de <span class="math inline">\(E\)</span> contient au plus
+<span class="math inline">\(n\)</span> vecteurs. Par conséquent, <span
+class="math inline">\((e_1, \ldots, e_n)\)</span> est une base de <span
+class="math inline">\(E\)</span>. ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(E\)</span> un espace vectoriel de
+dimension finie <span class="math inline">\(n\)</span>. Alors, toute
+famille génératrice de <span class="math inline">\(E\)</span> contenant
+<span class="math inline">\(n\)</span> vecteurs est une base de <span
+class="math inline">\(E\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\((f_1, \ldots,
+f_n)\)</span> une famille génératrice de <span
+class="math inline">\(E\)</span>. Puisque <span
+class="math inline">\(E\)</span> est de dimension finie, toute famille
+linéairement indépendante contient au plus <span
+class="math inline">\(n\)</span> vecteurs. Par conséquent, <span
+class="math inline">\((f_1, \ldots, f_n)\)</span> est une base de <span
+class="math inline">\(E\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La notion de base d’un espace vectoriel est fondamentale en algèbre
+linéaire. Elle permet de représenter les vecteurs de manière unique et
+facilite l’étude des propriétés structurelles des espaces vectoriels.
+Les théorèmes et propriétés associés aux bases sont essentiels pour
+comprendre les concepts de dimension et d’indépendance linéaire.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

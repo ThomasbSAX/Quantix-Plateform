@@ -1,0 +1,336 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Dualité de Wolfe : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Dualité de Wolfe : Une Exploration Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La dualité de Wolfe émerge comme une pierre angulaire dans la théorie
+de l’optimisation, particulièrement dans le domaine de la programmation
+linéaire. Cette notion, intimement liée à la dualité de
+Fenchel-Rockafellar, permet de transformer un problème d’optimisation en
+son dual, offrant ainsi des outils puissants pour résoudre des problèmes
+complexes.</p>
+<p>L’origine historique de la dualité de Wolfe remonte aux années 1960,
+lorsque Philip Wolfe a introduit cette notion pour simplifier l’analyse
+des problèmes d’optimisation non linéaire. La dualité de Wolfe est
+indispensable dans le cadre de l’optimisation convexe, où elle permet de
+passer d’un problème primal à son dual, souvent plus facile à
+résoudre.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la dualité de Wolfe, il est essentiel de définir les
+concepts clés.</p>
+<h2 class="unnumbered" id="problème-primal">Problème Primal</h2>
+<p>Considérons un problème d’optimisation primal de la forme suivante :
+<span class="math display">\[\begin{cases}
+\text{minimiser} &amp; f(x) + g(Ax) \\
+\text{sous contraintes} &amp; x \in X
+\end{cases}\]</span> où <span class="math inline">\(f: \mathbb{R}^n
+\rightarrow \mathbb{R}\)</span> et <span class="math inline">\(g:
+\mathbb{R}^m \rightarrow \mathbb{R}\)</span> sont des fonctions
+convexes, <span class="math inline">\(A: \mathbb{R}^n \rightarrow
+\mathbb{R}^m\)</span> est une application linéaire, et <span
+class="math inline">\(X \subseteq \mathbb{R}^n\)</span> est un ensemble
+convexe.</p>
+<h2 class="unnumbered" id="problème-dual">Problème Dual</h2>
+<p>Le problème dual associé au problème primal est défini comme suit :
+<span class="math display">\[\begin{cases}
+\text{maximiser} &amp; -f^*(A^*y) - g^*(y) \\
+\text{sous contraintes} &amp; A^*y \in \partial f(x), y \in \partial
+g(Ax)
+\end{cases}\]</span> où <span class="math inline">\(f^*\)</span> et
+<span class="math inline">\(g^*\)</span> sont les fonctions conjuguées
+de Fenchel des fonctions <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span>, respectivement, et <span
+class="math inline">\(A^*\)</span> est l’adjoint de l’application
+linéaire <span class="math inline">\(A\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-dualité-de-wolfe">Théorème de
+Dualité de Wolfe</h2>
+<p>Le théorème central de la dualité de Wolfe peut être énoncé comme
+suit :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> et <span class="math inline">\(g: \mathbb{R}^m
+\rightarrow \mathbb{R}\)</span> des fonctions convexes, <span
+class="math inline">\(A: \mathbb{R}^n \rightarrow \mathbb{R}^m\)</span>
+une application linéaire, et <span class="math inline">\(X \subseteq
+\mathbb{R}^n\)</span> un ensemble convexe. Supposons que le problème
+primal <span class="math display">\[\begin{cases}
+\text{minimiser} &amp; f(x) + g(Ax) \\
+\text{sous contraintes} &amp; x \in X
+\end{cases}\]</span> ait une solution optimale <span
+class="math inline">\(x^*\)</span>. Alors, le problème dual <span
+class="math display">\[\begin{cases}
+\text{maximiser} &amp; -f^*(A^*y) - g^*(y) \\
+\text{sous contraintes} &amp; A^*y \in \partial f(x), y \in \partial
+g(Ax)
+\end{cases}\]</span> a une solution optimale <span
+class="math inline">\(y^*\)</span>, et les valeurs optimales des
+problèmes primal et dual sont égales, c’est-à-dire : <span
+class="math display">\[f(x^*) + g(Ax^*) = -f^*(A^*y^*) -
+g^*(y^*)\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-dualité-de-wolfe">Preuve du Théorème de
+Dualité de Wolfe</h2>
+<p>Pour démontrer le théorème de dualité de Wolfe, nous allons suivre
+une approche rigoureuse en plusieurs étapes.</p>
+<div class="proof">
+<p><em>Proof.</em> 1. **Existence de la Solution Primal** : Supposons
+que le problème primal ait une solution optimale <span
+class="math inline">\(x^*\)</span>. Cela signifie que pour tout <span
+class="math inline">\(x \in X\)</span>, nous avons : <span
+class="math display">\[f(x^*) + g(Ax^*) \leq f(x) + g(Ax)\]</span></p>
+<p>2. **Inégalité de Fenchel** : En utilisant l’inégalité de Fenchel
+pour les fonctions <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span>, nous obtenons : <span
+class="math display">\[f(x) + f^*(A^*y) \geq \langle A^*y, x
+\rangle\]</span> <span class="math display">\[g(Ax) + g^*(y) \geq
+\langle y, Ax \rangle\]</span></p>
+<p>3. **Combinaison des Inégalités** : En combinant ces inégalités, nous
+avons : <span class="math display">\[f(x) + g(Ax) \geq \langle A^*y, x
+\rangle + \langle y, Ax \rangle - f^*(A^*y) - g^*(y)\]</span></p>
+<p>4. **Condition de Dualité** : Pour que <span
+class="math inline">\(y\)</span> soit une solution optimale du problème
+dual, il doit satisfaire les conditions de dualité : <span
+class="math display">\[A^*y \in \partial f(x), y \in \partial
+g(Ax)\]</span></p>
+<p>5. **Égalité des Valeurs Optimales** : En utilisant les conditions de
+dualité et l’inégalité de Fenchel, nous pouvons montrer que : <span
+class="math display">\[f(x^*) + g(Ax^*) = -f^*(A^*y^*) -
+g^*(y^*)\]</span> où <span class="math inline">\(y^*\)</span> est une
+solution optimale du problème dual. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriété-i-convexité-des-fonctions">Propriété (i) : Convexité des
+Fonctions</h2>
+<p>Les fonctions <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> doivent être convexes pour que le
+théorème de dualité de Wolfe s’applique. Cette condition est essentielle
+pour garantir l’existence des sous-différentielles et l’application de
+l’inégalité de Fenchel.</p>
+<h2 class="unnumbered"
+id="propriété-ii-linéarité-de-lapplication">Propriété (ii) : Linéarité
+de l’Application</h2>
+<p>L’application <span class="math inline">\(A\)</span> doit être
+linéaire pour que son adjoint <span class="math inline">\(A^*\)</span>
+soit bien défini. Cette condition est cruciale pour établir la relation
+entre les problèmes primal et dual.</p>
+<h2 class="unnumbered"
+id="propriété-iii-convexité-de-lensemble">Propriété (iii) : Convexité de
+l’Ensemble</h2>
+<p>L’ensemble <span class="math inline">\(X\)</span> doit être convexe
+pour que le problème primal soit bien posé. Cette condition assure que
+les solutions optimales existent et sont uniques sous certaines
+hypothèses supplémentaires.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La dualité de Wolfe représente une avancée majeure dans la théorie de
+l’optimisation, offrant des outils puissants pour résoudre des problèmes
+complexes. En transformant un problème primal en son dual, cette notion
+permet de simplifier l’analyse et d’obtenir des solutions optimales
+efficacement. Les propriétés et théorèmes associés à la dualité de Wolfe
+continuent d’inspirer des recherches en optimisation convexe et en
+programmation linéaire.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

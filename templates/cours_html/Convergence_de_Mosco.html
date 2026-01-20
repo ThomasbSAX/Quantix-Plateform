@@ -1,0 +1,420 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Convergence de Mosco : Une approche variationnelle en analyse fonctionnelle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Convergence de Mosco : Une approche variationnelle en
+analyse fonctionnelle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La convergence de Mosco, introduite par U. Mosco en 1969, est un
+concept fondamental en analyse fonctionnelle et en théorie des équations
+aux dérivées partielles. Elle émerge dans le cadre de l’étude des
+propriétés variationnelles des suites d’espaces de Hilbert et de leurs
+sous-espaces. Cette notion est particulièrement utile pour comprendre le
+comportement asymptotique des solutions d’équations aux dérivées
+partielles lorsque les domaines ou les opérateurs sous-jacents
+varient.</p>
+<p>La convergence de Mosco est indispensable pour plusieurs raisons.
+Tout d’abord, elle permet de généraliser la notion classique de
+convergence des sous-espaces dans les espaces de Hilbert. Ensuite, elle
+joue un rôle clé dans l’étude des problèmes de minimisation et des
+inégalités variationnelles. Enfin, elle trouve des applications dans
+divers domaines tels que la mécanique des solides déformables,
+l’optimisation et les problèmes de contrôle.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la convergence de Mosco, considérons deux espaces de
+Hilbert <span class="math inline">\(H\)</span> et <span
+class="math inline">\(H&#39;\)</span>, et une suite d’espaces de Hilbert
+<span class="math inline">\((H_n)_{n \in \mathbb{N}}\)</span>. Nous
+cherchons à comprendre comment les sous-espaces de <span
+class="math inline">\(H_n\)</span> convergent vers un sous-espace de
+<span class="math inline">\(H\)</span>.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\((H_n)_{n \in \mathbb{N}}\)</span>
+une suite d’espaces de Hilbert et <span class="math inline">\(H\)</span>
+un espace de Hilbert. On dit que la suite <span
+class="math inline">\((H_n)_{n \in \mathbb{N}}\)</span> converge vers
+<span class="math inline">\(H\)</span> au sens de Mosco si les deux
+conditions suivantes sont satisfaites :</p>
+<ol>
+<li><p>Pour toute suite <span class="math inline">\((u_n)_{n \in
+\mathbb{N}}\)</span> telle que <span class="math inline">\(u_n \in
+H_n\)</span> et <span class="math inline">\(u_n \rightharpoonup
+u\)</span> faiblement dans <span class="math inline">\(H\)</span>, on a
+<span class="math inline">\(u \in H\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(u \in H\)</span>, il existe
+une suite <span class="math inline">\((u_n)_{n \in \mathbb{N}}\)</span>
+telle que <span class="math inline">\(u_n \in H_n\)</span> et <span
+class="math inline">\(u_n \to u\)</span> fortement dans <span
+class="math inline">\(H\)</span>.</p></li>
+</ol>
+</div>
+<p>De manière équivalente, on peut formuler la convergence de Mosco en
+termes de fonctionnelles convexes. Soient <span
+class="math inline">\(\phi_n : H \to \mathbb{R} \cup
+\{+\infty\}\)</span> des fonctionnelles convexes, propres, semi-continu
+inférieures et telles que <span class="math inline">\(\phi_n(u) =
++\infty\)</span> pour tout <span class="math inline">\(u \notin
+H_n\)</span>. On dit que la suite <span
+class="math inline">\((\phi_n)_{n \in \mathbb{N}}\)</span> converge vers
+une fonctionnelle <span class="math inline">\(\phi : H \to \mathbb{R}
+\cup \{+\infty\}\)</span> au sens de Mosco si :</p>
+<ol>
+<li><p>Pour toute suite <span class="math inline">\((u_n)_{n \in
+\mathbb{N}}\)</span> telle que <span class="math inline">\(u_n
+\rightharpoonup u\)</span> faiblement dans <span
+class="math inline">\(H\)</span> et <span
+class="math inline">\(\limsup_{n \to \infty} \phi_n(u_n) &lt;
++\infty\)</span>, on a <span class="math inline">\(\phi(u) \leq
+\liminf_{n \to \infty} \phi_n(u_n)\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(u \in H\)</span>, il existe
+une suite <span class="math inline">\((u_n)_{n \in \mathbb{N}}\)</span>
+telle que <span class="math inline">\(u_n \to u\)</span> fortement dans
+<span class="math inline">\(H\)</span> et <span
+class="math inline">\(\limsup_{n \to \infty} \phi_n(u_n) \leq
+\phi(u)\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un résultat fondamental concernant la convergence de Mosco est le
+théorème suivant, dû à U. Mosco :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\((H_n)_{n \in \mathbb{N}}\)</span>
+une suite d’espaces de Hilbert et <span class="math inline">\(H\)</span>
+un espace de Hilbert. La suite <span class="math inline">\((H_n)_{n \in
+\mathbb{N}}\)</span> converge vers <span
+class="math inline">\(H\)</span> au sens de Mosco si et seulement si,
+pour toute fonctionnelle convexe, propre, semi-continue inférieure <span
+class="math inline">\(\phi : H \to \mathbb{R} \cup \{+\infty\}\)</span>,
+la suite des fonctionnelles <span class="math inline">\((\phi_n)_{n \in
+\mathbb{N}}\)</span> définies par <span class="math display">\[\phi_n(u)
+=
+\begin{cases}
+\phi(u) &amp; \text{si } u \in H_n, \\
++\infty &amp; \text{sinon.}
+\end{cases}\]</span> converge vers <span
+class="math inline">\(\phi\)</span> au sens de Mosco.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de convergence de Mosco, nous allons
+montrer les deux implications.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Preuve de l’implication directe
+:</strong></p>
+<p>Supposons que la suite <span class="math inline">\((H_n)_{n \in
+\mathbb{N}}\)</span> converge vers <span
+class="math inline">\(H\)</span> au sens de Mosco. Soit <span
+class="math inline">\(\phi : H \to \mathbb{R} \cup \{+\infty\}\)</span>
+une fonctionnelle convexe, propre et semi-continue inférieure. Nous
+devons montrer que la suite <span class="math inline">\((\phi_n)_{n \in
+\mathbb{N}}\)</span> converge vers <span
+class="math inline">\(\phi\)</span> au sens de Mosco.</p>
+<ol>
+<li><p>Soit <span class="math inline">\((u_n)_{n \in
+\mathbb{N}}\)</span> une suite telle que <span class="math inline">\(u_n
+\rightharpoonup u\)</span> faiblement dans <span
+class="math inline">\(H\)</span> et <span
+class="math inline">\(\limsup_{n \to \infty} \phi_n(u_n) &lt;
++\infty\)</span>. Puisque <span class="math inline">\(\phi_n(u_n) =
+\phi(u_n)\)</span>, on a <span class="math inline">\(\limsup_{n \to
+\infty} \phi(u_n) &lt; +\infty\)</span>. Comme <span
+class="math inline">\(\phi\)</span> est semi-continue inférieure, on a
+<span class="math inline">\(\phi(u) \leq \liminf_{n \to \infty}
+\phi(u_n)\)</span>. Donc, <span class="math inline">\(\phi(u) \leq
+\liminf_{n \to \infty} \phi_n(u_n)\)</span>.</p></li>
+<li><p>Soit <span class="math inline">\(u \in H\)</span>. D’après la
+définition de la convergence de Mosco, il existe une suite <span
+class="math inline">\((u_n)_{n \in \mathbb{N}}\)</span> telle que <span
+class="math inline">\(u_n \to u\)</span> fortement dans <span
+class="math inline">\(H\)</span>. Puisque <span
+class="math inline">\(\phi\)</span> est semi-continue inférieure, on a
+<span class="math inline">\(\phi(u) \leq \liminf_{n \to \infty}
+\phi(u_n)\)</span>. De plus, comme <span class="math inline">\(u_n \in
+H_n\)</span>, on a <span class="math inline">\(\phi_n(u_n) =
+\phi(u_n)\)</span>. Donc, <span class="math inline">\(\limsup_{n \to
+\infty} \phi_n(u_n) = \limsup_{n \to \infty} \phi(u_n) \leq
+\phi(u)\)</span>.</p></li>
+</ol>
+<p><strong>Preuve de l’implication réciproque :</strong></p>
+<p>Supposons que, pour toute fonctionnelle convexe, propre et
+semi-continue inférieure <span class="math inline">\(\phi : H \to
+\mathbb{R} \cup \{+\infty\}\)</span>, la suite <span
+class="math inline">\((\phi_n)_{n \in \mathbb{N}}\)</span> converge vers
+<span class="math inline">\(\phi\)</span> au sens de Mosco. Nous devons
+montrer que la suite <span class="math inline">\((H_n)_{n \in
+\mathbb{N}}\)</span> converge vers <span
+class="math inline">\(H\)</span> au sens de Mosco.</p>
+<ol>
+<li><p>Soit <span class="math inline">\((u_n)_{n \in
+\mathbb{N}}\)</span> une suite telle que <span class="math inline">\(u_n
+\rightharpoonup u\)</span> faiblement dans <span
+class="math inline">\(H\)</span>. Considérons la fonctionnelle
+indicatrice de l’espace <span class="math inline">\(H\)</span>, définie
+par <span class="math display">\[\phi(u) =
+    \begin{cases}
+    0 &amp; \text{si } u \in H, \\
+    +\infty &amp; \text{sinon.}
+    \end{cases}\]</span> La suite <span
+class="math inline">\((\phi_n)_{n \in \mathbb{N}}\)</span> converge vers
+<span class="math inline">\(\phi\)</span> au sens de Mosco. Donc, <span
+class="math inline">\(\phi(u) \leq \liminf_{n \to \infty}
+\phi_n(u_n)\)</span>. Puisque <span class="math inline">\(\phi_n(u_n) =
+0\)</span> pour tout <span class="math inline">\(n \in
+\mathbb{N}\)</span>, on a <span class="math inline">\(\phi(u) =
+0\)</span>. Donc, <span class="math inline">\(u \in H\)</span>.</p></li>
+<li><p>Soit <span class="math inline">\(u \in H\)</span>. Considérons la
+fonctionnelle indicatrice de l’espace <span
+class="math inline">\(H\)</span>, définie par <span
+class="math display">\[\phi(u) =
+    \begin{cases}
+    0 &amp; \text{si } u \in H, \\
+    +\infty &amp; \text{sinon.}
+    \end{cases}\]</span> La suite <span
+class="math inline">\((\phi_n)_{n \in \mathbb{N}}\)</span> converge vers
+<span class="math inline">\(\phi\)</span> au sens de Mosco. Donc, il
+existe une suite <span class="math inline">\((u_n)_{n \in
+\mathbb{N}}\)</span> telle que <span class="math inline">\(u_n \to
+u\)</span> fortement dans <span class="math inline">\(H\)</span> et
+<span class="math inline">\(\limsup_{n \to \infty} \phi_n(u_n) \leq
+\phi(u)\)</span>. Puisque <span class="math inline">\(\phi(u) =
+0\)</span>, on a <span class="math inline">\(\limsup_{n \to \infty}
+\phi_n(u_n) = 0\)</span>. Donc, <span class="math inline">\(u_n \in
+H_n\)</span> pour tout <span class="math inline">\(n \in
+\mathbb{N}\)</span>.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons quelques propriétés et corollaires importants concernant
+la convergence de Mosco.</p>
+<ol>
+<li><p><strong>Stabilité par passage à la sous-suite :</strong> Si une
+suite <span class="math inline">\((H_n)_{n \in \mathbb{N}}\)</span>
+converge vers <span class="math inline">\(H\)</span> au sens de Mosco,
+alors toute sous-suite <span class="math inline">\((H_{n_k})_{k \in
+\mathbb{N}}\)</span> converge également vers <span
+class="math inline">\(H\)</span> au sens de Mosco.</p></li>
+<li><p><strong>Stabilité par intersection finie :</strong> Si <span
+class="math inline">\((H_n^1)_{n \in \mathbb{N}}\)</span> et <span
+class="math inline">\((H_n^2)_{n \in \mathbb{N}}\)</span> sont deux
+suites d’espaces de Hilbert qui convergent respectivement vers <span
+class="math inline">\(H^1\)</span> et <span
+class="math inline">\(H^2\)</span> au sens de Mosco, alors la suite
+<span class="math inline">\((H_n^1 \cap H_n^2)_{n \in
+\mathbb{N}}\)</span> converge vers <span class="math inline">\(H^1 \cap
+H^2\)</span> au sens de Mosco.</p></li>
+<li><p><strong>Convergence des solutions d’inégalités variationnelles
+:</strong> Soient <span class="math inline">\((H_n)_{n \in
+\mathbb{N}}\)</span> une suite d’espaces de Hilbert qui converge vers
+<span class="math inline">\(H\)</span> au sens de Mosco, et <span
+class="math inline">\((f_n)_{n \in \mathbb{N}}\)</span> une suite de
+fonctions convexes, continues et semi-continues inférieures qui converge
+uniformément vers une fonction <span class="math inline">\(f : H \to
+\mathbb{R}\)</span>. Si <span class="math inline">\(u_n\)</span> est une
+solution de l’inégalité variationnelle <span
+class="math display">\[\langle u_n, v - u_n \rangle + f_n(v) - f_n(u_n)
+\geq 0, \quad \forall v \in H_n,\]</span> alors toute sous-suite de
+<span class="math inline">\((u_n)_{n \in \mathbb{N}}\)</span> admet une
+sous-suite qui converge faiblement vers une solution de l’inégalité
+variationnelle <span class="math display">\[\langle u, v - u \rangle +
+f(v) - f(u) \geq 0, \quad \forall v \in H.\]</span></p></li>
+</ol>
+</body>
+</html>
+{% include "footer.html" %}
+

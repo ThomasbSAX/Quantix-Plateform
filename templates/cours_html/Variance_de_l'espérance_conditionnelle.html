@@ -1,0 +1,336 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance de l’espérance conditionnelle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance de l’espérance conditionnelle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’étude des propriétés des espérances conditionnelles est un pilier
+fondamental en théorie des probabilités. Parmi ces propriétés, la
+variance de l’espérance conditionnelle occupe une place
+particulière.</p>
+<p>L’idée centrale est d’analyser comment la variance d’une variable
+aléatoire peut être décomposée en une partie conditionnelle et une
+partie inconditionnelle. Cette notion est cruciale dans l’analyse des
+modèles de régression, où l’on cherche à comprendre la variabilité des
+résidus par rapport aux prévisions.</p>
+<p>La variance de l’espérance conditionnelle émerge naturellement dans
+le cadre des processus stochastiques et des chaînes de Markov, où elle
+permet de quantifier la dispersion des valeurs conditionnelles autour de
+leur moyenne.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la variance de l’espérance conditionnelle, commençons
+par rappeler quelques notions fondamentales.</p>
+<p>Soit <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> un
+espace probabilisé et <span class="math inline">\(X\)</span> une
+variable aléatoire intégrable. Considérons une sous-tribu <span
+class="math inline">\(\mathcal{G}\)</span> de <span
+class="math inline">\(\mathcal{F}\)</span>.</p>
+<p>L’espérance conditionnelle de <span class="math inline">\(X\)</span>
+par rapport à <span class="math inline">\(\mathcal{G}\)</span> est notée
+<span class="math inline">\(E[X|\mathcal{G}]\)</span>. C’est une
+variable aléatoire mesurable par rapport à <span
+class="math inline">\(\mathcal{G}\)</span> telle que pour toute fonction
+<span class="math inline">\(h\)</span> mesurable et bornée :</p>
+<p><span class="math display">\[E[h(X)] =
+E[E[h(X)|\mathcal{G}]]\]</span></p>
+<p>La variance conditionnelle de <span class="math inline">\(X\)</span>
+par rapport à <span class="math inline">\(\mathcal{G}\)</span> est
+définie comme :</p>
+<p><span class="math display">\[\text{Var}(X|\mathcal{G}) = E[(X -
+E[X|\mathcal{G}])^2 |\mathcal{G}]\]</span></p>
+<p>La variance de l’espérance conditionnelle est alors définie comme la
+variance de <span class="math inline">\(E[X|\mathcal{G}]\)</span> :</p>
+<p><span class="math display">\[\text{Var}(E[X|\mathcal{G}]) =
+E\left[\left(E[X|\mathcal{G}] - E[X]\right)^2\right]\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un résultat fondamental concernant la variance de l’espérance
+conditionnelle est la loi de la variance totale, qui décompose la
+variance d’une variable aléatoire en une somme de deux termes.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+intégrable et <span class="math inline">\(\mathcal{G}\)</span> une
+sous-tribu de <span class="math inline">\(\mathcal{F}\)</span>.
+Alors,</p>
+<p><span class="math display">\[\text{Var}(X) =
+\text{Var}(E[X|\mathcal{G}]) + E[\text{Var}(X|\mathcal{G})]\]</span></p>
+<p>En d’autres termes, pour tout <span class="math inline">\(\omega \in
+\Omega\)</span>,</p>
+<p><span class="math display">\[E\left[(X - E[X])^2\right] =
+E\left[\left(E[X|\mathcal{G}] - E[X]\right)^2\right] + E\left[E\left[(X
+- E[X|\mathcal{G}])^2 \Big| \mathcal{G}\right]\right]\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer la loi de la variance totale, nous commençons par
+développer l’expression de <span
+class="math inline">\(\text{Var}(X)\)</span> :</p>
+<p><span class="math display">\[\begin{align*}
+\text{Var}(X) &amp;= E\left[(X - E[X])^2\right] \\
+&amp;= E\left[\left(X - E[X|\mathcal{G}] + E[X|\mathcal{G}] -
+E[X]\right)^2\right] \\
+&amp;= E\left[\left(X - E[X|\mathcal{G}]\right)^2 + 2\left(X -
+E[X|\mathcal{G}]\right)\left(E[X|\mathcal{G}] - E[X]\right) +
+\left(E[X|\mathcal{G}] - E[X]\right)^2\right] \\
+&amp;= E\left[\left(X - E[X|\mathcal{G}]\right)^2\right] +
+2E\left[\left(X - E[X|\mathcal{G}]\right)\left(E[X|\mathcal{G}] -
+E[X]\right)\right] + E\left[\left(E[X|\mathcal{G}] -
+E[X]\right)^2\right]
+\end{align*}\]</span></p>
+<p>Le terme central est nul car <span
+class="math inline">\(E[X|\mathcal{G}]\)</span> est <span
+class="math inline">\(\mathcal{G}\)</span>-mesurable et <span
+class="math inline">\(X - E[X|\mathcal{G}]\)</span> a une espérance
+conditionnelle nulle par rapport à <span
+class="math inline">\(\mathcal{G}\)</span> :</p>
+<p><span class="math display">\[E\left[\left(X -
+E[X|\mathcal{G}]\right)\left(E[X|\mathcal{G}] - E[X]\right) \Big|
+\mathcal{G}\right] = (E[X|\mathcal{G}] -
+E[E[X|\mathcal{G}]|\mathcal{G}])(E[X|\mathcal{G}] - E[X]) =
+0\]</span></p>
+<p>Ainsi, nous obtenons :</p>
+<p><span class="math display">\[\text{Var}(X) = E\left[\left(X -
+E[X|\mathcal{G}]\right)^2\right] +
+\text{Var}(E[X|\mathcal{G}])\]</span></p>
+<p>En utilisant la définition de la variance conditionnelle, nous avons
+:</p>
+<p><span class="math display">\[E\left[\left(X -
+E[X|\mathcal{G}]\right)^2\right] = E\left[E\left[(X -
+E[X|\mathcal{G}])^2 \Big| \mathcal{G}\right]\right] =
+E[\text{Var}(X|\mathcal{G})]\]</span></p>
+<p>Ce qui achève la démonstration.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La loi de la variance totale possède plusieurs propriétés
+intéressantes :</p>
+<ol>
+<li><p>La variance de l’espérance conditionnelle <span
+class="math inline">\(\text{Var}(E[X|\mathcal{G}])\)</span> est toujours
+positive ou nulle. Elle mesure la variabilité de l’espérance
+conditionnelle autour de l’espérance inconditionnelle.</p></li>
+<li><p>Le terme <span
+class="math inline">\(E[\text{Var}(X|\mathcal{G})]\)</span> mesure la
+variabilité moyenne de <span class="math inline">\(X\)</span> autour de
+son espérance conditionnelle. Il est toujours positif ou nul.</p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(\mathcal{G}\)</span> sont indépendants, alors
+<span class="math inline">\(\text{Var}(E[X|\mathcal{G}]) = 0\)</span> et
+<span class="math inline">\(\text{Var}(X) = E[\text{Var}(X|\mathcal{G})]
+= \text{Var}(X)\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\mathcal{G}\)</span> est la tribu
+triviale, alors <span class="math inline">\(E[X|\mathcal{G}] =
+E[X]\)</span> et <span class="math inline">\(\text{Var}(X) =
+\text{Var}(E[X|\mathcal{G}]) + E[\text{Var}(X|\mathcal{G})] =
+\text{Var}(X) + 0\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\mathcal{G} =
+\mathcal{F}\)</span>, alors <span class="math inline">\(E[X|\mathcal{G}]
+= X\)</span> et <span class="math inline">\(\text{Var}(X) =
+\text{Var}(E[X|\mathcal{G}]) + E[\text{Var}(X|\mathcal{G})] = 0 +
+\text{Var}(X)\)</span>.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La variance de l’espérance conditionnelle est un outil puissant pour
+décomposer la variabilité d’une variable aléatoire. La loi de la
+variance totale permet de séparer cette variabilité en deux composantes
+: une partie due à la variabilité de l’espérance conditionnelle et une
+autre due à la variabilité moyenne autour de cette espérance.</p>
+<p>Cette décomposition est particulièrement utile dans l’analyse des
+modèles statistiques et probabilistes, où elle permet de mieux
+comprendre les sources de variabilité et d’améliorer les
+prédictions.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

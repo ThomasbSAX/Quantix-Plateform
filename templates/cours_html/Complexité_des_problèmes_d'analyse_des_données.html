@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes d’analyse des données</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes d’analyse des données</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des données est un domaine en pleine expansion, motivé par
+l’essor des technologies numériques et la nécessité de traiter des
+volumes croissants d’informations. À l’origine, les méthodes d’analyse
+des données remontent aux travaux pionniers de Karl Pearson et Ronald
+Fisher au début du XXe siècle. Ces méthodes ont évolué pour répondre aux
+besoins de la statistique, puis se sont étendues à des domaines variés
+tels que l’apprentissage automatique, la bioinformatique et les sciences
+sociales.</p>
+<p>L’émergence de la notion de complexité dans l’analyse des données est
+indispensable pour comprendre les limites et les capacités des
+algorithmes utilisés. La complexité permet de quantifier le coût
+computationnel nécessaire pour résoudre un problème donné, que ce soit
+en termes de temps ou d’espace. Elle est cruciale pour évaluer
+l’efficacité des algorithmes et pour choisir les méthodes les plus
+appropriées en fonction des contraintes matérielles et temporelles.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement la complexité des problèmes d’analyse
+des données, il est essentiel de comprendre ce que nous cherchons à
+mesurer. Nous voulons quantifier le temps ou l’espace nécessaire pour
+résoudre un problème donné, en fonction de la taille de l’entrée. Par
+exemple, pour un algorithme de classification, nous souhaitons savoir
+combien de temps il prendra en fonction du nombre d’échantillons et de
+caractéristiques.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> un algorithme et <span
+class="math inline">\(n\)</span> la taille de l’entrée. La complexité
+temporelle de <span class="math inline">\(A\)</span>, notée <span
+class="math inline">\(T_A(n)\)</span>, est le nombre d’opérations
+élémentaires nécessaires pour exécuter <span
+class="math inline">\(A\)</span> sur une entrée de taille <span
+class="math inline">\(n\)</span>. <span class="math display">\[T_A(n) =
+\max_{|x|=n} \text{Temps}(A(x))\]</span></p>
+</div>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> un algorithme et <span
+class="math inline">\(n\)</span> la taille de l’entrée. La complexité
+spatiale de <span class="math inline">\(A\)</span>, notée <span
+class="math inline">\(S_A(n)\)</span>, est la quantité maximale d’espace
+mémoire nécessaire pour exécuter <span class="math inline">\(A\)</span>
+sur une entrée de taille <span class="math inline">\(n\)</span>. <span
+class="math display">\[S_A(n) = \max_{|x|=n}
+\text{Esace}(A(x))\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre la complexité des problèmes d’analyse des données, il
+est utile de se référer à certains théorèmes fondamentaux. Par exemple,
+le théorème du temps d’exécution optimal nous donne une borne inférieure
+sur le temps nécessaire pour résoudre un problème donné.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(P\)</span> un problème de décision
+et <span class="math inline">\(A\)</span> un algorithme qui résout <span
+class="math inline">\(P\)</span>. Si <span class="math inline">\(T_A(n)
+= O(f(n))\)</span>, alors il existe une constante <span
+class="math inline">\(c &gt; 0\)</span> telle que pour tout algorithme
+<span class="math inline">\(B\)</span> qui résout <span
+class="math inline">\(P\)</span>, on a <span
+class="math display">\[T_B(n) = \Omega(f(n)/c)\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ce théorème repose sur l’idée que si un
+algorithme <span class="math inline">\(A\)</span> peut résoudre le
+problème <span class="math inline">\(P\)</span> en temps <span
+class="math inline">\(O(f(n))\)</span>, alors tout autre algorithme
+<span class="math inline">\(B\)</span> doit au moins prendre un temps
+proportionnel à <span class="math inline">\(f(n)\)</span>. Cela découle
+du fait que les opérations élémentaires nécessaires pour résoudre le
+problème sont limitées par la taille de l’entrée <span
+class="math inline">\(n\)</span>. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer la complexité des problèmes d’analyse des données,
+considérons un exemple simple : le tri d’un tableau de nombres. Nous
+voulons montrer que tout algorithme de tri a une complexité temporelle
+d’au moins <span class="math inline">\(O(n \log n)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(A\)</span> un
+algorithme de tri. Pour tout tableau <span
+class="math inline">\(x\)</span> de taille <span
+class="math inline">\(n\)</span>, l’algorithme <span
+class="math inline">\(A\)</span> doit comparer et échanger les éléments
+de manière à obtenir un tableau trié. Le nombre minimal d’opérations
+nécessaires pour trier un tableau est donné par la relation de
+récurrence : <span class="math display">\[T_A(n) \geq 2T_A(n/2) +
+O(n)\]</span> En résolvant cette récurrence, nous obtenons : <span
+class="math display">\[T_A(n) = \Omega(n \log n)\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes concernant la
+complexité des problèmes d’analyse des données :</p>
+<ol>
+<li><p>La complexité temporelle d’un algorithme est une fonction
+croissante de la taille de l’entrée.</p></li>
+<li><p>La complexité spatiale d’un algorithme est également une fonction
+croissante de la taille de l’entrée.</p></li>
+<li><p>Pour tout problème <span class="math inline">\(P\)</span>, il
+existe un algorithme optimal <span class="math inline">\(A\)</span> tel
+que <span class="math inline">\(T_A(n) = O(f(n))\)</span>, où <span
+class="math inline">\(f(n)\)</span> est la borne inférieure du temps
+d’exécution pour résoudre <span
+class="math inline">\(P\)</span>.</p></li>
+</ol>
+<div class="proof">
+<p><em>Proof.</em> Pour la propriété (i), considérons deux entrées <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> telles que <span
+class="math inline">\(|x| = n\)</span> et <span
+class="math inline">\(|y| = m\)</span> avec <span
+class="math inline">\(n &lt; m\)</span>. Puisque l’algorithme <span
+class="math inline">\(A\)</span> doit traiter plus d’éléments pour <span
+class="math inline">\(y\)</span>, il est clair que <span
+class="math inline">\(T_A(m) &gt; T_A(n)\)</span>.</p>
+<p>Pour la propriété (ii), le raisonnement est similaire. La quantité
+d’espace mémoire nécessaire pour traiter une entrée plus grande est
+également plus importante.</p>
+<p>Pour la propriété (iii), l’algorithme optimal <span
+class="math inline">\(A\)</span> est celui qui atteint la borne
+inférieure du temps d’exécution pour résoudre le problème <span
+class="math inline">\(P\)</span>. Cela signifie que tout autre
+algorithme ne peut pas être plus efficace que <span
+class="math inline">\(A\)</span> en termes de complexité
+temporelle. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La compréhension de la complexité des problèmes d’analyse des données
+est essentielle pour développer des algorithmes efficaces et adaptés aux
+contraintes matérielles et temporelles. En utilisant les définitions,
+théorèmes et propriétés présentés dans cet article, nous pouvons évaluer
+et comparer les performances des différents algorithmes d’analyse des
+données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

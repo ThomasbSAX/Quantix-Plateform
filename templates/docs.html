@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Documentation — Quantix</title>
+  <meta name="description" content="Documentation Quantix : plateforme locale de traitement de données, nettoyage, analyse statistique, visualisation, conversion et annotation." />
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="../static/css/base.css">
+  <link rel="stylesheet" href="../static/css/layout.css">
+  <link rel="stylesheet" href="../static/css/navbar.css">
+  <link rel="stylesheet" href="../static/css/footer.css">
+  <link rel="stylesheet" href="../static/css/components.css">
+  <link rel="stylesheet" href="../static/css/animations.css">
+
+  <style>
+    /* Pleine largeur pour éviter les rendus compressés */
+    .docs-container { max-width:none !important; width:100%; padding-left:24px; padding-right:24px; }
+    @media (max-width: 600px) { .docs-container { padding-left:16px; padding-right:16px; } }
+
+    .doc-grid { display:grid; grid-template-columns:260px 1fr; gap:32px; margin-top:24px; }
+    @media (max-width:900px) { .doc-grid { grid-template-columns:1fr; } }
+    .doc-toc { position:sticky; top:20px; }
+    .doc-toc h3 { font-size:1rem; margin-bottom:12px; }
+    .doc-toc a { color:var(--text-secondary); text-decoration:none; font-size:.9rem; line-height:1.6; }
+    .doc-toc a:hover { color:var(--accent-primary); }
+    .doc-section { margin-bottom:64px; }
+    .doc-section h2 { margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--border-primary); }
+    .doc-section h3 { margin:24px 0 12px; }
+    .card { padding:16px; border-radius:8px; background:var(--surface-card); border:1px solid var(--border-primary); margin-bottom:16px; }
+    .function-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:16px; }
+    .step { display:flex; gap:12px; margin:16px 0; align-items:flex-start; }
+    .step .num { width:28px; height:28px; border-radius:50%; background:var(--accent-primary); color:#fff; display:flex; align-items:center; justify-content:center; font-size:.9rem; margin-top:4px; }
+
+    .doc-note { font-size: .92rem; color: var(--text-secondary); }
+    .demo-gallery { display:grid; grid-template-columns:repeat(auto-fit, minmax(360px,1fr)); gap:18px; }
+    .demo-card { border:1px solid var(--border-primary); border-radius:12px; background:var(--surface-card); overflow:hidden; }
+    .demo-card__head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-bottom:1px solid var(--border-primary); }
+    .demo-card__title { font-weight:600; font-size:.95rem; margin:0; }
+    .demo-card__link { font-size:.85rem; color:var(--accent-primary); text-decoration:none; }
+    .demo-card__link:hover { text-decoration:underline; }
+    .demo-iframe { width:100%; height:420px; border:0; background:#fff; }
+    .demo-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+
+    /* Embeds répartis dans la doc (texte + rendu) */
+    /*
+      Objectif UX:
+      - éviter les gros blancs quand le texte est court
+      - éviter l'effet "graphique collé à droite"
+      => on empile (texte puis rendu) et on centre sur une largeur confortable.
+    */
+    .doc-split { display:grid; grid-template-columns:1fr; gap:14px; align-items:start; margin:16px 0; }
+    .doc-split > * { width:100%; max-width: 980px; margin-left:auto; margin-right:auto; }
+    .doc-embed { border:1px solid var(--border-primary); border-radius:12px; background:var(--surface-card); overflow:hidden; }
+    .doc-embed__head { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-bottom:1px solid var(--border-primary); }
+    .doc-embed__title { margin:0; font-weight:600; font-size:.95rem; }
+    .doc-embed__link { font-size:.85rem; color:var(--accent-primary); text-decoration:none; }
+    .doc-embed__link:hover { text-decoration:underline; }
+    .doc-embed__frame { width:100%; height:520px; border:0; background:#fff; }
+    @media (max-width: 600px) { .doc-embed__frame { height:420px; } }
+
+    /* Captures d’écran (affiche un placeholder si l’image n’existe pas encore) */
+    .doc-shot { border:1px solid var(--border-primary); border-radius:12px; background:var(--surface-card); padding:12px; margin:16px 0; }
+    .doc-shot img { width:100%; height:auto; border-radius:10px; display:block; }
+    .doc-shot figcaption { margin-top:10px; font-size:.92rem; color:var(--text-secondary); }
+    .doc-shot__missing { display:none; padding:14px; border:1px dashed var(--border-primary); border-radius:10px; color:var(--text-secondary); background:rgba(0,0,0,.02); }
+    .doc-shot.is-missing .doc-shot__missing { display:block; }
+    .doc-shot.is-missing img { display:none; }
+  </style>
+</head>
+<body>
+  {% include 'header.html' %}
+
+  <!-- Hero -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1 id="main-title" style="font-size: 2.5rem; font-weight: 300; color: #1a1a1a; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; opacity: 0;">Documentation Quantix</h1>
+      <p>Guide complet pour utiliser Quantix : import, nettoyage, exploration (Lab), visualisation, traduction et audio (en local).</p>
+      <div style="margin-top:24px;">
+        <a class="btn btn-primary" href="/dashboard"><i class="fa-solid fa-chart-line"></i> Ouvrir le Dashboard</a>
+        <a class="btn btn-ghost" href="/"><i class="fa-solid fa-house"></i> Accueil</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contenu -->
+  <main class="container docs-container" style="padding:48px 0 64px;">
+    <div class="doc-grid">
+      <!-- Table des matières -->
+      <aside class="doc-toc">
+        <h3>Sommaire</h3>
+        <ol>
+          <li><a href="#intro">Introduction</a></li>
+          <li><a href="#dashboard">Dashboard</a></li>
+          <li><a href="#import">Import</a></li>
+          <li><a href="#clean">Nettoyage</a></li>
+          <li><a href="#analyse">Analyse</a></li>
+          <li><a href="#visualisation">Visualisation</a></li>
+          <li><a href="#graphiques">Graphes &amp; rendus</a></li>
+          <li><a href="#annotation">Annotation (Labelling)</a></li>
+          <li><a href="#export">Export</a></li>
+          <li><a href="#biblio">Bibliothèque</a></li>
+          <li><a href="#workflow">Guide d’utilisation</a></li>
+          <li><a href="#securite">Sécurité</a></li>
+          <li><a href="#contact">Support</a></li>
+        </ol>
+      </aside>
+
+      <!-- Corps -->
+      <div>
+
+        <!-- INTRO -->
+        <section id="intro" class="doc-section">
+          <h2>1. Introduction</h2>
+          <p>
+            <strong>Quantix</strong> n’est pas une marque, ni une entreprise : c’est un projet né d’un cheminement intellectuel, d’une curiosité et d’une conviction.  
+            J’ai voulu construire un outil à la fois rigoureux et accessible ; une passerelle entre le calcul et la compréhension.  
+            Je m’appelle <strong>Thomas Ben Yazza</strong>, étudiant en sciences des données au 
+            <strong><a href="https://louislegrand.fr" target="_blank" rel="noopener noreferrer">lycée Louis-le-Grand</a></strong> 
+            et à l’<strong><a href="https://psl.eu" target="_blank" rel="noopener noreferrer">Université Paris Sciences &amp; Lettres (PSL)</a></strong>.  
+            <em>Quantix</em> est né d’un constat simple : la data science, malgré son potentiel immense, reste trop souvent enfermée derrière des interfaces complexes, des modèles opaques et des outils coûteux.  
+            J’ai voulu faire exactement l’inverse : un environnement clair, qui préserve la beauté de l'algorthmie pure en même temps que la simplicité d'utilisation.  
+
+          <br><br>
+          Si vous êtes ici, c’est peut-être que vous cherchez ce que les grandes plateformes ne proposent plus : la sobriété, la liberté et la maîtrise de vos propres données.  
+          Pas de compte, pas d’abonnement, pas de trace.   
+          Lorsque vous fermez la page, vos fichiers s’effacent : parce que vos données ne nous appartiennent pas, et parce qu’un outil de confiance doit commencer par le respect de la confidentialité.  
+          <strong>Quantix</strong> est conçu dans cet esprit : rigoureux, transparent et humain.
+
+          <br><br>
+          L’application regroupe tout un cycle d’analyse : <em>nettoyage, exploration, visualisation, conversion, traduction, retranscription audio et même de l'annotation</em>.  
+          Elle ne cherche pas à impressionner, mais à accompagner : chaque fonction a été pensée pour simplifier le travail du chercheur, de l’étudiant ou de l’analyste, sans les déposséder de leur raisonnement.  
+          Tout se fait pas à pas, de manière lisible et reproductible, parce que la pédagogie fait partie intégrante de la démarche scientifique.
+
+          <br><br>
+          <strong>Quantix</strong> ne prétend pas rivaliser avec les grands logiciels du marché : Power BI, Tableau, SAS ou RStudio.  
+          Il propose autre chose : une alternative française, sobre, académique et libre.  
+          Un outil pensé pour ceux qui aiment comprendre avant d’automatiser, et qui souhaitent garder la main sur leurs données comme sur leurs idées.  
+          C’est un espace de travail honnête : sans artifice, sans captation, sans superflu.
+
+          <br><br>
+          Le projet doit beaucoup à l’environnement intellectuel dans lequel il est né.  
+          Il s’inscrit dans la tradition d’exigence de <strong>Louis-le-Grand</strong> et de l’<strong>ENS-PSL</strong>, où la science des données se nourrit autant de rigueur mathématique que de sens critique.  
+          Je tiens à remercier tout particulièrement <strong>Valentin Thouzeau</strong> et <strong>Zoey Zhong</strong>, professeurs-chercheurs à l’École normale supérieure et à Louis-le-Grand, dont les conseils et la bienveillance ont largement orienté la réflexion et la structure de ce travail.
+
+          <br><br>
+          <em>Quantix</em> est, au fond, un projet artisanal au service d’une idée simple : redonner à la donnée sa clarté, à la technique sa transparence, et à l’analyse sa part d’intelligence humaine.  
+          C’est une manière de dire que la science des données n’a pas besoin d’être ésotérique pour être puissante, ni distante pour être fiable.  
+          Elle peut être proche, lisible, et, surtout, à la portée de tous.
+        </p>
+
+
+        </section>
+
+        <!-- DASHBOARD -->
+        <section id="dashboard" class="doc-section">
+          <h2>2. Dashboard</h2>
+          <p>
+            Le Dashboard est l’interface la plus directe pour travailler sur un <strong>dataset</strong> : import → aperçu → nettoyage → export.
+            L’idée est simple : tu charges un fichier, tu vois immédiatement ce qu’il contient, puis tu appliques des opérations en gardant la main.
+          </p>
+
+          <div class="card">
+            <h3>Ce que tu peux faire ici (concret)</h3>
+            <ul>
+              <li><strong>Importer</strong> un fichier (CSV / Excel / JSON / TXT) et obtenir un aperçu.</li>
+              <li><strong>Nettoyer</strong> : doublons, lignes/colonnes vides, normalisation de noms, valeurs manquantes (moyenne/médiane/mode), conversion de colonnes en numérique…</li>
+              <li><strong>Rechercher et filtrer</strong> dans l’aperçu (utile pour vérifier rapidement une hypothèse ou un cas bizarre).</li>
+              <li><strong>Voir des statistiques descriptives</strong> (moyenne, médiane, quantiles, min/max, écart-type, manquants) via le bouton <em>Stats descriptives</em>.</li>
+              <li><strong>Exporter</strong> un fichier nettoyé après exécution des opérations.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3>Le déroulé typique (2 minutes)</h3>
+            <div class="step"><div class="num">1</div><div><strong>Importer</strong> ton fichier (zone d’upload à gauche).</div></div>
+            <div class="step"><div class="num">2</div><div><strong>Regarder l’aperçu</strong> et utiliser la recherche/les filtres si besoin.</div></div>
+            <div class="step"><div class="num">3</div><div><strong>Cliquer sur “Stats descriptives”</strong> pour un premier diagnostic (manquants + distribution rapide).</div></div>
+            <div class="step"><div class="num">4</div><div><strong>Cocher des opérations</strong> (doublons, manquants, normalisation…) puis <strong>Exécuter</strong>.</div></div>
+            <div class="step"><div class="num">5</div><div><strong>Télécharger</strong> le résultat (un nouveau fichier est généré).</div></div>
+          </div>
+
+          <p class="doc-note">
+            Note : le Dashboard travaille sur le <strong>dataset en session</strong>. Par conception, l’application évite de conserver des données entre pages.
+          </p>
+
+          <figure class="doc-shot">
+            <img
+              src="/static/docs_screenshots/dashboard_import.png"
+              alt="Dashboard Quantix : zone d'import et actions principales"
+              loading="lazy"
+              onload="this.closest('.doc-shot').classList.add('is-loaded')"
+              onerror="this.closest('.doc-shot').classList.add('is-missing')"
+            />
+            <div class="doc-shot__missing">
+              Capture à ajouter : <strong>Dashboard</strong> (import + boutons principaux).<br />
+              Placez l’image dans <code>static/docs_screenshots/dashboard_import.png</code>.
+            </div>
+            <figcaption>
+              Repères : l’import se fait via le dashboard, puis les onglets/sections permettent d’accéder au nettoyage, à l’analyse et aux visualisations.
+            </figcaption>
+          </figure>
+
+          <div class="function-grid">
+            <div class="card"><h3><i class="fa-solid fa-file-import"></i> Import</h3><p>Ajoutez vos fichiers CSV, Excel, JSON ou texte.</p></div>
+            <div class="card"><h3><i class="fa-solid fa-broom"></i> Nettoyage</h3><p>Supprimez doublons, normalisez, gérez les valeurs manquantes.</p></div>
+            <div class="card"><h3><i class="fa-solid fa-chart-bar"></i> Analyse</h3><p>Stats descriptives (moyenne/médiane/quantiles), filtres/recherche, export.</p></div>
+            <div class="card"><h3><i class="fa-solid fa-highlighter"></i> Annotation</h3><p>Surlignez et étiquetez des extraits via l’outil Labelling.</p></div>
+          </div>
+
+          <p class="doc-note">
+            Les captures d’écran affichées par cette page sont prises depuis l’UI et déposées dans <code>static/docs_screenshots/</code>.
+            (Optionnel) Un script de capture automatique est disponible : <code>capture_docs_screenshots.py</code>.
+          </p>
+        </section>
+
+       <!-- IMPORT -->
+        <section id="import" class="doc-section">
+          <h2>3. Import</h2>
+
+          <p>
+            L’importation est la première étape de votre analyse sur <strong>Quantix</strong>.  
+            Déposez simplement votre fichier dans la zone ci-dessous ou cliquez pour le sélectionner depuis votre ordinateur.  
+            <br>Formats supportés pour le nettoyage et l'analyse: <strong>CSV</strong>, <strong>Excel</strong>, <strong>JSON</strong>, <strong>TXT</strong>.
+            Pour les documents (PDF/images) et l’audio, les fonctionnalités évoluent encore.
+            <br> 
+            Limitation actuelle : lors de la traduction de documents, <em>les formules et les images ne sont pas encore préservées de façon fiable</em>.
+          </p>
+
+            <div class="card">
+              <h3>Où importer “pour de vrai” ?</h3>
+              <p class="doc-note">
+                La zone d’import ci-dessous sert surtout de <strong>repère visuel</strong> dans la documentation.
+                Pour lancer un traitement (nettoyage, stats, plots…), utilise plutôt :
+                <strong><a href="/dashboard">/dashboard</a></strong> (nettoyage + export) ou <strong><a href="/lab">/lab</a></strong> (analyse + visualisation).
+              </p>
+            </div>
+
+            <div class="card">
+              <h3>Pourquoi le format importe</h3>
+              <ul>
+                <li><strong>CSV</strong> : simple, léger, universel. Parfait pour commencer.</li>
+                <li><strong>Excel</strong> : pratique si le fichier contient plusieurs feuilles, ou si l’équipe travaille déjà dans Excel.</li>
+                <li><strong>JSON</strong> : utile pour des exports d’API (mais peut être irrégulier selon la structure).</li>
+                <li><strong>TXT/TSV</strong> : utile quand les colonnes sont séparées par des tabulations.</li>
+              </ul>
+              <p class="doc-note">
+                Astuce : si un CSV “a l’air cassé” (colonnes décalées), c’est souvent un problème de séparateur (virgule/point-virgule) ou d’encodage.
+              </p>
+            </div>
+
+          <div class="import-container">
+            <div class="drop-zone" id="dropTarget">
+              <i class="fa-solid fa-cloud-upload-alt"></i>
+              <h3>Glissez et déposez votre fichier ici</h3>
+              <p>ou cliquez pour sélectionner un fichier</p>
+              <input type="file" id="fileInput" style="display:none;">
+            </div>
+
+            <!-- Animation -->
+            <div class="file-float">
+              <div class="file-icon"></div>
+            </div>
+          </div>
+        </section>
+
+<style>
+  .import-container {
+    position: relative;
+    margin: 2rem auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .drop-zone {
+    position: relative;
+    border: 2.5px dashed var(--primary);
+    border-radius: 16px;
+    background: rgba(29,162,255,0.04);
+    text-align: center;
+    padding: 2rem 3rem;
+    width: 450px;
+    height: 200px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+  }
+
+  .drop-zone:hover {
+    background: rgba(29,162,255,0.08);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .drop-zone i {
+    font-size: 3rem;
+    color: var(--primary);
+    margin-bottom: 0.6rem;
+  }
+
+  .file-float {
+    position: absolute;
+    top: -130px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .file-icon {
+    width: 60px;
+    height: 80px;
+    background: linear-gradient(145deg, var(--primary), #82c8ff);
+    border-radius: 6px;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    position: relative;
+    animation: glideDown 4.5s ease-in-out infinite;
+  }
+
+  .file-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-top: 25px solid #fff;
+    border-left: 25px solid transparent;
+    border-radius: 2px;
+  }
+
+  @keyframes glideDown {
+    0% {
+      transform: translate(-50px, -50px) rotate(-6deg);
+      opacity: 0;
+      box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+    }
+    20% {
+      opacity: 1;
+    }
+    40% {
+      transform: translate(40px, 60px) rotate(4deg);
+      box-shadow: 0 15px 25px rgba(0,0,0,0.15);
+    }
+    60% {
+      transform: translate(-20px, 130px) rotate(-2deg);
+      box-shadow: 0 25px 30px rgba(0,0,0,0.25);
+    }
+    80% {
+      transform: translate(0px, 190px) rotate(0deg);
+      box-shadow: 0 30px 35px rgba(0,0,0,0.3);
+    }
+    100% {
+      transform: translate(0px, -50px) rotate(-5deg);
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .drop-zone {
+      width: 90%;
+      height: 180px;
+    }
+  }
+</style>
+
+<script>
+  const dropZone = document.getElementById("dropTarget");
+  const fileInput = document.getElementById("fileInput");
+
+  dropZone.addEventListener("click", () => fileInput.click());
+  dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.style.background = "rgba(29,162,255,0.12)";
+  });
+  dropZone.addEventListener("dragleave", () => {
+    dropZone.style.background = "rgba(29,162,255,0.04)";
+  });
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      dropZone.innerHTML = `<i class="fa-solid fa-circle-check" style="color:var(--primary)"></i>
+      <h3>${file.name}</h3>
+      <p>Fichier importé avec succès</p>`;
+    }
+  });
+</script>
+
+
+        <!-- NETTOYAGE -->
+        <section id="clean" class="doc-section">
+          <h2>4. Nettoyage</h2>
+          <p>
+            Le nettoyage sert à rendre le dataset <strong>cohérent</strong> avant l’analyse : mêmes types, mêmes conventions, moins de bruit.
+            On ne “corrige” pas tout au hasard : on fait des choix justifiables.
+          </p>
+
+          <div class="card">
+            <h3>Ordre recommandé (simple et efficace)</h3>
+            <div class="step"><div class="num">1</div><div><strong>Doublons</strong> : commencer par supprimer les lignes strictement identiques.</div></div>
+            <div class="step"><div class="num">2</div><div><strong>Noms de colonnes</strong> : normaliser (espaces → underscore) pour éviter les erreurs plus tard.</div></div>
+            <div class="step"><div class="num">3</div><div><strong>Types</strong> : convertir ce qui doit être numérique (sinon stats/plots faussés).</div></div>
+            <div class="step"><div class="num">4</div><div><strong>Valeurs manquantes</strong> : choisir une stratégie (supprimer vs remplir).</div></div>
+            <div class="step"><div class="num">5</div><div><strong>Valeurs aberrantes</strong> : à traiter si elles cassent les moyennes / échelles.</div></div>
+          </div>
+
+          <div class="card">
+            <h3>Pourquoi “médiane” plutôt que “moyenne” (souvent)</h3>
+            <p class="doc-note">
+              La moyenne est très sensible aux outliers. Si une colonne a quelques valeurs extrêmes (ex : 1, 2, 2, 3, 1 000 000),
+              la moyenne ne représente plus une “valeur typique”. La médiane reste stable.
+            </p>
+          </div>
+
+          <div class="doc-split">
+            <div>
+              <div class="card">
+                <h3>Exemple : repérer les valeurs manquantes</h3>
+                <p class="doc-note">
+                  Dans <a href="/lab">/lab</a> (Plot Studio), le rendu <em>Valeurs manquantes</em> aide à voir rapidement quelles colonnes posent problème.
+                </p>
+              </div>
+            </div>
+
+            <div class="doc-embed">
+              <div class="doc-embed__head">
+                <p class="doc-embed__title">Rendu — valeurs manquantes (démo)</p>
+                <a class="doc-embed__link" href="/static/demo_plots/15_missing_values.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="doc-embed__frame" loading="lazy" src="/static/demo_plots/15_missing_values.html" title="Valeurs manquantes"></iframe>
+            </div>
+          </div>
+        </section>
+
+        <!-- ANALYSE -->
+        <section id="analyse" class="doc-section">
+          <h2>5. Analyse</h2>
+          <p>
+            L’analyse, dans Quantix, est volontairement <strong>pragmatique</strong> : on commence par des indicateurs simples, lisibles, puis on passe à des vues (corrélations, distributions) quand ça aide.
+          </p>
+
+          <div class="card">
+            <h3>Statistiques descriptives (la base qui sert vraiment)</h3>
+            <p class="doc-note">
+              Sur un dataset numérique, tu peux obtenir rapidement : <strong>moyenne</strong>, <strong>médiane</strong>, <strong>Q1/Q3</strong>, <strong>min/max</strong>, <strong>écart-type</strong> et le nombre de <strong>valeurs manquantes</strong>.
+            </p>
+            <ul>
+              <li><strong>Dans le Dashboard</strong> : bouton <em>Stats descriptives</em> (affiche un tableau par colonne numérique).</li>
+              <li><strong>Dans le Lab</strong> : outil <em>Statistiques descriptives</em> (retourne aussi un <code>describe</code> complet et une heatmap de corrélation pour les colonnes numériques).</li>
+            </ul>
+            <p class="doc-note">
+              Pourquoi c’est utile : en 30 secondes tu repères les colonnes “bizarres” (trop de manquants, échelle énorme, min/max incohérents).
+              Ça évite de faire des plots ou des modèles sur des bases déjà biaisées.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Corrélations : à quoi ça sert (et à quoi ça ne sert pas)</h3>
+            <p class="doc-note">
+              La corrélation sert à repérer des relations <em>linéaires</em> (ou monotones selon la méthode) entre variables numériques.
+              C’est utile pour détecter des variables redondantes, ou des signaux très liés.
+              Ce n’est pas une preuve de causalité.
+            </p>
+          </div>
+
+          <div class="doc-split">
+            <div>
+              <div class="card">
+                <h3>Exemple : analyser les corrélations</h3>
+                <p class="doc-note">
+                  La heatmap de corrélation (Plot Studio) sert à visualiser rapidement les liens (positifs/négatifs) entre métriques.
+                  Si tu vois un bloc très bleu (corrélation proche de 1), ça peut indiquer une redondance.
+                </p>
+              </div>
+            </div>
+
+            <div class="doc-embed">
+              <div class="doc-embed__head">
+                <p class="doc-embed__title">Rendu — corrélations (démo)</p>
+                <a class="doc-embed__link" href="/static/demo_plots/14_corr_heatmap.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="doc-embed__frame" loading="lazy" src="/static/demo_plots/14_corr_heatmap.html" title="Corrélations"></iframe>
+            </div>
+          </div>
+        </section>
+
+        <!-- VISUALISATION -->
+        <section id="visualisation" class="doc-section">
+          <h2>6. Visualisation</h2>
+          <p>Créez rapidement des graphiques pour explorer vos données :</p>
+          <ul>
+            <li>Histogrammes</li>
+            <li>Graphiques en barres et secteurs</li>
+            <li>Courbes temporelles</li>
+          </ul>
+
+          <div class="doc-split">
+            <div>
+              <div class="card">
+                <h3>Exemple : séries temporelles</h3>
+                <p class="doc-note">
+                  Pour des données datées, commencez souvent par une <em>courbe</em> (trend) et une <em>moyenne mobile</em>.
+                </p>
+                <p class="doc-note">
+                  Pourquoi : une série temporelle se comprend d’abord dans le temps. La moyenne mobile aide à distinguer la tendance du bruit.
+                </p>
+              </div>
+
+              <div class="card">
+                <h3>Comment faire (Plot Studio dans /lab)</h3>
+                <div class="step"><div class="num">1</div><div>Importer un dataset dans <strong><a href="/lab">/lab</a></strong>.</div></div>
+                <div class="step"><div class="num">2</div><div>Choisir un type de rendu (courbe, histogramme, heatmap…).</div></div>
+                <div class="step"><div class="num">3</div><div>Sélectionner les colonnes (X/Y, group_by, couleur…).</div></div>
+                <div class="step"><div class="num">4</div><div>Générer le rendu puis l’ouvrir en plein écran si nécessaire.</div></div>
+              </div>
+            </div>
+
+            <div class="doc-embed">
+              <div class="doc-embed__head">
+                <p class="doc-embed__title">Rendu — courbe (démo)</p>
+                <a class="doc-embed__link" href="/static/demo_plots/01_line_sales.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="doc-embed__frame" loading="lazy" src="/static/demo_plots/01_line_sales.html" title="Courbe ventes"></iframe>
+            </div>
+          </div>
+
+          <figure class="doc-shot">
+            <img
+              src="/static/docs_screenshots/lab_plotstudio.png"
+              alt="Plot Studio : sélection du type de graphique et des colonnes"
+              loading="lazy"
+              onload="this.closest('.doc-shot').classList.add('is-loaded')"
+              onerror="this.closest('.doc-shot').classList.add('is-missing')"
+            />
+            <div class="doc-shot__missing">
+              Capture à ajouter : <strong>Plot Studio</strong> (sélecteurs : type de plot, colonnes X/Y, options).<br />
+              Placez l’image dans <code>static/docs_screenshots/lab_plotstudio.png</code>.
+            </div>
+            <figcaption>
+              Ordre typique : choisir un type de rendu → sélectionner les colonnes → générer.
+            </figcaption>
+          </figure>
+        </section>
+
+        <!-- GRAPHES + DEMOS -->
+        <section id="graphiques" class="doc-section">
+          <h2>6bis. Graphes &amp; rendus (démonstration)</h2>
+          <p>
+            Quantix propose deux approches distinctes autour des graphes / visualisations :
+          </p>
+          <ul>
+            <li><strong>Graph Studio</strong> (<a href="/graph">/graph</a>) : construit un <em>graphe</em> (réseau) à partir d’un dataset (corrélation, kNN, edgelist, co-occurrence) et affiche des métriques.</li>
+            <li><strong>Plot Studio</strong> (dans <a href="/lab">/lab</a>) : génère des <em>graphiques Plotly</em> (courbes, distributions, corrélations, séries temporelles, etc.).</li>
+          </ul>
+
+          <div class="card">
+            <h3>Pré-requis (important)</h3>
+            <p class="doc-note">
+              La génération de graphes/plots se fait à partir d’un <strong>dataset chargé en session</strong> (CSV/Excel/JSON/TXT selon la page).
+              Si aucune donnée n’est chargée, l’UI peut afficher des exemples « démo ».
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Dataset de démo + 20 rendus (non vides)</h3>
+            <p class="doc-note">
+              Les rendus ci-dessous sont générés depuis un dataset mensuel (mois + métriques : ventes, coûts, profit, visites, taux de conversion…).
+              Tu peux ouvrir chaque rendu en plein écran.
+            </p>
+            <div class="demo-actions">
+              <a class="btn btn-primary" href="/static/demo_plots/index.html" target="_blank" rel="noopener">Ouvrir la galerie complète</a>
+              <a class="btn btn-ghost" href="/static/demo_plots/demo_monthly_metrics.csv" target="_blank" rel="noopener">Télécharger le CSV de démo</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Note sur la documentation</h3>
+            <p class="doc-note">
+              Pour éviter un "mur" de graphes compressés, des rendus sont intégrés directement dans les sections pertinentes (nettoyage, analyse, visualisation).
+              La galerie complète reste accessible ci-dessus.
+            </p>
+          </div>
+
+          <div class="demo-gallery">
+            <div class="demo-card">
+              <div class="demo-card__head">
+                <p class="demo-card__title">Courbe — ventes mensuelles</p>
+                <a class="demo-card__link" href="/static/demo_plots/01_line_sales.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="demo-iframe" loading="lazy" src="/static/demo_plots/01_line_sales.html" title="Courbe ventes"></iframe>
+            </div>
+
+            <div class="demo-card">
+              <div class="demo-card__head">
+                <p class="demo-card__title">Moyenne mobile — ventes</p>
+                <a class="demo-card__link" href="/static/demo_plots/02_rolling_mean_sales.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="demo-iframe" loading="lazy" src="/static/demo_plots/02_rolling_mean_sales.html" title="Rolling mean ventes"></iframe>
+            </div>
+
+            <div class="demo-card">
+              <div class="demo-card__head">
+                <p class="demo-card__title">Scatter + régression — ventes vs visites</p>
+                <a class="demo-card__link" href="/static/demo_plots/03_scatter_sales_visits.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="demo-iframe" loading="lazy" src="/static/demo_plots/03_scatter_sales_visits.html" title="Scatter ventes vs visites"></iframe>
+            </div>
+
+            <div class="demo-card">
+              <div class="demo-card__head">
+                <p class="demo-card__title">Densité 2D — heatmap</p>
+                <a class="demo-card__link" href="/static/demo_plots/04_density2d_heatmap.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="demo-iframe" loading="lazy" src="/static/demo_plots/04_density2d_heatmap.html" title="Densité 2D heatmap"></iframe>
+            </div>
+
+            <div class="demo-card">
+              <div class="demo-card__head">
+                <p class="demo-card__title">Corrélations — heatmap</p>
+                <a class="demo-card__link" href="/static/demo_plots/14_corr_heatmap.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="demo-iframe" loading="lazy" src="/static/demo_plots/14_corr_heatmap.html" title="Heatmap corrélations"></iframe>
+            </div>
+
+            <div class="demo-card">
+              <div class="demo-card__head">
+                <p class="demo-card__title">Valeurs manquantes</p>
+                <a class="demo-card__link" href="/static/demo_plots/15_missing_values.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="demo-iframe" loading="lazy" src="/static/demo_plots/15_missing_values.html" title="Valeurs manquantes"></iframe>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Comment utiliser (cas typiques)</h3>
+            <ul>
+              <li><strong>Explorer un dataset</strong> : charge un fichier dans <a href="/dashboard">/dashboard</a>, puis utilise <a href="/lab">/lab</a> pour générer des plots (distributions, corrélations, séries temporelles).</li>
+              <li><strong>Construire un réseau</strong> : charge un dataset (avec colonnes numériques ou source/target) puis va sur <a href="/graph">/graph</a> → choisis un type (corrélation/kNN/edgelist/co-occurrence) → “Générer”.</li>
+              <li><strong>Exporter</strong> : selon l’outil, tu peux récupérer un JSON de graphe (Graph Studio) ou exporter des rendus/plots (Plot Studio / Lab).</li>
+            </ul>
+            <p class="doc-note">
+              Astuce : pour <em>co-occurrence</em>, il faut une colonne texte (Quantix choisit une colonne texte automatiquement si possible, sinon tu dois la préciser).
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Visualisations supplémentaires (fiables) — démo</h3>
+            <p class="doc-note">
+              Ces rendus valident des visus additionnelles à partir de deux CSV de test : un dataset <em>numérique</em> et un dataset <em>texte</em>.
+            </p>
+            <div class="demo-actions">
+              <a class="btn btn-ghost" href="/static/demo_plots_extra/demo_numeric_for_plots.csv" target="_blank" rel="noopener">CSV numérique (test)</a>
+              <a class="btn btn-ghost" href="/static/demo_plots_extra/demo_text_for_plots.csv" target="_blank" rel="noopener">CSV texte (test)</a>
+            </div>
+          </div>
+
+          <div class="demo-gallery">
+            <div class="demo-card">
+              <div class="demo-card__head">
+                <p class="demo-card__title">Aires empilées — ventes par région</p>
+                <a class="demo-card__link" href="/static/demo_plots_extra/01_stacked_area_sales.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="demo-iframe" loading="lazy" src="/static/demo_plots_extra/01_stacked_area_sales.html" title="Aires empilées"></iframe>
+            </div>
+
+            <div class="demo-card">
+              <div class="demo-card__head">
+                <p class="demo-card__title">Heatmap pivot — profit (mois × région)</p>
+                <a class="demo-card__link" href="/static/demo_plots_extra/04_heatmap_profit.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="demo-iframe" loading="lazy" src="/static/demo_plots_extra/04_heatmap_profit.html" title="Heatmap pivot"></iframe>
+            </div>
+
+            <div class="demo-card">
+              <div class="demo-card__head">
+                <p class="demo-card__title">Funnel — par étape</p>
+                <a class="demo-card__link" href="/static/demo_plots_extra/05_funnel.html" target="_blank" rel="noopener">Plein écran</a>
+              </div>
+              <iframe class="demo-iframe" loading="lazy" src="/static/demo_plots_extra/05_funnel.html" title="Funnel"></iframe>
+            </div>
+          </div>
+
+          <figure class="doc-shot">
+            <img
+              src="/static/docs_screenshots/graph_studio.png"
+              alt="Graph Studio : choix du type de graphe et génération"
+              loading="lazy"
+              onload="this.closest('.doc-shot').classList.add('is-loaded')"
+              onerror="this.closest('.doc-shot').classList.add('is-missing')"
+            />
+            <div class="doc-shot__missing">
+              Capture à ajouter : <strong>Graph Studio</strong> (choix corrélation/kNN/edgelist/co-occurrence + bouton “Générer”).<br />
+              Placez l’image dans <code>static/docs_screenshots/graph_studio.png</code>.
+            </div>
+            <figcaption>
+              Graph Studio construit un réseau (nœuds/arêtes) depuis le dataset ; Plot Studio produit des graphiques (courbes, heatmaps...).
+            </figcaption>
+          </figure>
+        </section>
+
+        <!-- ANNOTATION -->
+        <section id="annotation" class="doc-section">
+          <h2>7. Annotation (Labelling)</h2>
+          <p>
+            L’outil <strong>Labelling</strong> permet d’annoter un document en surlignant des passages et en leur associant des marqueurs.
+          </p>
+          <ul>
+            <li>Création/gestion de marqueurs (par document)</li>
+            <li>Surlignage d’extraits avec un marqueur et une couleur</li>
+            <li>Ajout de commentaires sur une sélection</li>
+            <li>Export d’une vue CSV des annotations</li>
+          </ul>
+
+          <figure class="doc-shot">
+            <img
+              src="/static/docs_screenshots/labelling_markers.png"
+              alt="Labelling : création de marqueurs et annotation d'extraits"
+              loading="lazy"
+              onload="this.closest('.doc-shot').classList.add('is-loaded')"
+              onerror="this.closest('.doc-shot').classList.add('is-missing')"
+            />
+            <div class="doc-shot__missing">
+              Capture à ajouter : <strong>Labelling</strong> (liste des marqueurs + bouton d’ajout + annotation sur texte).<br />
+              Placez l’image dans <code>static/docs_screenshots/labelling_markers.png</code>.
+            </div>
+            <figcaption>
+              Les marqueurs sont isolés par document : un nouveau document ne réutilise pas les marqueurs du précédent.
+            </figcaption>
+          </figure>
+
+          <div class="card">
+            <h3>Comment annoter (pas à pas)</h3>
+            <div class="step"><div class="num">1</div><div>Importer un document dans <strong>Labelling</strong>.</div></div>
+            <div class="step"><div class="num">2</div><div>Créer un ou plusieurs <strong>marqueurs</strong> (nom + couleur).</div></div>
+            <div class="step"><div class="num">3</div><div>Sélectionner un passage dans le texte, puis appliquer un marqueur.</div></div>
+            <div class="step"><div class="num">4</div><div>(Optionnel) Ajouter un commentaire pour expliquer le contexte.</div></div>
+            <div class="step"><div class="num">5</div><div>Exporter les annotations si besoin (CSV).</div></div>
+          </div>
+
+          <div class="card">
+            <h3>Pourquoi isoler les marqueurs par document</h3>
+            <p class="doc-note">
+              Quand on passe d’un document à un autre, on évite les “fuites” d’étiquettes : les marqueurs restent liés au document courant.
+              C’est plus sûr et ça évite de mélanger des schémas d’annotation.
+            </p>
+          </div>
+        </section>
+
+        <!-- EXPORT -->
+        <section id="export" class="doc-section">
+          <h2>8. Export</h2>
+          <p>
+            L’export sert à récupérer un résultat <strong>réutilisable</strong> : un fichier nettoyé, un rendu, ou un rapport.
+          </p>
+
+          <div class="card">
+            <h3>Exporter un dataset nettoyé</h3>
+            <p class="doc-note">
+              Dans le <strong>Dashboard</strong>, après exécution des opérations, un bouton <em>Télécharger</em> apparaît dans la fenêtre de résultats.
+              Le fichier est généré dans le dossier d’uploads de l’application et servi via un lien.
+            </p>
+          </div>
+
+          <div class="card">
+            <h3>Exporter un rendu de plot</h3>
+            <p class="doc-note">
+              Dans le <strong>Lab</strong>, certains rendus peuvent être exportés en <strong>PDF</strong> (fonction “export plot → PDF”).
+              Si tu as besoin d’un autre format (image), tu peux ensuite convertir le fichier via l’outil de conversion (ex : PNG ↔ JPG).
+            </p>
+          </div>
+        </section>
+
+        <!-- BIBLIO -->
+        <section id="biblio" class="doc-section">
+          <h2>9. Bibliothèque</h2>
+          <p>
+            La bibliothèque intégrée propose des cours de mathématiques et statistiques (démonstrations, exercices, applications).
+          </p>
+          <a href="/biblio" class="btn btn-ghost"><i class="fa-solid fa-book"></i> Accéder à la bibliothèque</a>
+        </section>
+
+        <!-- WORKFLOW -->
+        <section id="workflow" class="doc-section">
+          <h2>10. Guide d’utilisation</h2>
+          <p class="doc-note">
+            Voici un parcours “qui marche” dans la plupart des cas. Le but n’est pas de tout faire : c’est d’éviter les erreurs classiques.
+          </p>
+
+          <div class="step"><div class="num">1</div><div><h4>Ouvrir le Dashboard</h4><p><strong>Pourquoi</strong> : c’est l’endroit le plus rapide pour voir l’état du dataset et faire un premier nettoyage.</p></div></div>
+          <div class="step"><div class="num">2</div><div><h4>Importer vos données</h4><p><strong>Pourquoi</strong> : sans import, pas de session dataset et donc pas d’analyse exploitable.</p></div></div>
+          <div class="step"><div class="num">3</div><div><h4>Faire un diagnostic rapide</h4><p><strong>Comment</strong> : regarder l’aperçu + ouvrir <em>Stats descriptives</em> (moyenne/médiane/quantiles/manquants). <strong>Pourquoi</strong> : repérer vite les colonnes problématiques.</p></div></div>
+          <div class="step"><div class="num">4</div><div><h4>Nettoyer (avec intention)</h4><p><strong>Comment</strong> : doublons → types → manquants. <strong>Pourquoi</strong> : un nettoyage au hasard crée parfois plus de dégâts qu’il n’en répare.</p></div></div>
+          <div class="step"><div class="num">5</div><div><h4>Passer au Lab pour explorer</h4><p><strong>Comment</strong> : dans <a href="/lab">/lab</a>, générer des distributions (histogrammes/boxplots) et une corrélation si c’est pertinent. <strong>Pourquoi</strong> : les plots montrent des choses que des tableaux ne montrent pas.</p></div></div>
+          <div class="step"><div class="num">6</div><div><h4>Exporter</h4><p><strong>Pourquoi</strong> : garder une version propre et reproductible (dataset nettoyé, rendu PDF…).</p></div></div>
+        </section>
+
+        <!-- SÉCURITÉ -->
+        <section id="securite" class="doc-section">
+          <h2>11. Sécurité</h2>
+          <p>
+            Quantix est conçu pour limiter la persistance des données.
+            En pratique, l’application travaille avec des fichiers stockés <strong>temporairement</strong> dans le dossier d’uploads pendant la session.
+          </p>
+
+          <div class="card">
+            <h3>Ce que ça implique (simplement)</h3>
+            <ul>
+              <li><strong>Traitement local</strong> : tu utilises ton instance Quantix (pas besoin de compte).</li>
+              <li><strong>Stockage temporaire</strong> : les fichiers restent disponibles le temps de travailler, puis sont purgés lors de certaines navigations/fin de session.</li>
+              <li><strong>Bon réflexe</strong> : après export, garde une copie locale et considère la session comme “jetable”.</li>
+            </ul>
+          </div>
+          <a href="/confidentialite">Lire la politique de confidentialité</a>
+        </section>
+
+        <!-- CONTACT -->
+        <section id="contact" class="doc-section">
+          <h2>12. Support</h2>
+          <p>Besoin d’aide ? Contactez-nous :</p>
+          <ul>
+            <li><a href="/contact">Page de contact</a></li>
+            <li><a href="/apropos">À propos du projet</a></li>
+          </ul>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script>
+    if (typeof initDocsPage === 'function') {
+      initDocsPage();
+    }
+
+    // Effet typewriter pour le titre
+    function typeWriter(element, text, speed, callback) {
+      let i = 0;
+      element.textContent = '';
+      element.style.opacity = '1';
+      
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else if (callback) {
+          setTimeout(callback, 300);
+        }
+      }
+      type();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const title = document.getElementById('main-title');
+      if (title) {
+        typeWriter(title, 'Documentation Quantix', 80);
+      }
+    });
+  </script>
+
+  {% include 'footer.html' %}
+</body>
+</html>

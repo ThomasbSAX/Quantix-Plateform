@@ -1,0 +1,399 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Polynômes de Laguerre : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Polynômes de Laguerre : Une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les polynômes de Laguerre, nommés en l’honneur du physicien français
+Edmond Laguerre (1834-1886), occupent une place centrale dans de
+nombreuses branches des mathématiques et de la physique. Leur origine
+remonte à la fin du XIXe siècle, où ils furent introduits pour résoudre
+des problèmes de physique mathématique, notamment en optique et en
+mécanique quantique. Ces polynômes orthogonaux apparaissent
+naturellement dans la résolution de l’équation différentielle de
+Laguerre, qui est une forme particulière de l’équation
+hypergéométrique.</p>
+<p>Les polynômes de Laguerre sont indissociables des fonctions
+spéciales, un domaine des mathématiques qui étudie les solutions
+particulières d’équations différentielles linéaires. Leur importance
+réside dans leur capacité à fournir des bases pour des espaces de
+fonctions, ce qui les rend indispensables en analyse numérique et en
+théorie des probabilités. De plus, leur propriété d’orthogonalité en
+fait des outils puissants pour l’approximation de fonctions et la
+résolution de problèmes aux limites.</p>
+<p>Dans ce chapitre, nous explorerons les polynômes de Laguerre sous
+différents angles : leur définition formelle, leurs propriétés
+fondamentales, et leurs applications dans divers domaines des
+mathématiques et de la physique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire les polynômes de Laguerre, commençons par comprendre
+ce que nous cherchons à obtenir. Imaginons que nous voulions trouver une
+famille de polynômes orthogonaux sur l’intervalle <span
+class="math inline">\([0, \infty)\)</span> par rapport à la mesure <span
+class="math inline">\(e^{-x} dx\)</span>. Ces polynômes doivent
+satisfaire certaines conditions de normalisation et d’orthogonalité.
+Après avoir exploré ces propriétés, nous pouvons formuler la définition
+des polynômes de Laguerre.</p>
+<h2 id="définition-des-polynômes-de-laguerre">Définition des Polynômes
+de Laguerre</h2>
+<p>Les polynômes de Laguerre <span class="math inline">\(L_n(x)\)</span>
+sont définis par la relation de récurrence suivante :</p>
+<p><span class="math display">\[L_0(x) = 1, \quad L_1(x) = 1 -
+x\]</span></p>
+<p>et pour <span class="math inline">\(n \geq 2\)</span>,</p>
+<p><span class="math display">\[(n+1)L_{n+1}(x) = (2n + 1 - x)L_n(x) - n
+L_{n-1}(x).\]</span></p>
+<p>Une autre formulation des polynômes de Laguerre est donnée par la
+série génératrice :</p>
+<p><span class="math display">\[\sum_{n=0}^{\infty} L_n(x) t^n =
+\frac{1}{1-t} e^{-\frac{xt}{1-t}}.\]</span></p>
+<p>Enfin, les polynômes de Laguerre peuvent également être définis par
+l’intégrale :</p>
+<p><span class="math display">\[L_n(x) = \frac{1}{n!} e^x
+\frac{d^n}{dx^n} (x^n e^{-x}).\]</span></p>
+<h2 id="polynômes-de-laguerre-généralisés">Polynômes de Laguerre
+Généralisés</h2>
+<p>Les polynômes de Laguerre généralisés <span
+class="math inline">\(L_n^{(\alpha)}(x)\)</span> sont une extension des
+polynômes de Laguerre classiques. Ils sont définis par la relation de
+récurrence :</p>
+<p><span class="math display">\[L_0^{(\alpha)}(x) = 1, \quad
+L_1^{(\alpha)}(x) = 1 + \frac{x}{\alpha+1} - x\]</span></p>
+<p>et pour <span class="math inline">\(n \geq 2\)</span>,</p>
+<p><span class="math display">\[(n+1)L_{n+1}^{(\alpha)}(x) = (2n +
+\alpha + 1 - x)L_n^{(\alpha)}(x) - (n + \alpha)
+L_{n-1}^{(\alpha)}(x).\]</span></p>
+<p>Une autre formulation des polynômes de Laguerre généralisés est
+donnée par la série génératrice :</p>
+<p><span class="math display">\[\sum_{n=0}^{\infty} L_n^{(\alpha)}(x)
+t^n = \frac{1}{(1-t)^{\alpha+1}} e^{-\frac{xt}{1-t}}.\]</span></p>
+<p>Enfin, les polynômes de Laguerre généralisés peuvent également être
+définis par l’intégrale :</p>
+<p><span class="math display">\[L_n^{(\alpha)}(x) = \frac{1}{n!}
+x^{-\alpha} e^x \frac{d^n}{dx^n} (x^{n+\alpha} e^{-x}).\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons quelques théorèmes fondamentaux
+concernant les polynômes de Laguerre. Ces théorèmes illustrent leurs
+propriétés d’orthogonalité, leur relation avec les équations
+différentielles, et leurs applications en analyse.</p>
+<h2 id="orthogonalité-des-polynômes-de-laguerre">Orthogonalité des
+Polynômes de Laguerre</h2>
+<div class="theorem">
+<p>Les polynômes de Laguerre <span class="math inline">\(L_n(x)\)</span>
+sont orthogonaux sur l’intervalle <span class="math inline">\([0,
+\infty)\)</span> par rapport à la mesure <span
+class="math inline">\(e^{-x} dx\)</span>. Plus précisément,</p>
+<p><span class="math display">\[\int_{0}^{\infty} L_n(x) L_m(x) e^{-x}
+dx = \delta_{nm},\]</span></p>
+<p>où <span class="math inline">\(\delta_{nm}\)</span> est le symbole de
+Kronecker.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer cette propriété, nous utilisons la
+relation de récurrence et les propriétés des polynômes orthogonaux. En
+particulier, nous montrons que les polynômes <span
+class="math inline">\(L_n(x)\)</span> satisfont une équation
+différentielle qui garantit leur orthogonalité. ◻</p>
+</div>
+<h2 id="équation-différentielle-de-laguerre">Équation Différentielle de
+Laguerre</h2>
+<div class="theorem">
+<p>Les polynômes de Laguerre <span class="math inline">\(L_n(x)\)</span>
+satisfont l’équation différentielle :</p>
+<p><span class="math display">\[x \frac{d^2 y}{dx^2} + (1 - x)
+\frac{dy}{dx} + n y = 0.\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Nous commençons par supposer que <span
+class="math inline">\(y(x) = L_n(x)\)</span> et nous substituons cette
+expression dans l’équation différentielle. En utilisant les relations de
+récurrence et les propriétés des dérivées, nous montrons que l’équation
+est satisfaite. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Dans cette section, nous fournissons des preuves détaillées pour les
+théorèmes présentés dans la section précédente. Ces preuves illustrent
+l’importance des polynômes de Laguerre et leur relation avec d’autres
+concepts mathématiques.</p>
+<h2 id="preuve-de-lorthogonalité">Preuve de l’Orthogonalité</h2>
+<p>Pour démontrer l’orthogonalité des polynômes de Laguerre, nous
+utilisons la relation de récurrence et les propriétés des polynômes
+orthogonaux. En particulier, nous montrons que les polynômes <span
+class="math inline">\(L_n(x)\)</span> satisfont une équation
+différentielle qui garantit leur orthogonalité.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons l’équation différentielle satisfaisante
+par les polynômes de Laguerre :</p>
+<p><span class="math display">\[x \frac{d^2 y}{dx^2} + (1 - x)
+\frac{dy}{dx} + n y = 0.\]</span></p>
+<p>En utilisant les relations de récurrence, nous pouvons montrer que
+cette équation a une solution polynomiale. De plus, en utilisant la
+théorie des équations différentielles linéaires, nous pouvons démontrer
+que les solutions sont orthogonales par rapport à la mesure <span
+class="math inline">\(e^{-x} dx\)</span>. ◻</p>
+</div>
+<h2 id="preuve-de-léquation-différentielle">Preuve de l’Équation
+Différentielle</h2>
+<p>Pour démontrer que les polynômes de Laguerre satisfont l’équation
+différentielle de Laguerre, nous utilisons la définition des polynômes
+et leurs propriétés.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons <span class="math inline">\(y(x) =
+L_n(x)\)</span>. En utilisant la relation de récurrence, nous pouvons
+exprimer les dérivées premières et secondes de <span
+class="math inline">\(y(x)\)</span> en termes des polynômes de Laguerre.
+En substituant ces expressions dans l’équation différentielle, nous
+obtenons une identité qui est satisfaite pour tout <span
+class="math inline">\(x \geq 0\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Dans cette section, nous présentons quelques propriétés et
+corollaires des polynômes de Laguerre. Ces résultats illustrent leur
+richesse mathématique et leurs applications dans divers domaines.</p>
+<h2 id="propriétés-des-polynômes-de-laguerre">Propriétés des Polynômes
+de Laguerre</h2>
+<ol>
+<li><p>Les polynômes de Laguerre <span
+class="math inline">\(L_n(x)\)</span> sont des solutions polynomiales de
+l’équation différentielle de Laguerre.</p></li>
+<li><p>Les polynômes de Laguerre <span
+class="math inline">\(L_n(x)\)</span> sont orthogonaux sur l’intervalle
+<span class="math inline">\([0, \infty)\)</span> par rapport à la mesure
+<span class="math inline">\(e^{-x} dx\)</span>.</p></li>
+<li><p>Les polynômes de Laguerre généralisés <span
+class="math inline">\(L_n^{(\alpha)}(x)\)</span> sont des solutions
+polynomiales de l’équation différentielle généralisée de
+Laguerre.</p></li>
+</ol>
+<h2 id="corollaires-des-polynômes-de-laguerre">Corollaires des Polynômes
+de Laguerre</h2>
+<div class="corollary">
+<p>Les polynômes de Laguerre <span class="math inline">\(L_n(x)\)</span>
+satisfont la relation de récurrence :</p>
+<p><span class="math display">\[(n+1)L_{n+1}(x) = (2n + 1 - x)L_n(x) - n
+L_{n-1}(x).\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cette relation de récurrence peut être démontrée en
+utilisant la définition des polynômes de Laguerre et leurs
+propriétés. ◻</p>
+</div>
+<div class="corollary">
+<p>Les polynômes de Laguerre <span class="math inline">\(L_n(x)\)</span>
+satisfont la série génératrice :</p>
+<p><span class="math display">\[\sum_{n=0}^{\infty} L_n(x) t^n =
+\frac{1}{1-t} e^{-\frac{xt}{1-t}}.\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cette série génératrice peut être démontrée en
+utilisant la définition des polynômes de Laguerre et leurs
+propriétés. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les polynômes de Laguerre sont des outils mathématiques puissants
+avec une riche histoire et de nombreuses applications. Leur étude nous
+permet de mieux comprendre les fonctions spéciales, l’analyse numérique,
+et la physique mathématique. Dans cet article, nous avons exploré leurs
+définitions, leurs propriétés, et leurs applications. Les polynômes de
+Laguerre continuent d’être un sujet de recherche actif, avec de
+nouvelles découvertes et applications émergentes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

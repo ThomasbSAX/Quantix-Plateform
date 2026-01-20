@@ -1,0 +1,302 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Analyse en Composantes Indépendantes : Théorie et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Analyse en Composantes Indépendantes : Théorie et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’Analyse en Composantes Indépendantes (ICA) est une technique
+statistique avancée qui a émergé dans les années 1980 et 1990,
+principalement grâce aux travaux de Herault et Jutten (1986) et Comon
+(1994). Cette méthode vise à décomposer un signal multicomposantes en
+sources indépendantes, une problématique cruciale dans de nombreux
+domaines tels que le traitement du signal, l’imagerie médicale et la
+reconnaissance des formes.</p>
+<p>L’ICA résout un problème fondamental : comment séparer des signaux
+mélangés lorsque les sources sont indépendantes. Contrairement à
+l’Analyse en Composantes Principales (ACP), qui maximise la variance des
+composantes, l’ICA cherche à maximiser leur indépendance. Cette approche
+est indispensable dans des contextes où les données sont le résultat de
+mélanges linéaires de sources indépendantes, comme dans
+l’électroencéphalographie (EEG) ou la télédétection.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’ICA, commençons par définir ce que nous cherchons à
+atteindre. Supposons que nous ayons un vecteur de signaux observés <span
+class="math inline">\(\mathbf{X} = (X_1, X_2, \ldots, X_n)^T\)</span>,
+qui est un mélange linéaire de sources indépendantes <span
+class="math inline">\(\mathbf{S} = (S_1, S_2, \ldots, S_n)^T\)</span>.
+Notre objectif est de retrouver <span
+class="math inline">\(\mathbf{S}\)</span> à partir de <span
+class="math inline">\(\mathbf{X}\)</span>.</p>
+<p>Formellement, le modèle de mélange linéaire instantané est donné par
+: <span class="math display">\[\mathbf{X} =
+\mathbf{A}\mathbf{S}\]</span> où <span
+class="math inline">\(\mathbf{A}\)</span> est une matrice de mélange
+<span class="math inline">\(n \times n\)</span>. L’ICA cherche à estimer
+une matrice de déméliange <span
+class="math inline">\(\mathbf{W}\)</span> telle que : <span
+class="math display">\[\mathbf{Y} = \mathbf{W}\mathbf{X}\]</span> où
+<span class="math inline">\(\mathbf{Y}\)</span> est une estimation des
+sources indépendantes <span
+class="math inline">\(\mathbf{S}\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en ICA est le théorème de décomposition des
+sources indépendantes, qui stipule que sous certaines conditions, les
+composantes indépendantes peuvent être estimées de manière unique (à une
+permutation et à une mise à l’échelle près).</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{X}\)</span> un vecteur
+aléatoire de dimension <span class="math inline">\(n\)</span> tel que
+<span class="math inline">\(\mathbf{X} = \mathbf{A}\mathbf{S}\)</span>,
+où <span class="math inline">\(\mathbf{S}\)</span> est un vecteur de
+sources indépendantes. Si les composantes de <span
+class="math inline">\(\mathbf{S}\)</span> sont non gaussiennes et si la
+matrice <span class="math inline">\(\mathbf{A}\)</span> est inversible,
+alors il existe une matrice <span
+class="math inline">\(\mathbf{W}\)</span> telle que les composantes de
+<span class="math inline">\(\mathbf{Y} = \mathbf{W}\mathbf{X}\)</span>
+sont mutuellement indépendantes.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve de ce théorème repose sur plusieurs étapes clés. Tout
+d’abord, nous devons supposer que les sources <span
+class="math inline">\(\mathbf{S}\)</span> sont indépendantes et non
+gaussiennes. Ensuite, nous utilisons le fait que la fonction de densité
+conjointe des composantes indépendantes est le produit des fonctions de
+densité marginales.</p>
+<p>Pour estimer <span class="math inline">\(\mathbf{W}\)</span>, nous
+maximisons une mesure d’indépendance, telle que l’information mutuelle
+ou des mesures basées sur les moments d’ordre supérieur. La maximisation
+de ces critères conduit à une estimation de <span
+class="math inline">\(\mathbf{W}\)</span> qui rend les composantes de
+<span class="math inline">\(\mathbf{Y}\)</span> indépendantes.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Plusieurs propriétés importantes découlent du théorème de
+décomposition des sources indépendantes :</p>
+<ol>
+<li><p><strong>Unicité</strong> : Les composantes indépendantes sont
+uniques à une permutation et à une mise à l’échelle près. Cela signifie
+que si <span class="math inline">\(\mathbf{W}_1\)</span> et <span
+class="math inline">\(\mathbf{W}_2\)</span> sont deux matrices de
+déméliange, alors <span class="math inline">\(\mathbf{Y}_1 =
+\mathbf{W}_1\mathbf{X}\)</span> et <span
+class="math inline">\(\mathbf{Y}_2 = \mathbf{W}_2\mathbf{X}\)</span>
+seront les mêmes à une permutation et à une mise à l’échelle
+près.</p></li>
+<li><p><strong>Non-gaussianité</strong> : Les sources indépendantes
+doivent être non gaussiennes. Si les sources sont gaussiennes, l’ICA ne
+peut pas les séparer car la distribution gaussienne est fermée sous le
+mélange linéaire.</p></li>
+<li><p><strong>Estimation</strong> : L’estimation de <span
+class="math inline">\(\mathbf{W}\)</span> peut être réalisée en
+utilisant des algorithmes itératifs tels que l’algorithme de FastICA ou
+des méthodes basées sur les gradients.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’Analyse en Composantes Indépendantes est une technique puissante
+pour la séparation de sources indépendantes. Son application va des
+sciences cognitives à l’ingénierie, en passant par la finance et la
+bioinformatique. Bien que les hypothèses de non-gaussianité et
+d’indépendance soient fortes, l’ICA offre des solutions robustes à des
+problèmes complexes de mélange de signaux.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

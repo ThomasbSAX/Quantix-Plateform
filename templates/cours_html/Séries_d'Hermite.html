@@ -1,0 +1,309 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Séries d’Hermite</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Séries d’Hermite</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les séries d’Hermite, nommées en l’honneur du mathématicien français
+Charles Hermite, jouent un rôle fondamental dans de nombreuses branches
+des mathématiques et de la physique. Elles apparaissent naturellement
+dans l’étude des équations différentielles, en mécanique quantique, et
+en théorie des probabilités. Leur importance réside dans leur capacité à
+fournir des solutions orthogonales à certaines équations
+différentielles, ce qui les rend particulièrement utiles dans l’analyse
+de Fourier et la résolution de problèmes aux limites.</p>
+<p>Les séries d’Hermite sont également étroitement liées aux polynômes
+d’Hermite, qui sont une famille de polynômes orthogonaux. Ces polynômes
+apparaissent comme solutions de l’équation différentielle d’Hermite, et
+leur étude est cruciale pour comprendre les propriétés des séries
+d’Hermite.</p>
+<p>Dans cet article, nous explorerons les définitions formelles des
+séries d’Hermite, leurs propriétés fondamentales, et quelques théorèmes
+importants qui les concernent. Nous fournirons également des preuves
+détaillées pour illustrer la rigueur mathématique sous-jacente à ces
+concepts.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire les séries d’Hermite, commençons par comprendre ce
+que nous cherchons à obtenir. Supposons que nous voulions exprimer une
+fonction <span class="math inline">\(f(x)\)</span> comme une somme
+infinie de polynômes orthogonaux. Les séries d’Hermite sont une manière
+de réaliser cette décomposition, en utilisant les polynômes d’Hermite
+comme base.</p>
+<p>Les polynômes d’Hermite <span class="math inline">\(H_n(x)\)</span>
+sont définis par la relation de récurrence suivante : <span
+class="math display">\[H_{n+1}(x) = 2x H_n(x) - 2n H_{n-1}(x)\]</span>
+avec les conditions initiales <span class="math inline">\(H_0(x) =
+1\)</span> et <span class="math inline">\(H_1(x) = 2x\)</span>.</p>
+<p>Une série d’Hermite est alors une expression de la forme : <span
+class="math display">\[f(x) = \sum_{n=0}^{\infty} c_n H_n(x)\]</span> où
+les coefficients <span class="math inline">\(c_n\)</span> sont
+déterminés par l’orthogonalité des polynômes d’Hermite.</p>
+<p>Formellement, les coefficients <span
+class="math inline">\(c_n\)</span> sont donnés par : <span
+class="math display">\[c_n = \frac{1}{2^n n! \sqrt{\pi}}
+\int_{-\infty}^{\infty} f(x) H_n(x) e^{-x^2} \, dx\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant les séries d’Hermite est le
+théorème de convergence, qui stipule que sous certaines conditions sur
+la fonction <span class="math inline">\(f(x)\)</span>, la série
+d’Hermite converge vers <span class="math inline">\(f(x)\)</span>.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f(x)\)</span> une fonction
+intégrable sur <span class="math inline">\(\mathbb{R}\)</span> telle que
+: <span class="math display">\[\int_{-\infty}^{\infty} |f(x)|^2 e^{-x^2}
+\, dx &lt; \infty\]</span> Alors la série d’Hermite : <span
+class="math display">\[\sum_{n=0}^{\infty} c_n H_n(x)\]</span> converge
+vers <span class="math inline">\(f(x)\)</span> dans l’espace <span
+class="math inline">\(L^2(\mathbb{R}, e^{-x^2} dx)\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de convergence, nous utilisons
+l’orthogonalité des polynômes d’Hermite. L’intégrale suivante est nulle
+pour <span class="math inline">\(m \neq n\)</span> : <span
+class="math display">\[\int_{-\infty}^{\infty} H_m(x) H_n(x) e^{-x^2} \,
+dx = 0\]</span> Cette propriété est cruciale pour montrer que les
+coefficients <span class="math inline">\(c_n\)</span> sont bien définis
+et uniques.</p>
+<p>La preuve détaillée du théorème de convergence repose sur le fait que
+les polynômes d’Hermite forment une base orthonormale de l’espace <span
+class="math inline">\(L^2(\mathbb{R}, e^{-x^2} dx)\)</span>. En
+utilisant le théorème de Parseval, nous pouvons montrer que : <span
+class="math display">\[\sum_{n=0}^{\infty} |c_n|^2 =
+\int_{-\infty}^{\infty} |f(x)|^2 e^{-x^2} \, dx\]</span> Ce qui implique
+la convergence de la série d’Hermite vers <span
+class="math inline">\(f(x)\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les séries d’Hermite possèdent plusieurs propriétés intéressantes,
+que nous énumérons ci-dessous :</p>
+<ol>
+<li><p>Les polynômes d’Hermite <span
+class="math inline">\(H_n(x)\)</span> sont orthogonaux dans l’espace
+<span class="math inline">\(L^2(\mathbb{R}, e^{-x^2}
+dx)\)</span>.</p></li>
+<li><p>Les séries d’Hermite convergent rapidement pour les fonctions
+lisses et décroissantes à l’infini.</p></li>
+<li><p>Les coefficients <span class="math inline">\(c_n\)</span> peuvent
+être calculés explicitement pour certaines fonctions spéciales.</p></li>
+</ol>
+<p>Pour illustrer la propriété (iii), considérons l’exemple de la
+fonction <span class="math inline">\(f(x) = e^{x^2}\)</span>. Les
+coefficients <span class="math inline">\(c_n\)</span> sont donnés par :
+<span class="math display">\[c_n = \frac{1}{2^n n! \sqrt{\pi}}
+\int_{-\infty}^{\infty} e^{x^2} H_n(x) e^{-x^2} \, dx = \frac{1}{2^n n!
+\sqrt{\pi}} \int_{-\infty}^{\infty} H_n(x) \, dx\]</span> En utilisant
+la relation de récurrence des polynômes d’Hermite, nous pouvons montrer
+que <span class="math inline">\(c_n = 0\)</span> pour tout <span
+class="math inline">\(n \geq 1\)</span>, et <span
+class="math inline">\(c_0 = 1\)</span>. Ainsi, la série d’Hermite pour
+<span class="math inline">\(f(x) = e^{x^2}\)</span> est simplement :
+<span class="math display">\[e^{x^2} = H_0(x)\]</span></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les séries d’Hermite sont un outil puissant pour l’analyse des
+fonctions et la résolution de problèmes différentiels. Leur étude offre
+un aperçu profond des propriétés des polynômes orthogonaux et de leurs
+applications en physique et en ingénierie. Dans cet article, nous avons
+exploré les définitions, les théorèmes, et les propriétés des séries
+d’Hermite, en fournissant des preuves détaillées pour illustrer leur
+validité.</p>
+<p>Les séries d’Hermite continuent de susciter un intérêt considérable
+dans la recherche mathématique, et leur étude ouvre la voie à de
+nouvelles découvertes dans divers domaines des sciences appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

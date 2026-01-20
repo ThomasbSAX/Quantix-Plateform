@@ -1,0 +1,332 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de décision</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title"><strong>Complexité des problèmes de
+décision</strong></h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude de la complexité des problèmes de décision est un pilier
+fondamental en informatique théorique et en mathématiques discrètes. À
+l’origine, cette notion émerge dans les années 1960 et 1970 avec les
+travaux pionniers de Stephen Cook, Richard Karp et Michael Rabin. Ces
+chercheurs ont cherché à classifier les problèmes en fonction de leur
+difficulté algorithmique, donnant naissance à des classes complexes
+comme <strong>P</strong>, <strong>NP</strong> et
+<strong>NP-complet</strong>.</p>
+<p>Pourquoi cette notion est-elle indispensable ? Parce qu’elle permet
+de comprendre les limites des algorithmes et des machines. Un problème
+de décision est un problème pour lequel la réponse est simplement "oui"
+ou "non". Par exemple, déterminer si un graphe contient un cycle
+hamiltonien est un problème de décision. La complexité d’un tel problème
+mesure le temps et l’espace nécessaires pour obtenir une réponse.</p>
+<p>Ce cadre est indispensable car il permet de distinguer les problèmes
+"faciles" (résolubles en temps polynomial) des problèmes "difficiles"
+(requérant un temps exponentiel). Il guide également les chercheurs dans
+la conception d’algorithmes optimaux et l’optimisation des ressources
+informatiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir formellement la complexité des problèmes de
+décision, il est essentiel de comprendre ce que nous cherchons à
+capturer. Nous voulons mesurer la difficulté d’un problème en termes de
+temps et d’espace nécessaires pour le résoudre. Un problème de décision
+est un problème pour lequel la réponse est binaire : oui ou non.</p>
+<div class="definition">
+<p>Un problème de décision <span class="math inline">\(L\)</span> est un
+ensemble de chaînes binaires. Pour une instance <span
+class="math inline">\(x\)</span>, la réponse est "oui" si <span
+class="math inline">\(x \in L\)</span> et "non" sinon.</p>
+</div>
+<p>Formellement, un problème de décision peut être défini comme suit :
+<span class="math display">\[L \subseteq \{0,1\}^*\]</span></p>
+<p>Nous pouvons également le définir en termes de langage formel : <span
+class="math display">\[L = \{ x \in \{0,1\}^* \mid P(x) \}\]</span> où
+<span class="math inline">\(P(x)\)</span> est une propriété que
+l’instance <span class="math inline">\(x\)</span> doit satisfaire.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’un des théorèmes les plus célèbres en complexité computationnelle
+est le théorème de Cook-Levin, qui établit la
+<strong>NP-complétude</strong> du problème de satisfaction booléenne
+(SAT).</p>
+<div class="theorem">
+<p>Le problème de satisfaction booléenne (SAT) est
+<strong>NP-complet</strong>. Cela signifie que :</p>
+<ul>
+<li><p>SAT est dans <strong>NP</strong> (il existe un algorithme de
+vérification en temps polynomial).</p></li>
+<li><p>Tout problème dans <strong>NP</strong> peut être réduit à SAT en
+temps polynomial.</p></li>
+</ul>
+</div>
+<p>Pour comprendre ce théorème, imaginons que nous voulons vérifier si
+une formule booléenne est satisfiable. Le théorème de Cook-Levin nous
+dit que ce problème est au moins aussi difficile que tout autre problème
+dans <strong>NP</strong>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Cook-Levin, nous devons montrer que SAT
+est dans <strong>NP</strong> et que tout problème dans
+<strong>NP</strong> peut être réduit à SAT.</p>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p><strong>SAT est dans NP</strong> : Pour une formule booléenne
+<span class="math inline">\(\phi\)</span> et une affectation <span
+class="math inline">\(\tau\)</span>, nous pouvons vérifier en temps
+polynomial si <span class="math inline">\(\tau\)</span> satisfait <span
+class="math inline">\(\phi\)</span>. Il suffit de substituer les
+variables dans <span class="math inline">\(\phi\)</span> par leurs
+valeurs dans <span class="math inline">\(\tau\)</span> et d’évaluer
+l’expression résultante.</p></li>
+<li><p><strong>Réduction de tout problème dans NP à SAT</strong> : Soit
+<span class="math inline">\(L\)</span> un problème dans
+<strong>NP</strong>. Par définition, il existe une relation <span
+class="math inline">\(R_L\)</span> et un polynôme <span
+class="math inline">\(p\)</span> tels que pour toute instance <span
+class="math inline">\(x\)</span>, il existe un certificat <span
+class="math inline">\(y\)</span> de taille <span
+class="math inline">\(p(|x|)\)</span> tel que <span
+class="math inline">\((x, y) \in R_L\)</span>. Nous pouvons construire
+une formule booléenne <span class="math inline">\(\phi_{x}\)</span> qui
+est satisfiable si et seulement si <span class="math inline">\(x \in
+L\)</span>. Cette construction peut être faite en temps
+polynomial.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le théorème de Cook-Levin a plusieurs propriétés et corollaires
+importants.</p>
+<div class="proposition">
+<ol>
+<li><p>Tout problème <strong>NP-complet</strong> est dans
+<strong>NP</strong>.</p></li>
+<li><p>Tout problème dans <strong>NP</strong> peut être réduit en temps
+polynomial à un problème <strong>NP-complet</strong>.</p></li>
+<li><p>Si un problème <strong>NP-complet</strong> peut être résolu en
+temps polynomial, alors <strong>P = NP</strong>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>Par définition, un problème <strong>NP-complet</strong> est dans
+<strong>NP</strong>.</p></li>
+<li><p>Par définition, un problème <strong>NP-complet</strong> accepte
+toutes les réductions polynomiales depuis tout problème dans
+<strong>NP</strong>.</p></li>
+<li><p>Si un problème <strong>NP-complet</strong> peut être résolu en
+temps polynomial, alors tous les problèmes dans <strong>NP</strong>
+peuvent être résolus en temps polynomial (via réduction). Par
+conséquent, <strong>P = NP</strong>.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’étude de la complexité des problèmes de décision est un domaine
+riche et fascinant. Les théorèmes comme celui de Cook-Levin nous
+permettent de comprendre les limites des algorithmes et des machines.
+Ils guident également la recherche en informatique théorique et en
+mathématiques discrètes.</p>
+<p>En conclusion, la complexité des problèmes de décision est un sujet
+passionnant qui continue d’inspirer les chercheurs et de défier notre
+compréhension des limites computationnelles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

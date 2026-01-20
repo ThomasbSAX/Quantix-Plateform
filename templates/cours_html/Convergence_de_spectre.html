@@ -1,0 +1,354 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Convergence de spectre</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Convergence de spectre</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La notion de convergence de spectre émerge naturellement dans l’étude
+des opérateurs linéaires et des matrices. Elle est indispensable pour
+comprendre le comportement asymptotique des solutions d’équations
+différentielles et intégro-différentielles, ainsi que pour l’analyse
+numérique des systèmes dynamiques. Historiquement, cette notion a été
+motivée par le besoin de généraliser les concepts classiques de
+convergence ponctuelle et uniforme à des espaces fonctionnels plus
+complexes.</p>
+<p>La convergence de spectre permet de capturer la stabilité des valeurs
+propres d’un opérateur sous des perturbations. Elle est cruciale dans de
+nombreuses applications, notamment en mécanique quantique, en théorie du
+contrôle et en traitement du signal. Dans cet article, nous explorerons
+les définitions formelles de la convergence de spectre, les théorèmes
+fondamentaux qui la régissent, et nous fournirons des preuves détaillées
+de ces résultats.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de convergence de spectre, commençons par
+rappeler quelques concepts préliminaires. Considérons un espace de
+Banach <span class="math inline">\(X\)</span> et un opérateur linéaire
+borné <span class="math inline">\(T : X \to X\)</span>. Le spectre de
+<span class="math inline">\(T\)</span>, noté <span
+class="math inline">\(\sigma(T)\)</span>, est l’ensemble des nombres
+complexes <span class="math inline">\(\lambda\)</span> pour lesquels
+l’opérateur <span class="math inline">\(T - \lambda I\)</span> n’est pas
+inversible.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((T_n)_{n \in \mathbb{N}}\)</span>
+une suite d’opérateurs linéaires bornés sur un espace de Banach <span
+class="math inline">\(X\)</span>, et soit <span
+class="math inline">\(T\)</span> un autre opérateur linéaire borné sur
+<span class="math inline">\(X\)</span>. On dit que la suite <span
+class="math inline">\((T_n)\)</span> converge en spectre vers <span
+class="math inline">\(T\)</span>, noté <span class="math inline">\(T_n
+\xrightarrow{\sigma} T\)</span>, si pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe un entier
+<span class="math inline">\(N \in \mathbb{N}\)</span> tel que pour tout
+<span class="math inline">\(n \geq N\)</span>, on a <span
+class="math display">\[\sigma(T_n) \subset \{ \lambda \in \mathbb{C} :
+\text{dist}(\lambda, \sigma(T)) &lt; \epsilon \}.\]</span></p>
+</div>
+<p>Une autre manière de formuler cette définition est la suivante : pour
+tout <span class="math inline">\(\epsilon &gt; 0\)</span>, il existe un
+entier <span class="math inline">\(N \in \mathbb{N}\)</span> tel que
+pour tout <span class="math inline">\(n \geq N\)</span>, on a <span
+class="math display">\[\sigma(T_n) \cap \{ \lambda \in \mathbb{C} :
+\text{dist}(\lambda, \sigma(T)) \geq \epsilon \} =
+\emptyset.\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Nous présentons maintenant un théorème fondamental concernant la
+convergence de spectre.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((T_n)_{n \in \mathbb{N}}\)</span>
+une suite d’opérateurs linéaires bornés sur un espace de Banach <span
+class="math inline">\(X\)</span>, et soit <span
+class="math inline">\(T\)</span> un autre opérateur linéaire borné sur
+<span class="math inline">\(X\)</span>. Si la suite <span
+class="math inline">\((T_n)\)</span> converge vers <span
+class="math inline">\(T\)</span> en norme, c’est-à-dire si <span
+class="math display">\[\lim_{n \to \infty} \|T_n - T\| = 0,\]</span>
+alors la suite <span class="math inline">\((T_n)\)</span> converge aussi
+en spectre vers <span class="math inline">\(T\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous allons utiliser plusieurs outils
+d’analyse fonctionnelle. Commençons par rappeler un lemme important.</p>
+<div class="lemma">
+<p>Soit <span class="math inline">\(T\)</span> un opérateur linéaire
+borné sur un espace de Banach <span class="math inline">\(X\)</span>, et
+soit <span class="math inline">\(\lambda \in \mathbb{C}\)</span>. Si
+<span class="math inline">\(\lambda\)</span> appartient au spectre
+essentiel de <span class="math inline">\(T\)</span>, noté <span
+class="math inline">\(\sigma_{\text{ess}}(T)\)</span>, alors pour tout
+<span class="math inline">\(\epsilon &gt; 0\)</span>, il existe un
+opérateur <span class="math inline">\(S\)</span> de norme inférieure à
+<span class="math inline">\(\epsilon\)</span> tel que <span
+class="math display">\[\sigma(T + S) \cap \{ z \in \mathbb{C} : |z -
+\lambda| &lt; \epsilon \} \neq \emptyset.\]</span></p>
+</div>
+<p>Nous pouvons maintenant prouver le théorème.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\epsilon &gt;
+0\)</span>. Puisque la suite <span class="math inline">\((T_n)\)</span>
+converge vers <span class="math inline">\(T\)</span> en norme, il existe
+un entier <span class="math inline">\(N \in \mathbb{N}\)</span> tel que
+pour tout <span class="math inline">\(n \geq N\)</span>, on a <span
+class="math display">\[\|T_n - T\| &lt; \epsilon.\]</span> Soit <span
+class="math inline">\(\lambda \in \sigma(T)\)</span>. Nous voulons
+montrer que pour tout <span class="math inline">\(n \geq N\)</span>, il
+existe un <span class="math inline">\(\mu \in \sigma(T_n)\)</span> tel
+que <span class="math display">\[|\lambda - \mu| &lt;
+3\epsilon.\]</span> Considérons l’opérateur <span
+class="math inline">\(S = T_n - T\)</span>. Par hypothèse, on a <span
+class="math inline">\(\|S\| &lt; \epsilon\)</span>. D’après le lemme de
+Weyl, il existe un opérateur <span class="math inline">\(R\)</span> de
+norme inférieure à <span class="math inline">\(\epsilon\)</span> tel que
+<span class="math display">\[\sigma(T + R) \cap \{ z \in \mathbb{C} : |z
+- \lambda| &lt; 2\epsilon \} \neq \emptyset.\]</span> Posons <span
+class="math inline">\(R = S + (R - S)\)</span>. On a <span
+class="math display">\[\|R - S\| \leq \|R\| + \|S\| &lt;
+2\epsilon.\]</span> Donc, <span class="math inline">\(\|R - S\| &lt;
+2\epsilon\)</span>. Puisque <span class="math inline">\(T + R = T_n + (R
+- S)\)</span>, et que <span class="math inline">\(\|R - S\| &lt;
+2\epsilon\)</span>, on a <span class="math display">\[\sigma(T_n) \cap
+\{ z \in \mathbb{C} : |z - \lambda| &lt; 3\epsilon \} \neq
+\emptyset.\]</span> Cela montre que pour tout <span
+class="math inline">\(\lambda \in \sigma(T)\)</span>, il existe un <span
+class="math inline">\(\mu \in \sigma(T_n)\)</span> tel que <span
+class="math inline">\(|\lambda - \mu| &lt; 3\epsilon\)</span>. Par
+conséquent, on a <span class="math display">\[\sigma(T_n) \subset \{ z
+\in \mathbb{C} : \text{dist}(z, \sigma(T)) &lt; 3\epsilon \}.\]</span>
+Cela achève la preuve du théorème. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous terminons cet article en énumérant quelques propriétés
+importantes de la convergence de spectre.</p>
+<ol>
+<li><p>La convergence en spectre est une notion topologique sur
+l’ensemble des opérateurs linéaires bornés. Elle induit une topologie
+qui est plus faible que la topologie de la norme d’opérateur.</p></li>
+<li><p>La convergence en spectre est stable par passage à la limite.
+Plus précisément, si <span class="math inline">\((T_n)\)</span> converge
+en spectre vers <span class="math inline">\(T\)</span> et que <span
+class="math inline">\((S_n)\)</span> converge en spectre vers <span
+class="math inline">\(S\)</span>, alors la suite <span
+class="math inline">\((T_n + S_n)\)</span> converge en spectre vers
+<span class="math inline">\(T + S\)</span>.</p></li>
+<li><p>La convergence en spectre est compatible avec la multiplication
+des opérateurs. Si <span class="math inline">\((T_n)\)</span> converge
+en spectre vers <span class="math inline">\(T\)</span> et que <span
+class="math inline">\((S_n)\)</span> converge en spectre vers <span
+class="math inline">\(S\)</span>, alors la suite <span
+class="math inline">\((T_n S_n)\)</span> converge en spectre vers <span
+class="math inline">\(TS\)</span>.</p></li>
+<li><p>La convergence en spectre est compatible avec l’adjoint des
+opérateurs. Si <span class="math inline">\((T_n)\)</span> converge en
+spectre vers <span class="math inline">\(T\)</span>, alors la suite
+<span class="math inline">\((T_n^*)\)</span> converge en spectre vers
+<span class="math inline">\(T^*\)</span>.</p></li>
+</ol>
+<p>La convergence de spectre est un outil puissant pour l’étude des
+opérateurs linéaires et leurs perturbations. Elle permet de capturer des
+comportements asymptotiques subtils qui ne sont pas visibles avec les
+notions classiques de convergence. Dans cet article, nous avons présenté
+les définitions fondamentales, un théorème important et ses preuves
+détaillées, ainsi que quelques propriétés clés. La convergence de
+spectre continue d’être un sujet actif de recherche en analyse
+fonctionnelle et en théorie des opérateurs.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

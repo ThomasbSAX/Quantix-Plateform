@@ -1,0 +1,343 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de binning par standardisation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de binning
+par standardisation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’encodage par extraction de caractéristiques de binning par
+standardisation est une technique avancée en apprentissage automatique
+et en traitement du signal. Cette méthode trouve son origine dans le
+besoin de transformer des données brutes en caractéristiques
+significatives pour les modèles prédictifs. Le binning, ou
+discrétisation, est une étape clé dans ce processus, permettant de
+regrouper les données en intervalles (bins) pour réduire la complexité
+et améliorer la généralisation des modèles.</p>
+<p>L’idée centrale est de standardiser les données au sein de chaque
+bin, c’est-à-dire de les transformer pour qu’elles aient une moyenne
+nulle et un écart-type unité. Cela permet de rendre les caractéristiques
+plus comparables et d’améliorer la performance des algorithmes de
+machine learning. Cette technique est particulièrement utile dans les
+domaines où les données sont bruitées ou présentent des variations
+importantes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’encodage par extraction de caractéristiques de
+binning par standardisation, il est essentiel de définir plusieurs
+concepts clés.</p>
+<h2 class="unnumbered" id="binning">Binning</h2>
+<p>Le binning consiste à diviser un ensemble de données continues en
+intervalles distincts. Formellement, soit <span
+class="math inline">\(X\)</span> un ensemble de données réelles et <span
+class="math inline">\(k\)</span> le nombre de bins souhaités. Nous
+cherchons à partitionner <span class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> intervalles disjoints <span
+class="math inline">\(B_1, B_2, \ldots, B_k\)</span> tels que :</p>
+<p><span class="math display">\[X = \bigcup_{i=1}^k B_i \quad \text{et}
+\quad B_i \cap B_j = \emptyset \quad \forall i \neq j\]</span></p>
+<h2 class="unnumbered" id="standardisation">Standardisation</h2>
+<p>La standardisation d’un ensemble de données <span
+class="math inline">\(Y\)</span> consiste à transformer chaque élément
+<span class="math inline">\(y_i \in Y\)</span> pour obtenir une nouvelle
+variable <span class="math inline">\(z_i\)</span> telle que :</p>
+<p><span class="math display">\[z_i = \frac{y_i -
+\mu_Y}{\sigma_Y}\]</span></p>
+<p>où <span class="math inline">\(\mu_Y\)</span> est la moyenne de <span
+class="math inline">\(Y\)</span> et <span
+class="math inline">\(\sigma_Y\)</span> est l’écart-type de <span
+class="math inline">\(Y\)</span>.</p>
+<h2 class="unnumbered"
+id="encodage-par-extraction-de-caractéristiques">Encodage par extraction
+de caractéristiques</h2>
+<p>L’encodage par extraction de caractéristiques consiste à transformer
+un ensemble de données brutes en un ensemble de caractéristiques
+significatives. Dans le contexte du binning par standardisation, cela
+implique de calculer des statistiques (moyenne, écart-type, etc.) pour
+chaque bin et d’utiliser ces statistiques comme nouvelles
+caractéristiques.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered"
+id="théorème-de-standardisation-des-bins">Théorème de standardisation
+des bins</h2>
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+réelles et <span class="math inline">\(B_1, B_2, \ldots, B_k\)</span>
+les bins obtenus par discrétisation de <span
+class="math inline">\(X\)</span>. Pour chaque bin <span
+class="math inline">\(B_i\)</span>, définissons <span
+class="math inline">\(Y_i\)</span> comme l’ensemble des éléments de
+<span class="math inline">\(X\)</span> appartenant à <span
+class="math inline">\(B_i\)</span>. Si nous standardisons chaque <span
+class="math inline">\(Y_i\)</span>, alors les nouvelles variables <span
+class="math inline">\(Z_i\)</span> auront une moyenne nulle et un
+écart-type unité.</p>
+<p><span class="math display">\[\forall i \in \{1, 2, \ldots, k\}, \quad
+\mu_{Z_i} = 0 \quad \text{et} \quad \sigma_{Z_i} = 1\]</span></p>
+<h2 class="unnumbered" id="preuve">Preuve</h2>
+<p>Pour chaque bin <span class="math inline">\(B_i\)</span>, nous avons
+:</p>
+<p><span class="math display">\[\mu_{Y_i} = \frac{1}{|Y_i|} \sum_{y_j
+\in Y_i} y_j\]</span></p>
+<p><span class="math display">\[\sigma_{Y_i} = \sqrt{\frac{1}{|Y_i|}
+\sum_{y_j \in Y_i} (y_j - \mu_{Y_i})^2}\]</span></p>
+<p>En appliquant la standardisation, nous obtenons :</p>
+<p><span class="math display">\[z_j = \frac{y_j -
+\mu_{Y_i}}{\sigma_{Y_i}}\]</span></p>
+<p>La moyenne de <span class="math inline">\(Z_i\)</span> est alors
+:</p>
+<p><span class="math display">\[\mu_{Z_i} = \frac{1}{|Y_i|} \sum_{z_j
+\in Z_i} z_j = \frac{1}{|Y_i|} \sum_{y_j \in Y_i} \frac{y_j -
+\mu_{Y_i}}{\sigma_{Y_i}} = 0\]</span></p>
+<p>L’écart-type de <span class="math inline">\(Z_i\)</span> est :</p>
+<p><span class="math display">\[\sigma_{Z_i} = \sqrt{\frac{1}{|Y_i|}
+\sum_{z_j \in Z_i} (z_j - \mu_{Z_i})^2} = 1\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriété-1-invariance-par-translation">Propriété 1: Invariance par
+translation</h2>
+<p>La standardisation des bins est invariante par translation. Cela
+signifie que si nous ajoutons une constante <span
+class="math inline">\(c\)</span> à toutes les données, la
+standardisation des bins reste inchangée.</p>
+<p><span class="math display">\[\forall c \in \mathbb{R}, \quad
+\text{Standardisation}(X + c) = \text{Standardisation}(X)\]</span></p>
+<h2 class="unnumbered" id="preuve-1">Preuve</h2>
+<p>Soit <span class="math inline">\(X&#39; = X + c\)</span>. Pour chaque
+bin <span class="math inline">\(B_i\)</span>, nous avons :</p>
+<p><span class="math display">\[\mu_{Y_i&#39;} = \mu_{Y_i} +
+c\]</span></p>
+<p><span class="math display">\[\sigma_{Y_i&#39;} =
+\sigma_{Y_i}\]</span></p>
+<p>En appliquant la standardisation, nous obtenons :</p>
+<p><span class="math display">\[z_j&#39; = \frac{y_j&#39; -
+\mu_{Y_i&#39;}}{\sigma_{Y_i&#39;}} = \frac{(y_j + c) - (\mu_{Y_i} +
+c)}{\sigma_{Y_i}} = \frac{y_j - \mu_{Y_i}}{\sigma_{Y_i}} =
+z_j\]</span></p>
+<h2 class="unnumbered" id="propriété-2-invariance-par-échelle">Propriété
+2: Invariance par échelle</h2>
+<p>La standardisation des bins est invariante par échelle. Cela signifie
+que si nous multiplions toutes les données par une constante <span
+class="math inline">\(\lambda\)</span>, la standardisation des bins
+reste inchangée.</p>
+<p><span class="math display">\[\forall \lambda &gt; 0, \quad
+\text{Standardisation}(\lambda X) =
+\text{Standardisation}(X)\]</span></p>
+<h2 class="unnumbered" id="preuve-2">Preuve</h2>
+<p>Soit <span class="math inline">\(X&#39; = \lambda X\)</span>. Pour
+chaque bin <span class="math inline">\(B_i\)</span>, nous avons :</p>
+<p><span class="math display">\[\mu_{Y_i&#39;} = \lambda
+\mu_{Y_i}\]</span></p>
+<p><span class="math display">\[\sigma_{Y_i&#39;} = \lambda
+\sigma_{Y_i}\]</span></p>
+<p>En appliquant la standardisation, nous obtenons :</p>
+<p><span class="math display">\[z_j&#39; = \frac{y_j&#39; -
+\mu_{Y_i&#39;}}{\sigma_{Y_i&#39;}} = \frac{\lambda y_j - \lambda
+\mu_{Y_i}}{\lambda \sigma_{Y_i}} = \frac{y_j - \mu_{Y_i}}{\sigma_{Y_i}}
+= z_j\]</span></p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de binning par
+standardisation est une technique puissante pour transformer des données
+brutes en caractéristiques significatives. En standardisant les données
+au sein de chaque bin, nous obtenons des caractéristiques plus
+comparables et améliorons la performance des modèles prédictifs. Cette
+méthode est particulièrement utile dans les domaines où les données sont
+bruitées ou présentent des variations importantes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

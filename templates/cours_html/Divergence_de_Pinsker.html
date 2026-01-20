@@ -1,0 +1,316 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Pinsker : Une Mesure de l’Information Mutuelle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Pinsker : Une Mesure de l’Information
+Mutuelle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La divergence de Pinsker, également connue sous le nom d’inégalité de
+Pinsker ou de distance variationnelle, est une notion fondamentale en
+théorie de l’information et en probabilités. Elle émerge comme un outil
+puissant pour mesurer la distance entre deux distributions de
+probabilité discrètes. Son importance réside dans sa capacité à fournir
+une borne inférieure sur la distance de Hellinger, une mesure bien
+établie de la similarité entre distributions.</p>
+<p>L’origine historique de cette divergence remonte aux travaux de
+Pinsker dans les années 1960. Elle est particulièrement utile dans des
+contextes où l’on souhaite évaluer la performance d’estimateurs ou
+comprendre les limites de détection dans des problèmes de tests
+statistiques. La divergence de Pinsker est également indispensable en
+apprentissage automatique, où elle permet de quantifier l’information
+mutuelle entre variables aléatoires.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la divergence de Pinsker, commençons par rappeler
+quelques notions préliminaires. Considérons deux distributions de
+probabilité discrètes <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> définies sur un ensemble fini <span
+class="math inline">\(\mathcal{X}\)</span>. On cherche à mesurer la
+distance entre ces deux distributions.</p>
+<p>La divergence de Kullback-Leibler (KL) est une mesure classique de la
+distance entre deux distributions. Elle est définie comme suit :</p>
+<p><span class="math display">\[D_{KL}(P \parallel Q) = \sum_{x \in
+\mathcal{X}} P(x) \log \left( \frac{P(x)}{Q(x)} \right).\]</span></p>
+<p>Cependant, cette mesure n’est pas symétrique et peut être infinie. La
+divergence de Pinsker, quant à elle, est une borne inférieure sur la
+distance de Hellinger <span class="math inline">\(H(P, Q)\)</span>,
+définie par :</p>
+<p><span class="math display">\[H(P, Q) = \sqrt{1 - \sum_{x \in
+\mathcal{X}} \sqrt{P(x)Q(x)}}.\]</span></p>
+<p>La divergence de Pinsker est alors définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité
+discrètes définies sur un ensemble fini <span
+class="math inline">\(\mathcal{X}\)</span>. La divergence de Pinsker
+entre <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est définie par :</p>
+<p><span class="math display">\[D_{\text{Pinsker}}(P, Q) = \frac{1}{2}
+\| P - Q \|_1,\]</span></p>
+<p>où <span class="math inline">\(\| P - Q \|_1\)</span> désigne la
+distance de total variation entre <span class="math inline">\(P\)</span>
+et <span class="math inline">\(Q\)</span>, définie par :</p>
+<p><span class="math display">\[\| P - Q \|_1 = \sum_{x \in \mathcal{X}}
+|P(x) - Q(x)|.\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’un des théorèmes fondamentaux concernant la divergence de Pinsker
+est l’inégalité de Pinsker, qui relie cette divergence à la distance de
+Hellinger.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité
+discrètes définies sur un ensemble fini <span
+class="math inline">\(\mathcal{X}\)</span>. Alors, on a l’inégalité
+suivante :</p>
+<p><span class="math display">\[H^2(P, Q) \leq D_{\text{Pinsker}}(P,
+Q).\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver l’inégalité de Pinsker, nous allons utiliser la
+définition de la distance de Hellinger et la divergence de Pinsker.
+Commençons par rappeler que :</p>
+<p><span class="math display">\[H^2(P, Q) = 1 - \sum_{x \in \mathcal{X}}
+\sqrt{P(x)Q(x)}.\]</span></p>
+<p>Nous voulons montrer que :</p>
+<p><span class="math display">\[1 - \sum_{x \in \mathcal{X}}
+\sqrt{P(x)Q(x)} \leq \frac{1}{2} \| P - Q \|_1.\]</span></p>
+<p>Pour ce faire, nous utilisons l’inégalité de Cauchy-Schwarz et les
+propriétés des normes. Considérons la fonction <span
+class="math inline">\(f(t) = \sqrt{t}\)</span>, qui est concave. Par
+l’inégalité de Jensen, nous avons :</p>
+<p><span class="math display">\[\sum_{x \in \mathcal{X}} \sqrt{P(x)Q(x)}
+\geq \left( \sum_{x \in \mathcal{X}} P(x) \right) \sqrt{ \left( \sum_{x
+\in \mathcal{X}} Q(x) \right)^{-1} } = \sqrt{ \sum_{x \in \mathcal{X}}
+P(x)Q(x)}.\]</span></p>
+<p>En utilisant l’inégalité de Cauchy-Schwarz, nous obtenons :</p>
+<p><span class="math display">\[\sum_{x \in \mathcal{X}} P(x)Q(x) \leq
+\sqrt{ \sum_{x \in \mathcal{X}} P^2(x) } \sqrt{ \sum_{x \in \mathcal{X}}
+Q^2(x) }.\]</span></p>
+<p>En combinant ces résultats, nous pouvons montrer que :</p>
+<p><span class="math display">\[1 - \sum_{x \in \mathcal{X}}
+\sqrt{P(x)Q(x)} \leq 1 - \sqrt{ \sum_{x \in \mathcal{X}} P(x)Q(x)} \leq
+\frac{1}{2} \| P - Q \|_1.\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La divergence de Pinsker possède plusieurs propriétés intéressantes.
+En voici quelques-unes :</p>
+<ol>
+<li><p>**Symétrie** : La divergence de Pinsker est symétrique,
+c’est-à-dire que <span class="math inline">\(D_{\text{Pinsker}}(P, Q) =
+D_{\text{Pinsker}}(Q, P)\)</span>.</p></li>
+<li><p>**Non-négativité** : La divergence de Pinsker est non négative,
+c’est-à-dire que <span class="math inline">\(D_{\text{Pinsker}}(P, Q)
+\geq 0\)</span>, avec égalité si et seulement si <span
+class="math inline">\(P = Q\)</span>.</p></li>
+<li><p>**Bornes supérieures** : La divergence de Pinsker est bornée par
+1, c’est-à-dire que <span class="math inline">\(D_{\text{Pinsker}}(P, Q)
+\leq 1\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La divergence de Pinsker est un outil puissant pour mesurer la
+distance entre deux distributions de probabilité discrètes. Son
+utilisation est particulièrement utile dans des contextes où l’on
+souhaite évaluer la performance d’estimateurs ou comprendre les limites
+de détection dans des problèmes de tests statistiques. Les propriétés et
+théorèmes associés à cette divergence en font un sujet d’étude riche et
+fascinant en théorie de l’information et en probabilités.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

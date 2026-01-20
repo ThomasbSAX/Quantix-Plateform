@@ -1,0 +1,401 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Fitch-Margoliash : Une Approche Métrique en Phylogénie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Fitch-Margoliash : Une Approche Métrique
+en Phylogénie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Fitch-Margoliash émerge dans le cadre passionnant de
+la phylogénie, cette discipline qui cherche à reconstruire les arbres
+évolutifs à partir de données moléculaires. L’idée centrale est de
+quantifier la dissimilarité entre les espèces en utilisant des
+informations sur le temps d’évolution. Cette distance, introduite par
+Fitch et Margoliash en 1967, répond à un besoin crucial : fournir une
+métrique robuste pour évaluer les relations évolutives.</p>
+<p>L’origine historique de cette distance est liée à l’étude des
+séquences protéiques. Fitch et Margoliash ont remarqué que les
+différences observées entre les séquences ne reflétaient pas toujours
+fidèlement le temps écoulé depuis un ancêtre commun. Ils ont donc
+proposé une méthode pour estimer ce temps en tenant compte des taux
+d’évolution variables entre les lignées.</p>
+<p>La notion de distance de Fitch-Margoliash est indispensable pour
+plusieurs raisons. Premièrement, elle permet de reconstruire des arbres
+phylogénétiques plus précis en intégrant des informations temporelles.
+Deuxièmement, elle offre un cadre rigoureux pour comparer les espèces en
+fonction de leur histoire évolutive. Enfin, elle ouvre la voie à des
+méthodes plus sophistiquées d’analyse phylogénétique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement la distance de Fitch-Margoliash, il est
+essentiel de comprendre ce que nous cherchons à capturer. Imaginons que
+nous avons deux espèces, A et B, et que nous voulons mesurer le temps
+depuis leur dernier ancêtre commun. Les séquences protéiques de ces
+espèces peuvent présenter des différences, mais ces différences ne sont
+pas toujours proportionnelles au temps écoulé. Nous cherchons donc une
+méthode pour estimer ce temps en tenant compte des taux d’évolution
+variables.</p>
+<p>Pour formaliser cette idée, nous introduisons quelques notations.
+Soit <span class="math inline">\(T\)</span> un arbre phylogénétique avec
+<span class="math inline">\(n\)</span> feuilles, représentant <span
+class="math inline">\(n\)</span> espèces. Pour chaque arête <span
+class="math inline">\(e\)</span> de l’arbre, nous notons <span
+class="math inline">\(t_e\)</span> le temps d’évolution associé à cette
+arête. Nous supposons que les taux d’évolution sont variables et notons
+<span class="math inline">\(r_i\)</span> le taux d’évolution de l’espèce
+<span class="math inline">\(i\)</span>.</p>
+<p>La distance de Fitch-Margoliash entre deux espèces <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> est définie comme la somme des temps
+d’évolution le long du chemin reliant ces deux espèces, pondérée par
+leurs taux d’évolution respectifs. Formellement, nous avons :</p>
+<p><span class="math display">\[d_{FM}(i,j) = \sum_{e \in P(i,j)} t_e
+(r_i + r_j)\]</span></p>
+<p>où <span class="math inline">\(P(i,j)\)</span> est l’ensemble des
+arêtes du chemin reliant les espèces <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>.</p>
+<p>Une autre manière de formuler cette définition est d’utiliser la
+notion de distance ultramétrique. La distance de Fitch-Margoliash
+satisfait la propriété ultramétrique si pour toutes espèces <span
+class="math inline">\(i, j, k\)</span>, nous avons :</p>
+<p><span class="math display">\[d_{FM}(i,j) \leq \max(d_{FM}(i,k),
+d_{FM}(k,j))\]</span></p>
+<p>Cette propriété est cruciale pour la reconstruction des arbres
+phylogénétiques, car elle garantit que les distances respectent la
+hiérarchie de l’arbre.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Fitch-Margoliash est le
+théorème de l’arbre ultramétrique. Ce théorème établit une condition
+nécessaire et suffisante pour qu’une matrice de distances puisse être
+représentée par un arbre ultramétrique.</p>
+<p>Pour formuler ce théorème, nous introduisons quelques notations
+supplémentaires. Soit <span class="math inline">\(D\)</span> une matrice
+de distances entre <span class="math inline">\(n\)</span> espèces, où
+<span class="math inline">\(D_{ij}\)</span> représente la distance entre
+les espèces <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>. Nous disons que <span
+class="math inline">\(D\)</span> est ultramétrique si pour toutes
+espèces <span class="math inline">\(i, j, k\)</span>, nous avons :</p>
+<p><span class="math display">\[D_{ij} \leq \max(D_{ik},
+D_{kj})\]</span></p>
+<p>Le théorème de l’arbre ultramétrique s’énonce comme suit :</p>
+<div class="theorem">
+<p>Une matrice de distances <span class="math inline">\(D\)</span> est
+ultramétrique si et seulement si il existe un arbre ultramétrique <span
+class="math inline">\(T\)</span> avec des longueurs d’arêtes <span
+class="math inline">\(t_e\)</span> tels que pour toutes espèces <span
+class="math inline">\(i, j\)</span>, nous avons :</p>
+<p><span class="math display">\[D_{ij} = \sum_{e \in P(i,j)}
+t_e\]</span></p>
+</div>
+<p>La démonstration de ce théorème repose sur des propriétés
+fondamentales des arbres ultramétriques et des matrices de distances.
+Nous allons maintenant détailler cette démonstration.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de l’arbre ultramétrique, nous allons
+procéder en deux étapes. Tout d’abord, nous montrerons que si <span
+class="math inline">\(D\)</span> est ultramétrique, alors il existe un
+arbre ultramétrique <span class="math inline">\(T\)</span> représentant
+<span class="math inline">\(D\)</span>. Ensuite, nous montrerons que si
+<span class="math inline">\(D\)</span> peut être représenté par un arbre
+ultramétrique <span class="math inline">\(T\)</span>, alors <span
+class="math inline">\(D\)</span> est ultramétrique.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span class="math inline">\(D\)</span>
+soit ultramétrique. Nous allons construire un arbre ultramétrique <span
+class="math inline">\(T\)</span> représentant <span
+class="math inline">\(D\)</span>. Pour ce faire, nous utilisons
+l’algorithme de Neighbor-Joining, qui est une méthode standard pour
+reconstruire des arbres phylogénétiques à partir de matrices de
+distances.</p>
+<p>L’algorithme de Neighbor-Joining fonctionne comme suit. Tout d’abord,
+nous choisissons deux espèces <span class="math inline">\(i\)</span> et
+<span class="math inline">\(j\)</span> telles que <span
+class="math inline">\(D_{ij}\)</span> soit minimale. Nous créons un
+nouveau nœud <span class="math inline">\(u\)</span> et nous connectons
+<span class="math inline">\(u\)</span> à <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> avec des arêtes de longueur <span
+class="math inline">\(t_{ui} = t_{uj} = D_{ij}/2\)</span>. Ensuite, nous
+mettons à jour la matrice de distances en remplaçant les lignes et
+colonnes correspondantes à <span class="math inline">\(i\)</span> et
+<span class="math inline">\(j\)</span> par une nouvelle ligne et colonne
+correspondant à <span class="math inline">\(u\)</span>. Nous répétons ce
+processus jusqu’à ce qu’il ne reste plus qu’une seule espèce.</p>
+<p>Il est facile de voir que cet algorithme produit un arbre
+ultramétrique <span class="math inline">\(T\)</span> représentant <span
+class="math inline">\(D\)</span>. En effet, à chaque étape, nous créons
+un nouveau nœud et nous mettons à jour les distances de manière à
+préserver la propriété ultramétrique.</p>
+<p>Réciproquement, supposons que <span class="math inline">\(D\)</span>
+puisse être représenté par un arbre ultramétrique <span
+class="math inline">\(T\)</span>. Nous allons montrer que <span
+class="math inline">\(D\)</span> est ultramétrique. Pour ce faire, nous
+utilisons la propriété fondamentale des arbres ultramétriques : pour
+toutes espèces <span class="math inline">\(i, j, k\)</span>, nous avons
+:</p>
+<p><span class="math display">\[D_{ij} = \sum_{e \in P(i,j)} t_e \leq
+\max\left(\sum_{e \in P(i,k)} t_e, \sum_{e \in P(k,j)} t_e\right) =
+\max(D_{ik}, D_{kj})\]</span></p>
+<p>Ceci montre que <span class="math inline">\(D\)</span> est
+ultramétrique. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant énumérer quelques propriétés importantes de la
+distance de Fitch-Margoliash et en fournir des preuves détaillées.</p>
+<ol>
+<li><p>La distance de Fitch-Margoliash est symétrique. C’est-à-dire que
+pour toutes espèces <span class="math inline">\(i, j\)</span>, nous
+avons :</p>
+<p><span class="math display">\[d_{FM}(i,j) = d_{FM}(j,i)\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> La symétrie de la distance de Fitch-Margoliash
+découle directement de la définition. En effet, pour toutes espèces
+<span class="math inline">\(i, j\)</span>, nous avons :</p>
+<p><span class="math display">\[d_{FM}(i,j) = \sum_{e \in P(i,j)} t_e
+(r_i + r_j) = \sum_{e \in P(j,i)} t_e (r_j + r_i) =
+d_{FM}(j,i)\]</span> ◻</p>
+</div></li>
+<li><p>La distance de Fitch-Margoliash satisfait l’inégalité
+triangulaire. C’est-à-dire que pour toutes espèces <span
+class="math inline">\(i, j, k\)</span>, nous avons :</p>
+<p><span class="math display">\[d_{FM}(i,j) \leq d_{FM}(i,k) +
+d_{FM}(k,j)\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> L’inégalité triangulaire pour la distance de
+Fitch-Margoliash peut être démontrée en utilisant la propriété
+ultramétrique. En effet, pour toutes espèces <span
+class="math inline">\(i, j, k\)</span>, nous avons :</p>
+<p><span class="math display">\[d_{FM}(i,j) \leq \max(d_{FM}(i,k),
+d_{FM}(k,j)) \leq d_{FM}(i,k) + d_{FM}(k,j)\]</span> ◻</p>
+</div></li>
+<li><p>La distance de Fitch-Margoliash est invariante par scaling.
+C’est-à-dire que pour toutes espèces <span class="math inline">\(i,
+j\)</span> et pour tout scalaire <span class="math inline">\(\alpha &gt;
+0\)</span>, nous avons :</p>
+<p><span class="math display">\[d_{FM}(i,j) = \alpha
+d_{FM}(i,j)\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> L’invariance par scaling de la distance de
+Fitch-Margoliash découle du fait que les temps d’évolution <span
+class="math inline">\(t_e\)</span> et les taux d’évolution <span
+class="math inline">\(r_i\)</span> sont tous deux multipliés par le même
+scalaire <span class="math inline">\(\alpha\)</span>. En effet, pour
+toutes espèces <span class="math inline">\(i, j\)</span>, nous avons
+:</p>
+<p><span class="math display">\[d_{FM}(i,j) = \sum_{e \in P(i,j)} t_e
+(r_i + r_j) = \alpha \sum_{e \in P(i,j)} (\alpha t_e)(\alpha r_i +
+\alpha r_j) = \alpha d_{FM}(i,j)\]</span> ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Fitch-Margoliash est une notion fondamentale en
+phylogénie, offrant un cadre rigoureux pour quantifier les relations
+évolutives entre les espèces. Son introduction par Fitch et Margoliash
+en 1967 a marqué un tournant dans l’analyse des séquences protéiques et
+a ouvert la voie à des méthodes plus sophistiquées de reconstruction
+phylogénétique.</p>
+<p>Dans cet article, nous avons présenté les définitions, théorèmes et
+propriétés de la distance de Fitch-Margoliash. Nous avons également
+fourni des preuves détaillées de ces résultats, en mettant l’accent sur
+les aspects techniques et mathématiques. Nous espérons que cet article
+contribuera à une meilleure compréhension de cette notion passionnante
+et de son importance en phylogénie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,329 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Early Stopping: Une Technique d’Optimisation en Apprentissage Automatique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Early Stopping: Une Technique d’Optimisation en
+Apprentissage Automatique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’apprentissage automatique moderne repose sur des modèles de plus en
+plus complexes, souvent paramétrés par un grand nombre de paramètres.
+L’optimisation de ces modèles nécessite des techniques efficaces pour
+éviter le surapprentissage et garantir une généralisation optimale.
+Parmi ces techniques, l’<em>Early Stopping</em> (arrêt précoce) se
+distingue par sa simplicité et son efficacité.</p>
+<p>L’idée sous-jacente à l’Early Stopping est d’interrompre le processus
+d’apprentissage dès que la performance du modèle sur un ensemble de
+validation cesse de s’améliorer. Cette approche permet non seulement de
+réduire le temps de calcul, mais aussi d’éviter le surapprentissage, un
+phénomène courant lorsque les modèles sont entraînés trop longtemps.</p>
+<p>Historiquement, l’Early Stopping a été utilisé dans divers contextes,
+notamment en régression et en classification. Son application s’est
+généralisée avec l’avènement des réseaux de neurones, où les temps
+d’entraînement peuvent être prohibitifs. L’Early Stopping est donc
+devenu un outil indispensable dans l’arsenal des techniques
+d’optimisation en apprentissage automatique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’Early Stopping, il est essentiel de définir
+quelques concepts clés. Considérons un modèle paramétré par un vecteur
+<span class="math inline">\(\theta \in \mathbb{R}^d\)</span>, entraîné
+sur un ensemble de données <span class="math inline">\(D = \{ (x_i, y_i)
+\}_{i=1}^n\)</span>. L’objectif est de minimiser une fonction de coût
+<span class="math inline">\(L(\theta)\)</span> sur un ensemble de
+validation <span class="math inline">\(V = \{ (x&#39;_j, y&#39;_j)
+\}_{j=1}^m\)</span>.</p>
+<div class="definition">
+<p>La fonction de coût <span class="math inline">\(L(\theta)\)</span>
+mesure l’erreur du modèle paramétré par <span
+class="math inline">\(\theta\)</span> sur l’ensemble de validation <span
+class="math inline">\(V\)</span>. Formellement, <span
+class="math display">\[L(\theta) = \frac{1}{m} \sum_{j=1}^m
+\ell(f(x&#39;_j, \theta), y&#39;_j),\]</span> où <span
+class="math inline">\(\ell\)</span> est une fonction de perte appropriée
+(par exemple, la perte quadratique pour la régression ou la perte
+logistique pour la classification).</p>
+</div>
+<div class="definition">
+<p>L’Early Stopping est une technique d’optimisation qui interrompt
+l’entraînement du modèle lorsque la fonction de coût <span
+class="math inline">\(L(\theta)\)</span> sur l’ensemble de validation
+cesse de diminuer pendant un nombre prédéfini d’époques, appelé
+<em>patience</em>. Formellement, soit <span
+class="math inline">\(t\)</span> le numéro de l’époque actuelle et <span
+class="math inline">\(p\)</span> la patience. L’entraînement est arrêté
+si <span class="math display">\[\forall k \in \{1, \ldots, p\},
+L(\theta_{t-k}) \leq L(\theta_{t}).\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’Early Stopping peut être vu comme une méthode de régularisation
+implicite. En effet, il empêche le modèle de s’adapter trop étroitement
+aux données d’entraînement, ce qui réduit le risque de
+surapprentissage.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(L(\theta)\)</span> une fonction de
+coût convexe et différentiable. Supposons que l’algorithme
+d’optimisation utilisé (par exemple, la descente de gradient) converge
+vers un minimum local en l’absence d’Early Stopping. Alors, l’Early
+Stopping garantit que le modèle converge vers un minimum local de <span
+class="math inline">\(L(\theta)\)</span> sur l’ensemble de
+validation.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve repose sur le fait que l’Early Stopping
+interrompt l’entraînement lorsque la fonction de coût cesse de diminuer.
+En d’autres termes, il empêche le modèle de s’éloigner du minimum local
+trouvé jusqu’à présent. Par conséquent, l’Early Stopping garantit que le
+modèle converge vers un minimum local de <span
+class="math inline">\(L(\theta)\)</span> sur l’ensemble de
+validation. ◻</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour illustrer la puissance de l’Early Stopping, considérons un
+exemple simple. Supposons que nous entraînons un modèle de régression
+linéaire sur un ensemble de données <span
+class="math inline">\(D\)</span>. La fonction de coût est la somme des
+carrés des erreurs, et l’algorithme d’optimisation utilisé est la
+descente de gradient.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\theta_t\)</span> le
+vecteur de paramètres à l’époque <span class="math inline">\(t\)</span>.
+La mise à jour des paramètres est donnée par <span
+class="math display">\[\theta_{t+1} = \theta_t - \eta \nabla
+L(\theta_t),\]</span> où <span class="math inline">\(\eta\)</span> est
+le taux d’apprentissage. Si la fonction de coût <span
+class="math inline">\(L(\theta)\)</span> cesse de diminuer pendant <span
+class="math inline">\(p\)</span> époques consécutives, l’entraînement
+est arrêté. Cela signifie que <span
+class="math display">\[L(\theta_{t-p}) \leq L(\theta_{t-p+1}) \leq
+\ldots \leq L(\theta_t).\]</span> Par conséquent, le modèle converge
+vers un minimum local de <span class="math inline">\(L(\theta)\)</span>
+sur l’ensemble de validation. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’Early Stopping possède plusieurs propriétés intéressantes, qui en
+font une technique d’optimisation puissante et flexible.</p>
+<ol>
+<li><p><strong>Réduction du temps de calcul</strong> : L’Early Stopping
+permet de réduire le temps d’entraînement en interrompant le processus
+dès que la performance du modèle cesse de s’améliorer. Cela est
+particulièrement utile pour les modèles complexes, où les temps
+d’entraînement peuvent être prohibitifs.</p></li>
+<li><p><strong>Régularisation implicite</strong> : L’Early Stopping agit
+comme une forme de régularisation, en empêchant le modèle de s’adapter
+trop étroitement aux données d’entraînement. Cela réduit le risque de
+surapprentissage et améliore la généralisation du modèle.</p></li>
+<li><p><strong>Compatibilité avec diverses fonctions de coût</strong> :
+L’Early Stopping peut être utilisé avec différentes fonctions de coût,
+ce qui en fait une technique d’optimisation flexible et polyvalente. Il
+est particulièrement efficace pour les fonctions de coût non convexes,
+où l’optimisation peut être difficile.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’Early Stopping est une technique d’optimisation puissante et
+flexible, qui trouve ses racines dans l’histoire de l’apprentissage
+automatique. Son efficacité en fait un outil indispensable pour
+l’entraînement des modèles complexes, où les temps de calcul peuvent
+être prohibitifs. En interrompant le processus d’apprentissage dès que
+la performance du modèle cesse de s’améliorer, l’Early Stopping permet
+non seulement de réduire le temps de calcul, mais aussi d’éviter le
+surapprentissage et d’améliorer la généralisation du modèle.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,402 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Séries divergentes sommables : Une exploration des méthodes de sommation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Séries divergentes sommables : Une exploration des
+méthodes de sommation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les séries infinies sont un outil fondamental en analyse
+mathématique. Cependant, certaines séries ne convergent pas au sens
+classique de Cauchy. Ces séries, dites <em>divergentes</em>, peuvent
+parfois être “sommées” en utilisant des méthodes alternatives. L’étude
+des séries divergentes sommables est un domaine riche qui a émergé pour
+répondre à des besoins en physique théorique, en ingénierie et même en
+mathématiques pures.</p>
+<p>L’idée de sommer des séries divergentes peut sembler paradoxale.
+Pourtant, des méthodes comme celles d’Euler, de Cesàro ou de Borel
+permettent d’attribuer un sens à certaines séries divergentes. Ces
+méthodes ont été développées pour résoudre des problèmes concrets où les
+séries classiques ne suffisaient pas.</p>
+<p>Dans cet article, nous explorerons les concepts fondamentaux des
+séries divergentes sommables, en mettant l’accent sur les définitions
+rigoureuses et les théorèmes clés. Nous verrons comment ces méthodes
+peuvent être appliquées pour donner un sens à des séries qui, autrement,
+ne convergeraient pas.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les séries divergentes sommables, commençons par
+rappeler la définition classique de convergence d’une série.</p>
+<div class="definition">
+<p><strong>Définition 1</strong>. <em>Soit <span
+class="math inline">\((a_n)_{n \in \mathbb{N}}\)</span> une suite de
+nombres complexes. On dit que la série <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> converge au sens
+de Cauchy si et seulement si la suite partielle <span
+class="math inline">\((S_N)_{N \in \mathbb{N}}\)</span>, définie par
+<span class="math display">\[S_N = \sum_{n=0}^{N} a_n,\]</span> admet
+une limite finie dans <span class="math inline">\(\mathbb{C}\)</span>
+lorsque <span class="math inline">\(N\)</span> tend vers l’infini. Dans
+ce cas, on dit que la série est <em>convergente</em> et on note sa somme
+par <span class="math display">\[\sum_{n=0}^{\infty} a_n = \lim_{N \to
+\infty} S_N.\]</span></em></p>
+</div>
+<p>Maintenant, considérons une série qui ne converge pas au sens de
+Cauchy. Nous cherchons à lui attribuer une somme en utilisant une
+méthode alternative.</p>
+<div class="definition">
+<p><strong>Définition 2</strong>. <em>Soit <span
+class="math inline">\((a_n)_{n \in \mathbb{N}}\)</span> une suite de
+nombres complexes. Une méthode de sommation est une règle qui, à chaque
+série <span class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span>,
+associe une somme <span class="math inline">\(S \in \mathbb{C} \cup
+\{\infty\}\)</span> (ou <span class="math inline">\(\mathbb{R} \cup
+\{\infty\}\)</span> si on se restreint aux réels), notée <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n = S\)</span>, de telle
+sorte que si la série converge au sens de Cauchy, alors <span
+class="math inline">\(S\)</span> est égale à sa somme
+classique.</em></p>
+</div>
+<p>Une méthode de sommation est dite <em>linéaire</em> si elle satisfait
+les propriétés suivantes :</p>
+<ol>
+<li><p>Si <span class="math inline">\(\sum_{n=0}^{\infty} a_n =
+S\)</span> et <span class="math inline">\(\sum_{n=0}^{\infty} b_n =
+T\)</span>, alors <span class="math inline">\(\sum_{n=0}^{\infty} (a_n +
+b_n) = S + T\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\sum_{n=0}^{\infty} a_n =
+S\)</span>, alors pour tout scalaire <span class="math inline">\(\lambda
+\in \mathbb{C}\)</span>, on a <span
+class="math inline">\(\sum_{n=0}^{\infty} \lambda a_n = \lambda
+S\)</span>.</p></li>
+</ol>
+<h1 id="méthodes-de-sommation">Méthodes de Sommation</h1>
+<p>Nous allons maintenant présenter quelques méthodes de sommation
+classiques pour les séries divergentes.</p>
+<h2 id="méthode-deuler">Méthode d’Euler</h2>
+<p>La méthode de sommation d’Euler est l’une des premières méthodes
+introduites pour sommer les séries divergentes. Elle est
+particulièrement utile pour les séries dont les termes sont des
+polynômes en <span class="math inline">\(n\)</span>.</p>
+<div class="theoreme">
+<p><strong>Théorème 3</strong> (Méthode d’Euler). <em>Soit <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> une série de
+nombres complexes. On dit que la série est <em>sommable au sens
+d’Euler</em> à la somme <span class="math inline">\(S\)</span> si et
+seulement si la série transformée <span
+class="math display">\[\sum_{n=0}^{\infty} (1 - \frac{1}{n+1})^k
+a_n\]</span> converge au sens de Cauchy vers <span
+class="math inline">\(S\)</span> pour tout entier <span
+class="math inline">\(k \geq 0\)</span>.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous devons montrer que
+la limite existe et est indépendante de <span
+class="math inline">\(k\)</span>. Supposons que <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> soit sommable au
+sens d’Euler à la somme <span class="math inline">\(S\)</span>. Alors,
+pour tout <span class="math inline">\(\epsilon &gt; 0\)</span>, il
+existe un entier <span class="math inline">\(N\)</span> tel que pour
+tout <span class="math inline">\(n \geq N\)</span>, <span
+class="math display">\[|(1 - \frac{1}{n+1})^k a_n - S| &lt;
+\epsilon.\]</span> En prenant la limite lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini, nous obtenons <span
+class="math display">\[\lim_{n \to \infty} (1 - \frac{1}{n+1})^k a_n =
+S.\]</span> Cette limite est indépendante de <span
+class="math inline">\(k\)</span> car <span class="math inline">\((1 -
+\frac{1}{n+1})^k\)</span> tend vers <span
+class="math inline">\(1\)</span> lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini. ◻</p>
+</div>
+<h2 id="méthode-de-cesàro">Méthode de Cesàro</h2>
+<p>La méthode de sommation de Cesàro est une autre approche pour sommer
+les séries divergentes. Elle est basée sur la moyenne des sommes
+partielles.</p>
+<div class="definition">
+<p><strong>Définition 4</strong>. <em>Soit <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> une série de
+nombres complexes. On dit que la série est <em>sommable au sens de
+Cesàro</em> à la somme <span class="math inline">\(S\)</span> si et
+seulement si la suite des moyennes partielles <span
+class="math display">\[C_N = \frac{1}{N+1} \sum_{n=0}^{N} S_n,\]</span>
+où <span class="math inline">\(S_n = \sum_{k=0}^{n} a_k\)</span>,
+converge vers <span class="math inline">\(S\)</span> lorsque <span
+class="math inline">\(N\)</span> tend vers l’infini.</em></p>
+</div>
+<div class="theoreme">
+<p><strong>Théorème 5</strong> (Méthode de Cesàro). <em>Si une série
+<span class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> est
+convergente au sens de Cauchy, alors elle est sommable au sens de Cesàro
+et sa somme est la même.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> converge vers
+<span class="math inline">\(S\)</span>. Alors, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe un entier
+<span class="math inline">\(N\)</span> tel que pour tout <span
+class="math inline">\(n \geq N\)</span>, <span
+class="math display">\[|S_n - S| &lt; \epsilon.\]</span> En prenant la
+moyenne sur les <span class="math inline">\(N+1\)</span> premiers
+termes, nous obtenons <span class="math display">\[|C_N - S| \leq
+\frac{1}{N+1} \sum_{n=0}^{N} |S_n - S| &lt; \epsilon.\]</span> Ainsi, la
+suite <span class="math inline">\((C_N)\)</span> converge vers <span
+class="math inline">\(S\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant explorer quelques propriétés importantes des
+séries divergentes sommables.</p>
+<div class="corollaire">
+<p><strong>Corollaire 1</strong>. <em>Si une série <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> est sommable au
+sens d’Euler, alors elle est aussi sommable au sens de Cesàro.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> soit sommable au
+sens d’Euler à la somme <span class="math inline">\(S\)</span>. Alors,
+pour tout <span class="math inline">\(\epsilon &gt; 0\)</span>, il
+existe un entier <span class="math inline">\(N\)</span> tel que pour
+tout <span class="math inline">\(n \geq N\)</span>, <span
+class="math display">\[|(1 - \frac{1}{n+1})^k a_n - S| &lt;
+\epsilon.\]</span> En prenant la moyenne sur les <span
+class="math inline">\(N+1\)</span> premiers termes, nous obtenons <span
+class="math display">\[|C_N - S| \leq \frac{1}{N+1} \sum_{n=0}^{N} |(1 -
+\frac{1}{n+1})^k a_n - S| &lt; \epsilon.\]</span> Ainsi, la suite <span
+class="math inline">\((C_N)\)</span> converge vers <span
+class="math inline">\(S\)</span>. ◻</p>
+</div>
+<div class="corollaire">
+<p><strong>Corollaire 2</strong>. <em>Si une série <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> est sommable au
+sens de Cesàro, alors la série <span
+class="math inline">\(\sum_{n=0}^{\infty} (a_n - a_{n+1})\)</span> est
+sommable au sens de Cesàro.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n\)</span> soit sommable au
+sens de Cesàro à la somme <span class="math inline">\(S\)</span>. Alors,
+pour tout <span class="math inline">\(\epsilon &gt; 0\)</span>, il
+existe un entier <span class="math inline">\(N\)</span> tel que pour
+tout <span class="math inline">\(n \geq N\)</span>, <span
+class="math display">\[|C_n - S| &lt; \epsilon.\]</span> En considérant
+la série <span class="math inline">\(\sum_{n=0}^{\infty} (a_n -
+a_{n+1})\)</span>, nous avons <span class="math display">\[C&#39;_n =
+\frac{1}{n+1} \sum_{k=0}^{n} (S_k - S_{k+1}) = C_0 -
+\frac{S_{n+1}}{n+1}.\]</span> En prenant la limite lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini, nous obtenons <span
+class="math display">\[\lim_{n \to \infty} C&#39;_n = S.\]</span> Ainsi,
+la série <span class="math inline">\(\sum_{n=0}^{\infty} (a_n -
+a_{n+1})\)</span> est sommable au sens de Cesàro à la somme <span
+class="math inline">\(S\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les séries divergentes sommables offrent une richesse mathématique et
+une utilité pratique qui ne peuvent être ignorées. Les méthodes de
+sommation, comme celles d’Euler et de Cesàro, permettent d’attribuer un
+sens à des séries qui, autrement, ne convergeraient pas. Ces techniques
+ont trouvé des applications dans divers domaines, notamment en physique
+théorique et en ingénierie.</p>
+<p>Dans cet article, nous avons exploré les concepts fondamentaux des
+séries divergentes sommables. Nous avons vu comment ces méthodes peuvent
+être utilisées pour donner un sens à des séries divergentes et avons
+démontré quelques théorèmes clés. Cependant, il reste encore beaucoup à
+découvrir dans ce domaine fascinant.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

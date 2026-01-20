@@ -1,0 +1,326 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Graphes bayésiens : Modélisation probabiliste et inférence</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Graphes bayésiens : Modélisation probabiliste et
+inférence</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les graphes bayésiens émergent comme un outil fondamental en
+modélisation probabiliste, fusionnant la théorie des graphes et les
+principes bayésiens. Leur origine remonte aux travaux pionniers de Judea
+Pearl dans les années 1980, répondant à un besoin croissant de modéliser
+des systèmes complexes avec incertitudes. Ces graphes offrent une
+représentation concise et intuitive de relations conditionnelles entre
+variables aléatoires, rendant leur utilisation indispensable en
+intelligence artificielle, en bio-informatique et en finance.</p>
+<p>Leur puissance réside dans leur capacité à capturer des dépendances
+structurelles tout en permettant une inférence efficace. En effet, ils
+transcendent les limitations des modèles paramétriques classiques en
+exploitant la factorisation de la distribution conjointe via le théorème
+de factorisation des graphes bayésiens. Cette propriété est cruciale
+pour traiter des données haute dimension, où les méthodes
+traditionnelles deviennent intenables.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre un graphe bayésien, commençons par identifier ce que
+nous cherchons à représenter. Imaginons un ensemble de variables
+aléatoires où certaines dépendent d’autres sous des conditions
+spécifiques. Nous voulons capturer ces relations de manière à ce que la
+distribution conjointe se factorise naturellement.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un graphe dirigé
+acyclique où <span class="math inline">\(V\)</span> est l’ensemble des
+sommets représentant des variables aléatoires et <span
+class="math inline">\(E\)</span> l’ensemble des arêtes orientées
+représentant les dépendances conditionnelles. Un graphe bayésien <span
+class="math inline">\(\mathcal{G}\)</span> est un couple <span
+class="math inline">\((G, P)\)</span> où <span
+class="math inline">\(P\)</span> est une distribution de probabilité
+conjointe sur les variables de <span class="math inline">\(V\)</span>
+qui respecte la structure de <span class="math inline">\(G\)</span>.</p>
+</div>
+<p>Formellement, pour tout sommet <span class="math inline">\(X \in
+V\)</span>, soit <span class="math inline">\(\text{Pa}_G(X)\)</span>
+l’ensemble des parents de <span class="math inline">\(X\)</span> dans
+<span class="math inline">\(G\)</span>. La distribution conjointe <span
+class="math inline">\(P\)</span> se factorise comme suit : <span
+class="math display">\[P(X_1, X_2, \ldots, X_n) = \prod_{X_i \in V}
+P(X_i \mid \text{Pa}_G(X_i))\]</span></p>
+<p>Cette factorisation est au cœur de l’efficacité des graphes
+bayésiens, permettant une inférence conditionnelle simplifiée.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème central en théorie des graphes bayésiens est le théorème
+de factorisation, qui formalise la propriété de décomposition
+probabiliste.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(\mathcal{G} = (G, P)\)</span> un
+graphe bayésien. Alors la distribution conjointe <span
+class="math inline">\(P\)</span> peut être exprimée comme le produit des
+distributions conditionnelles locales : <span
+class="math display">\[P(X_1, X_2, \ldots, X_n) = \prod_{X_i \in V}
+P(X_i \mid \text{Pa}_G(X_i))\]</span></p>
+</div>
+<p>La démonstration de ce théorème repose sur l’absence de cycles dans
+le graphe dirigé, garantissant que chaque variable ne dépend que de ses
+parents immédiats. Cette propriété est cruciale pour l’inférence et la
+modélisation.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de factorisation, procédons par récurrence
+sur le nombre de sommets <span class="math inline">\(n\)</span> dans le
+graphe.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Base de récurrence</strong> : Pour <span
+class="math inline">\(n=1\)</span>, la factorisation est triviale car il
+n’y a qu’une seule variable et aucun parent.</p>
+<p><strong>Hypothèse de récurrence</strong> : Supposons que le théorème
+est vrai pour un graphe bayésien avec <span
+class="math inline">\(n\)</span> sommets.</p>
+<p><strong>Pas de récurrence</strong> : Considérons un graphe bayésien
+avec <span class="math inline">\(n+1\)</span> sommets. Soit <span
+class="math inline">\(X_{n+1}\)</span> un sommet sans parents (feuille).
+La distribution conjointe peut s’écrire : <span
+class="math display">\[P(X_1, \ldots, X_{n+1}) = P(X_{n+1} \mid X_1,
+\ldots, X_n) P(X_1, \ldots, X_n)\]</span> Par hypothèse de récurrence,
+<span class="math inline">\(P(X_1, \ldots, X_n)\)</span> se factorise
+selon la structure du sous-graphe induit par <span
+class="math inline">\(\{X_1, \ldots, X_n\}\)</span>. Comme <span
+class="math inline">\(X_{n+1}\)</span> n’a pas de parents dans le graphe
+complet, sa distribution conditionnelle ne dépend que des autres
+variables. Ainsi, la factorisation globale est préservée. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les graphes bayésiens possèdent plusieurs propriétés intéressantes
+qui en font des outils puissants pour l’inférence probabiliste.</p>
+<div class="proposition">
+<p>Les propriétés suivantes découlent directement de la structure des
+graphes bayésiens :</p>
+<ol>
+<li><p><strong>Indépendance conditionnelle</strong> : Deux variables
+<span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendantes conditionnellement à
+un ensemble de variables <span class="math inline">\(\mathbf{Z}\)</span>
+si tout chemin entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> est bloqué par <span
+class="math inline">\(\mathbf{Z}\)</span>. Formellement, si <span
+class="math inline">\(X \perp\!\!\!\perp Y \mid \mathbf{Z}\)</span> dans
+le graphe, alors cette indépendance est vérifiée par la distribution
+conjointe.</p></li>
+<li><p><strong>Inférence exacte</strong> : Dans un graphe bayésien,
+l’inférence de la distribution conditionnelle d’une variable donnée les
+autres peut être effectuée en temps polynomial si le graphe est un
+arbre.</p></li>
+<li><p><strong>Apprentissage structurel</strong> : La structure d’un
+graphe bayésien peut être apprise à partir de données en utilisant des
+algorithmes comme l’algorithme de recherche de score ou les tests
+d’indépendance conditionnelle.</p></li>
+</ol>
+</div>
+<p>Chacune de ces propriétés ouvre des perspectives pour des
+applications pratiques, allant de la prédiction à l’analyse causale.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les graphes bayésiens représentent une avancée majeure dans la
+modélisation probabiliste, combinant élégamment théorie des graphes et
+statistiques bayésiennes. Leur capacité à capturer des dépendances
+complexes tout en permettant une inférence efficace les rend
+indispensables dans de nombreux domaines. Les défis futurs incluent
+l’amélioration des algorithmes d’apprentissage structurel et le
+développement de méthodes pour traiter les graphes bayésiens
+dynamiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

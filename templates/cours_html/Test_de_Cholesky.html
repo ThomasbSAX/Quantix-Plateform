@@ -1,0 +1,362 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Test de Cholesky : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Test de Cholesky : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le test de Cholesky est une méthode fondamentale en algèbre linéaire
+numérique, nommée d’après le mathématicien français André-Louis
+Cholesky. Ce test est crucial pour déterminer si une matrice donnée est
+définie positive, une propriété essentielle dans de nombreuses
+applications, notamment en optimisation, en traitement du signal et en
+statistiques.</p>
+<p>L’importance du test de Cholesky réside dans sa capacité à fournir
+une factorisation rapide et stable des matrices définies positives.
+Cette factorisation est utilisée dans divers algorithmes numériques pour
+résoudre des systèmes d’équations linéaires, calculer des déterminants
+et effectuer des interpolations. Le test de Cholesky est également
+utilisé dans les méthodes de Monte Carlo pour générer des variables
+aléatoires corrélées.</p>
+<p>Dans cet article, nous explorerons les définitions et les théorèmes
+associés au test de Cholesky, suivis de preuves détaillées et de
+propriétés importantes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Commençons par comprendre ce que nous cherchons à déterminer.
+Supposons que nous ayons une matrice <span
+class="math inline">\(A\)</span> de taille <span class="math inline">\(n
+\times n\)</span>. Nous voulons savoir si cette matrice est définie
+positive, c’est-à-dire que pour tout vecteur non nul <span
+class="math inline">\(x\)</span>, le produit scalaire <span
+class="math inline">\(x^T A x\)</span> est strictement positif.</p>
+<p>Pour ce faire, nous devons définir la factorisation de Cholesky. La
+factorisation de Cholesky d’une matrice <span
+class="math inline">\(A\)</span> est une décomposition de la forme <span
+class="math inline">\(A = LL^T\)</span>, où <span
+class="math inline">\(L\)</span> est une matrice triangulaire
+inférieure.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice symétrique
+définie positive de taille <span class="math inline">\(n \times
+n\)</span>. La factorisation de Cholesky de <span
+class="math inline">\(A\)</span> est une matrice triangulaire inférieure
+<span class="math inline">\(L\)</span> telle que : <span
+class="math display">\[A = LL^T\]</span> où <span
+class="math inline">\(L\)</span> est une matrice de taille <span
+class="math inline">\(n \times n\)</span> avec des éléments diagonaux
+strictement positifs.</p>
+</div>
+<p>Une autre manière de formuler cette définition est la suivante :
+<span class="math display">\[\forall i, j \in \{1, 2, \dots, n\}, \quad
+A_{ij} = \sum_{k=1}^{\min(i,j)} L_{ik} L_{jk}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour déterminer si une matrice est définie positive, nous pouvons
+utiliser le test de Cholesky. Le théorème suivant établit une condition
+nécessaire et suffisante pour qu’une matrice soit définie positive.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(A\)</span> une matrice symétrique
+réelle de taille <span class="math inline">\(n \times n\)</span>. La
+matrice <span class="math inline">\(A\)</span> est définie positive si
+et seulement si la factorisation de Cholesky existe.</p>
+</div>
+<p>Pour prouver ce théorème, nous devons d’abord établir un lemme
+intermédiaire.</p>
+<div class="lemme">
+<p>Soit <span class="math inline">\(A\)</span> une matrice symétrique
+définie positive de taille <span class="math inline">\(n \times
+n\)</span>. Alors, pour tout sous-matrice principale <span
+class="math inline">\(A_k\)</span> de taille <span
+class="math inline">\(k \times k\)</span> (où <span
+class="math inline">\(1 \leq k \leq n\)</span>), le déterminant de <span
+class="math inline">\(A_k\)</span> est strictement positif.</p>
+</div>
+<div class="preuve">
+<p>Nous procédons par récurrence sur <span
+class="math inline">\(k\)</span>.</p>
+<p><strong>Initialisation</strong> : Pour <span class="math inline">\(k
+= 1\)</span>, <span class="math inline">\(A_1\)</span> est un scalaire.
+Puisque <span class="math inline">\(A\)</span> est définie positive,
+<span class="math inline">\(A_1 &gt; 0\)</span>.</p>
+<p><strong>Hérédité</strong> : Supposons que pour tout <span
+class="math inline">\(m \leq k\)</span>, le déterminant de <span
+class="math inline">\(A_m\)</span> est strictement positif. Considérons
+<span class="math inline">\(A_{k+1}\)</span>. Par la propriété de la
+matrice définie positive, le déterminant de <span
+class="math inline">\(A_{k+1}\)</span> est strictement positif.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Nous pouvons maintenant prouver le théorème principal.</p>
+<div class="preuve">
+<p><strong>Nécessité</strong> : Supposons que <span
+class="math inline">\(A\)</span> soit définie positive. Nous devons
+montrer que la factorisation de Cholesky existe.</p>
+<p>Nous procédons par récurrence sur <span
+class="math inline">\(n\)</span>.</p>
+<p><strong>Initialisation</strong> : Pour <span class="math inline">\(n
+= 1\)</span>, <span class="math inline">\(A\)</span> est un scalaire
+positif, et la factorisation de Cholesky est triviale.</p>
+<p><strong>Hérédité</strong> : Supposons que pour toute matrice définie
+positive de taille <span class="math inline">\(m \times m\)</span> (où
+<span class="math inline">\(m &lt; n\)</span>), la factorisation de
+Cholesky existe. Considérons une matrice <span
+class="math inline">\(A\)</span> de taille <span class="math inline">\(n
+\times n\)</span>.</p>
+<p>Par le lemme précédent, les sous-matrices principales <span
+class="math inline">\(A_k\)</span> ont des déterminants strictement
+positifs. Nous pouvons donc utiliser l’algorithme de Cholesky pour
+construire <span class="math inline">\(L\)</span> en résolvant des
+systèmes triangulaires inférieurs.</p>
+<p><strong>Suffisance</strong> : Supposons que la factorisation de
+Cholesky existe. Nous devons montrer que <span
+class="math inline">\(A\)</span> est définie positive.</p>
+<p>Soit <span class="math inline">\(x\)</span> un vecteur non nul.
+Alors, <span class="math display">\[x^T A x = x^T LL^T x = (L^T x)^T
+(L^T x) = \| L^T x \|^2 &gt; 0\]</span> puisque <span
+class="math inline">\(L^T x\)</span> est non nul.</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes du test de
+Cholesky.</p>
+<ul>
+<li><p>La factorisation de Cholesky est unique si nous imposons que les
+éléments diagonaux de <span class="math inline">\(L\)</span> soient
+strictement positifs.</p>
+<div class="preuve">
+<p>Supposons qu’il existe deux factorisations <span
+class="math inline">\(A = L_1 L_1^T\)</span> et <span
+class="math inline">\(A = L_2 L_2^T\)</span>. Alors, <span
+class="math inline">\(L_1 L_1^T = L_2 L_2^T\)</span>.</p>
+<p>En multipliant par <span class="math inline">\(L_1^{-T}\)</span> à
+gauche et par <span class="math inline">\(L_1^{-1}\)</span> à droite,
+nous obtenons <span class="math inline">\(I = (L_1^{-1} L_2)(L_1^{-1}
+L_2)^T\)</span>.</p>
+<p>Puisque <span class="math inline">\(L_1^{-1} L_2\)</span> est
+triangulaire inférieure avec des éléments diagonaux strictement
+positifs, il s’ensuit que <span class="math inline">\(L_1^{-1} L_2 =
+I\)</span>, donc <span class="math inline">\(L_1 = L_2\)</span>.</p>
+</div></li>
+<li><p>La factorisation de Cholesky est numériquement stable pour les
+matrices définies positives.</p>
+<div class="preuve">
+<p>La stabilité numérique de la factorisation de Cholesky découle du
+fait que les opérations impliquées (résolution de systèmes
+triangulaires) sont numériquement stables.</p>
+</div></li>
+<li><p>La factorisation de Cholesky peut être utilisée pour résoudre des
+systèmes d’équations linéaires rapidement.</p>
+<div class="preuve">
+<p>Soit <span class="math inline">\(A x = b\)</span> un système
+d’équations linéaires. En utilisant la factorisation de Cholesky <span
+class="math inline">\(A = LL^T\)</span>, nous pouvons résoudre le
+système en deux étapes : <span class="math display">\[Ly = b \quad
+\text{et} \quad L^T x = y\]</span> Chacune de ces étapes peut être
+résolue efficacement en utilisant des substitutions avant et
+arrière.</p>
+</div></li>
+</ul>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le test de Cholesky est une méthode puissante et efficace pour
+déterminer si une matrice est définie positive. Sa factorisation
+associée permet de résoudre divers problèmes numériques de manière
+stable et rapide. Les propriétés et les théorèmes associés au test de
+Cholesky en font un outil indispensable dans de nombreuses applications
+scientifiques et ingénierie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,322 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Algorithme de Householder : Une Révolution en Calcul Matriciel</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Algorithme de Householder : Une Révolution en Calcul
+Matriciel</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’algorithme de Householder, nommé en l’honneur du mathématicien
+américain Alston Scott Householder, représente une avancée majeure dans
+le domaine de l’algèbre linéaire numérique. Cet algorithme, introduit en
+1958, est conçu pour transformer une matrice en une forme plus simple,
+facilitant ainsi des opérations telles que la diagonalisation ou la
+résolution de systèmes linéaires. L’importance de cet algorithme réside
+dans sa capacité à réduire les erreurs d’arrondi et à améliorer
+l’efficacité des calculs, surtout pour les matrices de grande
+taille.</p>
+<p>L’essor des ordinateurs dans les années 1950 a rendu nécessaire le
+développement d’algorithmes efficaces pour manipuler des matrices.
+L’algorithme de Householder répond à ce besoin en fournissant une
+méthode systématique pour transformer une matrice en une forme
+triangulaire ou diagonale, ce qui est essentiel pour de nombreuses
+applications en ingénierie, physique et sciences des données.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’algorithme de Householder, il est crucial de
+définir quelques concepts clés.</p>
+<h2 class="unnumbered" id="matrice-de-householder">Matrice de
+Householder</h2>
+<p>Considérons une matrice <span class="math inline">\(A \in
+\mathbb{R}^{n \times n}\)</span>. L’objectif est de trouver une matrice
+orthogonale <span class="math inline">\(H\)</span> telle que <span
+class="math inline">\(H A\)</span> ait une forme simplifiée. La matrice
+de Householder est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathbf{v} \in \mathbb{R}^n\)</span>
+un vecteur non nul. La matrice de Householder associée à <span
+class="math inline">\(\mathbf{v}\)</span> est définie par : <span
+class="math display">\[H = I - 2 \frac{\mathbf{v}
+\mathbf{v}^T}{\mathbf{v}^T \mathbf{v}}\]</span> où <span
+class="math inline">\(I\)</span> est la matrice identité de taille <span
+class="math inline">\(n \times n\)</span>.</p>
+</div>
+<p>Cette matrice <span class="math inline">\(H\)</span> est orthogonale,
+c’est-à-dire que <span class="math inline">\(H^T H = I\)</span>. De
+plus, elle reflète tout vecteur <span class="math inline">\(\mathbf{x}
+\in \mathbb{R}^n\)</span> par rapport à l’hyperplan orthogonal à <span
+class="math inline">\(\mathbf{v}\)</span>.</p>
+<h2 class="unnumbered" id="reflection">Reflection</h2>
+<p>La réflexion d’un vecteur <span
+class="math inline">\(\mathbf{x}\)</span> par rapport à l’hyperplan
+orthogonal à <span class="math inline">\(\mathbf{v}\)</span> est donnée
+par : <span class="math display">\[H \mathbf{x} = \mathbf{x} - 2
+\frac{\mathbf{v}^T \mathbf{x}}{\mathbf{v}^T \mathbf{v}}
+\mathbf{v}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-householder">Théorème de
+Householder</h2>
+<p>Le théorème fondamental de l’algorithme de Householder est le suivant
+:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A \in \mathbb{R}^{n \times
+n}\)</span> une matrice symétrique. Il existe une suite de matrices de
+Householder <span class="math inline">\(H_1, H_2, \ldots, H_k\)</span>
+telles que : <span class="math display">\[H_k \cdots H_2 H_1 A H_1^T
+H_2^T \cdots H_k^T\]</span> est une matrice diagonale.</p>
+</div>
+<h2 class="unnumbered" id="preuve-du-théorème-de-householder">Preuve du
+Théorème de Householder</h2>
+<p>La preuve de ce théorème repose sur le principe de la réduction
+successive des éléments hors diagonale. Voici une esquisse de la preuve
+:</p>
+<p>1. **Initialisation** : Commencez avec la matrice <span
+class="math inline">\(A\)</span>.</p>
+<p>2. **Choix du vecteur <span
+class="math inline">\(\mathbf{v}\)</span>** : Pour chaque étape,
+choisissez un vecteur <span class="math inline">\(\mathbf{v}\)</span>
+tel que la réflexion par rapport à l’hyperplan orthogonal à <span
+class="math inline">\(\mathbf{v}\)</span> annule les éléments hors
+diagonale dans une colonne spécifique.</p>
+<p>3. **Application de la matrice de Householder** : Appliquez la
+matrice de Householder <span class="math inline">\(H\)</span>
+correspondante à <span class="math inline">\(A\)</span>.</p>
+<p>4. **Répétition** : Répétez le processus jusqu’à ce que la matrice
+soit diagonalisée.</p>
+<p>Chaque étape utilise les propriétés de l’orthogonalité et de la
+réflexion pour garantir que les éléments hors diagonale sont réduits
+systématiquement.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-1-orthogonalité">Propriété 1 :
+Orthogonalité</h2>
+<p>La matrice de Householder <span class="math inline">\(H\)</span> est
+orthogonale, c’est-à-dire : <span class="math display">\[H^T H =
+I\]</span></p>
+<h2 class="unnumbered" id="preuve-de-la-propriété-1">Preuve de la
+Propriété 1</h2>
+<p>La preuve repose sur le calcul direct : <span
+class="math display">\[H^T H = \left( I - 2 \frac{\mathbf{v}
+\mathbf{v}^T}{\mathbf{v}^T \mathbf{v}} \right)^T \left( I - 2
+\frac{\mathbf{v} \mathbf{v}^T}{\mathbf{v}^T \mathbf{v}} \right) = I - 4
+\frac{\mathbf{v} \mathbf{v}^T}{\mathbf{v}^T \mathbf{v}} + 4
+\frac{\mathbf{v} \mathbf{v}^T \mathbf{v} \mathbf{v}^T}{(\mathbf{v}^T
+\mathbf{v})^2}\]</span> En simplifiant, on obtient : <span
+class="math display">\[H^T H = I\]</span></p>
+<h2 class="unnumbered"
+id="propriété-2-conservation-de-la-norme">Propriété 2 : Conservation de
+la Norme</h2>
+<p>La matrice de Householder conserve la norme des vecteurs,
+c’est-à-dire : <span class="math display">\[\| H \mathbf{x} \| = \|
+\mathbf{x} \|\]</span></p>
+<h2 class="unnumbered" id="preuve-de-la-propriété-2">Preuve de la
+Propriété 2</h2>
+<p>La preuve repose sur le calcul de la norme : <span
+class="math display">\[\| H \mathbf{x} \|^2 = (H \mathbf{x})^T (H
+\mathbf{x}) = \mathbf{x}^T H^T H \mathbf{x} = \mathbf{x}^T I \mathbf{x}
+= \| \mathbf{x} \|^2\]</span></p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’algorithme de Householder est un outil puissant et efficace pour la
+diagonalisation des matrices symétriques. Son utilisation extensive dans
+les calculs numériques témoigne de son importance et de sa robustesse.
+En comprenant les concepts fondamentaux et les propriétés des matrices
+de Householder, on peut apprécier pleinement la beauté et l’utilité de
+cet algorithme.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

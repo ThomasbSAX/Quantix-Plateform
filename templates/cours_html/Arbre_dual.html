@@ -1,0 +1,352 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Arbre Dual : Structure et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Arbre Dual : Structure et Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des arbres dans la théorie des graphes est un domaine riche
+et varié, offrant des applications dans de nombreux domaines tels que
+l’informatique théorique, la biologie évolutive et les réseaux de
+communication. Parmi ces structures, l’arbre dual occupe une place
+particulière en raison de ses propriétés uniques et de son utilité dans
+la résolution de problèmes complexes.</p>
+<p>L’arbre dual émerge naturellement dans le contexte des graphes
+planaires, où il permet de représenter les relations entre les faces
+d’un graphe. Cette notion est indispensable pour comprendre la dualité
+entre sommets et faces, un concept fondamental en topologie des graphes.
+Historiquement, l’arbre dual a été introduit pour simplifier l’analyse
+des graphes planaires et faciliter la résolution de problèmes tels que
+le coloriage des cartes ou l’optimisation des réseaux.</p>
+<p>Dans cet article, nous explorerons la définition formelle de l’arbre
+dual, ses propriétés fondamentales et ses applications pratiques. Nous
+verrons comment cette structure permet de transformer des problèmes
+complexes en problèmes plus simples et mieux compris.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir l’arbre dual, commençons par comprendre ce que nous
+cherchons à représenter. Considérons un graphe planaire <span
+class="math inline">\(G\)</span> avec ses faces. Nous voulons capturer
+les relations d’adjacence entre ces faces. Intuitivement, chaque face du
+graphe <span class="math inline">\(G\)</span> peut être vue comme un
+sommet dans l’arbre dual, et deux sommets de l’arbre dual sont reliés
+par une arête si les faces correspondantes partagent une arête commune
+dans <span class="math inline">\(G\)</span>.</p>
+<p>Formellement, soit <span class="math inline">\(G = (V, E)\)</span> un
+graphe planaire avec une représentation plane donnée. L’arbre dual <span
+class="math inline">\(G^* = (V^*, E^*)\)</span> de <span
+class="math inline">\(G\)</span> est défini comme suit :</p>
+<ul>
+<li><p>Chaque sommet <span class="math inline">\(v^* \in V^*\)</span>
+représente une face distincte de <span
+class="math inline">\(G\)</span>.</p></li>
+<li><p>Deux sommets <span class="math inline">\(v^*_1, v^*_2 \in
+V^*\)</span> sont reliés par une arête <span class="math inline">\(e^*
+\in E^*\)</span> si et seulement si les faces correspondantes partagent
+une arête commune dans <span class="math inline">\(G\)</span>.</p></li>
+</ul>
+<p>En d’autres termes, pour tout graphe planaire <span
+class="math inline">\(G = (V, E)\)</span>, il existe un arbre dual <span
+class="math inline">\(G^* = (V^*, E^*)\)</span> tel que : <span
+class="math display">\[\forall f_1, f_2 \in \text{Faces}(G), \exists e^*
+\in E^* \text{ tel que } v^*_{f_1} \text{ est adjacent à } v^*_{f_2}
+\Leftrightarrow \exists e \in E \text{ incident à } f_1 \text{ et }
+f_2.\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant les arbres duals est le suivant
+:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(G\)</span> un graphe planaire
+connexe. Alors, l’arbre dual <span class="math inline">\(G^*\)</span> de
+<span class="math inline">\(G\)</span> est un arbre.</p>
+</div>
+<p>Pour comprendre ce théorème, considérons d’abord que <span
+class="math inline">\(G\)</span> est connexe. Cela signifie qu’il existe
+un chemin entre toute paire de sommets dans <span
+class="math inline">\(G\)</span>. En conséquence, les faces de <span
+class="math inline">\(G\)</span> sont également connectées via des
+arêtes communes. L’arbre dual <span class="math inline">\(G^*\)</span>
+capture cette connexité en reliant les sommets correspondants aux faces
+adjacentes.</p>
+<p>La preuve de ce théorème repose sur plusieurs propriétés clés :</p>
+<ul>
+<li><p>La connexité de <span class="math inline">\(G\)</span> implique
+que les faces sont connectées.</p></li>
+<li><p>L’absence de cycles dans <span class="math inline">\(G^*\)</span>
+découle du fait que toute boucle dans <span
+class="math inline">\(G^*\)</span> créerait un cycle dans <span
+class="math inline">\(G\)</span>, ce qui contredirait la planéité de
+<span class="math inline">\(G\)</span>.</p></li>
+</ul>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de l’arbre dual, procédons par étapes :</p>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>Considérons un graphe planaire <span class="math inline">\(G =
+(V, E)\)</span> connexe. Par définition, pour toute paire de sommets
+<span class="math inline">\(u, v \in V\)</span>, il existe un chemin
+reliant <span class="math inline">\(u\)</span> à <span
+class="math inline">\(v\)</span>.</p></li>
+<li><p>Pour toute paire de faces <span class="math inline">\(f_1, f_2
+\in \text{Faces}(G)\)</span>, il existe un chemin dans <span
+class="math inline">\(G\)</span> qui passe par une séquence de faces
+adjacentes. Cela signifie que les sommets correspondants <span
+class="math inline">\(v^*_{f_1}, v^*_{f_2} \in V^*\)</span> sont
+connectés dans <span class="math inline">\(G^*\)</span>.</p></li>
+<li><p>Supposons par contradiction qu’il existe un cycle dans <span
+class="math inline">\(G^*\)</span>. Cela impliquerait l’existence d’un
+cycle dans <span class="math inline">\(G\)</span> formé par les arêtes
+séparant les faces correspondantes. Cependant, un tel cycle dans <span
+class="math inline">\(G\)</span> contredirait la planéité de <span
+class="math inline">\(G\)</span>, car un graphe planaire ne peut
+contenir de cycles séparant les faces sans créer une nouvelle
+face.</p></li>
+<li><p>Par conséquent, <span class="math inline">\(G^*\)</span> ne
+contient pas de cycles et est donc un arbre.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les arbres duals possèdent plusieurs propriétés intéressantes :</p>
+<ul>
+<li><p><strong>Propriété (i)</strong> : Pour tout graphe planaire <span
+class="math inline">\(G\)</span>, l’arbre dual <span
+class="math inline">\(G^*\)</span> est unique à isomorphismes près.</p>
+<div class="proof">
+<p><em>Proof.</em> La preuve repose sur le fait que la structure de
+l’arbre dual est entièrement déterminée par les relations d’adjacence
+entre les faces de <span class="math inline">\(G\)</span>, qui sont
+elles-mêmes déterminées par la représentation plane de <span
+class="math inline">\(G\)</span>. ◻</p>
+</div></li>
+<li><p><strong>Propriété (ii)</strong> : Si <span
+class="math inline">\(G\)</span> est un graphe planaire maximal
+(c’est-à-dire qu’aucune arête supplémentaire ne peut être ajoutée sans
+violer la planéité), alors <span class="math inline">\(G^*\)</span> est
+un arbre couvrant maximal de <span class="math inline">\(G\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Dans un graphe planaire maximal, chaque paire de
+faces adjacentes est reliée par une arête. Par conséquent, l’arbre dual
+<span class="math inline">\(G^*\)</span> inclut toutes les relations
+d’adjacence possibles entre les faces, ce qui en fait un arbre couvrant
+maximal. ◻</p>
+</div></li>
+<li><p><strong>Propriété (iii)</strong> : L’arbre dual <span
+class="math inline">\(G^*\)</span> d’un graphe planaire <span
+class="math inline">\(G\)</span> peut être utilisé pour résoudre des
+problèmes de coloriage des cartes.</p>
+<div class="proof">
+<p><em>Proof.</em> Le problème du coloriage des cartes peut être
+reformulé en termes de coloriage des sommets de <span
+class="math inline">\(G^*\)</span>, où chaque couleur représente une
+face distincte. Les propriétés de l’arbre dual garantissent que ce
+coloriage est possible avec un nombre minimal de couleurs. ◻</p>
+</div></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’arbre dual est une structure fascinante qui offre des insights
+profonds sur la topologie des graphes planaires. Ses propriétés et ses
+applications en font un outil précieux pour les mathématiciens et les
+informaticiens. En comprenant l’arbre dual, nous pouvons mieux
+appréhender la complexité des graphes et résoudre des problèmes
+autrement inaccessibles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

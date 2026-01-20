@@ -1,0 +1,354 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance tronquée : une mesure robuste de la dispersion</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance tronquée : une mesure robuste de la
+dispersion</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La variance, mesure classique de la dispersion d’un ensemble de
+données, est sensible aux valeurs extrêmes ou aberrantes. La variance
+tronquée émerge comme une alternative robuste, particulièrement utile en
+statistique descriptive et inférentielle. Son origine conceptuelle
+remonte aux travaux sur la robustesse statistique, où l’objectif est de
+limiter l’impact des observations extrêmes.</p>
+<p>La variance tronquée est indispensable dans les contextes où les
+données présentent une asymétrie marquée ou des valeurs aberrantes. Elle
+permet d’obtenir une mesure de dispersion plus représentative de la
+majorité des observations, tout en atténuant l’influence des valeurs
+extrêmes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la variance tronquée, commençons par comprendre ce que
+nous cherchons à mesurer. Nous voulons une mesure de dispersion qui ne
+soit pas affectée par les valeurs extrêmes. Cela signifie que nous
+devons exclure une certaine proportion des données les plus petites et
+les plus grandes avant de calculer la variance.</p>
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire de
+loi <span class="math inline">\(P\)</span>, et soit <span
+class="math inline">\(F\)</span> sa fonction de répartition. Pour un
+niveau de troncature <span class="math inline">\(\alpha \in (0,
+1)\)</span>, définissons les quantiles inférieurs et supérieurs comme
+suit : <span class="math display">\[q_{\alpha/2} = \inf \{ x : F(x) \geq
+\alpha/2 \}\]</span> <span class="math display">\[q_{1-\alpha/2} = \sup
+\{ x : F(x) \leq 1 - \alpha/2 \}\]</span></p>
+<p>La variance tronquée au niveau <span
+class="math inline">\(\alpha\)</span> est alors définie comme la
+variance de la variable aléatoire tronquée <span
+class="math inline">\(X_{\text{tr}}\)</span>, qui prend les valeurs de
+<span class="math inline">\(X\)</span> comprises entre <span
+class="math inline">\(q_{\alpha/2}\)</span> et <span
+class="math inline">\(q_{1-\alpha/2}\)</span>. Formellement, pour un
+échantillon <span class="math inline">\(x_1, x_2, \ldots, x_n\)</span>,
+la variance tronquée est donnée par : <span
+class="math display">\[\sigma^2_{\text{tr}, \alpha} = \frac{1}{n(1 -
+\alpha)} \sum_{i=1}^n (x_i - \bar{x}_{\text{tr}})^2 \cdot
+\mathbb{I}(q_{\alpha/2} \leq x_i \leq q_{1-\alpha/2})\]</span> où <span
+class="math inline">\(\bar{x}_{\text{tr}}\)</span> est la moyenne
+tronquée définie par : <span class="math display">\[\bar{x}_{\text{tr}}
+= \frac{1}{n(1 - \alpha)} \sum_{i=1}^n x_i \cdot \mathbb{I}(q_{\alpha/2}
+\leq x_i \leq q_{1-\alpha/2})\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la variance tronquée est le
+théorème de la convergence en loi de l’estimateur de la variance
+tronquée. Ce théorème assure que, sous certaines conditions,
+l’estimateur de la variance tronquée converge vers la vraie variance
+tronquée lorsque la taille de l’échantillon tend vers l’infini.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> un
+échantillon aléatoire i.i.d. de loi <span
+class="math inline">\(P\)</span>, et soit <span
+class="math inline">\(\sigma^2_{\text{tr}, \alpha}\)</span> la variance
+tronquée au niveau <span class="math inline">\(\alpha\)</span>. Alors,
+l’estimateur de la variance tronquée <span
+class="math inline">\(S^2_{\text{tr}, \alpha}\)</span> converge en loi
+vers une variable aléatoire normale lorsque <span
+class="math inline">\(n \to \infty\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la convergence en loi, nous utilisons le
+théorème central limite pour les statistiques <span
+class="math inline">\(U\)</span>-statistiques. L’estimateur de la
+variance tronquée peut être exprimé comme une <span
+class="math inline">\(U\)</span>-statistique, et sous certaines
+conditions de régularité, nous pouvons appliquer le théorème central
+limite pour obtenir la convergence en loi.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons l’estimateur de la variance tronquée :
+<span class="math display">\[S^2_{\text{tr}, \alpha} = \frac{1}{n(1 -
+\alpha)} \sum_{i=1}^n (X_i - \bar{X}_{\text{tr}})^2 \cdot
+\mathbb{I}(q_{\alpha/2} \leq X_i \leq q_{1-\alpha/2})\]</span> où <span
+class="math inline">\(\bar{X}_{\text{tr}}\)</span> est la moyenne
+tronquée. Nous pouvons réécrire cet estimateur comme une <span
+class="math inline">\(U\)</span>-statistique : <span
+class="math display">\[S^2_{\text{tr}, \alpha} = \frac{1}{n(n-1)(1 -
+\alpha)^2} \sum_{i \neq j} (X_i - X_j)^2 \cdot \mathbb{I}(q_{\alpha/2}
+\leq X_i, X_j \leq q_{1-\alpha/2})\]</span> En appliquant le théorème
+central limite pour les <span
+class="math inline">\(U\)</span>-statistiques, nous obtenons la
+convergence en loi vers une variable aléatoire normale. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+variance tronquée :</p>
+<ol>
+<li><p><strong>Invariance par translation</strong> : La variance
+tronquée est invariante par translation. Cela signifie que si nous
+ajoutons une constante à chaque observation, la variance tronquée reste
+inchangée.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(Y = X + c\)</span>,
+où <span class="math inline">\(c\)</span> est une constante. Alors, la
+variance tronquée de <span class="math inline">\(Y\)</span> est : <span
+class="math display">\[\sigma^2_{\text{tr}, \alpha}(Y) = \frac{1}{n(1 -
+\alpha)} \sum_{i=1}^n (Y_i - \bar{Y}_{\text{tr}})^2 \cdot
+\mathbb{I}(q_{\alpha/2} \leq Y_i \leq q_{1-\alpha/2})\]</span> En
+remplaçant <span class="math inline">\(Y_i\)</span> par <span
+class="math inline">\(X_i + c\)</span>, nous obtenons : <span
+class="math display">\[\sigma^2_{\text{tr}, \alpha}(Y) = \frac{1}{n(1 -
+\alpha)} \sum_{i=1}^n (X_i + c - (\bar{X}_{\text{tr}} + c))^2 \cdot
+\mathbb{I}(q_{\alpha/2} \leq X_i + c \leq q_{1-\alpha/2})\]</span>
+Simplifiant, nous voyons que <span
+class="math inline">\(\sigma^2_{\text{tr}, \alpha}(Y) =
+\sigma^2_{\text{tr}, \alpha}(X)\)</span>. ◻</p>
+</div></li>
+<li><p><strong>Homogénéité d’ordre 2</strong> : La variance tronquée est
+homogène d’ordre 2. Cela signifie que si nous multiplions chaque
+observation par une constante <span class="math inline">\(c\)</span>, la
+variance tronquée est multipliée par <span
+class="math inline">\(c^2\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(Y = cX\)</span>, où
+<span class="math inline">\(c\)</span> est une constante. Alors, la
+variance tronquée de <span class="math inline">\(Y\)</span> est : <span
+class="math display">\[\sigma^2_{\text{tr}, \alpha}(Y) = \frac{1}{n(1 -
+\alpha)} \sum_{i=1}^n (Y_i - \bar{Y}_{\text{tr}})^2 \cdot
+\mathbb{I}(q_{\alpha/2} \leq Y_i \leq q_{1-\alpha/2})\]</span> En
+remplaçant <span class="math inline">\(Y_i\)</span> par <span
+class="math inline">\(cX_i\)</span>, nous obtenons : <span
+class="math display">\[\sigma^2_{\text{tr}, \alpha}(Y) = \frac{c^2}{n(1
+- \alpha)} \sum_{i=1}^n (X_i - \bar{X}_{\text{tr}})^2 \cdot \mathbb{I}(c
+q_{\alpha/2} \leq X_i \leq c q_{1-\alpha/2})\]</span> Si <span
+class="math inline">\(c &gt; 0\)</span>, les quantiles sont simplement
+multipliés par <span class="math inline">\(c\)</span>, et la variance
+tronquée est multipliée par <span
+class="math inline">\(c^2\)</span>. ◻</p>
+</div></li>
+<li><p><strong>Robustesse</strong> : La variance tronquée est robuste
+aux valeurs aberrantes. En excluant une certaine proportion des données
+les plus petites et les plus grandes, nous limitons l’impact des
+observations extrêmes sur la mesure de dispersion.</p>
+<div class="proof">
+<p><em>Proof.</em> La robustesse de la variance tronquée découle
+directement de sa définition. En excluant les observations extrêmes,
+nous réduisons l’influence des valeurs aberrantes sur la mesure de
+dispersion. Cela rend la variance tronquée plus représentative de la
+majorité des observations. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La variance tronquée est une mesure robuste de la dispersion qui
+offre plusieurs avantages par rapport à la variance classique. Elle est
+particulièrement utile dans les contextes où les données présentent des
+valeurs aberrantes ou une asymétrie marquée. Les propriétés et théorèmes
+associés à la variance tronquée en font un outil précieux pour l’analyse
+statistique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

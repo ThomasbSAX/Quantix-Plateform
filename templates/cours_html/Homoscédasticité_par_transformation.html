@@ -1,0 +1,363 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Homoscédasticité par transformation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Homoscédasticité par transformation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’homoscédasticité, ou homoscedasticité, est une propriété
+fondamentale en statistique qui désigne la constance de la variance des
+erreurs dans un modèle. Cette notion est cruciale pour l’application
+valide de nombreuses techniques statistiques, notamment les tests
+d’hypothèses et la régression linéaire. Cependant, dans de nombreux cas
+pratiques, les données présentent une hétéroscédasticité, c’est-à-dire
+une variance non constante. Pour pallier ce problème, des
+transformations des données peuvent être appliquées afin de rendre la
+variance constante.</p>
+<p>Cette approche est particulièrement utile dans le cadre des modèles
+de régression, où l’homoscédasticité est une hypothèse clé pour la
+validité des tests statistiques et la précision des estimations. Les
+transformations permettent non seulement de stabiliser la variance, mais
+aussi parfois de rendre les relations entre variables plus
+linéaires.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’aborder les transformations, il est essentiel de définir
+précisément l’homoscédasticité et ses implications.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(Y\)</span> une variable aléatoire
+dépendante et <span class="math inline">\(X\)</span> un vecteur de
+variables indépendantes. On dit que le modèle est homoscédastique si la
+variance des erreurs <span class="math inline">\(\epsilon\)</span> est
+constante pour toutes les valeurs de <span
+class="math inline">\(X\)</span>. Formellement, cela s’écrit : <span
+class="math display">\[\forall x_1, x_2 \in \mathbb{R}^n, \quad
+\text{Var}(\epsilon | X = x_1) = \text{Var}(\epsilon | X =
+x_2)\]</span></p>
+</div>
+<p>L’homoscédasticité est souvent vérifiée graphiquement en traçant les
+résidus d’un modèle de régression contre les valeurs prédites. Si les
+points semblent répartis de manière aléatoire autour de zéro sans
+tendance particulière, on peut considérer que l’hypothèse
+d’homoscédasticité est respectée.</p>
+<h1 class="unnumbered"
+id="transformations-pour-lhomoscédasticité">Transformations pour
+l’Homoscédasticité</h1>
+<p>Plusieurs transformations peuvent être appliquées aux données pour
+rendre la variance constante. Les plus courantes sont les
+transformations logarithmiques, les transformations racine carrée et les
+transformations de Box-Cox.</p>
+<h2 class="unnumbered" id="transformation-logarithmique">Transformation
+Logarithmique</h2>
+<p>La transformation logarithmique est souvent utilisée pour stabiliser
+la variance, notamment lorsque les données présentent une tendance à
+l’hétéroscédasticité croissante avec la moyenne.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(Y\)</span> une variable aléatoire
+positive. La transformation logarithmique est définie par : <span
+class="math display">\[Y&#39; = \log(Y)\]</span></p>
+</div>
+<p>Cette transformation est particulièrement efficace lorsque la
+variance des erreurs augmente avec la moyenne de <span
+class="math inline">\(Y\)</span>.</p>
+<h2 class="unnumbered" id="transformation-racine-carrée">Transformation
+Racine Carrée</h2>
+<p>La transformation racine carrée est utile lorsque les données
+présentent une variance proportionnelle à la moyenne.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(Y\)</span> une variable aléatoire
+positive. La transformation racine carrée est définie par : <span
+class="math display">\[Y&#39; = \sqrt{Y}\]</span></p>
+</div>
+<p>Cette transformation est souvent utilisée pour les données de
+comptage, où la variance est proportionnelle à la moyenne.</p>
+<h2 class="unnumbered" id="transformation-de-box-cox">Transformation de
+Box-Cox</h2>
+<p>La transformation de Box-Cox est une généralisation des
+transformations logarithmiques et racine carrée. Elle permet de trouver
+la transformation optimale pour rendre les données normalement
+distribuées et homoscédastiques.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(Y\)</span> une variable aléatoire
+positive et <span class="math inline">\(\lambda\)</span> un paramètre
+réel. La transformation de Box-Cox est définie par : <span
+class="math display">\[Y&#39; =
+\begin{cases}
+\frac{Y^\lambda - 1}{\lambda} &amp; \text{si } \lambda \neq 0 \\
+\log(Y) &amp; \text{si } \lambda = 0
+\end{cases}\]</span></p>
+</div>
+<p>Le paramètre <span class="math inline">\(\lambda\)</span> est estimé
+de manière à maximiser la vraisemblance du modèle transformé.</p>
+<h1 class="unnumbered" id="théorèmes-et-propriétés">Théorèmes et
+Propriétés</h1>
+<p>Plusieurs théorèmes et propriétés sont associés à l’homoscédasticité
+et aux transformations.</p>
+<h2 class="unnumbered" id="théorème-de-gauss-markov">Théorème de
+Gauss-Markov</h2>
+<p>Le théorème de Gauss-Markov est fondamental en régression linéaire.
+Il stipule que sous certaines hypothèses, dont l’homoscédasticité, les
+estimateurs des moindres carrés sont les meilleurs estimateurs linéaires
+non biaisés.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(Y = X\beta + \epsilon\)</span> un
+modèle linéaire général, où <span class="math inline">\(X\)</span> est
+une matrice de variables indépendantes, <span
+class="math inline">\(\beta\)</span> un vecteur de coefficients et <span
+class="math inline">\(\epsilon\)</span> un vecteur d’erreurs. Si les
+erreurs sont homoscédastiques et non corrélées, alors l’estimateur des
+moindres carrés <span class="math inline">\(\hat{\beta} = (X^T X)^{-1}
+X^T Y\)</span> est le meilleur estimateur linéaire non biaisé.</p>
+</div>
+<h2 class="unnumbered" id="propriétés-des-transformations">Propriétés
+des Transformations</h2>
+<p>Les transformations présentent plusieurs propriétés importantes :</p>
+<ol>
+<li><p>La transformation logarithmique est définie uniquement pour les
+variables positives.</p></li>
+<li><p>La transformation racine carrée est également définie uniquement
+pour les variables positives.</p></li>
+<li><p>La transformation de Box-Cox généralise les transformations
+logarithmiques et racine carrée.</p></li>
+</ol>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Les preuves des théorèmes et propriétés sont essentielles pour
+comprendre leur validité.</p>
+<h2 class="unnumbered" id="preuve-du-théorème-de-gauss-markov">Preuve du
+Théorème de Gauss-Markov</h2>
+<p>La preuve du théorème de Gauss-Markov repose sur plusieurs étapes
+:</p>
+<p>1. **Hypothèses** : On suppose que <span
+class="math inline">\(\mathbb{E}[\epsilon | X] = 0\)</span> et <span
+class="math inline">\(\text{Var}(\epsilon | X) = \sigma^2 I\)</span>, où
+<span class="math inline">\(I\)</span> est la matrice identité.</p>
+<p>2. **Estimateur des Moindres Carrés** : L’estimateur des moindres
+carrés est défini par <span class="math inline">\(\hat{\beta} = (X^T
+X)^{-1} X^T Y\)</span>.</p>
+<p>3. **Biais** : On montre que <span
+class="math inline">\(\mathbb{E}[\hat{\beta}] = \beta\)</span>, ce qui
+prouve que l’estimateur est non biaisé.</p>
+<p>4. **Variance** : On montre que la variance de <span
+class="math inline">\(\hat{\beta}\)</span> est minimale parmi tous les
+estimateurs linéaires non biaisés.</p>
+<h2 class="unnumbered"
+id="preuve-des-propriétés-des-transformations">Preuve des Propriétés des
+Transformations</h2>
+<p>Les preuves des propriétés des transformations sont plus intuitives
+:</p>
+<p>1. **Transformation Logarithmique** : La transformation logarithmique
+est définie uniquement pour les variables positives car le logarithme
+d’un nombre négatif ou nul n’est pas défini dans <span
+class="math inline">\(\mathbb{R}\)</span>.</p>
+<p>2. **Transformation Racine Carrée** : De même, la racine carrée d’un
+nombre négatif n’est pas définie dans <span
+class="math inline">\(\mathbb{R}\)</span>.</p>
+<p>3. **Transformation de Box-Cox** : La transformation de Box-Cox
+généralise les transformations logarithmiques et racine carrée en
+permettant une interpolation continue entre ces deux cas extrêmes.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’homoscédasticité est une propriété cruciale en statistique, et les
+transformations des données permettent de la rétablir lorsque les
+hypothèses du modèle ne sont pas satisfaites. Les transformations
+logarithmiques, racine carrée et de Box-Cox sont des outils puissants
+pour stabiliser la variance et améliorer la validité des modèles de
+régression. Les théorèmes et propriétés associés à ces transformations
+fournissent une base solide pour leur application pratique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

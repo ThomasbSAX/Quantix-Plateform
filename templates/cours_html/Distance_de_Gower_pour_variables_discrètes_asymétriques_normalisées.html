@@ -1,0 +1,361 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Gower pour variables discrètes asymétriques normalisées</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Gower pour variables discrètes
+asymétriques normalisées</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Gower est une mesure de dissimilarité particulièrement
+adaptée pour les données mixtes, combinant à la fois des variables
+quantitatives et qualitatives. Son importance réside dans sa capacité à
+normaliser les contributions de chaque variable, ce qui est crucial pour
+l’analyse des données où les échelles et les types de variables
+varient.</p>
+<p>L’origine de la distance de Gower remonte aux travaux de Michael A.
+Gower en 1971, qui a introduit cette mesure pour répondre aux besoins
+des analyses multivariées où les données ne sont pas homogènes. Cette
+distance est indispensable dans les domaines tels que la biologie,
+l’écologie et les sciences sociales, où les données sont souvent de
+nature mixte.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Gower, commençons par comprendre ce que
+nous cherchons à mesurer. Nous voulons une mesure de dissimilarité qui
+prenne en compte la nature des variables et leurs échelles respectives.
+La distance de Gower est particulièrement utile pour les variables
+discrètes asymétriques, où les valeurs ne sont pas symétriquement
+distribuées autour d’une moyenne.</p>
+<p>Considérons deux objets <span class="math inline">\(i\)</span> et
+<span class="math inline">\(j\)</span>, chacun décrit par un ensemble de
+variables. Pour chaque variable <span class="math inline">\(k\)</span>,
+nous voulons mesurer la dissimilarité entre les valeurs <span
+class="math inline">\(x_{ik}\)</span> et <span
+class="math inline">\(x_{jk}\)</span>. La distance de Gower est définie
+comme la somme des dissimilarités normalisées pour chaque variable.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une matrice de données
+avec <span class="math inline">\(n\)</span> objets et <span
+class="math inline">\(p\)</span> variables. Pour chaque variable <span
+class="math inline">\(k\)</span>, soit <span
+class="math inline">\(d_{ijk}\)</span> la dissimilarité entre les objets
+<span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>. La distance de Gower <span
+class="math inline">\(d_{ij}\)</span> est définie par : <span
+class="math display">\[d_{ij} = \frac{\sum_{k=1}^{p} r_{ijk}
+d_{ijk}}{\sum_{k=1}^{p} r_{ijk}}\]</span> où <span
+class="math inline">\(r_{ijk}\)</span> est un indicateur qui vaut 1 si
+la dissimilarité pour la variable <span class="math inline">\(k\)</span>
+est définie, et 0 sinon.</p>
+</div>
+<p>Pour les variables discrètes asymétriques normalisées, la
+dissimilarité <span class="math inline">\(d_{ijk}\)</span> peut être
+définie comme : <span class="math display">\[d_{ijk} = \frac{|x_{ik} -
+x_{jk}|}{\max_k(x_k) - \min_k(x_k)}\]</span> où <span
+class="math inline">\(\max_k(x_k)\)</span> et <span
+class="math inline">\(\min_k(x_k)\)</span> sont respectivement les
+valeurs maximale et minimale de la variable <span
+class="math inline">\(k\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la distance de Gower est celui de la
+normalisation des dissimilarités. Ce théorème garantit que les
+contributions de chaque variable sont comparables, indépendamment de
+leurs échelles originales.</p>
+<div class="theorem">
+<p>Pour toute matrice de données <span class="math inline">\(X\)</span>
+avec <span class="math inline">\(n\)</span> objets et <span
+class="math inline">\(p\)</span> variables, la distance de Gower <span
+class="math inline">\(d_{ij}\)</span> satisfait les propriétés suivantes
+:</p>
+<ol>
+<li><p><span class="math inline">\(d_{ij} \geq 0\)</span> pour tout
+<span class="math inline">\(i, j\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ij} = 0\)</span> si et seulement
+si <span class="math inline">\(i = j\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ij} = d_{ji}\)</span> pour tout
+<span class="math inline">\(i, j\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ij} \leq 1\)</span> pour tout
+<span class="math inline">\(i, j\)</span>.</p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la normalisation des dissimilarités, nous
+devons montrer que chaque propriété est satisfaite.</p>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>Pour tout <span class="math inline">\(i, j\)</span>, la
+dissimilarité <span class="math inline">\(d_{ijk}\)</span> est non
+négative, et la somme de valeurs non négatives est également non
+négative. Donc <span class="math inline">\(d_{ij} \geq
+0\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(i = j\)</span>, alors <span
+class="math inline">\(x_{ik} = x_{jk}\)</span> pour toute variable <span
+class="math inline">\(k\)</span>, ce qui implique <span
+class="math inline">\(d_{ijk} = 0\)</span>. Par conséquent, <span
+class="math inline">\(d_{ij} = 0\)</span>. Réciproquement, si <span
+class="math inline">\(d_{ij} = 0\)</span>, alors toutes les
+dissimilarités <span class="math inline">\(d_{ijk}\)</span> doivent être
+nulles, ce qui implique <span class="math inline">\(x_{ik} =
+x_{jk}\)</span> pour toute variable <span
+class="math inline">\(k\)</span>. Donc <span class="math inline">\(i =
+j\)</span>.</p></li>
+<li><p>La symétrie de <span class="math inline">\(d_{ij}\)</span>
+découle de la symétrie de <span class="math inline">\(d_{ijk}\)</span>,
+car <span class="math inline">\(|x_{ik} - x_{jk}| = |x_{jk} -
+x_{ik}|\)</span>.</p></li>
+<li><p>La normalisation par <span class="math inline">\(\max_k(x_k) -
+\min_k(x_k)\)</span> garantit que chaque dissimilarité <span
+class="math inline">\(d_{ijk}\)</span> est comprise entre 0 et 1. Par
+conséquent, la somme des dissimilarités normalisées est également
+comprise entre 0 et 1.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Gower possède plusieurs propriétés intéressantes,
+notamment en ce qui concerne la normalisation et la gestion des
+variables manquantes.</p>
+<div class="proposition">
+<ol>
+<li><p>La distance de Gower est invariante par translation des
+variables. Cela signifie que l’ajout d’une constante à une variable ne
+change pas la distance de Gower.</p></li>
+<li><p>La distance de Gower est également invariante par multiplication
+par une constante positive. Cela signifie que la multiplication d’une
+variable par une constante positive ne change pas la distance de
+Gower.</p></li>
+<li><p>La distance de Gower peut être utilisée pour des variables
+qualitatives en définissant une dissimilarité appropriée, telle que la
+distance de Hamming pour les variables binaires.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>Soit <span class="math inline">\(c\)</span> une constante. La
+dissimilarité pour la variable <span class="math inline">\(k\)</span>
+devient <span class="math inline">\(|(x_{ik} + c) - (x_{jk} + c)| =
+|x_{ik} - x_{jk}|\)</span>, qui est inchangée. Par conséquent, la
+distance de Gower reste inchangée.</p></li>
+<li><p>Soit <span class="math inline">\(a\)</span> une constante
+positive. La dissimilarité pour la variable <span
+class="math inline">\(k\)</span> devient <span class="math inline">\(|a
+x_{ik} - a x_{jk}| = a |x_{ik} - x_{jk}|\)</span>. La normalisation par
+<span class="math inline">\(\max_k(x_k) - \min_k(x_k)\)</span> devient
+<span class="math inline">\(a (\max_k(x_k) - \min_k(x_k))\)</span>, ce
+qui annule l’effet de la multiplication. Par conséquent, la distance de
+Gower reste inchangée.</p></li>
+<li><p>Pour les variables qualitatives, la dissimilarité peut être
+définie comme <span class="math inline">\(d_{ijk} = 1\)</span> si <span
+class="math inline">\(x_{ik} \neq x_{jk}\)</span>, et <span
+class="math inline">\(d_{ijk} = 0\)</span> sinon. Cette définition est
+compatible avec la distance de Gower, car elle respecte les propriétés
+de non-négativité, de symétrie et de bornes.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Gower est une mesure de dissimilarité puissante et
+flexible, particulièrement adaptée pour les données mixtes. Sa capacité
+à normaliser les contributions de chaque variable en fait un outil
+précieux pour l’analyse des données dans divers domaines. Les propriétés
+et théorèmes associés à la distance de Gower garantissent sa robustesse
+et son utilité dans les applications pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,330 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Inégalité de Hoeffding discrète : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Inégalité de Hoeffding discrète : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’inégalité de Hoeffding discrète est une pierre angulaire des
+mathématiques appliquées, particulièrement dans le domaine des
+probabilités et de la théorie des statistiques. Son origine remonte aux
+travaux du mathématicien allemand Wassily Hoeffding dans les années
+1960, où il cherchait à établir des bornes sur la déviation d’une somme
+de variables aléatoires par rapport à leur espérance. Cette inégalité
+est devenue indispensable dans l’analyse des algorithmes aléatoires, la
+théorie de l’apprentissage statistique et bien d’autres domaines où les
+incertitudes doivent être maîtrisées.</p>
+<p>L’intérêt principal de l’inégalité de Hoeffding discrète réside dans
+sa capacité à fournir des garanties probabilistes sur les performances
+d’algorithmes ou de modèles statistiques. Elle permet, par exemple, de
+déterminer avec quelle probabilité une somme de variables aléatoires
+bornées s’écarte significativement de sa valeur moyenne. Cette notion
+est cruciale pour comprendre les comportements asymptotiques et pour
+garantir la robustesse des résultats obtenus dans des contextes
+incertains.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire l’inégalité de Hoeffding discrète, commençons par
+définir les concepts fondamentaux nécessaires. Supposons que nous ayons
+une suite de variables aléatoires <span class="math inline">\(X_1, X_2,
+\ldots, X_n\)</span> qui sont indépendantes et identiquement distribuées
+(i.i.d.). Chaque variable <span class="math inline">\(X_i\)</span> est
+bornée, c’est-à-dire qu’il existe des constantes <span
+class="math inline">\(a_i\)</span> et <span
+class="math inline">\(b_i\)</span> telles que : <span
+class="math display">\[a_i \leq X_i \leq b_i \quad \text{pour tout } i =
+1, 2, \ldots, n.\]</span></p>
+<p>L’objectif est de quantifier la probabilité que la somme <span
+class="math inline">\(S_n = X_1 + X_2 + \ldots + X_n\)</span> s’écarte
+de son espérance <span class="math inline">\(\mathbb{E}[S_n]\)</span>.
+Formellement, l’inégalité de Hoeffding discrète s’énonce comme suit
+:</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> des
+variables aléatoires indépendantes et bornées telles que <span
+class="math inline">\(a_i \leq X_i \leq b_i\)</span> pour tout <span
+class="math inline">\(i\)</span>. Alors, pour tout <span
+class="math inline">\(t &gt; 0\)</span>, on a : <span
+class="math display">\[\mathbb{P}\left( \left| S_n - \mathbb{E}[S_n]
+\right| \geq t \right) \leq 2 \exp\left( -\frac{2t^2}{\sum_{i=1}^n (b_i
+- a_i)^2} \right).\]</span></p>
+</div>
+<p>Cette inégalité montre que la probabilité que <span
+class="math inline">\(S_n\)</span> s’écarte de son espérance d’au moins
+<span class="math inline">\(t\)</span> est exponentiellement petite en
+fonction de <span class="math inline">\(t^2\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’inégalité de Hoeffding discrète est un résultat central en théorie
+des probabilités, et elle peut être généralisée ou adaptée à divers
+contextes. Un théorème fondamental lié à cette inégalité est le suivant
+:</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> des
+variables aléatoires indépendantes et bornées telles que <span
+class="math inline">\(a_i \leq X_i \leq b_i\)</span> pour tout <span
+class="math inline">\(i\)</span>. Alors, pour tout <span
+class="math inline">\(t &gt; 0\)</span>, on a : <span
+class="math display">\[\mathbb{P}\left( S_n - \mathbb{E}[S_n] \geq t
+\right) \leq \exp\left( -\frac{2t^2}{\sum_{i=1}^n (b_i - a_i)^2}
+\right),\]</span> et <span class="math display">\[\mathbb{P}\left( S_n -
+\mathbb{E}[S_n] \leq -t \right) \leq \exp\left(
+-\frac{2t^2}{\sum_{i=1}^n (b_i - a_i)^2} \right).\]</span></p>
+</div>
+<p>La démonstration de ce théorème repose sur des techniques d’analyse
+convexe et l’utilisation de la fonction génératrice de moments. Elle est
+détaillée dans la section suivante.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer l’inégalité de Hoeffding discrète, nous allons
+utiliser la fonction génératrice de moments. Considérons une variable
+aléatoire <span class="math inline">\(X\)</span> bornée telle que <span
+class="math inline">\(a \leq X \leq b\)</span>. La fonction génératrice
+de moments de <span class="math inline">\(X\)</span> est définie par :
+<span class="math display">\[M_X(\lambda) = \mathbb{E}\left[ e^{\lambda
+X} \right].\]</span></p>
+<p>En utilisant la convexité de la fonction exponentielle, nous pouvons
+montrer que : <span class="math display">\[M_X(\lambda) \leq e^{\lambda
+a} \mathbb{P}(X = b) + e^{\lambda b} \mathbb{P}(X = a).\]</span></p>
+<p>En prenant le logarithme de cette inégalité, nous obtenons : <span
+class="math display">\[\lambda \mathbb{E}[X] - \log M_X(\lambda) \leq
+\lambda b + \log\left( e^{\lambda (a - b)} \mathbb{P}(X = b) +
+\mathbb{P}(X = a) \right).\]</span></p>
+<p>En utilisant cette inégalité pour chaque variable <span
+class="math inline">\(X_i\)</span>, nous pouvons déduire l’inégalité de
+Hoeffding discrète pour la somme <span
+class="math inline">\(S_n\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’inégalité de Hoeffding discrète possède plusieurs propriétés
+intéressantes qui en font un outil puissant dans l’analyse des
+algorithmes et des modèles statistiques. Voici quelques-unes de ces
+propriétés :</p>
+<ol>
+<li><p>**Bornes exponentielles** : La probabilité que <span
+class="math inline">\(S_n\)</span> s’écarte de son espérance est
+exponentiellement petite en fonction de <span
+class="math inline">\(t^2\)</span>. Cela signifie que plus <span
+class="math inline">\(t\)</span> est grand, plus la probabilité de
+déviation est faible.</p></li>
+<li><p>**Indépendance des variables** : L’inégalité de Hoeffding
+discrète suppose que les variables <span
+class="math inline">\(X_i\)</span> sont indépendantes. Cette condition
+est cruciale pour la validité du résultat.</p></li>
+<li><p>**Bornes uniformes** : Si toutes les variables <span
+class="math inline">\(X_i\)</span> ont les mêmes bornes <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span>, l’inégalité se simplifie en : <span
+class="math display">\[\mathbb{P}\left( \left| S_n - \mathbb{E}[S_n]
+\right| \geq t \right) \leq 2 \exp\left( -\frac{2t^2}{n(b - a)^2}
+\right).\]</span></p></li>
+</ol>
+<p>Ces propriétés montrent la puissance et la flexibilité de l’inégalité
+de Hoeffding discrète dans divers contextes probabilistes.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’inégalité de Hoeffding discrète est un résultat fondamental en
+théorie des probabilités, avec des applications dans de nombreux
+domaines des mathématiques appliquées. Son importance réside dans sa
+capacité à fournir des garanties probabilistes sur les performances
+d’algorithmes et de modèles statistiques. Les démonstrations et
+propriétés présentées dans cet article illustrent la richesse et la
+profondeur de ce résultat, qui continue d’inspirer des recherches dans
+les domaines de l’apprentissage automatique et de la théorie des
+statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

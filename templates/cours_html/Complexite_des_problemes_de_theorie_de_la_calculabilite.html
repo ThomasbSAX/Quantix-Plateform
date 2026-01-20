@@ -1,0 +1,354 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de théorie de la calculabilité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de théorie de la
+calculabilité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La théorie de la calculabilité, née au début du XXe siècle des
+travaux pionniers de Turing, Gödel et Church, a pour objet l’étude des
+problèmes qui peuvent être résolus par des machines. Cette théorie
+s’inscrit dans un cadre plus large, celui de la logique mathématique et
+de l’informatique théorique. Elle émerge comme une réponse aux questions
+fondamentales posées par Hilbert sur la décision des problèmes
+mathématiques.</p>
+<p>Pourquoi cette notion est-elle indispensable ? Parce qu’elle permet
+de classer les problèmes en fonction de leur difficulté algorithmique.
+Elle répond à des questions du type : "Peut-on décider si un programme
+s’arrêtera un jour ?" (problème de l’arrêt), ou encore "Peut-on
+déterminer si une formule logique est valide ?" (problème de la
+satisfaction). Ces questions, bien que simples à formuler, sont d’une
+complexité extrême et nécessitent une analyse rigoureuse.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de parler de complexité, il est essentiel de définir ce qu’est
+un problème calculable. Intuitivement, un problème est calculable si une
+machine de Turing peut le résoudre en un temps fini. Mais comment
+formaliser cette idée ?</p>
+<div class="definition">
+<p>Un problème de décision est un ensemble <span class="math inline">\(L
+\subseteq \{0,1\}^*\)</span>. On dit que <span
+class="math inline">\(L\)</span> est calculable (ou récursif) s’il
+existe une machine de Turing qui, pour tout mot <span
+class="math inline">\(x \in \{0,1\}^*\)</span>, s’arrête et accepte si
+<span class="math inline">\(x \in L\)</span> ou rejette si <span
+class="math inline">\(x \notin L\)</span>.</p>
+</div>
+<p>Formellement, cela se traduit par : <span
+class="math display">\[\exists M \text{ machine de Turing } \forall x
+\in \{0,1\}^* \left( M(x) \downarrow \text{ et } (x \in L
+\Leftrightarrow M(x) = 1) \right)\]</span></p>
+<p>Un problème est dit semi-calculable (ou récursivement énumérable) si
+une machine de Turing peut l’accepter, mais pas nécessairement le
+rejeter.</p>
+<div class="definition">
+<p>Un problème <span class="math inline">\(L \subseteq
+\{0,1\}^*\)</span> est semi-calculable si : <span
+class="math display">\[\exists M \text{ machine de Turing } \forall x
+\in \{0,1\}^* \left( x \in L \Rightarrow M(x) \downarrow \text{ et }
+M(x) = 1 \right)\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre la complexité des problèmes, il est crucial d’étudier
+les théorèmes qui établissent des limites sur ce qui peut être calculé.
+Le premier résultat fondamental est le théorème de non-calculabilité du
+problème de l’arrêt.</p>
+<div class="theorem">
+<p>Le problème de l’arrêt <span class="math inline">\(A = \{ \langle M,
+x \rangle \mid M(x) \downarrow \}\)</span> n’est pas calculable.</p>
+</div>
+<p>Pour démontrer ce théorème, nous utilisons une preuve par
+contradiction. Supposons que <span class="math inline">\(A\)</span> soit
+calculable et construisons une machine de Turing <span
+class="math inline">\(M_A\)</span> qui, pour toute entrée <span
+class="math inline">\(\langle M, x \rangle\)</span>, simule <span
+class="math inline">\(M(x)\)</span> et accepte si <span
+class="math inline">\(M(x) \downarrow\)</span>.</p>
+<p>Considérons maintenant la machine de Turing <span
+class="math inline">\(D\)</span> définie comme suit : <span
+class="math display">\[D(M) = \begin{cases}
+\text{loop} &amp; \text{si } M_A(\langle M, M \rangle) = 1 \\
+\text{halt} &amp; \text{sinon}
+\end{cases}\]</span></p>
+<p>Si <span class="math inline">\(D(M) \downarrow\)</span>, alors <span
+class="math inline">\(M_A(\langle D, D \rangle) = 0\)</span>, ce qui
+signifie que <span class="math inline">\(D(D) \uparrow\)</span>. Mais si
+<span class="math inline">\(D(M) \uparrow\)</span>, alors <span
+class="math inline">\(M_A(\langle D, D \rangle) = 1\)</span>, ce qui
+signifie que <span class="math inline">\(D(D) \downarrow\)</span>. Cette
+contradiction prouve que notre hypothèse initiale est fausse.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer la puissance de ces concepts, examinons une preuve
+détaillée du théorème suivant :</p>
+<div class="theorem">
+<p>Tout problème non-trivial sur les machines de Turing est
+non-calculable.</p>
+</div>
+<p>Un problème <span class="math inline">\(P\)</span> sur les machines
+de Turing est non-trivial si : <span class="math display">\[\exists M_1,
+M_2 \text{ machines de Turing } (P(M_1) = 0 \text{ et } P(M_2) =
+1)\]</span></p>
+<p>La preuve de ce théorème repose sur une réduction du problème de
+l’arrêt. Supposons que <span class="math inline">\(P\)</span> soit
+calculable et construisons une machine de Turing <span
+class="math inline">\(M_P\)</span> qui, pour toute entrée <span
+class="math inline">\(\langle M, x \rangle\)</span>, décide si <span
+class="math inline">\(P(M) = 1\)</span>.</p>
+<p>Considérons maintenant la machine de Turing <span
+class="math inline">\(M&#39;\)</span> définie comme suit : <span
+class="math display">\[M&#39;(x) = \begin{cases}
+\text{halt} &amp; \text{si } M_P(M_x) = 1 \\
+\text{loop} &amp; \text{sinon}
+\end{cases}\]</span> où <span class="math inline">\(M_x\)</span> est une
+machine de Turing qui simule <span
+class="math inline">\(M(x)\)</span>.</p>
+<p>Si <span class="math inline">\(A\)</span> était calculable, alors
+nous pourrions décider si <span class="math inline">\(M&#39;(x)
+\downarrow\)</span> en utilisant <span
+class="math inline">\(M_P\)</span>. Mais comme <span
+class="math inline">\(A\)</span> n’est pas calculable, cela implique que
+<span class="math inline">\(P\)</span> ne peut pas l’être non plus.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les théorèmes de la calculabilité ont de nombreuses implications
+intéressantes. En voici quelques-unes :</p>
+<div class="corollaire">
+<p>Pour tout problème <span class="math inline">\(A&#39;\)</span> tel
+que <span class="math inline">\(A \leq_T A&#39;\)</span>, <span
+class="math inline">\(A&#39;\)</span> n’est pas calculable.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La réduction de <span
+class="math inline">\(A\)</span> à <span
+class="math inline">\(A&#39;\)</span> montre que si <span
+class="math inline">\(A&#39;\)</span> était calculable, alors <span
+class="math inline">\(A\)</span> le serait aussi. Mais comme <span
+class="math inline">\(A\)</span> n’est pas calculable, cela implique que
+<span class="math inline">\(A&#39;\)</span> ne l’est pas non plus. ◻</p>
+</div>
+<div class="corollaire">
+<p>L’ensemble des problèmes semi-calculables est clos sous union et
+intersection finie.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Soient <span class="math inline">\(L_1\)</span> et
+<span class="math inline">\(L_2\)</span> deux problèmes
+semi-calculables. Pour chaque <span class="math inline">\(i = 1,
+2\)</span>, il existe une machine de Turing <span
+class="math inline">\(M_i\)</span> qui accepte <span
+class="math inline">\(L_i\)</span>. Nous pouvons construire une nouvelle
+machine de Turing <span class="math inline">\(M\)</span> qui simule
+<span class="math inline">\(M_1\)</span> et <span
+class="math inline">\(M_2\)</span> en parallèle. Si l’une des deux
+machines accepte, alors <span class="math inline">\(M\)</span> accepte
+également. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La théorie de la calculabilité est un domaine riche et fascinant, qui
+nous permet de comprendre les limites fondamentales du calcul. Les
+théorèmes présentés ici ne sont qu’un aperçu de ce que cette théorie a à
+offrir. Ils ouvrent la voie à des questions plus profondes sur la nature
+de l’intelligence artificielle, de la cryptographie et même de la
+conscience.</p>
+<p>En conclusion, la complexité des problèmes de théorie de la
+calculabilité est un sujet d’une importance capitale pour les
+mathématiciens, les informaticiens et les philosophes. Elle nous
+rappelle que certaines questions, bien que simples à formuler, peuvent
+être d’une complexité insondable.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Gower pour variables mixtes symétriques normalisées</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Gower pour variables mixtes symétriques
+normalisées</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Gower émerge comme une réponse élégante à un problème
+fondamental en analyse de données : la mesure de similarité entre
+entités décrites par des variables mixtes. Dans un contexte où les
+données combinent variables quantitatives et qualitatives, les méthodes
+classiques de distance euclidienne ou de dissimilarité binaire se
+révèlent inadéquates. La notion de symétrie et de normalisation ajoute
+une couche supplémentaire de complexité, nécessitant une approche
+sophistiquée pour préserver l’interprétabilité et la robustesse des
+mesures.</p>
+<p>Cette distance est indispensable dans des domaines tels que la
+biologie, la psychométrie et l’économie, où les données sont souvent
+hétérogènes. Elle permet de comparer des individus ou des objets en
+tenant compte de la nature diverse de leurs attributs, tout en
+normalisant les contributions individuelles pour éviter les biais liés
+aux échelles de mesure.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Gower, commençons par comprendre ce que
+nous cherchons à mesurer. Imaginons deux individus décrits par un
+ensemble de variables, certaines quantitatives et d’autres qualitatives.
+Nous voulons une mesure qui capture la dissimilarité entre ces
+individus, en tenant compte de la nature des variables et en normalisant
+leurs contributions.</p>
+<p>Supposons que nous ayons un ensemble de <span
+class="math inline">\(n\)</span> individus et <span
+class="math inline">\(p\)</span> variables. Pour chaque variable <span
+class="math inline">\(j\)</span>, nous définissons une fonction de
+dissimilarité <span class="math inline">\(d_{jk}(x, y)\)</span> entre
+deux individus <span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span>. Pour les variables quantitatives,
+cette fonction est souvent basée sur la différence absolue normalisée.
+Pour les variables qualitatives, elle est basée sur une dissimilarité
+binaire.</p>
+<p>Formellement, la distance de Gower entre deux individus <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> est définie comme suit :</p>
+<p><span class="math display">\[G(x, y) = \frac{\sum_{j=1}^{p} w_j
+d_{jk}(x, y)}{\sum_{j=1}^{p} w_j}\]</span></p>
+<p>où <span class="math inline">\(w_j\)</span> est le poids de la
+variable <span class="math inline">\(j\)</span>, souvent défini comme
+<span class="math inline">\(w_j = 1\)</span> pour simplifier.</p>
+<p>Pour les variables quantitatives, la dissimilarité est définie par
+:</p>
+<p><span class="math display">\[d_{jk}(x, y) = \frac{|x_j -
+y_j|}{R_j}\]</span></p>
+<p>où <span class="math inline">\(R_j\)</span> est l’étendue de la
+variable <span class="math inline">\(j\)</span>, c’est-à-dire la
+différence entre la valeur maximale et minimale.</p>
+<p>Pour les variables qualitatives, la dissimilarité est définie par
+:</p>
+<p><span class="math display">\[d_{jk}(x, y) = \begin{cases}
+0 &amp; \text{si } x_j = y_j \\
+1 &amp; \text{sinon}
+\end{cases}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Considérons le théorème fondamental de la distance de Gower, qui
+garantit que cette mesure satisfait les propriétés d’une distance
+métrique.</p>
+<p><strong>Théorème (Distance de Gower)</strong>: La distance de Gower
+<span class="math inline">\(G\)</span> définie sur un ensemble
+d’individus décrits par des variables mixtes symétriques normalisées
+satisfait les propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(G(x, y) \geq 0\)</span> pour tout
+<span class="math inline">\(x, y\)</span>,</p></li>
+<li><p><span class="math inline">\(G(x, y) = 0\)</span> si et seulement
+si <span class="math inline">\(x = y\)</span>,</p></li>
+<li><p><span class="math inline">\(G(x, y) = G(y, x)\)</span> pour tout
+<span class="math inline">\(x, y\)</span>,</p></li>
+<li><p><span class="math inline">\(G(x, z) \leq G(x, y) + G(y,
+z)\)</span> pour tout <span class="math inline">\(x, y,
+z\)</span>.</p></li>
+</ol>
+<p><strong>Démonstration</strong>:</p>
+<p>1. <strong>Non-négativité</strong>: Par construction, <span
+class="math inline">\(d_{jk}(x, y) \geq 0\)</span> pour tout <span
+class="math inline">\(j\)</span>, donc <span class="math inline">\(G(x,
+y) \geq 0\)</span>.</p>
+<p>2. <strong>Identité</strong>: Si <span class="math inline">\(x =
+y\)</span>, alors <span class="math inline">\(d_{jk}(x, y) = 0\)</span>
+pour tout <span class="math inline">\(j\)</span>, donc <span
+class="math inline">\(G(x, y) = 0\)</span>. Réciproquement, si <span
+class="math inline">\(G(x, y) = 0\)</span>, alors <span
+class="math inline">\(d_{jk}(x, y) = 0\)</span> pour tout <span
+class="math inline">\(j\)</span>, ce qui implique <span
+class="math inline">\(x_j = y_j\)</span> pour toute variable
+quantitative et <span class="math inline">\(x_j = y_j\)</span> pour
+toute variable qualitative. Ainsi, <span class="math inline">\(x =
+y\)</span>.</p>
+<p>3. <strong>Symétrie</strong>: La symétrie de <span
+class="math inline">\(G\)</span> découle directement de la symétrie des
+fonctions de dissimilarité <span
+class="math inline">\(d_{jk}\)</span>.</p>
+<p>4. <strong>Inégalité triangulaire</strong>: L’inégalité triangulaire
+est plus complexe à démontrer. Elle repose sur le fait que chaque
+composante <span class="math inline">\(d_{jk}\)</span> satisfait
+l’inégalité triangulaire, et que la somme pondérée préserve cette
+propriété.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer l’inégalité triangulaire, nous procédons comme suit
+:</p>
+<p>Soient <span class="math inline">\(x, y, z\)</span> trois individus.
+Nous avons :</p>
+<p><span class="math display">\[G(x, z) = \frac{\sum_{j=1}^{p} w_j
+d_{jk}(x, z)}{\sum_{j=1}^{p} w_j}\]</span></p>
+<p>Nous voulons montrer que :</p>
+<p><span class="math display">\[G(x, z) \leq G(x, y) + G(y,
+z)\]</span></p>
+<p>En utilisant la définition de <span class="math inline">\(G\)</span>,
+cela équivaut à :</p>
+<p><span class="math display">\[\sum_{j=1}^{p} w_j d_{jk}(x, z) \leq
+\sum_{j=1}^{p} w_j (d_{jk}(x, y) + d_{jk}(y, z))\]</span></p>
+<p>Cette inégalité découle du fait que chaque <span
+class="math inline">\(d_{jk}\)</span> satisfait l’inégalité
+triangulaire, et que les poids <span class="math inline">\(w_j\)</span>
+sont positifs.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+distance de Gower :</p>
+<ol>
+<li><p><strong>Normalisation</strong>: La distance de Gower est
+normalisée par la somme des poids, ce qui garantit que <span
+class="math inline">\(0 \leq G(x, y) \leq 1\)</span>.</p></li>
+<li><p><strong>Robustesse</strong>: La distance de Gower est robuste aux
+variables manquantes, car elle permet d’exclure les variables pour
+lesquelles les données sont incomplètes.</p></li>
+<li><p><strong>Interprétabilité</strong>: La distance de Gower est
+facilement interprétable, car chaque composante contribue
+proportionnellement à la dissimilarité globale.</p></li>
+</ol>
+<p><strong>Preuve de la Normalisation</strong>:</p>
+<p>Par construction, <span class="math inline">\(d_{jk}(x, y) \leq
+1\)</span> pour toute variable quantitative (car normalisée par
+l’étendue) et <span class="math inline">\(d_{jk}(x, y) \leq 1\)</span>
+pour toute variable qualitative. Ainsi,</p>
+<p><span class="math display">\[G(x, y) = \frac{\sum_{j=1}^{p} w_j
+d_{jk}(x, y)}{\sum_{j=1}^{p} w_j} \leq \frac{\sum_{j=1}^{p}
+w_j}{\sum_{j=1}^{p} w_j} = 1\]</span></p>
+<p>De plus, <span class="math inline">\(G(x, y) \geq 0\)</span> par
+non-négativité.</p>
+<p><strong>Preuve de la Robustesse</strong>:</p>
+<p>Si une variable <span class="math inline">\(j\)</span> est manquante
+pour les individus <span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span>, nous pouvons simplement exclure cette
+variable du calcul de <span class="math inline">\(G(x, y)\)</span>. Cela
+revient à définir <span class="math inline">\(w_j = 0\)</span> pour
+cette variable.</p>
+<p><strong>Preuve de l’Interprétabilité</strong>:</p>
+<p>Chaque composante <span class="math inline">\(d_{jk}(x, y)\)</span>
+mesure la dissimilarité sur une variable spécifique. La somme pondérée
+de ces composantes permet de comprendre quelles variables contribuent le
+plus à la dissimilarité globale.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

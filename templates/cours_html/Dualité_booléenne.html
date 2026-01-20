@@ -1,0 +1,386 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Dualité booléenne</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Dualité booléenne</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’algèbre booléenne, structure fondamentale en mathématiques
+discrètes, trouve ses racines dans les travaux de George Boole au XIXème
+siècle. Cette algèbre, initialement conçue pour formaliser le
+raisonnement logique, s’est révélée essentielle dans de nombreux
+domaines tels que l’informatique théorique, la théorie des circuits, et
+même les sciences sociales. La dualité booléenne, concept central de
+cette algèbre, émerge comme une symétrie profonde entre les opérations
+de conjonction et disjonction.</p>
+<p>Cette dualité n’est pas seulement une curiosité mathématique; elle
+est indispensable pour comprendre et manipuler les expressions
+booléennes de manière efficace. Elle permet, par exemple, de simplifier
+des circuits logiques en transformant des expressions complexes en leurs
+formes duales plus simples. De plus, elle joue un rôle crucial dans les
+preuves et les constructions algorithmiques en informatique
+théorique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la dualité booléenne, commençons par définir les
+éléments de base de l’algèbre booléenne. Considérons un ensemble <span
+class="math inline">\(B\)</span> muni de deux opérations binaires <span
+class="math inline">\(\land\)</span> (conjonction) et <span
+class="math inline">\(\lor\)</span> (disjonction), ainsi que d’une
+opération unaire <span class="math inline">\(\neg\)</span> (négation).
+On cherche à capturer l’idée que pour tout élément <span
+class="math inline">\(a \in B\)</span>, il existe un élément dual <span
+class="math inline">\(a&#39;\)</span> tel que certaines propriétés sont
+symétriques par rapport à la conjonction et la disjonction.</p>
+<div class="definition">
+<p>Une algèbre booléenne est un ensemble <span
+class="math inline">\(B\)</span> muni de deux opérations binaires <span
+class="math inline">\(\land\)</span> et <span
+class="math inline">\(\lor\)</span>, une opération unaire <span
+class="math inline">\(\neg\)</span>, et deux éléments distincts <span
+class="math inline">\(0\)</span> et <span
+class="math inline">\(1\)</span> satisfaisant les axiomes suivants pour
+tous <span class="math inline">\(a, b, c \in B\)</span>:</p>
+<ul>
+<li><p>Commutativité: <span class="math inline">\(a \land b = b \land
+a\)</span> et <span class="math inline">\(a \lor b = b \lor
+a\)</span>.</p></li>
+<li><p>Associativité: <span class="math inline">\((a \land b) \land c =
+a \land (b \land c)\)</span> et <span class="math inline">\((a \lor b)
+\lor c = a \lor (b \lor c)\)</span>.</p></li>
+<li><p>Distributivité: <span class="math inline">\(a \land (b \lor c) =
+(a \land b) \lor (a \land c)\)</span> et <span class="math inline">\(a
+\lor (b \land c) = (a \lor b) \land (a \lor c)\)</span>.</p></li>
+<li><p>Absorption: <span class="math inline">\(a \land (a \lor b) =
+a\)</span> et <span class="math inline">\(a \lor (a \land b) =
+a\)</span>.</p></li>
+<li><p>Identités: <span class="math inline">\(a \land 1 = a\)</span>,
+<span class="math inline">\(a \lor 0 = a\)</span>.</p></li>
+<li><p>Complément: <span class="math inline">\(a \land \neg a =
+0\)</span> et <span class="math inline">\(a \lor \neg a =
+1\)</span>.</p></li>
+</ul>
+</div>
+<p>La dualité booléenne repose sur l’idée que pour toute expression
+booléenne, on peut obtenir une expression duale en échangeant <span
+class="math inline">\(\land\)</span> et <span
+class="math inline">\(\lor\)</span>, ainsi que <span
+class="math inline">\(0\)</span> et <span
+class="math inline">\(1\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(E\)</span> une expression booléenne.
+L’expression duale de <span class="math inline">\(E\)</span>, notée
+<span class="math inline">\(E^*\)</span>, est obtenue en remplaçant
+chaque occurrence de <span class="math inline">\(\land\)</span> par
+<span class="math inline">\(\lor\)</span>, chaque occurrence de <span
+class="math inline">\(\lor\)</span> par <span
+class="math inline">\(\land\)</span>, chaque occurrence de <span
+class="math inline">\(0\)</span> par <span
+class="math inline">\(1\)</span>, et chaque occurrence de <span
+class="math inline">\(1\)</span> par <span
+class="math inline">\(0\)</span>.</p>
+<p>Formellement, si <span class="math inline">\(E\)</span> est une
+expression booléenne construite à partir des variables <span
+class="math inline">\(x_1, x_2, \ldots, x_n\)</span>, alors: <span
+class="math display">\[E^* = \text{remplacer } \land \text{ par } \lor,
+\lor \text{ par } \land, 0 \text{ par } 1, \text{ et } 1 \text{ par } 0
+\text{ dans } E.\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en algèbre booléenne est le principe de
+dualité, qui stipule que pour toute identité booléenne valide, son
+expression duale est également une identité valide.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(E\)</span> une expression booléenne.
+Si <span class="math inline">\(E\)</span> est une identité valide dans
+une algèbre booléenne, alors son expression duale <span
+class="math inline">\(E^*\)</span> est également une identité
+valide.</p>
+</div>
+<p>Pour illustrer ce théorème, considérons l’identité booléenne
+suivante: <span class="math display">\[a \land (b \lor c) = (a \land b)
+\lor (a \land c).\]</span></p>
+<p>Son expression duale est: <span class="math display">\[a \lor (b
+\land c) = (a \lor b) \land (a \lor c).\]</span></p>
+<p>Ces deux identités sont toutes deux valides dans une algèbre
+booléenne, ce qui illustre le principe de dualité.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le principe de dualité, nous devons montrer que pour
+toute identité booléenne <span class="math inline">\(E\)</span>, son
+expression duale <span class="math inline">\(E^*\)</span> est également
+une identité valide.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span class="math inline">\(E\)</span>
+soit une identité booléenne valide. Cela signifie que pour tous <span
+class="math inline">\(a, b, c \in B\)</span>, l’égalité <span
+class="math inline">\(E\)</span> est satisfaite.</p>
+<p>Considérons maintenant l’expression duale <span
+class="math inline">\(E^*\)</span>. Par définition, <span
+class="math inline">\(E^*\)</span> est obtenue en échangeant <span
+class="math inline">\(\land\)</span> et <span
+class="math inline">\(\lor\)</span>, ainsi que <span
+class="math inline">\(0\)</span> et <span
+class="math inline">\(1\)</span>.</p>
+<p>Pour montrer que <span class="math inline">\(E^*\)</span> est
+également une identité valide, nous devons démontrer que pour tous <span
+class="math inline">\(a, b, c \in B\)</span>, l’égalité <span
+class="math inline">\(E^*\)</span> est satisfaite.</p>
+<p>Considérons une substitution arbitraire des variables dans <span
+class="math inline">\(E\)</span>. Puisque <span
+class="math inline">\(E\)</span> est une identité valide, cette
+substitution satisfait l’égalité. En appliquant la même substitution à
+<span class="math inline">\(E^*\)</span>, nous obtenons une expression
+qui est duale de l’expression originale.</p>
+<p>En raison de la symétrie des axiomes de l’algèbre booléenne, cette
+expression duale doit également satisfaire l’égalité. Par conséquent,
+<span class="math inline">\(E^*\)</span> est une identité valide. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le principe de dualité donne lieu à plusieurs propriétés et
+corollaires importants.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(E\)</span> une expression booléenne.
+Les propriétés suivantes sont satisfaites:</p>
+<ul>
+<li><p>Dualité de la négation: <span class="math inline">\((\neg a)^* =
+\neg (a^*)\)</span>.</p></li>
+<li><p>Dualité de la conjonction et disjonction: <span
+class="math inline">\((a \land b)^* = a^* \lor b^*\)</span> et <span
+class="math inline">\((a \lor b)^* = a^* \land b^*\)</span>.</p></li>
+<li><p>Dualité des éléments constants: <span class="math inline">\(0^* =
+1\)</span> et <span class="math inline">\(1^* = 0\)</span>.</p></li>
+</ul>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver ces propriétés, nous utilisons le
+principe de dualité et les définitions des opérations booléennes.</p>
+<ul>
+<li><p>Dualité de la négation: Par définition, <span
+class="math inline">\((\neg a)^*\)</span> est obtenu en remplaçant <span
+class="math inline">\(\neg\)</span> par <span
+class="math inline">\(\neg^*\)</span>. Cependant, la négation est une
+opération unaire et ne change pas sous la dualité. Par conséquent, <span
+class="math inline">\((\neg a)^* = \neg (a^*)\)</span>.</p></li>
+<li><p>Dualité de la conjonction et disjonction: Par définition, <span
+class="math inline">\((a \land b)^*\)</span> est obtenu en remplaçant
+<span class="math inline">\(\land\)</span> par <span
+class="math inline">\(\lor\)</span>. Par conséquent, <span
+class="math inline">\((a \land b)^* = a^* \lor b^*\)</span>. De même,
+<span class="math inline">\((a \lor b)^* = a^* \land
+b^*\)</span>.</p></li>
+<li><p>Dualité des éléments constants: Par définition, <span
+class="math inline">\(0^* = 1\)</span> et <span
+class="math inline">\(1^* = 0\)</span>.</p></li>
+</ul>
+<p> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La dualité booléenne est un concept fondamental en algèbre booléenne,
+offrant une symétrie profonde entre les opérations de conjonction et
+disjonction. Ce concept est non seulement théorique, mais a également
+des applications pratiques dans divers domaines tels que l’informatique
+théorique et la théorie des circuits. Le principe de dualité, qui
+stipule que pour toute identité booléenne valide, son expression duale
+est également une identité valide, est un outil puissant pour simplifier
+et manipuler les expressions booléennes.</p>
+<p>En comprenant et en appliquant la dualité booléenne, nous pouvons non
+seulement approfondir notre compréhension de l’algèbre booléenne, mais
+aussi développer des algorithmes plus efficaces et des circuits logiques
+plus simples.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

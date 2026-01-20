@@ -1,0 +1,377 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’inégalité de Parseval : Un pont entre l’analyse et la théorie des probabilités</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’inégalité de Parseval : Un pont entre l’analyse et
+la théorie des probabilités</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’inégalité de Parseval, du nom du mathématicien français
+Marc-Antoine Parseval des Chênes, émerge au début du XIXème siècle comme
+une pierre angulaire dans l’étude des séries trigonométriques et, plus
+généralement, de la théorie des fonctions. Cette inégalité établit un
+lien profond entre les propriétés géométriques et analytiques des
+fonctions, en particulier dans le cadre des espaces de Hilbert. Elle
+trouve ses racines dans les travaux de Parseval sur la convergence des
+séries trigonométriques, mais son importance s’étend bien au-delà de ce
+cadre initial.</p>
+<p>L’inégalité de Parseval est indispensable dans l’analyse harmonique,
+où elle permet de quantifier la "taille" d’une fonction à travers ses
+coefficients de Fourier. Elle joue également un rôle crucial en théorie
+des probabilités, notamment dans l’étude des martingales et des
+processus stochastiques. En physique, elle est utilisée pour relier
+l’énergie d’un signal à ses composantes fréquentielles.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de formuler l’inégalité de Parseval, il est essentiel de
+définir les concepts fondamentaux qui la sous-tendent. Commençons par
+l’espace de Hilbert, un espace vectoriel muni d’un produit scalaire et
+complet pour la norme associée. Dans cet espace, les séries de Fourier
+jouent un rôle central.</p>
+<p>Considérons une fonction <span class="math inline">\(f\)</span>
+intégrable sur l’intervalle <span class="math inline">\([0,
+2\pi]\)</span>. Nous cherchons à la décomposer en une somme infinie de
+fonctions trigonométriques. Intuitivement, cette décomposition doit
+capturer les différentes fréquences présentes dans <span
+class="math inline">\(f\)</span>. Les coefficients de Fourier de <span
+class="math inline">\(f\)</span> sont donnés par :</p>
+<p><span class="math display">\[a_n = \frac{1}{\pi} \int_{0}^{2\pi} f(t)
+\cos(nt) \, dt\]</span> <span class="math display">\[b_n = \frac{1}{\pi}
+\int_{0}^{2\pi} f(t) \sin(nt) \, dt\]</span></p>
+<p>avec <span class="math inline">\(n \in \mathbb{N}\)</span>.</p>
+<p>La série de Fourier de <span class="math inline">\(f\)</span> est
+alors définie par :</p>
+<p><span class="math display">\[S[f](t) = \frac{a_0}{2} +
+\sum_{n=1}^{\infty} (a_n \cos(nt) + b_n \sin(nt))\]</span></p>
+<p>Nous cherchons à quantifier la "taille" de <span
+class="math inline">\(f\)</span> en utilisant ses coefficients de
+Fourier. L’inégalité de Parseval nous donne une relation entre la norme
+<span class="math inline">\(L^2\)</span> de <span
+class="math inline">\(f\)</span> et la somme des carrés de ses
+coefficients de Fourier.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f\)</span> une fonction intégrable
+sur <span class="math inline">\([0, 2\pi]\)</span> telle que <span
+class="math inline">\(\int_{0}^{2\pi} |f(t)|^2 \, dt &lt;
+\infty\)</span>. Les coefficients de Fourier <span
+class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span> de <span
+class="math inline">\(f\)</span> satisfont l’inégalité suivante :</p>
+<p><span class="math display">\[\frac{1}{\pi} \int_{0}^{2\pi} |f(t)|^2
+\, dt \geq \frac{|a_0|^2}{2} + \sum_{n=1}^{\infty} (|a_n|^2 +
+|b_n|^2)\]</span></p>
+<p>De plus, si <span class="math inline">\(f\)</span> est de classe
+<span class="math inline">\(C^1\)</span> par morceaux et si la série de
+Fourier de <span class="math inline">\(f\)</span> converge uniformément
+vers <span class="math inline">\(f\)</span>, alors l’égalité tient :</p>
+<p><span class="math display">\[\frac{1}{\pi} \int_{0}^{2\pi} |f(t)|^2
+\, dt = \frac{|a_0|^2}{2} + \sum_{n=1}^{\infty} (|a_n|^2 +
+|b_n|^2)\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>L’inégalité de Parseval est un cas particulier d’un résultat plus
+général, connu sous le nom de théorème de Plancherel. Ce théorème
+s’applique à des espaces de fonctions plus généraux que <span
+class="math inline">\(L^2([0, 2\pi])\)</span>.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(H\)</span> un espace de Hilbert
+séparable et soit <span class="math inline">\(U : H \to H\)</span> une
+transformation unitaire. Pour tout vecteur <span class="math inline">\(x
+\in H\)</span>, on a :</p>
+<p><span class="math display">\[\|x\|^2 = \sum_{n=0}^{\infty} |\langle
+x, e_n \rangle|^2\]</span></p>
+<p>où <span class="math inline">\(\{e_n\}_{n \in \mathbb{N}}\)</span>
+est une base hilbertienne de <span class="math inline">\(H\)</span>.</p>
+</div>
+<p>Le théorème de Plancherel généralise l’inégalité de Parseval en
+remplaçant les fonctions trigonométriques par une base hilbertienne
+arbitraire. Dans le cas particulier où <span class="math inline">\(H =
+L^2([0, 2\pi])\)</span> et où la base est formée des fonctions <span
+class="math inline">\(\{1, \cos(nt), \sin(nt)\}_{n \in
+\mathbb{N}}\)</span>, on retrouve l’inégalité de Parseval.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver l’inégalité de Parseval, nous utilisons les propriétés
+des séries de Fourier et les inégalités classiques de l’analyse.</p>
+<div class="proof">
+<p><em>Preuve de l’inégalité de Parseval.</em> Soit <span
+class="math inline">\(f\)</span> une fonction intégrable sur <span
+class="math inline">\([0, 2\pi]\)</span> telle que <span
+class="math inline">\(\int_{0}^{2\pi} |f(t)|^2 \, dt &lt;
+\infty\)</span>. Considérons la série de Fourier de <span
+class="math inline">\(f\)</span> :</p>
+<p><span class="math display">\[S[f](t) = \frac{a_0}{2} +
+\sum_{n=1}^{\infty} (a_n \cos(nt) + b_n \sin(nt))\]</span></p>
+<p>Nous savons que la série de Fourier converge vers <span
+class="math inline">\(f\)</span> dans l’espace <span
+class="math inline">\(L^2([0, 2\pi])\)</span>. Par conséquent, nous
+avons :</p>
+<p><span class="math display">\[\frac{1}{\pi} \int_{0}^{2\pi} |f(t) -
+S[f](t)|^2 \, dt \to 0\]</span></p>
+<p>en faisant tendre le nombre de termes dans <span
+class="math inline">\(S[f](t)\)</span> vers l’infini. En développant le
+carré, nous obtenons :</p>
+<p><span class="math display">\[\frac{1}{\pi} \int_{0}^{2\pi} |f(t)|^2
+\, dt - \frac{1}{\pi} \int_{0}^{2\pi} f(t) S[f](t) \, dt - \frac{1}{\pi}
+\int_{0}^{2\pi} S[f](t) f(t) \, dt + \frac{1}{\pi} \int_{0}^{2\pi}
+|S[f](t)|^2 \, dt \to 0\]</span></p>
+<p>En utilisant l’égalité de Parseval pour les polynômes
+trigonométriques, nous avons :</p>
+<p><span class="math display">\[\frac{1}{\pi} \int_{0}^{2\pi}
+|S[f](t)|^2 \, dt = \frac{|a_0|^2}{2} + \sum_{n=1}^{\infty} (|a_n|^2 +
+|b_n|^2)\]</span></p>
+<p>En faisant tendre le nombre de termes dans <span
+class="math inline">\(S[f](t)\)</span> vers l’infini, nous obtenons
+:</p>
+<p><span class="math display">\[\frac{1}{\pi} \int_{0}^{2\pi} |f(t)|^2
+\, dt \geq \frac{|a_0|^2}{2} + \sum_{n=1}^{\infty} (|a_n|^2 +
+|b_n|^2)\]</span></p>
+<p>Ceci prouve l’inégalité de Parseval. Si <span
+class="math inline">\(f\)</span> est de classe <span
+class="math inline">\(C^1\)</span> par morceaux et si la série de
+Fourier de <span class="math inline">\(f\)</span> converge uniformément
+vers <span class="math inline">\(f\)</span>, alors l’égalité
+tient. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’inégalité de Parseval possède plusieurs propriétés intéressantes,
+que nous énumérons ci-dessous.</p>
+<ol>
+<li><p>L’inégalité de Parseval s’étend aux fonctions de plusieurs
+variables. Si <span class="math inline">\(f\)</span> est une fonction
+intégrable sur <span class="math inline">\([0, 2\pi]^d\)</span> telle
+que <span class="math inline">\(\int_{[0, 2\pi]^d} |f(t)|^2 \, dt &lt;
+\infty\)</span>, alors les coefficients de Fourier multidimensionnels
+<span class="math inline">\(a_{\mathbf{n}}\)</span> et <span
+class="math inline">\(b_{\mathbf{n}}\)</span> de <span
+class="math inline">\(f\)</span> satisfont l’inégalité suivante :</p>
+<p><span class="math display">\[\frac{1}{(2\pi)^d} \int_{[0, 2\pi]^d}
+|f(t)|^2 \, dt \geq \sum_{\mathbf{n} \in \mathbb{N}^d}
+(|a_{\mathbf{n}}|^2 + |b_{\mathbf{n}}|^2)\]</span></p></li>
+<li><p>L’inégalité de Parseval peut être utilisée pour prouver des
+inégalités classiques, telles que l’inégalité de Bessel. Si <span
+class="math inline">\(f\)</span> est une fonction intégrable sur <span
+class="math inline">\([0, 2\pi]\)</span> telle que <span
+class="math inline">\(\int_{0}^{2\pi} |f(t)|^2 \, dt &lt;
+\infty\)</span>, alors les coefficients de Fourier <span
+class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span> de <span
+class="math inline">\(f\)</span> satisfont l’inégalité suivante :</p>
+<p><span class="math display">\[\frac{|a_0|^2}{2} + \sum_{n=1}^{\infty}
+(|a_n|^2 + |b_n|^2) \leq \frac{1}{\pi} \int_{0}^{2\pi} |f(t)|^2 \,
+dt\]</span></p></li>
+<li><p>L’inégalité de Parseval est également valable pour les séries de
+Fourier discrètes. Si <span class="math inline">\(\{x_n\}_{n \in
+\mathbb{Z}}\)</span> est une suite dans <span
+class="math inline">\(\ell^2(\mathbb{Z})\)</span>, alors les
+coefficients de Fourier discrets <span
+class="math inline">\(c_k\)</span> de <span
+class="math inline">\(\{x_n\}\)</span> satisfont l’inégalité suivante
+:</p>
+<p><span class="math display">\[\sum_{n \in \mathbb{Z}} |x_n|^2 \geq
+\frac{1}{2\pi} \sum_{k \in \mathbb{Z}} |c_k|^2\]</span></p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’inégalité de Parseval est un résultat fondamental en analyse
+harmonique et en théorie des probabilités. Elle établit un lien profond
+entre les propriétés géométriques et analytiques des fonctions, en
+particulier dans le cadre des espaces de Hilbert. Son importance s’étend
+bien au-delà du cadre initial des séries trigonométriques, et elle
+trouve des applications dans de nombreux domaines des mathématiques et
+de la physique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

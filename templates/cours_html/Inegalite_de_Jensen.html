@@ -1,0 +1,320 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’inégalité de Jensen : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’inégalité de Jensen : Une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’inégalité de Jensen émerge comme un pilier fondamental dans l’étude
+des fonctions convexes et concaves, offrant une généralisation puissante
+de concepts plus simples comme l’inégalité triangulaire. Son origine
+remonte aux travaux du mathématicien danois Johan Jensen en 1906, où il
+a établi cette inégalité pour les fonctions convexes. Cette notion est
+indispensable dans divers domaines des mathématiques appliquées,
+notamment en théorie de la décision, en économie, et en statistique, où
+elle permet de quantifier les effets des incertitudes et des
+attentes.</p>
+<p>L’inégalité de Jensen résout un problème crucial : comment évaluer
+une fonction convexe ou concave d’une variable aléatoire en termes de
+son espérance. Elle montre que l’espérance de la fonction est toujours
+supérieure (ou inférieure, dans le cas des fonctions concaves) à la
+fonction de l’espérance. Cette propriété est non seulement élégante mais
+aussi d’une utilité pratique immense, permettant des simplifications
+significatives dans l’analyse des modèles complexes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’inégalité de Jensen, commençons par rappeler ce que
+signifie une fonction convexe. Imaginez une corde tendue entre deux
+points sur un graphique. Si la courbe représentant votre fonction se
+trouve toujours en dessous de cette corde, alors votre fonction est
+convexe. Formellement :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f: I \rightarrow \mathbb{R}\)</span>
+une fonction définie sur un intervalle <span
+class="math inline">\(I\)</span> de <span
+class="math inline">\(\mathbb{R}\)</span>. On dit que <span
+class="math inline">\(f\)</span> est convexe si pour tout <span
+class="math inline">\(x, y \in I\)</span> et pour tout <span
+class="math inline">\(\lambda \in [0,1]\)</span>, on a : <span
+class="math display">\[f(\lambda x + (1-\lambda)y) \leq \lambda f(x) +
+(1-\lambda)f(y).\]</span></p>
+</div>
+<p>De manière équivalente, <span class="math inline">\(f\)</span> est
+convexe si pour tout <span class="math inline">\(x_0 \in I\)</span>, la
+fonction <span class="math inline">\(f\)</span> est au-dessus de ses
+tangentes en tout point <span class="math inline">\(x_0\)</span>.
+Autrement dit, pour tout <span class="math inline">\(x, y \in
+I\)</span>, il existe un réel <span class="math inline">\(m\)</span> tel
+que : <span class="math display">\[f(y) \geq f(x) + m(y -
+x).\]</span></p>
+<h1 id="théorème-de-jensen">Théorème de Jensen</h1>
+<p>Considérons maintenant une fonction convexe <span
+class="math inline">\(f\)</span> et une variable aléatoire <span
+class="math inline">\(X\)</span> prenant ses valeurs dans l’intervalle
+de convexité de <span class="math inline">\(f\)</span>. L’inégalité de
+Jensen affirme que l’espérance de <span
+class="math inline">\(f(X)\)</span> est supérieure à la fonction de
+l’espérance de <span class="math inline">\(X\)</span>. Pédagogiquement,
+cela signifie que si vous appliquez une fonction convexe à une variable
+aléatoire, puis prenez l’espérance, c’est comme si vous preniez d’abord
+l’espérance de la variable aléatoire et ensuite appliquiez la
+fonction.</p>
+<p>Formellement, le théorème s’énonce comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f: I \rightarrow \mathbb{R}\)</span>
+une fonction convexe définie sur un intervalle <span
+class="math inline">\(I\)</span> de <span
+class="math inline">\(\mathbb{R}\)</span>, et soit <span
+class="math inline">\(X\)</span> une variable aléatoire telle que <span
+class="math inline">\(P(X \in I) = 1\)</span>. Alors : <span
+class="math display">\[\mathbb{E}[f(X)] \geq
+f(\mathbb{E}[X]).\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer l’inégalité de Jensen, nous allons utiliser le fait
+que toute fonction convexe peut être approchée par des fonctions
+affines. Soit <span class="math inline">\(f\)</span> une fonction
+convexe sur un intervalle <span class="math inline">\(I\)</span>. Pour
+tout <span class="math inline">\(x_0 \in I\)</span>, il existe une
+tangente en <span class="math inline">\(x_0\)</span> donnée par : <span
+class="math display">\[f(y) \geq f(x_0) + m(y - x_0),\]</span> où <span
+class="math inline">\(m\)</span> est la pente de la tangente.</p>
+<p>En prenant l’espérance des deux côtés, nous obtenons : <span
+class="math display">\[\mathbb{E}[f(X)] \geq f(x_0) + m(\mathbb{E}[X] -
+x_0).\]</span></p>
+<p>En choisissant <span class="math inline">\(x_0 =
+\mathbb{E}[X]\)</span>, la dernière inégalité devient : <span
+class="math display">\[\mathbb{E}[f(X)] \geq
+f(\mathbb{E}[X]).\]</span></p>
+<p>Cette démonstration repose sur la propriété fondamentale des
+fonctions convexes et l’utilisation de l’espérance. Elle montre comment
+la convexité permet de majorer l’espérance de la fonction par la
+fonction de l’espérance.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’inégalité de Jensen possède plusieurs propriétés intéressantes qui
+en font un outil puissant dans l’analyse des fonctions convexes.</p>
+<ol>
+<li><p><strong>Égalité dans le cas affine</strong> : Si <span
+class="math inline">\(f\)</span> est une fonction affine, c’est-à-dire
+de la forme <span class="math inline">\(f(x) = ax + b\)</span>, alors
+l’inégalité de Jensen devient une égalité : <span
+class="math display">\[\mathbb{E}[f(X)] =
+f(\mathbb{E}[X]).\]</span></p></li>
+<li><p><strong>Inégalité pour les fonctions concaves</strong> : Si <span
+class="math inline">\(f\)</span> est une fonction concave, l’inégalité
+de Jensen s’inverse : <span class="math display">\[\mathbb{E}[f(X)] \leq
+f(\mathbb{E}[X]).\]</span></p></li>
+<li><p><strong>Application à la variance</strong> : En prenant <span
+class="math inline">\(f(x) = x^2\)</span>, qui est une fonction convexe,
+l’inégalité de Jensen donne : <span
+class="math display">\[\mathbb{E}[X^2] \geq (\mathbb{E}[X])^2.\]</span>
+Cette inégalité est fondamentale en statistique et montre que la
+variance de <span class="math inline">\(X\)</span> est toujours non
+négative.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’inégalité de Jensen est un résultat profond et élégant qui trouve
+des applications dans de nombreux domaines des mathématiques appliquées.
+Son utilisation permet de simplifier l’analyse des fonctions convexes et
+concaves, offrant des insights précieux sur le comportement des
+variables aléatoires. En comprenant et en maîtrisant cette inégalité, on
+ouvre la porte à une meilleure compréhension des modèles probabilistes
+et statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

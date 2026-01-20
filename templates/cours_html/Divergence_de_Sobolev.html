@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Sobolev</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Sobolev</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse de Sobolev, développée principalement par le mathématicien
+russe Sergueï Sobolev dans les années 1930, est une branche de l’analyse
+fonctionnelle qui généralise le concept de dérivée classique aux espaces
+de fonctions moins régulières. La divergence de Sobolev, en particulier,
+joue un rôle crucial dans la théorie des équations aux dérivées
+partielles (EDP) et dans l’étude des problèmes variatonnels.</p>
+<p>La divergence de Sobolev émerge naturellement dans le cadre de
+l’analyse des espaces de Sobolev, qui sont des espaces fonctionnels
+munis d’une norme intégrant à la fois les valeurs de la fonction et
+celles de ses dérivées. Ces espaces sont indispensables pour formuler
+rigoureusement des problèmes physiques et mécaniques, tels que ceux
+rencontrés en élasticité ou en mécanique des fluides.</p>
+<p>Dans cet article, nous explorerons les définitions fondamentales
+liées à la divergence de Sobolev, ainsi que ses propriétés et
+applications. Nous mettrons en lumière les théorèmes clés qui permettent
+de comprendre et d’utiliser efficacement cette notion dans divers
+contextes mathématiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir la divergence de Sobolev, il est essentiel de
+comprendre les espaces de Sobolev. Soit <span
+class="math inline">\(\Omega\)</span> un ouvert de <span
+class="math inline">\(\mathbb{R}^n\)</span>. L’espace de Sobolev <span
+class="math inline">\(W^{k,p}(\Omega)\)</span>, où <span
+class="math inline">\(k\)</span> est un entier positif et <span
+class="math inline">\(p \geq 1\)</span>, est défini comme l’ensemble des
+fonctions <span class="math inline">\(u\)</span> de <span
+class="math inline">\(L^p(\Omega)\)</span> dont les dérivées partielles
+jusqu’à l’ordre <span class="math inline">\(k\)</span> appartiennent
+également à <span class="math inline">\(L^p(\Omega)\)</span>.</p>
+<p>Pour une fonction <span class="math inline">\(u \in
+W^{1,p}(\mathbb{R}^n)\)</span>, la divergence de Sobolev est une
+généralisation de la divergence classique. Elle permet d’étendre le
+concept de divergence aux fonctions dont les dérivées ne sont pas
+nécessairement continues.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(u \in
+W^{1,p}(\mathbb{R}^n)\)</span>. La divergence de Sobolev de <span
+class="math inline">\(u\)</span>, notée <span
+class="math inline">\(\text{div}_s u\)</span>, est définie par la
+formule suivante : <span class="math display">\[\text{div}_s u =
+\sum_{i=1}^n \frac{\partial u_i}{\partial x_i}\]</span> où <span
+class="math inline">\(\frac{\partial u_i}{\partial x_i}\)</span> sont
+les dérivées partielles de <span class="math inline">\(u\)</span> au
+sens des distributions.</p>
+</div>
+<p>Cette définition peut être reformulée en utilisant la notion de
+dualité. Pour toute fonction test <span class="math inline">\(\phi \in
+C_c^\infty(\mathbb{R}^n)\)</span>, nous avons : <span
+class="math display">\[\langle \text{div}_s u, \phi \rangle = -
+\int_{\mathbb{R}^n} u \cdot \nabla \phi \, dx\]</span> où <span
+class="math inline">\(\langle \cdot, \cdot \rangle\)</span> désigne le
+crochet de dualité entre <span
+class="math inline">\(W^{-1,q}(\mathbb{R}^n)\)</span> et <span
+class="math inline">\(W^{1,p}_0(\mathbb{R}^n)\)</span>, avec <span
+class="math inline">\(\frac{1}{p} + \frac{1}{q} = 1\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux liés à la divergence de Sobolev est le
+théorème de divergence, qui généralise le théorème classique de Green.
+Ce théorème permet de relier l’intégrale d’une divergence sur un domaine
+à une intégrale de surface.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(u \in W^{1,p}(\mathbb{R}^n)\)</span>
+et <span class="math inline">\(\phi \in
+C_c^\infty(\mathbb{R}^n)\)</span>. Alors, nous avons : <span
+class="math display">\[\int_{\mathbb{R}^n} \text{div}_s u \, \phi \, dx
+= - \int_{\mathbb{R}^n} u \cdot \nabla \phi \, dx\]</span></p>
+</div>
+<p>La preuve de ce théorème repose sur l’utilisation des propriétés des
+espaces de Sobolev et des distributions. En particulier, elle utilise le
+fait que les dérivées au sens des distributions coïncident avec les
+dérivées classiques pour les fonctions régulières.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de divergence de Sobolev, nous commençons
+par rappeler que pour toute fonction <span class="math inline">\(u \in
+W^{1,p}(\mathbb{R}^n)\)</span>, les dérivées partielles <span
+class="math inline">\(\frac{\partial u_i}{\partial x_i}\)</span> sont
+définies au sens des distributions. Cela signifie que pour toute
+fonction test <span class="math inline">\(\phi \in
+C_c^\infty(\mathbb{R}^n)\)</span>, nous avons : <span
+class="math display">\[\left\langle \frac{\partial u_i}{\partial x_i},
+\phi \right\rangle = - \int_{\mathbb{R}^n} u_i \, \frac{\partial
+\phi}{\partial x_i} \, dx\]</span></p>
+<p>En utilisant cette propriété, nous pouvons écrire : <span
+class="math display">\[\langle \text{div}_s u, \phi \rangle =
+\sum_{i=1}^n \left\langle \frac{\partial u_i}{\partial x_i}, \phi
+\right\rangle = - \sum_{i=1}^n \int_{\mathbb{R}^n} u_i \, \frac{\partial
+\phi}{\partial x_i} \, dx = - \int_{\mathbb{R}^n} u \cdot \nabla \phi \,
+dx\]</span></p>
+<p>Cette égalité montre que la divergence de Sobolev <span
+class="math inline">\(\text{div}_s u\)</span> est bien définie comme une
+distribution et qu’elle satisfait la formule de divergence.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La divergence de Sobolev possède plusieurs propriétés importantes qui
+en font un outil puissant dans l’analyse des EDP. Nous en énumérons
+quelques-unes ci-dessous :</p>
+<ol>
+<li><p><strong>Linearité</strong> : La divergence de Sobolev est une
+opération linéaire. Pour tout <span class="math inline">\(u, v \in
+W^{1,p}(\mathbb{R}^n)\)</span> et <span class="math inline">\(\lambda,
+\mu \in \mathbb{R}\)</span>, nous avons : <span
+class="math display">\[\text{div}_s (\lambda u + \mu v) = \lambda \,
+\text{div}_s u + \mu \, \text{div}_s v\]</span></p></li>
+<li><p><strong>Produit scalaire</strong> : Pour tout <span
+class="math inline">\(u, v \in W^{1,p}(\mathbb{R}^n)\)</span>, nous
+avons : <span class="math display">\[\int_{\mathbb{R}^n} \text{div}_s u
+\, v \, dx = - \int_{\mathbb{R}^n} u \cdot \nabla v \,
+dx\]</span></p></li>
+<li><p><strong>Inégalité de Poincaré</strong> : Pour tout <span
+class="math inline">\(u \in W^{1,p}_0(\Omega)\)</span>, où <span
+class="math inline">\(\Omega\)</span> est un ouvert borné de <span
+class="math inline">\(\mathbb{R}^n\)</span>, il existe une constante
+<span class="math inline">\(C &gt; 0\)</span> telle que : <span
+class="math display">\[\|u\|_{L^p(\Omega)} \leq C \|\nabla
+u\|_{L^p(\Omega)}\]</span> Cette inégalité est cruciale pour l’étude des
+problèmes aux limites et des conditions de bord.</p></li>
+</ol>
+<p>La preuve de ces propriétés repose sur les définitions fondamentales
+et les théorèmes de l’analyse de Sobolev. Elles montrent la richesse et
+la puissance de cette théorie dans l’étude des fonctions peu
+régulières.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La divergence de Sobolev est un concept fondamental en analyse
+fonctionnelle et dans la théorie des EDP. Elle permet d’étendre les
+notions classiques de divergence aux espaces de Sobolev, ouvrant ainsi
+la voie à l’étude rigoureuse de problèmes physiques et mécaniques
+complexes. Les théorèmes et propriétés associés à la divergence de
+Sobolev sont des outils indispensables pour les mathématiciens et les
+physiciens travaillant dans ces domaines.</p>
+<p>En conclusion, l’analyse de Sobolev, et en particulier la divergence
+de Sobolev, représente une avancée majeure dans la compréhension des
+fonctions peu régulières et des équations aux dérivées partielles. Son
+étude continue de stimuler la recherche en mathématiques appliquées et
+en physique théorique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

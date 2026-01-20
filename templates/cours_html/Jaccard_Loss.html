@@ -1,0 +1,372 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Jaccard Loss: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Jaccard Loss: A Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>The concept of Jaccard similarity, originating from the works of Paul
+Jaccard in the early 20th century, has been a cornerstone in the field
+of set theory and statistics. Initially introduced to measure the
+similarity between sample sets, it has found extensive applications in
+various domains such as ecology, information retrieval, and more
+recently, machine learning.</p>
+<p>In the realm of machine learning, particularly in tasks involving set
+predictions like object detection or multi-label classification, the
+need for a suitable loss function arises. The Jaccard similarity
+coefficient, defined as the size of the intersection divided by the size
+of the union of two sets, provides a natural measure of similarity.
+However, for optimization purposes, we often require a loss function
+that minimizes the dissimilarity between predicted and ground truth
+sets.</p>
+<p>The Jaccard Loss, derived from the Jaccard similarity coefficient,
+serves this purpose. It quantifies the dissimilarity between two sets
+and is particularly useful in scenarios where the order of elements
+within a set does not matter. This loss function has gained prominence
+due to its effectiveness in various machine learning applications,
+making it a subject of significant interest and study.</p>
+<h1 id="definitions">Definitions</h1>
+<p>Let us first understand what we aim to achieve. We want a measure
+that quantifies how different two sets are, considering their
+intersection and union. This measure should be symmetric, meaning the
+dissimilarity from set A to set B is the same as from set B to set A. It
+should also be normalized, providing a value between 0 and 1, where 0
+indicates identical sets and 1 indicates completely disjoint sets.</p>
+<p>Given two finite sets <span class="math inline">\(A\)</span> and
+<span class="math inline">\(B\)</span>, the Jaccard similarity
+coefficient <span class="math inline">\(J(A, B)\)</span> is defined
+as:</p>
+<p><span class="math display">\[J(A, B) = \frac{|A \cap B|}{|A \cup
+B|}\]</span></p>
+<p>The Jaccard Loss <span class="math inline">\(L_J(A, B)\)</span> is
+then defined as the complement of the Jaccard similarity
+coefficient:</p>
+<p><span class="math display">\[L_J(A, B) = 1 - J(A, B)\]</span></p>
+<p>Alternatively, using set cardinalities:</p>
+<p><span class="math display">\[L_J(A, B) = 1 - \frac{|A \cap B|}{|A
+\cup B|} = \frac{|A \cup B| - |A \cap B|}{|A \cup B|} = \frac{|A
+\setminus B| + |B \setminus A|}{|A \cup B|}\]</span></p>
+<p>For sets <span class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span> in a universal set <span
+class="math inline">\(U\)</span>, the Jaccard Loss can also be expressed
+as:</p>
+<p><span class="math display">\[L_J(A, B) = \frac{\sum_{i \in U}
+\mathbb{I}_{A}(i)(1 - \mathbb{I}_{B}(i)) + \mathbb{I}_{B}(i)(1 -
+\mathbb{I}_{A}(i))}{\sum_{i \in U} \mathbb{I}_{A}(i) + \mathbb{I}_{B}(i)
+- \mathbb{I}_{A}(i)\mathbb{I}_{B}(i)}\]</span></p>
+<p>where <span class="math inline">\(\mathbb{I}_{S}(i)\)</span> is the
+indicator function that evaluates to 1 if <span class="math inline">\(i
+\in S\)</span> and 0 otherwise.</p>
+<h1 id="theorems">Theorems</h1>
+<p>Consider the following theorem regarding the properties of Jaccard
+Loss:</p>
+<div class="theorem">
+<p>For any two finite sets <span class="math inline">\(A\)</span> and
+<span class="math inline">\(B\)</span>, the Jaccard Loss satisfies the
+following properties:</p>
+<ol>
+<li><p>(Non-negativity) <span class="math inline">\(L_J(A, B) \geq
+0\)</span></p></li>
+<li><p>(Identity of Indiscernibles) <span class="math inline">\(L_J(A,
+B) = 0 \iff A = B\)</span></p></li>
+<li><p>(Symmetry) <span class="math inline">\(L_J(A, B) = L_J(B,
+A)\)</span></p></li>
+<li><p>(Boundedness) <span class="math inline">\(0 \leq L_J(A, B) \leq
+1\)</span></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> We will prove each property one by one.</p>
+<p><strong>(Non-negativity)</strong>: Since <span
+class="math inline">\(|A \setminus B|\)</span> and <span
+class="math inline">\(|B \setminus A|\)</span> are both non-negative,
+their sum is also non-negative. The denominator <span
+class="math inline">\(|A \cup B|\)</span> is positive for any two
+non-empty sets, hence <span class="math inline">\(L_J(A, B) \geq
+0\)</span>.</p>
+<p><strong>(Identity of Indiscernibles)</strong>: If <span
+class="math inline">\(A = B\)</span>, then <span
+class="math inline">\(|A \setminus B| = 0\)</span> and <span
+class="math inline">\(|B \setminus A| = 0\)</span>, so <span
+class="math inline">\(L_J(A, B) = 0\)</span>. Conversely, if <span
+class="math inline">\(L_J(A, B) = 0\)</span>, then <span
+class="math inline">\(|A \setminus B| + |B \setminus A| = 0\)</span>,
+which implies <span class="math inline">\(A = B\)</span>.</p>
+<p><strong>(Symmetry)</strong>: By definition, <span
+class="math inline">\(L_J(A, B) = 1 - J(A, B)\)</span>. Since <span
+class="math inline">\(J(A, B) = J(B, A)\)</span>, it follows that <span
+class="math inline">\(L_J(A, B) = L_J(B, A)\)</span>.</p>
+<p><strong>(Boundedness)</strong>: The numerator <span
+class="math inline">\(|A \setminus B| + |B \setminus A|\)</span> is
+always less than or equal to the denominator <span
+class="math inline">\(|A \cup B|\)</span>, because <span
+class="math inline">\(A \setminus B \subseteq A \cup B\)</span> and
+<span class="math inline">\(B \setminus A \subseteq A \cup B\)</span>.
+Therefore, <span class="math inline">\(L_J(A, B) \leq 1\)</span>. ◻</p>
+</div>
+<h1 id="proofs">Proofs</h1>
+<p>Let us delve deeper into the proof of one of the properties, namely
+the symmetry of Jaccard Loss.</p>
+<div class="proof">
+<p><em>Proof of Symmetry.</em> We aim to show that <span
+class="math inline">\(L_J(A, B) = L_J(B, A)\)</span>.</p>
+<p>Starting with the definition of Jaccard Loss:</p>
+<p><span class="math display">\[L_J(A, B) = 1 - \frac{|A \cap B|}{|A
+\cup B|}\]</span></p>
+<p>Similarly,</p>
+<p><span class="math display">\[L_J(B, A) = 1 - \frac{|B \cap A|}{|B
+\cup A|}\]</span></p>
+<p>Since <span class="math inline">\(|A \cap B| = |B \cap A|\)</span>
+and <span class="math inline">\(|A \cup B| = |B \cup A|\)</span>, it
+follows that:</p>
+<p><span class="math display">\[L_J(A, B) = L_J(B, A)\]</span></p>
+<p>This completes the proof. ◻</p>
+</div>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<p>We now list some important properties and corollaries of the Jaccard
+Loss.</p>
+<ol>
+<li><p>(Empty Set Property): For any set <span
+class="math inline">\(A\)</span>, <span class="math inline">\(L_J(A,
+\emptyset) = 1\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> If <span class="math inline">\(B =
+\emptyset\)</span>, then <span class="math inline">\(|A \cap B| =
+0\)</span> and <span class="math inline">\(|A \cup B| = |A|\)</span>.
+Therefore,</p>
+<p><span class="math display">\[L_J(A, \emptyset) = 1 - \frac{0}{|A|} =
+1\]</span> ◻</p>
+</div></li>
+<li><p>(Subset Property): If <span class="math inline">\(A \subseteq
+B\)</span>, then <span class="math inline">\(L_J(A, B) = 1 -
+\frac{|A|}{|B|}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> If <span class="math inline">\(A \subseteq
+B\)</span>, then <span class="math inline">\(|A \cap B| = |A|\)</span>
+and <span class="math inline">\(|A \cup B| = |B|\)</span>.
+Therefore,</p>
+<p><span class="math display">\[L_J(A, B) = 1 -
+\frac{|A|}{|B|}\]</span> ◻</p>
+</div></li>
+<li><p>(Complement Property): For any set <span
+class="math inline">\(A\)</span>, <span class="math inline">\(L_J(A,
+A^c) = 1\)</span>, where <span class="math inline">\(A^c\)</span>
+denotes the complement of <span class="math inline">\(A\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> If <span class="math inline">\(B = A^c\)</span>, then
+<span class="math inline">\(|A \cap B| = 0\)</span> and <span
+class="math inline">\(|A \cup B| = |U|\)</span>, where <span
+class="math inline">\(U\)</span> is the universal set. Therefore,</p>
+<p><span class="math display">\[L_J(A, A^c) = 1 - \frac{0}{|U|} =
+1\]</span> ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>The Jaccard Loss, as a measure of set dissimilarity, has proven to be
+a valuable tool in various applications, particularly in machine
+learning. Its properties of non-negativity, identity of indiscernibles,
+symmetry, and boundedness make it a robust choice for tasks involving
+set predictions. The detailed exploration of its definitions, theorems,
+proofs, and properties provides a comprehensive understanding of this
+loss function.</p>
+<p>As research continues to advance, the Jaccard Loss is likely to find
+even more applications, further solidifying its importance in the field
+of machine learning and beyond.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

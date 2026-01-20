@@ -1,0 +1,403 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Smooth L1 Loss: Une Exploration Mathématique et Computationnelle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Smooth L1 Loss: Une Exploration Mathématique et
+Computationnelle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’optimisation dans les modèles de machine learning est souvent
+confrontée à des fonctions de coût non différentiables, ce qui complique
+les algorithmes d’optimisation standard. Parmi ces fonctions de coût, la
+perte L1, ou norme <span class="math inline">\(L_1\)</span>, est
+particulièrement intéressante en raison de ses propriétés de sparsité.
+Cependant, sa non-différentiabilité au point zéro pose un défi pour les
+méthodes d’optimisation basées sur le gradient. C’est ici qu’intervient
+la <em>Smooth L1 Loss</em>, une fonction de coût qui combine les
+avantages de la perte L1 et de la perte L2 (ou norme <span
+class="math inline">\(L_2\)</span>), tout en étant différentiable
+partout.</p>
+<p>La <em>Smooth L1 Loss</em> émerge comme une solution élégante pour
+résoudre ce problème de non-différentiabilité, tout en conservant les
+propriétés souhaitables de la perte L1. Elle est indispensable dans des
+cadres tels que les réseaux de neurones convolutifs (CNN) pour la
+détection d’objets, où elle est utilisée comme fonction de coût dans des
+algorithmes comme Fast R-CNN et Faster R-CNN. Son utilisation permet
+d’équilibrer la robustesse de la perte L1 avec la stabilité numérique de
+la perte L2.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la <em>Smooth L1 Loss</em>, commençons par rappeler
+ce que nous cherchons à obtenir. Nous voulons une fonction de coût qui
+soit différentiable partout, tout en ayant un comportement similaire à
+la perte L1 pour les grandes valeurs de l’erreur et un comportement
+similaire à la perte L2 pour les petites erreurs. Cela signifie que nous
+cherchons une fonction qui soit "lisse" (c’est-à-dire différentiable) et
+qui ait une transition douce entre les deux régimes.</p>
+<p>Formellement, la <em>Smooth L1 Loss</em> est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(x \in \mathbb{R}\)</span> l’erreur
+entre la prédiction et la valeur vraie. La <em>Smooth L1 Loss</em> est
+définie par : <span class="math display">\[\sigma(x) =
+\begin{cases}
+0.5x^2 &amp; \text{si } |x| &lt; 1, \\
+|x| - 0.5 &amp; \text{sinon.}
+\end{cases}\]</span></p>
+</div>
+<p>Cette définition peut être réécrite en utilisant des quantificateurs
+et des fonctions indicatrices :</p>
+<p><span class="math display">\[\sigma(x) =
+\begin{cases}
+0.5x^2 &amp; \text{si } |x| &lt; 1, \\
+|x| - 0.5 &amp; \text{si } |x| \geq 1.
+\end{cases}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la <em>Smooth L1 Loss</em> est celui de
+sa différentiabilité. Nous cherchons à montrer que la fonction <span
+class="math inline">\(\sigma(x)\)</span> est différentiable partout, ce
+qui est une propriété cruciale pour les algorithmes d’optimisation basés
+sur le gradient.</p>
+<div class="theorem">
+<p>La fonction <span class="math inline">\(\sigma(x)\)</span> définie
+par : <span class="math display">\[\sigma(x) =
+\begin{cases}
+0.5x^2 &amp; \text{si } |x| &lt; 1, \\
+|x| - 0.5 &amp; \text{sinon.}
+\end{cases}\]</span> est différentiable sur <span
+class="math inline">\(\mathbb{R}\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver que <span
+class="math inline">\(\sigma(x)\)</span> est différentiable sur <span
+class="math inline">\(\mathbb{R}\)</span>, nous devons montrer que la
+dérivée de <span class="math inline">\(\sigma(x)\)</span> existe en tout
+point <span class="math inline">\(x \in \mathbb{R}\)</span>.</p>
+<p>1. Pour <span class="math inline">\(|x| &lt; 1\)</span>, <span
+class="math inline">\(\sigma(x) = 0.5x^2\)</span>. La dérivée est :
+<span class="math display">\[\frac{d}{dx}\sigma(x) = x.\]</span></p>
+<p>2. Pour <span class="math inline">\(|x| &gt; 1\)</span>, <span
+class="math inline">\(\sigma(x) = |x| - 0.5\)</span>. La dérivée est :
+<span class="math display">\[\frac{d}{dx}\sigma(x) =
+\text{sign}(x),\]</span> où <span
+class="math inline">\(\text{sign}(x)\)</span> est la fonction signe,
+définie par : <span class="math display">\[\text{sign}(x) =
+\begin{cases}
+1 &amp; \text{si } x &gt; 0, \\
+-1 &amp; \text{si } x &lt; 0.
+\end{cases}\]</span></p>
+<p>3. Au point <span class="math inline">\(x = 1\)</span>, nous devons
+vérifier la continuité de la dérivée. La limite de la dérivée à droite
+est : <span class="math display">\[\lim_{x \to 1^+}
+\frac{d}{dx}\sigma(x) = 1.\]</span> La limite de la dérivée à gauche est
+: <span class="math display">\[\lim_{x \to 1^-} \frac{d}{dx}\sigma(x) =
+1.\]</span> Ainsi, la dérivée est continue en <span
+class="math inline">\(x = 1\)</span>.</p>
+<p>4. De même, au point <span class="math inline">\(x = -1\)</span>, la
+limite de la dérivée à droite est : <span class="math display">\[\lim_{x
+\to -1^+} \frac{d}{dx}\sigma(x) = -1.\]</span> La limite de la dérivée à
+gauche est : <span class="math display">\[\lim_{x \to -1^-}
+\frac{d}{dx}\sigma(x) = -1.\]</span> Ainsi, la dérivée est continue en
+<span class="math inline">\(x = -1\)</span>.</p>
+<p>Par conséquent, <span class="math inline">\(\sigma(x)\)</span> est
+différentiable sur <span
+class="math inline">\(\mathbb{R}\)</span>. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Nous allons maintenant fournir une preuve détaillée de la
+différentiabilité de la <em>Smooth L1 Loss</em>. Cette preuve repose sur
+le fait que la fonction est différentiable dans chaque intervalle et que
+les dérivées sont continues aux points de transition.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour montrer que <span
+class="math inline">\(\sigma(x)\)</span> est différentiable sur <span
+class="math inline">\(\mathbb{R}\)</span>, nous devons vérifier la
+continuité de la fonction et de sa dérivée en tout point.</p>
+<p>1. Continuité de <span class="math inline">\(\sigma(x)\)</span> : -
+Pour <span class="math inline">\(|x| &lt; 1\)</span>, <span
+class="math inline">\(\sigma(x) = 0.5x^2\)</span> est continue. - Pour
+<span class="math inline">\(|x| &gt; 1\)</span>, <span
+class="math inline">\(\sigma(x) = |x| - 0.5\)</span> est continue. - Aux
+points <span class="math inline">\(x = \pm 1\)</span>, nous avons :
+<span class="math display">\[\lim_{x \to 1^-} \sigma(x) = 0.5(1)^2 =
+0.5,\]</span> <span class="math display">\[\lim_{x \to 1^+} \sigma(x) =
+|1| - 0.5 = 0.5,\]</span> <span class="math display">\[\lim_{x \to -1^-}
+\sigma(x) = 0.5(-1)^2 = 0.5,\]</span> <span
+class="math display">\[\lim_{x \to -1^+} \sigma(x) = |-1| - 0.5 =
+0.5.\]</span> Ainsi, <span class="math inline">\(\sigma(x)\)</span> est
+continue sur <span class="math inline">\(\mathbb{R}\)</span>.</p>
+<p>2. Continuité de la dérivée : - Pour <span class="math inline">\(|x|
+&lt; 1\)</span>, <span class="math inline">\(\frac{d}{dx}\sigma(x) =
+x\)</span> est continue. - Pour <span class="math inline">\(|x| &gt;
+1\)</span>, <span class="math inline">\(\frac{d}{dx}\sigma(x) =
+\text{sign}(x)\)</span> est continue. - Aux points <span
+class="math inline">\(x = \pm 1\)</span>, nous avons montré que les
+limites des dérivées existent et sont égales aux valeurs de la dérivée
+en ces points.</p>
+<p>Par conséquent, <span class="math inline">\(\sigma(x)\)</span> est
+différentiable sur <span
+class="math inline">\(\mathbb{R}\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant énumérer et prouver certaines propriétés
+importantes de la <em>Smooth L1 Loss</em>.</p>
+<div class="proposition">
+<p>La <em>Smooth L1 Loss</em> <span
+class="math inline">\(\sigma(x)\)</span> est convexe sur <span
+class="math inline">\(\mathbb{R}\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour montrer que <span
+class="math inline">\(\sigma(x)\)</span> est convexe, nous devons
+vérifier que sa dérivée seconde est non négative en tout point.</p>
+<p>1. Pour <span class="math inline">\(|x| &lt; 1\)</span>, <span
+class="math inline">\(\sigma(x) = 0.5x^2\)</span>. La dérivée seconde
+est : <span class="math display">\[\frac{d^2}{dx^2}\sigma(x) = 1 \geq
+0.\]</span></p>
+<p>2. Pour <span class="math inline">\(|x| &gt; 1\)</span>, <span
+class="math inline">\(\sigma(x) = |x| - 0.5\)</span>. La dérivée seconde
+est : <span class="math display">\[\frac{d^2}{dx^2}\sigma(x) = 0 \geq
+0.\]</span></p>
+<p>Ainsi, <span class="math inline">\(\sigma(x)\)</span> est convexe sur
+<span class="math inline">\(\mathbb{R}\)</span>. ◻</p>
+</div>
+<div class="corollaire">
+<p>La <em>Smooth L1 Loss</em> <span
+class="math inline">\(\sigma(x)\)</span> est Lipschitz continue sur
+<span class="math inline">\(\mathbb{R}\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour montrer que <span
+class="math inline">\(\sigma(x)\)</span> est Lipschitz continue, nous
+devons trouver une constante <span class="math inline">\(L &gt;
+0\)</span> telle que pour tout <span class="math inline">\(x, y \in
+\mathbb{R}\)</span>, <span class="math display">\[|\sigma(x) -
+\sigma(y)| \leq L|x - y|.\]</span></p>
+<p>1. Pour <span class="math inline">\(|x|, |y| &lt; 1\)</span>, <span
+class="math inline">\(\sigma(x) = 0.5x^2\)</span> et <span
+class="math inline">\(\sigma(y) = 0.5y^2\)</span>. Nous avons : <span
+class="math display">\[|\sigma(x) - \sigma(y)| = 0.5|x^2 - y^2| = 0.5|x
++ y||x - y| \leq |x + y||x - y|.\]</span> Puisque <span
+class="math inline">\(|x + y| \leq 2\)</span> pour <span
+class="math inline">\(|x|, |y| &lt; 1\)</span>, nous pouvons prendre
+<span class="math inline">\(L = 2\)</span>.</p>
+<p>2. Pour <span class="math inline">\(|x|, |y| &gt; 1\)</span>, <span
+class="math inline">\(\sigma(x) = |x| - 0.5\)</span> et <span
+class="math inline">\(\sigma(y) = |y| - 0.5\)</span>. Nous avons : <span
+class="math display">\[|\sigma(x) - \sigma(y)| = ||x| - |y|| \leq |x -
+y|.\]</span> Ainsi, nous pouvons prendre <span class="math inline">\(L =
+1\)</span>.</p>
+<p>3. Pour les cas mixtes, nous devons vérifier la continuité aux points
+de transition. Cela a été fait dans la preuve de la continuité de <span
+class="math inline">\(\sigma(x)\)</span>.</p>
+<p>Par conséquent, <span class="math inline">\(\sigma(x)\)</span> est
+Lipschitz continue sur <span class="math inline">\(\mathbb{R}\)</span>
+avec une constante de Lipschitz <span class="math inline">\(L =
+2\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La <em>Smooth L1 Loss</em> est une fonction de coût puissante et
+flexible qui combine les avantages de la perte L1 et de la perte L2. Sa
+différentiabilité partout en fait un choix naturel pour les algorithmes
+d’optimisation basés sur le gradient. Nous avons exploré ses propriétés
+mathématiques, notamment sa différentiabilité et sa convexité, ainsi que
+ses implications computationnelles. La <em>Smooth L1 Loss</em> continue
+de jouer un rôle crucial dans le développement des modèles de machine
+learning, en particulier dans les domaines où la robustesse et la
+stabilité numérique sont essentielles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,320 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La Variance de Huber : Une Approche Robuste en Statistique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La Variance de Huber : Une Approche Robuste en
+Statistique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La statistique robuste est un domaine essentiel pour traiter des
+données qui peuvent contenir des valeurs aberrantes ou des erreurs de
+mesure. Parmi les outils développés pour cette fin, la variance de Huber
+se distingue par sa capacité à fournir une estimation robuste de la
+dispersion des données. Introduite par Peter J. Huber dans les années
+1960, cette approche a révolutionné la manière dont nous traitons les
+données en présence d’anomalies.</p>
+<p>La variance de Huber émerge comme une réponse à la sensibilité des
+méthodes classiques, telles que la moyenne et la variance, face aux
+valeurs aberrantes. En effet, ces méthodes peuvent être fortement
+influencées par des points extrêmes, ce qui peut conduire à des
+estimations biaisées. La variance de Huber, en revanche, est conçue pour
+minimiser l’impact de ces valeurs aberrantes tout en conservant les
+propriétés statistiques souhaitables.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la variance de Huber, il est essentiel de définir
+d’abord la fonction de perte de Huber. Cette fonction combine les
+avantages de la fonction de perte quadratique et de la fonction de perte
+absolue. La fonction de perte quadratique est sensible aux valeurs
+aberrantes, tandis que la fonction de perte absolue est robuste mais
+moins efficace pour les petites erreurs.</p>
+<p>Considérons un ensemble de données <span class="math inline">\(\{x_1,
+x_2, \dots, x_n\}\)</span> et une estimation de la moyenne <span
+class="math inline">\(\mu\)</span>. La fonction de perte de Huber est
+définie comme suit :</p>
+<p><span class="math display">\[\rho(x, \mu) =
+\begin{cases}
+\frac{1}{2}(x - \mu)^2 &amp; \text{si } |x - \mu| \leq c, \\
+c|x - \mu| - \frac{1}{2}c^2 &amp; \text{sinon.}
+\end{cases}\]</span></p>
+<p>où <span class="math inline">\(c\)</span> est un paramètre de seuil
+qui contrôle la transition entre les deux régimes.</p>
+<p>La variance de Huber est alors définie comme l’espérance de la
+fonction de perte de Huber centrée autour de la moyenne robuste.
+Formellement, nous avons :</p>
+<p><span class="math display">\[\sigma^2_H = \mathbb{E}\left[\rho(X,
+\mu)^2\right],\]</span></p>
+<p>où <span class="math inline">\(X\)</span> est une variable aléatoire
+représentant les données et <span class="math inline">\(\mu\)</span> est
+l’estimation robuste de la moyenne.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la variance de Huber est le théorème de
+la consistance. Ce théorème garantit que l’estimateur de la variance de
+Huber converge vers la vraie variance lorsque le nombre de données tend
+vers l’infini.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\{X_n\}_{n \geq 1}\)</span> une
+suite de variables aléatoires indépendantes et identiquement distribuées
+(i.i.d.) avec une espérance finie <span
+class="math inline">\(\mu\)</span> et une variance finie <span
+class="math inline">\(\sigma^2\)</span>. Soit <span
+class="math inline">\(\hat{\mu}_n\)</span> un estimateur robuste de la
+moyenne et <span class="math inline">\(\hat{\sigma}^2_n\)</span>
+l’estimateur de la variance de Huber. Alors,</p>
+<p><span class="math display">\[\lim_{n \to \infty}
+\mathbb{P}\left(|\hat{\sigma}^2_n - \sigma^2| &gt; \epsilon\right) = 0,
+\quad \forall \epsilon &gt; 0.\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la consistance, nous utilisons le lemme
+des séries triangulaires et le théorème de la limite centrale.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons d’abord l’estimateur robuste de la
+moyenne <span class="math inline">\(\hat{\mu}_n\)</span>. Par hypothèse,
+cet estimateur est consistant, c’est-à-dire que</p>
+<p><span class="math display">\[\lim_{n \to \infty}
+\mathbb{P}\left(|\hat{\mu}_n - \mu| &gt; \epsilon\right) = 0, \quad
+\forall \epsilon &gt; 0.\]</span></p>
+<p>Ensuite, nous utilisons la fonction de perte de Huber pour définir
+l’estimateur de la variance. Nous avons</p>
+<p><span class="math display">\[\hat{\sigma}^2_n = \frac{1}{n}
+\sum_{i=1}^n \rho(X_i, \hat{\mu}_n)^2.\]</span></p>
+<p>Par le lemme des séries triangulaires, il suffit de montrer que pour
+chaque <span class="math inline">\(i\)</span>,</p>
+<p><span class="math display">\[\lim_{n \to \infty}
+\mathbb{P}\left(|\rho(X_i, \hat{\mu}_n)^2 - \rho(X_i, \mu)^2| &gt;
+\epsilon\right) = 0.\]</span></p>
+<p>En utilisant la continuité de la fonction <span
+class="math inline">\(\rho\)</span>, nous avons</p>
+<p><span class="math display">\[|\rho(X_i, \hat{\mu}_n)^2 - \rho(X_i,
+\mu)^2| \leq 2\rho(X_i, \hat{\mu}_n)|\rho(X_i, \hat{\mu}_n) - \rho(X_i,
+\mu)|.\]</span></p>
+<p>Par le théorème de la limite centrale et la consistance de <span
+class="math inline">\(\hat{\mu}_n\)</span>, nous pouvons conclure
+que</p>
+<p><span class="math display">\[\lim_{n \to \infty}
+\mathbb{P}\left(|\hat{\sigma}^2_n - \sigma^2| &gt; \epsilon\right) =
+0.\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La variance de Huber possède plusieurs propriétés intéressantes qui
+en font un outil puissant pour l’analyse des données robustes.</p>
+<ol>
+<li><p><strong>Robustesse</strong> : La variance de Huber est moins
+sensible aux valeurs aberrantes que la variance classique. Cela signifie
+qu’elle peut fournir une estimation plus fiable de la dispersion des
+données en présence d’anomalies.</p></li>
+<li><p><strong>Efficacité</strong> : Pour des données sans valeurs
+aberrantes, la variance de Huber est presque aussi efficace que la
+variance classique. Cela signifie qu’elle ne sacrifie pas beaucoup de
+précision lorsque les données sont bien comportées.</p></li>
+<li><p><strong>Consistance</strong> : Comme démontré par le théorème de
+la consistance, l’estimateur de la variance de Huber converge vers la
+vraie variance lorsque le nombre de données tend vers l’infini.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La variance de Huber est un outil essentiel pour l’analyse des
+données robustes. Son utilisation permet de traiter efficacement les
+valeurs aberrantes tout en conservant les propriétés statistiques
+souhaitables. En combinant les avantages de la fonction de perte
+quadratique et de la fonction de perte absolue, elle offre une solution
+équilibrée pour l’estimation de la dispersion des données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

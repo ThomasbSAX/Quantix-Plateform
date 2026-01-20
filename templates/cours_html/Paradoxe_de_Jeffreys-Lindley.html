@@ -1,0 +1,404 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Paradoxe de Jeffreys-Lindley : Un Pont entre les Approches Fréquentistes et Bayésiennes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Paradoxe de Jeffreys-Lindley : Un Pont entre les
+Approches Fréquentistes et Bayésiennes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le paradoxe de Jeffreys-Lindley émerge à l’intersection des
+statistiques fréquentistes et bayésiennes, deux paradigmes qui, malgré
+leurs différences fondamentales, cherchent à répondre aux mêmes
+questions. Ce paradoxe met en lumière une tension profonde entre ces
+deux approches lorsqu’il s’agit de tester des hypothèses
+statistiques.</p>
+<p>L’origine du paradoxe remonte aux travaux de Harold Jeffreys et
+Dennis Lindley dans les années 1930 et 1960. Jeffreys, un pionnier de la
+statistique bayésienne, et Lindley, un statisticien influent, ont
+souligné que les tests d’hypothèses peuvent conduire à des conclusions
+paradoxales lorsque l’on compare les approches fréquentistes et
+bayésiennes.</p>
+<p>Le paradoxe se manifeste lorsqu’une petite différence entre deux
+hypothèses peut être statistiquement significative selon une approche
+fréquentiste, mais pas selon une approche bayésienne. Ce paradoxe est
+crucial car il questionne la cohérence et l’interprétabilité des tests
+d’hypothèses, un pilier de l’inférence statistique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le paradoxe de Jeffreys-Lindley, il est essentiel de
+définir les concepts clés impliqués.</p>
+<h2 id="hypothèses-statistiques">Hypothèses Statistiques</h2>
+<p>Considérons deux hypothèses statistiques :</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> : l’hypothèse
+nulle.</p></li>
+<li><p><span class="math inline">\(H_1\)</span> : l’hypothèse
+alternative.</p></li>
+</ul>
+<p>En statistique fréquentiste, on teste <span
+class="math inline">\(H_0\)</span> contre <span
+class="math inline">\(H_1\)</span> en utilisant une statistique de test
+et une région critique. En statistique bayésienne, on compare les
+probabilités postérieures des hypothèses.</p>
+<h2 id="test-dhypothèses-fréquentiste">Test d’Hypothèses
+Fréquentiste</h2>
+<p>Un test d’hypothèses fréquentiste est défini par :</p>
+<ul>
+<li><p>Une statistique de test <span class="math inline">\(T(X)\)</span>
+basée sur les données <span class="math inline">\(X\)</span>.</p></li>
+<li><p>Une région critique <span class="math inline">\(C\)</span> telle
+que si <span class="math inline">\(T(X) \in C\)</span>, on rejette <span
+class="math inline">\(H_0\)</span>.</p></li>
+<li><p>Un niveau de signification <span
+class="math inline">\(\alpha\)</span> qui contrôle la probabilité de
+rejeter <span class="math inline">\(H_0\)</span> lorsque <span
+class="math inline">\(H_0\)</span> est vraie.</p></li>
+</ul>
+<p>Formellement, on a : <span class="math display">\[P(T(X) \in C | H_0)
+= \alpha\]</span></p>
+<h2 id="test-dhypothèses-bayésien">Test d’Hypothèses Bayésien</h2>
+<p>Un test d’hypothèses bayésien est défini par :</p>
+<ul>
+<li><p>Les probabilités postérieures <span class="math inline">\(P(H_0 |
+X)\)</span> et <span class="math inline">\(P(H_1 | X)\)</span>.</p></li>
+<li><p>Une règle de décision basée sur ces probabilités
+postérieures.</p></li>
+</ul>
+<p>Formellement, on a : <span class="math display">\[P(H_0 | X) =
+\frac{P(X | H_0) P(H_0)}{P(X)}\]</span> <span
+class="math display">\[P(H_1 | X) = \frac{P(X | H_1)
+P(H_1)}{P(X)}\]</span></p>
+<h2 id="le-paradoxe-de-jeffreys-lindley">Le Paradoxe de
+Jeffreys-Lindley</h2>
+<p>Le paradoxe de Jeffreys-Lindley se produit lorsque :</p>
+<ul>
+<li><p>Une petite différence entre <span
+class="math inline">\(H_0\)</span> et <span
+class="math inline">\(H_1\)</span> est statistiquement significative
+selon un test fréquentiste.</p></li>
+<li><p>La même différence n’est pas significative selon un test
+bayésien.</p></li>
+</ul>
+<p>Formellement, cela peut être exprimé comme : <span
+class="math display">\[P(T(X) \in C | H_0) = \alpha \quad \text{mais}
+\quad P(H_1 | X) &lt; P(H_0 | X)\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-jeffreys-lindley">Théorème de Jeffreys-Lindley</h2>
+<p>Le théorème de Jeffreys-Lindley établit une relation entre les tests
+fréquentistes et bayésiens. Il montre que pour certaines configurations,
+un test fréquentiste peut être significatif tandis qu’un test bayésien
+ne l’est pas.</p>
+<div class="theorem">
+<p>Supposons que :</p>
+<ul>
+<li><p><span class="math inline">\(H_0\)</span> et <span
+class="math inline">\(H_1\)</span> sont deux hypothèses
+simples.</p></li>
+<li><p><span class="math inline">\(X\)</span> est une variable aléatoire
+avec une densité de probabilité <span class="math inline">\(f(x |
+\theta)\)</span>.</p></li>
+<li><p><span class="math inline">\(\alpha\)</span> est le niveau de
+signification du test fréquentiste.</p></li>
+</ul>
+<p>Alors, il existe des cas où : <span class="math display">\[P(T(X) \in
+C | H_0) = \alpha \quad \text{mais} \quad P(H_1 | X) &lt; P(H_0 |
+X)\]</span></p>
+</div>
+<h2 id="démonstration-du-théorème-de-jeffreys-lindley">Démonstration du
+Théorème de Jeffreys-Lindley</h2>
+<p>Pour démontrer ce théorème, considérons les étapes suivantes :</p>
+<p>1. **Définir la Statistique de Test** : <span
+class="math display">\[T(X) = \frac{P(X | H_1)}{P(X | H_0)}\]</span></p>
+<p>2. **Déterminer la Région Critique** : <span class="math display">\[C
+= \{x | T(x) &gt; k\}\]</span> où <span class="math inline">\(k\)</span>
+est choisi de telle sorte que : <span class="math display">\[P(T(X) &gt;
+k | H_0) = \alpha\]</span></p>
+<p>3. **Calculer les Probabilités Postérieures** : <span
+class="math display">\[P(H_1 | X) = \frac{P(X | H_1) P(H_1)}{P(X | H_0)
+P(H_0) + P(X | H_1) P(H_1)}\]</span> <span class="math display">\[P(H_0
+| X) = \frac{P(X | H_0) P(H_0)}{P(X | H_0) P(H_0) + P(X | H_1)
+P(H_1)}\]</span></p>
+<p>4. **Comparer les Probabilités Postérieures** : <span
+class="math display">\[P(H_1 | X) &lt; P(H_0 | X) \quad \text{lorsque}
+\quad T(X) &lt; \frac{P(H_0)}{P(H_1)}\]</span></p>
+<p>5. **Conclusion** : <span class="math display">\[\text{Si} \quad k
+&gt; \frac{P(H_0)}{P(H_1)}, \quad \text{alors} \quad P(T(X) \in C | H_0)
+= \alpha \quad \text{mais} \quad P(H_1 | X) &lt; P(H_0 | X)\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="justification-des-étapes">Justification des Étapes</h2>
+<p>1. **Définition de la Statistique de Test** : La statistique de test
+<span class="math inline">\(T(X)\)</span> est choisie pour mesurer la
+différence entre les probabilités des données sous <span
+class="math inline">\(H_0\)</span> et <span
+class="math inline">\(H_1\)</span>.</p>
+<p>2. **Détermination de la Région Critique** : La région critique <span
+class="math inline">\(C\)</span> est définie pour contrôler le niveau de
+signification <span class="math inline">\(\alpha\)</span>.</p>
+<p>3. **Calcul des Probabilités Postérieures** : Les probabilités
+postérieures sont calculées en utilisant la règle de Bayes.</p>
+<p>4. **Comparaison des Probabilités Postérieures** : La comparaison
+montre que pour certaines valeurs de <span
+class="math inline">\(T(X)\)</span>, la probabilité postérieure de <span
+class="math inline">\(H_1\)</span> peut être inférieure à celle de <span
+class="math inline">\(H_0\)</span>.</p>
+<p>5. **Conclusion** : La conclusion montre que le paradoxe peut se
+produire lorsque la statistique de test dépasse un certain seuil.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-1-influence-des-a-priori">Propriété 1 : Influence des
+A Priori</h2>
+<p>La probabilité a priori des hypothèses joue un rôle crucial dans le
+paradoxe de Jeffreys-Lindley.</p>
+<div class="proposition">
+<p>Supposons que :</p>
+<ul>
+<li><p><span class="math inline">\(P(H_0) = p\)</span> et <span
+class="math inline">\(P(H_1) = 1 - p\)</span>.</p></li>
+<li><p><span class="math inline">\(T(X) &gt; k\)</span> où <span
+class="math inline">\(k &gt; \frac{p}{1 - p}\)</span>.</p></li>
+</ul>
+<p>Alors, <span class="math inline">\(P(H_1 | X) &lt; P(H_0 |
+X)\)</span>.</p>
+</div>
+<h2 id="démonstration-de-la-proposition-1">Démonstration de la
+Proposition 1</h2>
+<p>1. **Calcul des Probabilités Postérieures** : <span
+class="math display">\[P(H_1 | X) = \frac{T(X) (1 - p)}{p + T(X) (1 -
+p)}\]</span> <span class="math display">\[P(H_0 | X) = \frac{p}{p + T(X)
+(1 - p)}\]</span></p>
+<p>2. **Comparaison** : <span class="math display">\[P(H_1 | X) &lt;
+P(H_0 | X) \quad \text{lorsque} \quad T(X) &lt; \frac{p}{1 -
+p}\]</span></p>
+<p>3. **Conclusion** : <span class="math display">\[\text{Si} \quad T(X)
+&gt; k &gt; \frac{p}{1 - p}, \quad \text{alors} \quad P(H_1 | X) &lt;
+P(H_0 | X)\]</span></p>
+<h2 id="propriété-2-influence-de-la-taille-de-léchantillon">Propriété 2
+: Influence de la Taille de l’Échantillon</h2>
+<p>La taille de l’échantillon peut également influencer le paradoxe de
+Jeffreys-Lindley.</p>
+<div class="proposition">
+<p>Supposons que :</p>
+<ul>
+<li><p>La taille de l’échantillon <span class="math inline">\(n\)</span>
+augmente.</p></li>
+<li><p><span class="math inline">\(T(X)\)</span> reste
+constant.</p></li>
+</ul>
+<p>Alors, le paradoxe de Jeffreys-Lindley peut devenir plus
+prononcé.</p>
+</div>
+<h2 id="démonstration-de-la-proposition-2">Démonstration de la
+Proposition 2</h2>
+<p>1. **Calcul des Probabilités Postérieures** : <span
+class="math display">\[P(H_1 | X) = \frac{T(X)^{n} (1 - p)}{p + T(X)^{n}
+(1 - p)}\]</span> <span class="math display">\[P(H_0 | X) = \frac{p}{p +
+T(X)^{n} (1 - p)}\]</span></p>
+<p>2. **Comparaison** : <span class="math display">\[P(H_1 | X) &lt;
+P(H_0 | X) \quad \text{lorsque} \quad T(X)^{n} &lt; \frac{p}{1 -
+p}\]</span></p>
+<p>3. **Conclusion** : <span class="math display">\[\text{Si} \quad n
+\quad \text{augmente}, \quad T(X)^{n} \quad \text{peut devenir plus
+petit que} \quad \frac{p}{1 - p}\]</span></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le paradoxe de Jeffreys-Lindley met en lumière les différences
+fondamentales entre les approches fréquentistes et bayésiennes en
+statistique. Il souligne l’importance de comprendre les hypothèses
+sous-jacentes et les implications des tests d’hypothèses. En résolvant
+ce paradoxe, on peut améliorer la cohérence et l’interprétabilité des
+résultats statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

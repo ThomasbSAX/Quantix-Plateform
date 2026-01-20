@@ -1,0 +1,313 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode du point milieu : Une approche numérique fondamentale</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode du point milieu : Une approche numérique
+fondamentale</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La méthode du point milieu, ou méthode des rectangles, est une
+technique numérique de base pour l’approximation d’intégrales définies.
+Son origine remonte aux premiers développements du calcul numérique, où
+la nécessité de calculer des aires sous des courbes non intégrables
+analytiquement a conduit à l’élaboration de méthodes d’approximation.
+Cette méthode est particulièrement intéressante car elle est simple à
+implémenter et fournit une approximation rapide, bien que moins précise
+que d’autres méthodes comme la méthode des trapèzes ou de Simpson.</p>
+<p>L’importance de cette méthode réside dans sa capacité à fournir une
+première approximation d’une intégrale, souvent utilisée comme point de
+départ pour des méthodes plus sophistiquées. Elle est également
+fondamentale dans l’enseignement des mathématiques numériques, car elle
+illustre les principes de base de l’approximation numérique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la méthode du point milieu, commençons par définir ce
+que nous cherchons à approximer. Supposons que nous ayons une fonction
+<span class="math inline">\(f\)</span> continue sur un intervalle <span
+class="math inline">\([a, b]\)</span>. Nous voulons calculer l’intégrale
+définie de <span class="math inline">\(f\)</span> sur <span
+class="math inline">\([a, b]\)</span>, notée <span
+class="math inline">\(\int_{a}^{b} f(x) \, dx\)</span>.</p>
+<p>L’idée de la méthode du point milieu est d’approximer l’aire sous la
+courbe par une somme de rectangles. Chaque rectangle a une hauteur égale
+à la valeur de la fonction en son point milieu, et une largeur égale au
+pas de discrétisation.</p>
+<p>Formellement, divisons l’intervalle <span class="math inline">\([a,
+b]\)</span> en <span class="math inline">\(n\)</span> sous-intervalles
+égaux de longueur <span class="math inline">\(h = \frac{b -
+a}{n}\)</span>. Les points de division sont donnés par <span
+class="math inline">\(x_i = a + i h\)</span> pour <span
+class="math inline">\(i = 0, 1, \dots, n\)</span>.</p>
+<p>La méthode du point milieu consiste à approximer l’intégrale par la
+somme : <span class="math display">\[\int_{a}^{b} f(x) \, dx \approx h
+\sum_{i=1}^{n} f\left( \frac{x_i + x_{i-1}}{2} \right)\]</span> où <span
+class="math inline">\(\frac{x_i + x_{i-1}}{2}\)</span> est le point
+milieu du sous-intervalle <span class="math inline">\([x_{i-1},
+x_i]\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour analyser l’erreur d’approximation de la méthode du point milieu,
+nous avons besoin de quelques résultats théoriques. Supposons que <span
+class="math inline">\(f\)</span> est deux fois dérivable sur <span
+class="math inline">\([a, b]\)</span>, et notons <span
+class="math inline">\(M = \max_{x \in [a, b]}
+|f&#39;&#39;(x)|\)</span>.</p>
+<div class="theorem">
+<p>L’erreur d’approximation <span class="math inline">\(E\)</span> de la
+méthode du point milieu est donnée par : <span class="math display">\[E
+= -\frac{(b - a) h^2}{24} f&#39;&#39;(\xi)\]</span> pour un certain
+<span class="math inline">\(\xi \in [a, b]\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous utilisons le
+théorème de Taylor avec reste intégral. Considérons un sous-intervalle
+<span class="math inline">\([x_{i-1}, x_i]\)</span>. La fonction <span
+class="math inline">\(f\)</span> peut être développée en série de Taylor
+autour du point milieu <span class="math inline">\(c_i = \frac{x_{i-1} +
+x_i}{2}\)</span> : <span class="math display">\[f(x) = f(c_i) +
+f&#39;(c_i)(x - c_i) + \frac{f&#39;&#39;(\xi_x)}{2} (x - c_i)^2\]</span>
+où <span class="math inline">\(\xi_x \in [x_{i-1}, x_i]\)</span>.</p>
+<p>Intégrons cette expression sur <span class="math inline">\([x_{i-1},
+x_i]\)</span> : <span class="math display">\[\int_{x_{i-1}}^{x_i} f(x)
+\, dx = h f(c_i) + \frac{h^3}{24} f&#39;&#39;(\xi_i)\]</span> où <span
+class="math inline">\(\xi_i \in [x_{i-1}, x_i]\)</span>.</p>
+<p>En sommant sur tous les sous-intervalles, nous obtenons : <span
+class="math display">\[\int_{a}^{b} f(x) \, dx = h \sum_{i=1}^{n} f(c_i)
++ \frac{h^3}{24} \sum_{i=1}^{n} f&#39;&#39;(\xi_i)\]</span></p>
+<p>L’erreur d’approximation est donc : <span class="math display">\[E =
+\int_{a}^{b} f(x) \, dx - h \sum_{i=1}^{n} f(c_i) = \frac{h^3}{24}
+\sum_{i=1}^{n} f&#39;&#39;(\xi_i)\]</span></p>
+<p>En utilisant l’inégalité triangulaire et le fait que <span
+class="math inline">\(|f&#39;&#39;(\xi_i)| \leq M\)</span>, nous avons :
+<span class="math display">\[|E| \leq \frac{h^3}{24} n M = \frac{(b - a)
+h^2}{24} M\]</span></p>
+<p>Pour obtenir une expression plus précise, nous utilisons le théorème
+de la valeur moyenne pour les sommes. Il existe un <span
+class="math inline">\(\xi \in [a, b]\)</span> tel que : <span
+class="math display">\[\sum_{i=1}^{n} f&#39;&#39;(\xi_i) = n
+f&#39;&#39;(\xi)\]</span></p>
+<p>Ainsi, l’erreur d’approximation est : <span class="math display">\[E
+= \frac{(b - a) h^2}{24} f&#39;&#39;(\xi)\]</span></p>
+<p>Cela conclut la démonstration. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La méthode du point milieu possède plusieurs propriétés
+intéressantes, que nous énumérons ci-dessous :</p>
+<ol>
+<li><p><strong>Ordre de convergence</strong> : L’erreur d’approximation
+est proportionnelle à <span class="math inline">\(h^2\)</span>. Cela
+signifie que la méthode du point milieu est d’ordre 2, c’est-à-dire que
+l’erreur diminue quadratiquement avec le pas de discrétisation.</p></li>
+<li><p><strong>Stabilité</strong> : La méthode du point milieu est
+stable numériquement, car l’erreur d’approximation ne dépend pas des
+valeurs de la fonction aux extrémités de l’intervalle, mais uniquement
+des valeurs en les points milieux.</p></li>
+<li><p><strong>Comparaison avec la méthode des trapèzes</strong> : La
+méthode du point milieu est souvent plus précise que la méthode des
+trapèzes pour les fonctions convexes ou concaves, car elle prend en
+compte la courbure de la fonction.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La méthode du point milieu est une technique fondamentale en analyse
+numérique pour l’approximation d’intégrales définies. Bien que simple à
+implémenter, elle fournit des résultats précis pour de nombreuses
+applications pratiques. Son erreur d’approximation est bien comprise et
+peut être contrôlée en ajustant le pas de discrétisation. Cette méthode
+reste un outil précieux dans l’arsenal des méthodes numériques, tant
+pour l’enseignement que pour la recherche.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

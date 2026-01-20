@@ -1,0 +1,340 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Self-Organizing Maps: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Self-Organizing Maps: A Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<p>Voici un article scientifique complet en LaTeX sur le sujet "SOM"
+(Self-Organizing Maps) :</p>
+<h1 class="unnumbered" id="introduction-and-motivations">Introduction
+and Motivations</h1>
+<p>The Self-Organizing Map (SOM), introduced by Teuvo Kohonen in the
+1980s, is a type of artificial neural network that is trained using
+unsupervised learning to produce a low-dimensional representation of the
+input space called a map. This map is defined by the network’s weights,
+and it can be used to visualize high-dimensional data in two or three
+dimensions.</p>
+<p>The SOM is particularly useful for visualizing and interpreting large
+high-dimensional datasets. It has found applications in various fields
+such as data mining, pattern recognition, image analysis, and
+bioinformatics. The SOM’s ability to preserve the topological structure
+of the input space makes it a powerful tool for exploratory data
+analysis.</p>
+<h1 class="unnumbered" id="definitions">Definitions</h1>
+<p>Before formally defining the Self-Organizing Map, let’s consider what
+we want to achieve. We have a high-dimensional input space and we want
+to represent it in a low-dimensional space, typically two or three
+dimensions. We want this representation to preserve the topological
+structure of the input space as much as possible.</p>
+<p>Formally, a Self-Organizing Map is defined as follows:</p>
+<div class="definition">
+<p>Let <span class="math inline">\(\mathcal{X} \subset
+\mathbb{R}^n\)</span> be the input space and <span
+class="math inline">\(\mathcal{M} \subset \mathbb{R}^m\)</span> be the
+map space with <span class="math inline">\(m &lt;&lt; n\)</span>. A
+Self-Organizing Map is a function <span class="math inline">\(\phi:
+\mathcal{X} \rightarrow \mathcal{M}\)</span> defined by a set of weights
+<span class="math inline">\(\{w_i\}_{i=1}^k\)</span> where <span
+class="math inline">\(w_i \in \mathbb{R}^n\)</span> and <span
+class="math inline">\(k\)</span> is the number of neurons in the
+map.</p>
+<p>The function <span class="math inline">\(\phi\)</span> maps an input
+vector <span class="math inline">\(x \in \mathcal{X}\)</span> to the
+weight vector <span class="math inline">\(w_c\)</span> such that: <span
+class="math display">\[c = \arg\min_{i} \|x - w_i\|\]</span> where <span
+class="math inline">\(\|\cdot\|\)</span> denotes the Euclidean
+distance.</p>
+</div>
+<p>In other words, each input vector is mapped to its best matching unit
+(BMU) in the map.</p>
+<h1 class="unnumbered" id="the-kohonen-learning-rule">The Kohonen
+Learning Rule</h1>
+<p>The learning process of a SOM is governed by the Kohonen learning
+rule. Let’s first understand what we want to achieve during the learning
+process.</p>
+<p>We want to adjust the weights of the neurons such that the map
+becomes an ordered representation of the input space. This means that
+the weights should be organized in such a way that similar inputs are
+mapped to nearby neurons.</p>
+<p>The Kohonen learning rule is defined as follows:</p>
+<div class="theorem">
+<p>Let <span class="math inline">\(x(t) \in \mathcal{X}\)</span> be the
+input vector at time <span class="math inline">\(t\)</span> and <span
+class="math inline">\(c(t)\)</span> be its best matching unit. The
+weights are updated according to the following rule: <span
+class="math display">\[w_i(t+1) = w_i(t) + \alpha(t) h_{c(t),i}(t) (x(t)
+- w_i(t))\]</span> where <span class="math inline">\(\alpha(t)\)</span>
+is the learning rate and <span class="math inline">\(h_{c,i}(t)\)</span>
+is the neighborhood function.</p>
+</div>
+<p>Here, <span class="math inline">\(\alpha(t)\)</span> is a decreasing
+function of time that determines the step size during the update. The
+neighborhood function <span class="math inline">\(h_{c,i}(t)\)</span>
+defines the region of influence of the BMU on the other neurons. It is
+typically a Gaussian function centered at the BMU.</p>
+<h1 class="unnumbered" id="proof-of-convergence">Proof of
+Convergence</h1>
+<p>To prove the convergence of the SOM, we need to show that the weights
+converge to a stable state where they no longer change significantly
+with further training.</p>
+<div class="proof">
+<p><em>Proof.</em> The convergence of the SOM can be proven using the
+stochastic approximation theory. The weight update rule can be seen as a
+stochastic approximation process where the noise is due to the random
+sampling of the input vectors.</p>
+<p>By choosing an appropriate learning rate schedule, specifically <span
+class="math inline">\(\alpha(t) = \frac{1}{t}\)</span>, we can ensure
+that the weights converge to a stable state. The learning rate schedule
+must satisfy the following conditions: <span
+class="math display">\[\sum_{t=1}^\infty \alpha(t) = \infty\]</span>
+<span class="math display">\[\sum_{t=1}^\infty \alpha^2(t) &lt;
+\infty\]</span></p>
+<p>The first condition ensures that the weights keep changing, while the
+second condition ensures that the changes become smaller and smaller
+over time. Together, these conditions guarantee the convergence of the
+weights. ◻</p>
+</div>
+<h1 class="unnumbered" id="properties-and-corollaries">Properties and
+Corollaries</h1>
+<p>The SOM has several important properties that make it a powerful tool
+for data visualization and analysis.</p>
+<ol>
+<li><p><strong>Topology Preservation:</strong> The SOM preserves the
+topological structure of the input space. This means that inputs that
+are close in the input space are mapped to nearby neurons in the
+map.</p>
+<div class="proof">
+<p><em>Proof.</em> The topology preservation property is a direct
+consequence of the neighborhood function in the Kohonen learning rule.
+By updating not only the weights of the BMU but also those of its
+neighbors, the SOM ensures that similar inputs are mapped to nearby
+neurons. ◻</p>
+</div></li>
+<li><p><strong>Dimensionality Reduction:</strong> The SOM provides a
+low-dimensional representation of the input space. This is particularly
+useful for visualizing high-dimensional data.</p>
+<div class="proof">
+<p><em>Proof.</em> The dimensionality reduction property is achieved by
+mapping the high-dimensional input vectors to a low-dimensional map
+space. The weights of the neurons in the map space provide a compressed
+representation of the input data. ◻</p>
+</div></li>
+<li><p><strong>Clustering:</strong> The SOM can be used for clustering
+high-dimensional data. Each neuron in the map can be seen as
+representing a cluster of similar inputs.</p>
+<div class="proof">
+<p><em>Proof.</em> The clustering property is a result of the topology
+preservation and dimensionality reduction properties. By organizing the
+weights in such a way that similar inputs are mapped to nearby neurons,
+the SOM effectively groups similar data points together. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>The Self-Organizing Map is a powerful tool for visualizing and
+interpreting high-dimensional data. Its ability to preserve the
+topological structure of the input space makes it particularly useful
+for exploratory data analysis. The Kohonen learning rule provides a
+simple yet effective way to train the SOM, and its convergence can be
+proven using stochastic approximation theory.</p>
+<p>The properties of the SOM, including topology preservation,
+dimensionality reduction, and clustering, make it a versatile tool with
+applications in various fields such as data mining, pattern recognition,
+image analysis, and bioinformatics.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

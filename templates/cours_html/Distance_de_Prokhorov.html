@@ -1,0 +1,341 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Prokhorov : Une Mesure de Proximité entre Mesures de Probabilité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Prokhorov : Une Mesure de Proximité entre
+Mesures de Probabilité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La distance de Prokhorov émerge dans le paysage mathématique comme
+une réponse élégante à un problème fondamental : comment mesurer la
+proximité entre deux mesures de probabilité ? Cette notion, introduite
+par le mathématicien russe Yuri Prokhorov en 1956, trouve ses racines
+dans la théorie des probabilités et de l’analyse fonctionnelle. Elle est
+particulièrement utile dans les contextes où l’on souhaite comparer des
+distributions de probabilité, par exemple en statistique mathématique ou
+en théorie des processus stochastiques.</p>
+<p>L’importance de la distance de Prokhorov réside dans sa capacité à
+capturer des propriétés métriques fines entre mesures, tout en étant
+relativement simple à manipuler. Elle joue un rôle clé dans des domaines
+tels que la théorie du transport optimal, l’apprentissage automatique,
+et même en physique statistique. Dans cet article, nous explorerons les
+définitions, les théorèmes fondamentaux, et les propriétés de cette
+distance fascinante.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Prokhorov, commençons par comprendre
+ce que nous cherchons à capturer. Imaginons deux mesures de probabilité
+<span class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span> sur un espace métrique <span
+class="math inline">\((E, d)\)</span>. Nous voulons mesurer à quel point
+ces deux mesures sont proches l’une de l’autre. Une idée intuitive est
+de considérer les ensembles <span class="math inline">\(A\)</span> pour
+lesquels la différence <span class="math inline">\(|\mu(A) -
+\nu(A)|\)</span> est petite. Cependant, cela ne suffit pas car il existe
+des ensembles pour lesquels cette différence peut être grande même si
+les mesures sont proches. La distance de Prokhorov résout ce problème en
+considérant des perturbations de l’espace métrique lui-même.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((E, d)\)</span> un espace métrique
+séparable complet et soit <span
+class="math inline">\(\mathcal{P}(E)\)</span> l’ensemble des mesures de
+probabilité sur <span class="math inline">\(E\)</span>. La distance de
+Prokhorov entre deux mesures <span class="math inline">\(\mu, \nu \in
+\mathcal{P}(E)\)</span> est définie par <span
+class="math display">\[\pi(\mu, \nu) = \inf \left\{ \epsilon &gt; 0 :
+\forall A \subseteq E \text{ fermé}, \mu(A) \leq \nu(A^\epsilon) +
+\epsilon \right\},\]</span> où <span class="math inline">\(A^\epsilon =
+\{ x \in E : d(x, A) &lt; \epsilon \}\)</span> est le <span
+class="math inline">\(\epsilon\)</span>-voisinage de <span
+class="math inline">\(A\)</span>.</p>
+</div>
+<p>Une autre formulation équivalente est la suivante : <span
+class="math display">\[\pi(\mu, \nu) = \inf \left\{ \epsilon &gt; 0 :
+\forall A \subseteq E, \mu(A) \leq \nu(A^\epsilon) + \epsilon
+\right\}.\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant la distance de Prokhorov est
+le suivant, qui établit sa métrique :</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\((E, d)\)</span> un espace métrique
+séparable complet. La distance de Prokhorov <span
+class="math inline">\(\pi\)</span> est une métrique sur <span
+class="math inline">\(\mathcal{P}(E)\)</span>, c’est-à-dire qu’elle
+satisfait les propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(\pi(\mu, \nu) = 0\)</span> si et
+seulement si <span class="math inline">\(\mu = \nu\)</span>.</p></li>
+<li><p><span class="math inline">\(\pi(\mu, \nu) = \pi(\nu,
+\mu)\)</span>.</p></li>
+<li><p><span class="math inline">\(\pi(\mu, \nu) \leq \pi(\mu, \rho) +
+\pi(\rho, \nu)\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous procédons étape par
+étape.</p>
+<p><strong>(i)</strong> Supposons que <span
+class="math inline">\(\pi(\mu, \nu) = 0\)</span>. Cela signifie que pour
+tout <span class="math inline">\(\epsilon &gt; 0\)</span>, nous avons
+<span class="math inline">\(\mu(A) \leq \nu(A^\epsilon) +
+\epsilon\)</span> pour tout ensemble fermé <span
+class="math inline">\(A\)</span>. En prenant <span
+class="math inline">\(\epsilon \to 0\)</span>, nous obtenons <span
+class="math inline">\(\mu(A) \leq \nu(A)\)</span>. En échangeant les
+rôles de <span class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span>, nous obtenons également <span
+class="math inline">\(\nu(A) \leq \mu(A)\)</span>. Par conséquent, <span
+class="math inline">\(\mu(A) = \nu(A)\)</span> pour tout ensemble fermé
+<span class="math inline">\(A\)</span>, ce qui implique que <span
+class="math inline">\(\mu = \nu\)</span>.</p>
+<p><strong>(ii)</strong> La symétrie de la distance de Prokhorov découle
+directement de sa définition. En effet, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, nous avons <span
+class="math display">\[\mu(A) \leq \nu(A^\epsilon) + \epsilon \quad
+\text{et} \quad \nu(B) \leq \mu(B^\epsilon) + \epsilon.\]</span> En
+échangeant <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, nous obtenons la symétrie
+souhaitée.</p>
+<p><strong>(iii)</strong> L’inégalité triangulaire est un peu plus
+subtile. Supposons que <span class="math inline">\(\pi(\mu, \rho) =
+\epsilon_1\)</span> et <span class="math inline">\(\pi(\rho, \nu) =
+\epsilon_2\)</span>. Pour tout <span class="math inline">\(\delta &gt;
+0\)</span>, il existe des ensembles fermés <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> tels que <span
+class="math display">\[\mu(A) &gt; \rho(A^{\epsilon_1 + \delta}) -
+\delta \quad \text{et} \quad \rho(B) &gt; \nu(B^{\epsilon_2 + \delta}) -
+\delta.\]</span> En utilisant l’inégalité de l’union, nous pouvons
+montrer que <span class="math display">\[\mu(A \cap B) &gt; \nu((A \cap
+B)^{\epsilon_1 + \epsilon_2 + 2\delta}) - (\epsilon_1 + \epsilon_2 +
+2\delta).\]</span> En prenant <span class="math inline">\(\delta \to
+0\)</span>, nous obtenons l’inégalité triangulaire souhaitée. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La distance de Prokhorov possède plusieurs propriétés intéressantes.
+En voici quelques-unes :</p>
+<ol>
+<li><p><strong>Continuité</strong> : La distance de Prokhorov est
+continue par rapport à la topologie faible. Cela signifie que si <span
+class="math inline">\(\mu_n \to \mu\)</span> faiblement et <span
+class="math inline">\(\nu_n \to \nu\)</span> faiblement, alors <span
+class="math inline">\(\pi(\mu_n, \nu_n) \to \pi(\mu,
+\nu)\)</span>.</p></li>
+<li><p><strong>Compactité</strong> : L’espace <span
+class="math inline">\(\mathcal{P}(E)\)</span> muni de la distance de
+Prokhorov est compact si <span class="math inline">\(E\)</span> est
+compact. Cela est un résultat fondamental en théorie des
+probabilités.</p></li>
+<li><p><strong>Stabilité</strong> : La distance de Prokhorov est stable
+sous les transformations continues. Plus précisément, si <span
+class="math inline">\(f : E \to F\)</span> est une fonction continue,
+alors <span class="math display">\[\pi(f_\#\mu, f_\#\nu) \leq \pi(\mu,
+\nu),\]</span> où <span class="math inline">\(f_\#\mu\)</span> est la
+mesure image de <span class="math inline">\(\mu\)</span> par <span
+class="math inline">\(f\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Prokhorov est un outil puissant et élégant pour
+comparer des mesures de probabilité. Son importance dans divers domaines
+mathématiques et appliqués ne peut être sous-estimée. Nous espérons que
+cet article a permis de mettre en lumière les beautés et les subtilités
+de cette notion fascinante.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

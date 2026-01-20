@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Arbres de Décision : Une Approche Systématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Arbres de Décision : Une Approche
+Systématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’encodage par arbres de décision est une technique fondamentale en
+apprentissage automatique et en intelligence artificielle. Son origine
+remonte aux années 1960 avec les travaux de Ross Quinlan sur le système
+ID3. Cette méthode permet de représenter des règles de décision sous
+forme d’arbres, facilitant ainsi la compréhension et l’interprétation
+des modèles.</p>
+<p>Les arbres de décision sont indispensables dans de nombreux domaines,
+tels que la médecine, la finance et l’ingénierie, où la prise de
+décision doit être à la fois précise et explicable. Ils permettent de
+modéliser des processus décisionnels complexes en décomposant le
+problème en sous-problèmes plus simples.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’encodage par arbres de décision, il est essentiel
+de définir quelques concepts clés.</p>
+<h2 class="unnumbered" id="arbre-de-décision">Arbre de Décision</h2>
+<p>Considérons un ensemble de données <span
+class="math inline">\(D\)</span> contenant des exemples <span
+class="math inline">\((x_i, y_i)\)</span>, où <span
+class="math inline">\(x_i\)</span> représente les caractéristiques et
+<span class="math inline">\(y_i\)</span> la classe ou la valeur cible.
+Un arbre de décision est une structure hiérarchique qui partitionne
+récursivement l’espace des caractéristiques en sous-espaces
+homogènes.</p>
+<div class="definition">
+<p>Un arbre de décision <span class="math inline">\(T\)</span> est un
+graphe orienté acyclique défini par :</p>
+<ul>
+<li><p>Un nœud racine <span class="math inline">\(r\)</span>.</p></li>
+<li><p>Un ensemble de nœuds internes <span
+class="math inline">\(I\)</span> représentant des tests sur les
+caractéristiques.</p></li>
+<li><p>Un ensemble de nœuds feuilles <span
+class="math inline">\(L\)</span> représentant les décisions
+finales.</p></li>
+</ul>
+<p>Formellement, pour tout nœud interne <span class="math inline">\(i
+\in I\)</span>, il existe un test <span
+class="math inline">\(t_i\)</span> tel que : <span
+class="math display">\[t_i: X \rightarrow \{0, 1\}\]</span> où <span
+class="math inline">\(X\)</span> est l’espace des caractéristiques.</p>
+</div>
+<h2 class="unnumbered" id="fonction-de-partitionnement">Fonction de
+Partitionnement</h2>
+<p>La fonction de partitionnement est utilisée pour diviser les données
+en sous-ensembles plus petits.</p>
+<div class="definition">
+<p>Une fonction de partitionnement <span
+class="math inline">\(P\)</span> est une application qui, pour un nœud
+interne <span class="math inline">\(i\)</span>, divise l’ensemble des
+données <span class="math inline">\(D\)</span> en sous-ensembles <span
+class="math inline">\(D_1\)</span> et <span
+class="math inline">\(D_2\)</span> : <span class="math display">\[P_i: D
+\rightarrow (D_1, D_2)\]</span> telle que <span class="math inline">\(D
+= D_1 \cup D_2\)</span> et <span class="math inline">\(D_1 \cap D_2 =
+\emptyset\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered"
+id="théorème-de-loptimalité-des-arbres-de-décision">Théorème de
+l’Optimalité des Arbres de Décision</h2>
+<p>Le théorème de l’optimalité des arbres de décision stipule que, sous
+certaines conditions, un arbre de décision peut atteindre une erreur
+minimale.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(T\)</span> un arbre de décision
+construit à partir d’un ensemble de données <span
+class="math inline">\(D\)</span>. Si l’algorithme de construction
+utilise une fonction de coût optimale, alors l’erreur de classification
+<span class="math inline">\(\epsilon(T)\)</span> est minimale : <span
+class="math display">\[\epsilon(T) = \min_{T&#39;}
+\epsilon(T&#39;)\]</span> où <span class="math inline">\(T&#39;\)</span>
+parcourt l’ensemble de tous les arbres de décision possibles.</p>
+</div>
+<h2 class="unnumbered" id="preuve-du-théorème-de-loptimalité">Preuve du
+Théorème de l’Optimalité</h2>
+<p>La preuve repose sur le principe de récursion et d’optimisation
+locale.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour chaque nœud interne <span
+class="math inline">\(i\)</span>, nous choisissons le test <span
+class="math inline">\(t_i\)</span> qui minimise l’erreur de
+classification sur les sous-ensembles <span
+class="math inline">\(D_1\)</span> et <span
+class="math inline">\(D_2\)</span>. Par induction, nous pouvons montrer
+que l’erreur globale est minimale.</p>
+<p>Supposons que pour un nœud <span class="math inline">\(i\)</span>, le
+test optimal <span class="math inline">\(t_i\)</span> minimise l’erreur
+locale. Alors, par récursion, les sous-arbres construits à partir de
+<span class="math inline">\(D_1\)</span> et <span
+class="math inline">\(D_2\)</span> minimisent également leurs erreurs
+respectives. Par conséquent, l’arbre global <span
+class="math inline">\(T\)</span> minimise l’erreur de
+classification. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriété-de-la-pureté-des-nœuds-feuilles">Propriété de la Pureté
+des Nœuds Feuilles</h2>
+<p>Les nœuds feuilles d’un arbre de décision doivent être aussi purs que
+possible.</p>
+<div class="property">
+<p>Pour un nœud feuille <span class="math inline">\(l \in L\)</span>, la
+pureté <span class="math inline">\(p(l)\)</span> est définie comme la
+proportion d’exemples appartenant à la même classe : <span
+class="math display">\[p(l) = \max_{c} \frac{|D_l^c|}{|D_l|}\]</span> où
+<span class="math inline">\(D_l^c\)</span> est l’ensemble des exemples
+de classe <span class="math inline">\(c\)</span> dans le nœud feuille
+<span class="math inline">\(l\)</span>.</p>
+</div>
+<h2 class="unnumbered"
+id="corollaire-de-la-minimisation-de-lentropie">Corollaire de la
+Minimisation de l’Entropie</h2>
+<p>La minimisation de l’entropie est une méthode courante pour
+construire des arbres de décision.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(H(D)\)</span> l’entropie de
+l’ensemble de données <span class="math inline">\(D\)</span>. Pour un
+test <span class="math inline">\(t_i\)</span>, l’entropie après le
+partitionnement est : <span class="math display">\[H(D_1, D_2) =
+\frac{|D_1|}{|D|} H(D_1) + \frac{|D_2|}{|D|} H(D_2)\]</span> L’arbre de
+décision optimal minimise <span class="math inline">\(H(D_1,
+D_2)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par arbres de décision est une technique puissante et
+flexible pour la prise de décision. Son utilisation s’étend à de
+nombreux domaines, et son efficacité a été démontrée dans de nombreuses
+applications. Les théorèmes et propriétés présentés dans cet article
+fournissent une base solide pour comprendre et appliquer cette méthode
+de manière optimale.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

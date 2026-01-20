@@ -1,0 +1,328 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Loi Normale Inverse-Wishart a posteriori</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Loi Normale Inverse-Wishart <em>a posteriori</em></h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse bayésienne des données multivariées constitue un champ
+d’étude riche et complexe, où la modélisation des distributions <em>a
+posteriori</em> joue un rôle central. Parmi les distributions conjuguées
+utilisées pour modéliser des matrices de covariance, la loi Normale
+Inverse-Wishart se distingue par sa flexibilité et son applicabilité
+dans divers contextes statistiques. Cette loi, combinaison d’une
+distribution normale pour les paramètres de localisation et d’une
+distribution Inverse-Wishart pour les paramètres de dispersion, permet
+une modélisation cohérente et efficace des données multivariées.</p>
+<p>L’émergence de cette loi répond à un besoin crucial en statistique
+bayésienne : la nécessité d’une distribution <em>a posteriori</em> qui
+soit à la fois analytiquement tractable et capable de capturer la
+complexité des structures de covariance dans les données. En effet,
+l’Inverse-Wishart fournit une manière élégante de modéliser les
+incertitudes sur la matrice de covariance, tandis que la distribution
+normale permet une modélisation précise des paramètres de
+localisation.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la loi Normale Inverse-Wishart, commençons par
+comprendre les composantes fondamentales de cette distribution.
+Supposons que nous avons un vecteur aléatoire <span
+class="math inline">\(\mathbf{X} \in \mathbb{R}^p\)</span> et une
+matrice de covariance <span class="math inline">\(\Sigma\)</span>. Nous
+cherchons à modéliser conjointement la distribution de <span
+class="math inline">\(\mathbf{X}\)</span> et <span
+class="math inline">\(\Sigma\)</span>.</p>
+<p>La loi Normale Inverse-Wishart est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(\mathbf{X} \in
+\mathbb{R}^p\)</span>, <span class="math inline">\(\Sigma\)</span> une
+matrice de covariance symétrique définie positive, <span
+class="math inline">\(\mu_0 \in \mathbb{R}^p\)</span>, <span
+class="math inline">\(\Lambda_0 &gt; 0\)</span> une matrice symétrique
+définie positive, <span class="math inline">\(\nu_0 &gt; p-1\)</span>,
+et <span class="math inline">\(S_0 &gt; 0\)</span> une matrice
+symétrique définie positive.</p>
+<p>La densité conjointe de la loi Normale Inverse-Wishart est donnée par
+: <span class="math display">\[p(\mathbf{X}, \Sigma) = p(\mathbf{X} |
+\Sigma) p(\Sigma)\]</span> où <span class="math display">\[p(\mathbf{X}
+| \Sigma) = (2\pi)^{-p/2} |\Sigma|^{-1/2} \exp\left(-\frac{1}{2}
+(\mathbf{X} - \mu_0)^T \Sigma^{-1} (\mathbf{X} - \mu_0)\right)\]</span>
+et <span class="math display">\[p(\Sigma) = \frac{|\Sigma|^{-(\nu_0 + p
++ 1)/2} \exp\left(-\frac{1}{2} \text{tr}(S_0
+\Sigma^{-1})\right)}{2^{\nu_0 p / 2}
+\Gamma_p\left(\frac{\nu_0}{2}\right) |\Lambda_0|^{\nu_0 / 2}
+|S_0|^{\nu_0 / 2}}\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la loi Normale Inverse-Wishart est le
+théorème de conjugaison, qui stipule que si la distribution <em>a
+priori</em> des paramètres <span class="math inline">\((\mu,
+\Sigma)\)</span> suit une loi Normale Inverse-Wishart, alors la
+distribution <em>a posteriori</em> après observation des données <span
+class="math inline">\(\mathbf{X}_1, \ldots, \mathbf{X}_n\)</span> suit
+également une loi Normale Inverse-Wishart.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\mathbf{X}_1, \ldots,
+\mathbf{X}_n\)</span> des observations indépendantes et identiquement
+distribuées selon une loi normale multivariée <span
+class="math inline">\(\mathcal{N}_p(\mu, \Sigma)\)</span>. Supposons que
+la distribution <em>a priori</em> de <span class="math inline">\((\mu,
+\Sigma)\)</span> suit une loi Normale Inverse-Wishart avec paramètres
+<span class="math inline">\((\mu_0, \Lambda_0, \nu_0, S_0)\)</span>.</p>
+<p>Alors, la distribution <em>a posteriori</em> de <span
+class="math inline">\((\mu, \Sigma)\)</span> après observation des
+données est une loi Normale Inverse-Wishart avec paramètres mis à jour :
+<span class="math display">\[\mu_n = \frac{\Lambda_0 \mu_0 + n
+\bar{X}}{\Lambda_0 + n}, \quad \Lambda_n = \Lambda_0 + n, \quad \nu_n =
+\nu_0 + n, \quad S_n = S_0 + \sum_{i=1}^n (\mathbf{X}_i -
+\bar{\mathbf{X}})(\mathbf{X}_i - \bar{\mathbf{X}})^T + \frac{\Lambda_0
+n}{\Lambda_0 + n} (\bar{\mathbf{X}} - \mu_0)(\bar{\mathbf{X}} -
+\mu_0)^T\]</span> où <span class="math inline">\(\bar{\mathbf{X}} =
+\frac{1}{n} \sum_{i=1}^n \mathbf{X}_i\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de conjugaison, nous procédons comme suit
+:</p>
+<div class="proof">
+<p><em>Proof.</em> La distribution <em>a priori</em> conjointe de <span
+class="math inline">\((\mu, \Sigma)\)</span> est donnée par : <span
+class="math display">\[p(\mu, \Sigma) = p(\mu | \Sigma)
+p(\Sigma)\]</span> où <span class="math display">\[p(\mu | \Sigma) =
+(2\pi)^{-p/2} |\Lambda_0|^{-1/2} \exp\left(-\frac{1}{2} (\mu - \mu_0)^T
+\Lambda_0 (\mu - \mu_0)\right)\]</span> et <span
+class="math display">\[p(\Sigma) = \frac{|\Sigma|^{-(\nu_0 + p + 1)/2}
+\exp\left(-\frac{1}{2} \text{tr}(S_0 \Sigma^{-1})\right)}{2^{\nu_0 p /
+2} \Gamma_p\left(\frac{\nu_0}{2}\right) |\Lambda_0|^{\nu_0 / 2}
+|S_0|^{\nu_0 / 2}}\]</span></p>
+<p>La distribution <em>a posteriori</em> est proportionnelle au produit
+de la distribution <em>a priori</em> et de la vraisemblance des données
+: <span class="math display">\[p(\mu, \Sigma | \mathbf{X}_1, \ldots,
+\mathbf{X}_n) \propto p(\mu, \Sigma) \prod_{i=1}^n p(\mathbf{X}_i | \mu,
+\Sigma)\]</span></p>
+<p>En utilisant les propriétés des distributions normales et
+Inverse-Wishart, nous pouvons montrer que la distribution <em>a
+posteriori</em> suit une loi Normale Inverse-Wishart avec les paramètres
+mis à jour donnés dans le théorème. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La loi Normale Inverse-Wishart possède plusieurs propriétés
+intéressantes :</p>
+<ol>
+<li><p>La distribution Normale Inverse-Wishart est fermée sous
+conjugaison, ce qui signifie que la distribution <em>a posteriori</em>
+après observation des données suit également une loi Normale
+Inverse-Wishart.</p></li>
+<li><p>Les paramètres de la distribution <em>a posteriori</em> peuvent
+être facilement mis à jour en fonction des nouvelles
+observations.</p></li>
+<li><p>La loi Normale Inverse-Wishart permet une modélisation flexible
+des incertitudes sur les paramètres de localisation et de
+dispersion.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La loi Normale Inverse-Wishart <em>a posteriori</em> constitue un
+outil puissant pour l’analyse bayésienne des données multivariées. Sa
+capacité à modéliser conjointement les paramètres de localisation et de
+dispersion en fait une distribution conjuguée particulièrement utile
+dans divers contextes statistiques. Les propriétés de fermeture sous
+conjugaison et la facilité de mise à jour des paramètres en font un
+choix privilégié pour les applications pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

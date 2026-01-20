@@ -1,0 +1,301 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Modèles de causalité : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Modèles de causalité : Une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’étude de la causalité est une quête ancienne, remontant aux
+philosophes grecs. Cependant, c’est au XXème siècle que la causalité a
+commencé à être formalisée mathématiquement. L’émergence des modèles de
+causalité est motivée par le besoin de comprendre et de modéliser les
+relations causales dans des domaines variés tels que l’économie, la
+médecine, et les sciences sociales.</p>
+<p>Les modèles de causalité permettent de répondre à des questions
+fondamentales : “Qu’arriverait-il si nous changions une variable ?” ou
+encore “Quelle est l’influence réelle d’une politique publique ?”. Ces
+modèles sont indispensables pour éviter les pièges des corrélations
+fallacieuses et pour prendre des décisions éclairées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les modèles de causalité, il est essentiel de définir
+quelques concepts clés.</p>
+<h2 id="graphes-acycliques-dirigés-dags">Graphes acycliques dirigés
+(DAGs)</h2>
+<p>Nous cherchons à représenter les relations causales entre des
+variables. Imaginez un ensemble de variables où certaines influencent
+d’autres. Nous voulons capturer cette structure.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(V\)</span> un ensemble de variables.
+Un graphe acyclique dirigé (DAG) est un couple <span
+class="math inline">\((V, E)\)</span> où <span
+class="math inline">\(E\)</span> est un ensemble d’arêtes dirigées entre
+les variables de <span class="math inline">\(V\)</span> tel que : <span
+class="math display">\[\forall v \in V, \exists u \in V : (u, v) \in E
+\text{ et } (v, u) \notin E\]</span> et il n’existe aucun cycle dans le
+graphe.</p>
+</div>
+<h2 id="causalité-et-potentiels">Causalité et potentiels</h2>
+<p>Nous voulons quantifier l’effet d’une intervention sur une
+variable.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un DAG et soit
+<span class="math inline">\(X \subseteq V\)</span> un ensemble de
+variables. Le potentiel causale de <span
+class="math inline">\(Y\)</span> après une intervention sur <span
+class="math inline">\(X\)</span> est noté <span
+class="math inline">\(P(Y | do(X))\)</span> et représente la
+distribution de <span class="math inline">\(Y\)</span> si nous fixons
+<span class="math inline">\(X\)</span> à une certaine valeur.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-do-calculus">Théorème de do-calculus</h2>
+<p>Nous cherchons à exprimer les potentiels causales en termes de
+probabilités conditionnelles.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un DAG et soit
+<span class="math inline">\(X, Y, Z \subseteq V\)</span> des ensembles
+de variables. Sous certaines conditions, nous avons : <span
+class="math display">\[P(Y | do(X)) = P(Y | Z) \text{ si } X \text{ et }
+Y \text{ sont d-separés par } Z.\]</span></p>
+</div>
+<h2 id="démonstration-du-théorème-de-do-calculus">Démonstration du
+théorème de do-calculus</h2>
+<p>Pour démontrer ce théorème, nous utilisons plusieurs étapes :</p>
+<p>1. **Identification des chemins bloqués** : Nous identifions les
+chemins entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> qui sont bloqués par <span
+class="math inline">\(Z\)</span>.</p>
+<p>2. **Application des règles de do-calculus** : Nous appliquons les
+trois règles de do-calculus pour réécrire <span
+class="math inline">\(P(Y | do(X))\)</span> en termes de probabilités
+conditionnelles.</p>
+<p>3. **Simplification** : Nous simplifions l’expression obtenue pour
+obtenir <span class="math inline">\(P(Y | Z)\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-d-separation">Propriété de d-separation</h2>
+<div class="proposition">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un DAG et soit
+<span class="math inline">\(X, Y, Z \subseteq V\)</span> des ensembles
+de variables. Les variables <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> sont d-separées par <span
+class="math inline">\(Z\)</span> si tous les chemins entre <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont bloqués par <span
+class="math inline">\(Z\)</span>.</p>
+</div>
+<h2 id="corollaire-du-théorème-de-do-calculus">Corollaire du théorème de
+do-calculus</h2>
+<div class="corollary">
+<p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont d-separées par <span
+class="math inline">\(Z\)</span>, alors l’intervention sur <span
+class="math inline">\(X\)</span> n’affecte pas la distribution de <span
+class="math inline">\(Y\)</span> conditionnellement à <span
+class="math inline">\(Z\)</span>.</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les modèles de causalité offrent un cadre rigoureux pour comprendre
+et quantifier les relations causales. Ils sont essentiels pour éviter
+les erreurs d’interprétation des corrélations et pour prendre des
+décisions éclairées. Les avancées récentes en apprentissage automatique
+et en statistiques ont permis de développer des méthodes puissantes pour
+estimer les effets causaux à partir de données observées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,330 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La Distance de Wasserstein : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La Distance de Wasserstein : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Wasserstein, également connue sous le nom de distance
+de Kantorovich-Rubinstein, émerge comme un outil fondamental en théorie
+des probabilités et en analyse optimale de transport. Son origine
+remonte aux travaux pionniers de Leonid Kantorovich dans les années
+1940, qui cherchait à modéliser l’allocation optimale de ressources.
+Cette notion a été ensuite formalisée et popularisée par Vladimir
+Rubinstein dans les années 1950, donnant naissance à une théorie riche
+et profonde.</p>
+<p>La distance de Wasserstein mesure la dissimilarité entre deux mesures
+de probabilité en tenant compte du coût de transport d’une mesure vers
+une autre. Elle est indispensable dans divers domaines tels que
+l’apprentissage automatique, la statistique, et les sciences des
+données, où elle permet de comparer des distributions de manière
+géométriquement significative.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de Wasserstein, commençons par définir ce
+que nous cherchons à mesurer. Imaginons deux distributions de
+probabilité sur un espace métrique <span class="math inline">\((X,
+d)\)</span>. Nous voulons quantifier la différence entre ces deux
+distributions en tenant compte du coût minimal pour transformer l’une en
+l’autre.</p>
+<p>Formellement, la distance de Wasserstein d’ordre <span
+class="math inline">\(p\)</span> entre deux mesures de probabilité <span
+class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span> sur un espace métrique <span
+class="math inline">\((X, d)\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((X, d)\)</span> un espace métrique
+et <span class="math inline">\(p \geq 1\)</span>. La distance de
+Wasserstein d’ordre <span class="math inline">\(p\)</span> entre deux
+mesures de probabilité <span class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span> sur <span
+class="math inline">\(X\)</span> est donnée par : <span
+class="math display">\[W_p(\mu, \nu) = \left( \inf_{\gamma \in
+\Gamma(\mu, \nu)} \int_{X \times X} d(x, y)^p \, d\gamma(x, y)
+\right)^{1/p}\]</span> où <span class="math inline">\(\Gamma(\mu,
+\nu)\)</span> est l’ensemble des mesures de couplage entre <span
+class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span>, c’est-à-dire l’ensemble des mesures
+<span class="math inline">\(\gamma\)</span> sur <span
+class="math inline">\(X \times X\)</span> telles que pour tout borélien
+<span class="math inline">\(A \subset X\)</span>, <span
+class="math display">\[\gamma(A \times X) = \mu(A) \quad \text{et} \quad
+\gamma(X \times A) = \nu(A).\]</span></p>
+</div>
+<p>Une autre formulation équivalente, due à Kantorovich, est la suivante
+:</p>
+<div class="definition">
+<p>La distance de Wasserstein d’ordre <span
+class="math inline">\(p\)</span> peut également être exprimée sous forme
+duale comme : <span class="math display">\[W_p(\mu, \nu) = \sup_{f \in
+\text{Lip}_1(X)} \left( \int_X f \, d\mu - \int_X f \, d\nu
+\right)\]</span> où <span class="math inline">\(\text{Lip}_1(X)\)</span>
+est l’ensemble des fonctions <span class="math inline">\(f: X \to
+\mathbb{R}\)</span> Lipschitziennes avec une constante de Lipschitz
+inférieure ou égale à 1.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Wasserstein est le
+théorème de Kantorovich, qui établit l’existence d’un couplage
+optimal.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((X, d)\)</span> un espace métrique
+polonais et <span class="math inline">\(p \geq 1\)</span>. Pour toute
+paire de mesures de probabilité <span class="math inline">\(\mu\)</span>
+et <span class="math inline">\(\nu\)</span> sur <span
+class="math inline">\(X\)</span>, il existe une mesure de couplage <span
+class="math inline">\(\gamma^* \in \Gamma(\mu, \nu)\)</span> telle que :
+<span class="math display">\[W_p(\mu, \nu)^p = \int_{X \times X} d(x,
+y)^p \, d\gamma^*(x, y).\]</span></p>
+</div>
+<p>La preuve de ce théorème repose sur des résultats d’analyse convexe
+et de théorie de la mesure. Elle utilise notamment le théorème de
+minimisation de fonctionnelles convexes sur des espaces de Banach.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Kantorovich, nous suivons les étapes
+suivantes :</p>
+<p>1. **Existence d’un couplage optimal** : Nous considérons l’ensemble
+des mesures de couplage <span class="math inline">\(\Gamma(\mu,
+\nu)\)</span> et la fonctionnelle <span class="math inline">\(J(\gamma)
+= \int_{X \times X} d(x, y)^p \, d\gamma(x, y)\)</span>. Nous montrons
+que <span class="math inline">\(J\)</span> est une fonctionnelle convexe
+et inférieurement semi-continue sur <span
+class="math inline">\(\Gamma(\mu, \nu)\)</span>.</p>
+<p>2. **Minimisation de la fonctionnelle** : En utilisant le théorème de
+minimisation de fonctionnelles convexes, nous établissons l’existence
+d’une mesure <span class="math inline">\(\gamma^*\)</span> qui minimise
+<span class="math inline">\(J\)</span>.</p>
+<p>3. **Unicité du couplage optimal** : Nous montrons que si <span
+class="math inline">\((X, d)\)</span> est un espace métrique polonais et
+que <span class="math inline">\(p &gt; 1\)</span>, alors le couplage
+optimal est unique.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Wasserstein possède plusieurs propriétés intéressantes
+:</p>
+<ol>
+<li><p>**Inégalité triangulaire** : Pour toute triplet de mesures <span
+class="math inline">\(\mu, \nu, \eta\)</span> sur un espace métrique
+<span class="math inline">\((X, d)\)</span>, nous avons : <span
+class="math display">\[W_p(\mu, \eta) \leq W_p(\mu, \nu) + W_p(\nu,
+\eta).\]</span></p></li>
+<li><p>**Continuité par rapport à la convergence faible** : Si <span
+class="math inline">\(\mu_n\)</span> converge faiblement vers <span
+class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu_n\)</span> converge faiblement vers <span
+class="math inline">\(\nu\)</span>, alors : <span
+class="math display">\[\lim_{n \to \infty} W_p(\mu_n, \nu_n) = W_p(\mu,
+\nu).\]</span></p></li>
+<li><p>**Inégalité de Talagrand** : Pour des mesures <span
+class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span> sur un espace de Hilbert, nous avons
+: <span class="math display">\[W_2(\mu, \nu)^2 \leq 2 D(\mu \|
+\nu)\]</span> où <span class="math inline">\(D(\mu \| \nu)\)</span> est
+la divergence de Kullback-Leibler entre <span
+class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span>.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Wasserstein est un outil puissant et polyvalent en
+théorie des probabilités et en analyse optimale de transport. Ses
+applications vont de la statistique à l’apprentissage automatique, en
+passant par les sciences des données. La compréhension approfondie de
+cette distance permet de résoudre des problèmes complexes et d’ouvrir de
+nouvelles perspectives dans divers domaines scientifiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

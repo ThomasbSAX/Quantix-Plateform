@@ -1,0 +1,336 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de transformation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de transformation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les problèmes de transformation constituent un pilier fondamental en
+informatique théorique, particulièrement dans le domaine de la
+complexité algorithmique. Ces problèmes émergent naturellement lorsque
+l’on s’intéresse à la conversion d’une structure de données ou d’un
+problème en une autre, tout en préservant certaines propriétés
+essentielles. L’étude de leur complexité permet de comprendre les
+limites intrinsèques des algorithmes et d’optimiser les ressources
+nécessaires pour effectuer ces transformations.</p>
+<p>L’origine historique de ces problèmes remonte aux débuts de
+l’informatique théorique, avec des travaux pionniers sur les automates
+et les langages formels. Conceptuellement, ils trouvent leur racine dans
+la théorie des catégories, où les transformations sont modélisées par
+des morphismes. Techniquement, ils sont indispensables pour l’analyse
+des algorithmes de compilation, de cryptographie, et de traitement du
+signal.</p>
+<p>Pourquoi ces problèmes sont-ils si importants ? Parce qu’ils
+permettent de réduire des problèmes complexes à des problèmes plus
+simples, tout en garantissant que les solutions obtenues sont valides et
+efficaces. Par exemple, transformer un graphe en une arborescence permet
+de simplifier l’analyse des chemins et des composantes connexes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la complexité des problèmes de transformation,
+commençons par définir ce qu’est une transformation.</p>
+<p>Une transformation est un processus qui prend en entrée une structure
+de données ou un problème et produit en sortie une autre structure ou un
+autre problème, tout en préservant certaines propriétés. Par exemple,
+transformer un graphe en une arborescence signifie que l’on conserve les
+relations de connectivité tout en supprimant les cycles.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{S}\)</span>
+un ensemble de structures de données et <span
+class="math inline">\(\mathcal{T}\)</span> un autre ensemble. Une
+transformation est une fonction <span class="math inline">\(f:
+\mathcal{S} \rightarrow \mathcal{T}\)</span> telle que pour toute
+structure <span class="math inline">\(s \in \mathcal{S}\)</span>, il
+existe une structure <span class="math inline">\(t \in
+\mathcal{T}\)</span> vérifiant certaines propriétés.</p>
+<p>En termes de complexité, nous cherchons à déterminer le temps et
+l’espace nécessaires pour effectuer cette transformation. Par exemple,
+soit <span class="math inline">\(G\)</span> un graphe non orienté et
+<span class="math inline">\(T\)</span> une arborescence. Nous voulons
+trouver une fonction <span class="math inline">\(f\)</span> telle que
+<span class="math inline">\(f(G) = T\)</span>, où <span
+class="math inline">\(T\)</span> est une arborescence couvrant tous les
+sommets de <span class="math inline">\(G\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental dans ce domaine est le théorème de la
+transformation polynomiale. Ce théorème stipule que si un problème <span
+class="math inline">\(A\)</span> peut être transformé en un problème
+<span class="math inline">\(B\)</span> en temps polynomial, alors la
+complexité de <span class="math inline">\(A\)</span> est au plus égale à
+celle de <span class="math inline">\(B\)</span>.</p>
+<p>Formellement, soit <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux problèmes. On dit que <span
+class="math inline">\(A\)</span> se réduit polynomialement à <span
+class="math inline">\(B\)</span>, noté <span class="math inline">\(A
+\leq_p B\)</span>, s’il existe une fonction calculable en temps
+polynomial <span class="math inline">\(f\)</span> telle que pour toute
+instance <span class="math inline">\(x\)</span> de <span
+class="math inline">\(A\)</span>, <span class="math inline">\(x \in
+A\)</span> si et seulement si <span class="math inline">\(f(x) \in
+B\)</span>.</p>
+<p>Preuve : Supposons que <span class="math inline">\(A \leq_p
+B\)</span>. Cela signifie qu’il existe un algorithme polynomial qui
+transforme une instance de <span class="math inline">\(A\)</span> en une
+instance de <span class="math inline">\(B\)</span>. Si <span
+class="math inline">\(B\)</span> est dans la classe de complexité <span
+class="math inline">\(P\)</span>, alors il existe un algorithme
+polynomial pour résoudre <span class="math inline">\(B\)</span>. En
+composant ces deux algorithmes, nous obtenons un algorithme polynomial
+pour résoudre <span class="math inline">\(A\)</span>. Donc <span
+class="math inline">\(A \in P\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer ces concepts, considérons un exemple concret.
+Supposons que nous voulions transformer un graphe non orienté en une
+arborescence couvrant tous les sommets. Une méthode classique pour cela
+est l’algorithme de Kruskal.</p>
+<p>L’algorithme de Kruskal fonctionne comme suit : 1. Trier toutes les
+arêtes du graphe par poids croissant. 2. Initialiser une forêt où chaque
+sommet est une arborescence séparée. 3. Pour chaque arête, dans l’ordre
+de tri : a. Si les deux sommets de l’arête appartiennent à des
+arborescences différentes, ajouter l’arête à la forêt. b. Sinon, ignorer
+l’arête.</p>
+<p>Preuve de correction : L’algorithme de Kruskal produit une
+arborescence couvrant tous les sommets du graphe. En effet, à chaque
+étape, nous ajoutons une arête qui connecte deux composantes connexes
+distinctes. Ainsi, le nombre de composantes connexes diminue à chaque
+étape jusqu’à ce qu’il n’y en ait plus qu’une, formant une
+arborescence.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les problèmes de transformation possèdent plusieurs propriétés
+intéressantes :</p>
+<p>(i) <strong>Propriété de préservation</strong> : Une transformation
+doit préserver certaines propriétés essentielles des structures de
+données. Par exemple, transformer un graphe en une arborescence doit
+préserver la connectivité des sommets.</p>
+<p>Preuve : Soit <span class="math inline">\(G\)</span> un graphe non
+orienté et <span class="math inline">\(T\)</span> une arborescence
+couvrant tous les sommets de <span class="math inline">\(G\)</span>. Par
+construction, <span class="math inline">\(T\)</span> est un sous-graphe
+de <span class="math inline">\(G\)</span> qui contient tous les sommets
+de <span class="math inline">\(G\)</span>. De plus, <span
+class="math inline">\(T\)</span> est acyclique et connexe, ce qui
+signifie que tous les sommets de <span class="math inline">\(G\)</span>
+sont connectés dans <span class="math inline">\(T\)</span>.</p>
+<p>(ii) <strong>Propriété de complexité</strong> : La complexité d’une
+transformation dépend des structures de données impliquées. Par exemple,
+transformer un graphe en une arborescence peut être fait en temps
+polynomial.</p>
+<p>Preuve : L’algorithme de Kruskal transforme un graphe non orienté en
+une arborescence couvrant tous les sommets en temps polynomial. En
+effet, le tri des arêtes peut être fait en <span
+class="math inline">\(O(E \log E)\)</span>, où <span
+class="math inline">\(E\)</span> est le nombre d’arêtes, et l’ajout des
+arêtes peut être fait en <span class="math inline">\(O(E \log
+V)\)</span>, où <span class="math inline">\(V\)</span> est le nombre de
+sommets.</p>
+<p>(iii) <strong>Propriété de réduction</strong> : Si un problème <span
+class="math inline">\(A\)</span> se réduit polynomialement à un problème
+<span class="math inline">\(B\)</span>, alors la complexité de <span
+class="math inline">\(A\)</span> est au plus égale à celle de <span
+class="math inline">\(B\)</span>.</p>
+<p>Preuve : Supposons que <span class="math inline">\(A \leq_p
+B\)</span>. Cela signifie qu’il existe un algorithme polynomial qui
+transforme une instance de <span class="math inline">\(A\)</span> en une
+instance de <span class="math inline">\(B\)</span>. Si <span
+class="math inline">\(B\)</span> est dans la classe de complexité <span
+class="math inline">\(P\)</span>, alors il existe un algorithme
+polynomial pour résoudre <span class="math inline">\(B\)</span>. En
+composant ces deux algorithmes, nous obtenons un algorithme polynomial
+pour résoudre <span class="math inline">\(A\)</span>. Donc <span
+class="math inline">\(A \in P\)</span>.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

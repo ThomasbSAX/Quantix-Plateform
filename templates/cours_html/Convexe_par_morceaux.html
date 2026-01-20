@@ -1,0 +1,369 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Convexe par morceaux : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Convexe par morceaux : Une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’idée de convexité par morceaux émerge naturellement dans l’étude
+des fonctions non nécessairement convexes, mais qui peuvent être
+décomposées en parties convexes. Cette notion est particulièrement utile
+dans l’optimisation, où les fonctions objectives peuvent être complexes
+mais localement convexes. L’origine de cette notion remonte aux travaux
+sur les fonctions partiellement linéaires et les splines, où l’on
+cherche à modéliser des comportements locaux par des fonctions
+simples.</p>
+<p>La convexité par morceaux est indispensable dans les problèmes
+d’optimisation où la globalité de la convexité n’est pas requise, mais
+où l’on souhaite exploiter les propriétés locales de convexité pour
+simplifier les calculs et garantir des solutions optimales. Elle permet
+également de modéliser des phénomènes physiques ou économiques où les
+comportements locaux sont plus faciles à analyser que le comportement
+global.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre ce qu’est une fonction convexe par morceaux,
+commençons par rappeler la définition de convexité. Une fonction <span
+class="math inline">\(f: \mathbb{R}^n \to \mathbb{R}\)</span> est
+convexe si pour tout <span class="math inline">\(x, y \in
+\mathbb{R}^n\)</span> et pour tout <span class="math inline">\(\lambda
+\in [0,1]\)</span>, on a : <span class="math display">\[f(\lambda x +
+(1-\lambda)y) \leq \lambda f(x) + (1-\lambda)f(y).\]</span></p>
+<p>Maintenant, imaginons que nous divisons l’espace <span
+class="math inline">\(\mathbb{R}^n\)</span> en sous-ensembles disjoints
+<span class="math inline">\(X_1, X_2, \ldots, X_k\)</span> tels que
+chaque sous-ensemble <span class="math inline">\(X_i\)</span> est
+convexe. Si sur chacun de ces sous-ensembles, la fonction <span
+class="math inline">\(f\)</span> est convexe, alors nous pouvons dire
+que <span class="math inline">\(f\)</span> est convexe par morceaux.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X \subset \mathbb{R}^n\)</span> un
+ensemble et <span class="math inline">\(\{X_i\}_{i=1}^k\)</span> une
+partition de <span class="math inline">\(X\)</span> en sous-ensembles
+convexes. Une fonction <span class="math inline">\(f: X \to
+\mathbb{R}\)</span> est dite convexe par morceaux si pour tout <span
+class="math inline">\(i \in \{1, 2, \ldots, k\}\)</span>, la restriction
+de <span class="math inline">\(f\)</span> à <span
+class="math inline">\(X_i\)</span> est convexe.</p>
+</div>
+<p>Formellement, cela signifie que pour tout <span
+class="math inline">\(i \in \{1, 2, \ldots, k\}\)</span> et pour tous
+<span class="math inline">\(x, y \in X_i\)</span>, et pour tout <span
+class="math inline">\(\lambda \in [0,1]\)</span>, on a : <span
+class="math display">\[f(\lambda x + (1-\lambda)y) \leq \lambda f(x) +
+(1-\lambda)f(y).\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant les fonctions convexes par
+morceaux est le suivant :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> deux fonctions convexes par morceaux
+sur un ensemble <span class="math inline">\(X \subset
+\mathbb{R}^n\)</span>. Alors la fonction <span class="math inline">\(f +
+g\)</span> est également convexe par morceaux sur <span
+class="math inline">\(X\)</span>.</p>
+</div>
+<p>Pour comprendre ce théorème, considérons deux fonctions <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> qui sont convexes par morceaux. Cela
+signifie qu’il existe des partitions <span
+class="math inline">\(\{X_i\}_{i=1}^k\)</span> et <span
+class="math inline">\(\{Y_j\}_{j=1}^l\)</span> de <span
+class="math inline">\(X\)</span> en sous-ensembles convexes tels que
+<span class="math inline">\(f\)</span> est convexe sur chaque <span
+class="math inline">\(X_i\)</span> et <span
+class="math inline">\(g\)</span> est convexe sur chaque <span
+class="math inline">\(Y_j\)</span>. La somme <span
+class="math inline">\(f + g\)</span> sera convexe sur l’intersection des
+sous-ensembles de ces partitions, ce qui forme une nouvelle partition
+convexe.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span
+class="math inline">\(\{X_i\}_{i=1}^k\)</span> une partition de <span
+class="math inline">\(X\)</span> en sous-ensembles convexes telle que
+<span class="math inline">\(f\)</span> est convexe sur chaque <span
+class="math inline">\(X_i\)</span>, et soit <span
+class="math inline">\(\{Y_j\}_{j=1}^l\)</span> une partition de <span
+class="math inline">\(X\)</span> en sous-ensembles convexes telle que
+<span class="math inline">\(g\)</span> est convexe sur chaque <span
+class="math inline">\(Y_j\)</span>. Considérons la partition commune
+<span class="math inline">\(\{X_i \cap Y_j\}_{i=1,j=1}^{k,l}\)</span>.
+Pour chaque <span class="math inline">\((i,j)\)</span>, <span
+class="math inline">\(X_i \cap Y_j\)</span> est convexe car
+l’intersection de deux ensembles convexes est convexe.</p>
+<p>Pour tout <span class="math inline">\(x, y \in X_i \cap Y_j\)</span>
+et pour tout <span class="math inline">\(\lambda \in [0,1]\)</span>, on
+a : <span class="math display">\[f(\lambda x + (1-\lambda)y) \leq
+\lambda f(x) + (1-\lambda)f(y),\]</span> et <span
+class="math display">\[g(\lambda x + (1-\lambda)y) \leq \lambda g(x) +
+(1-\lambda)g(y).\]</span></p>
+<p>En ajoutant ces deux inégalités, on obtient : <span
+class="math display">\[(f + g)(\lambda x + (1-\lambda)y) \leq \lambda
+(f(x) + g(x)) + (1-\lambda)(f(y) + g(y)).\]</span></p>
+<p>Ainsi, <span class="math inline">\(f + g\)</span> est convexe sur
+chaque <span class="math inline">\(X_i \cap Y_j\)</span>, ce qui prouve
+que <span class="math inline">\(f + g\)</span> est convexe par
+morceaux. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les fonctions convexes par morceaux possèdent plusieurs propriétés
+intéressantes. En voici quelques-unes :</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(f\)</span> une fonction convexe par
+morceaux sur un ensemble <span class="math inline">\(X \subset
+\mathbb{R}^n\)</span>. Alors pour tout <span
+class="math inline">\(\alpha \geq 0\)</span>, la fonction <span
+class="math inline">\(\alpha f\)</span> est également convexe par
+morceaux sur <span class="math inline">\(X\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Soit <span
+class="math inline">\(\{X_i\}_{i=1}^k\)</span> une partition de <span
+class="math inline">\(X\)</span> en sous-ensembles convexes telle que
+<span class="math inline">\(f\)</span> est convexe sur chaque <span
+class="math inline">\(X_i\)</span>. Pour tout <span
+class="math inline">\(i \in \{1, 2, \ldots, k\}\)</span> et pour tous
+<span class="math inline">\(x, y \in X_i\)</span>, et pour tout <span
+class="math inline">\(\lambda \in [0,1]\)</span>, on a : <span
+class="math display">\[f(\lambda x + (1-\lambda)y) \leq \lambda f(x) +
+(1-\lambda)f(y).\]</span></p>
+<p>En multipliant par <span class="math inline">\(\alpha\)</span>, on
+obtient : <span class="math display">\[\alpha f(\lambda x +
+(1-\lambda)y) \leq \lambda \alpha f(x) + (1-\lambda)\alpha
+f(y).\]</span></p>
+<p>Ainsi, <span class="math inline">\(\alpha f\)</span> est convexe sur
+chaque <span class="math inline">\(X_i\)</span>, ce qui prouve que <span
+class="math inline">\(\alpha f\)</span> est convexe par morceaux. ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(f\)</span> une fonction convexe par
+morceaux sur un ensemble <span class="math inline">\(X \subset
+\mathbb{R}^n\)</span>. Alors pour tout <span class="math inline">\(b \in
+\mathbb{R}\)</span>, la fonction <span class="math inline">\(f +
+b\)</span> est également convexe par morceaux sur <span
+class="math inline">\(X\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Soit <span
+class="math inline">\(\{X_i\}_{i=1}^k\)</span> une partition de <span
+class="math inline">\(X\)</span> en sous-ensembles convexes telle que
+<span class="math inline">\(f\)</span> est convexe sur chaque <span
+class="math inline">\(X_i\)</span>. Pour tout <span
+class="math inline">\(i \in \{1, 2, \ldots, k\}\)</span> et pour tous
+<span class="math inline">\(x, y \in X_i\)</span>, et pour tout <span
+class="math inline">\(\lambda \in [0,1]\)</span>, on a : <span
+class="math display">\[f(\lambda x + (1-\lambda)y) \leq \lambda f(x) +
+(1-\lambda)f(y).\]</span></p>
+<p>En ajoutant <span class="math inline">\(b\)</span> des deux côtés, on
+obtient : <span class="math display">\[(f + b)(\lambda x + (1-\lambda)y)
+\leq \lambda (f(x) + b) + (1-\lambda)(f(y) + b).\]</span></p>
+<p>Ainsi, <span class="math inline">\(f + b\)</span> est convexe sur
+chaque <span class="math inline">\(X_i\)</span>, ce qui prouve que <span
+class="math inline">\(f + b\)</span> est convexe par morceaux. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La notion de convexité par morceaux est un outil puissant pour
+l’analyse des fonctions non nécessairement convexes. Elle permet de
+décomposer une fonction complexe en parties plus simples à analyser,
+tout en préservant certaines propriétés de convexité. Les théorèmes et
+corollaires présentés dans cet article montrent comment cette notion
+peut être utilisée pour simplifier l’étude des fonctions et des
+problèmes d’optimisation.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

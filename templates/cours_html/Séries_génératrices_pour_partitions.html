@@ -1,0 +1,373 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Séries génératrices pour partitions</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Séries génératrices pour partitions</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des partitions d’entiers est un domaine riche de la
+combinatoire, intimement lié à de nombreuses branches des mathématiques.
+Les partitions d’un entier <span class="math inline">\(n\)</span> sont
+les façons de l’écrire comme une somme de nombres entiers positifs, où
+l’ordre des termes n’est pas pris en compte. Par exemple, les partitions
+de 4 sont : <span class="math display">\[1+1+1+1,\ 2+1+1,\ 2+2,\ 3+1,\
+4\]</span> Les séries génératrices sont un outil puissant pour étudier
+les partitions. Elles permettent de codifier une grande quantité
+d’information sur les partitions dans une seule expression analytique,
+facilitant ainsi l’étude de leurs propriétés.</p>
+<p>Les séries génératrices pour partitions émergent naturellement dans
+le cadre de la théorie des fonctions symétriques et des polynômes de
+Schur. Elles jouent un rôle central dans la théorie des représentations,
+en particulier pour les groupes symétriques et les algèbres de Lie. De
+plus, elles apparaissent dans divers problèmes de combinatoire
+énumérative et algébrique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir les séries génératrices pour partitions, il est
+essentiel de comprendre ce que nous cherchons à capturer. Nous voulons
+une fonction qui encode le nombre de partitions d’un entier <span
+class="math inline">\(n\)</span> en une seule expression. Cette fonction
+doit être capable de capturer non seulement le nombre total de
+partitions, mais aussi des propriétés plus fines, telles que la
+multiplicité des parties ou les contraintes sur les partitions.</p>
+<p>Nous commençons par définir formellement une partition. Une
+<em>partition</em> d’un entier <span class="math inline">\(n\)</span>
+est une suite décroissante d’entiers positifs <span
+class="math inline">\(\lambda_1 \geq \lambda_2 \geq \dots \geq \lambda_k
+&gt; 0\)</span> telle que <span class="math inline">\(\sum_{i=1}^k
+\lambda_i = n\)</span>. Le nombre de partitions de <span
+class="math inline">\(n\)</span> est généralement noté <span
+class="math inline">\(p(n)\)</span>.</p>
+<p>Nous définissons maintenant la série génératrice pour partitions. La
+<em>série génératrice pour partitions</em> est une fonction formelle en
+une variable <span class="math inline">\(q\)</span> définie par : <span
+class="math display">\[\sum_{n=0}^{\infty} p(n) q^n =
+\prod_{k=1}^{\infty} \frac{1}{1 - q^k}\]</span> Cette série génératrice
+encode le nombre de partitions de chaque entier <span
+class="math inline">\(n\)</span> dans les coefficients de la série.</p>
+<p>Pour mieux comprendre cette définition, considérons ce que représente
+chaque facteur <span class="math inline">\(\frac{1}{1 - q^k}\)</span>
+dans le produit infini. Le développement en série de <span
+class="math inline">\(\frac{1}{1 - q^k}\)</span> est : <span
+class="math display">\[\frac{1}{1 - q^k} = \sum_{m=0}^{\infty} q^{k
+m}\]</span> Chaque terme <span class="math inline">\(q^{k m}\)</span>
+représente une partie de taille <span class="math inline">\(k\)</span>
+apparaissant <span class="math inline">\(m\)</span> fois dans la
+partition. Le produit infini sur tous les <span
+class="math inline">\(k\)</span> capture toutes les possibilités de
+partitions en sommant sur toutes les combinaisons possibles de
+parties.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant les séries génératrices pour
+partitions est le <em>théorème de Euler</em>, qui donne une formule
+explicite pour la série génératrice des partitions.</p>
+<div class="theorem">
+<p>La série génératrice pour partitions est donnée par : <span
+class="math display">\[\sum_{n=0}^{\infty} p(n) q^n =
+\prod_{k=1}^{\infty} \frac{1}{1 - q^k}\]</span></p>
+</div>
+<p>Pour démontrer ce théorème, nous commençons par comprendre pourquoi
+le produit infini représente bien les partitions. Chaque facteur <span
+class="math inline">\(\frac{1}{1 - q^k}\)</span> dans le produit
+correspond à la possibilité d’inclure des parties de taille <span
+class="math inline">\(k\)</span> dans une partition. Le développement en
+série de <span class="math inline">\(\frac{1}{1 - q^k}\)</span> montre
+que nous pouvons inclure zéro, une, deux, etc., parties de taille <span
+class="math inline">\(k\)</span>.</p>
+<p>En multipliant tous ces facteurs ensemble, nous obtenons une série où
+chaque terme est de la forme <span class="math inline">\(q^n\)</span>,
+et le coefficient de <span class="math inline">\(q^n\)</span> est
+précisément le nombre de partitions de <span
+class="math inline">\(n\)</span>. Cela provient du fait que chaque
+partition de <span class="math inline">\(n\)</span> correspond à un
+choix unique de coefficients dans le produit des séries.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Euler, nous procédons par induction sur
+<span class="math inline">\(n\)</span>. Nous montrons que pour tout
+entier positif <span class="math inline">\(n\)</span>, le coefficient de
+<span class="math inline">\(q^n\)</span> dans <span
+class="math inline">\(\prod_{k=1}^{\infty} \frac{1}{1 - q^k}\)</span>
+est égal au nombre de partitions de <span
+class="math inline">\(n\)</span>.</p>
+<p>Nous commençons par la base de l’induction. Pour <span
+class="math inline">\(n=0\)</span>, il n’y a qu’une seule partition, qui
+est la partition vide. Le coefficient de <span
+class="math inline">\(q^0\)</span> dans le produit infini est 1, ce qui
+correspond au nombre de partitions de 0.</p>
+<p>Supposons maintenant que le théorème soit vrai pour tous les entiers
+inférieurs à <span class="math inline">\(n\)</span>. Nous devons montrer
+qu’il est vrai pour <span class="math inline">\(n\)</span>.</p>
+<p>Considérons une partition quelconque de <span
+class="math inline">\(n\)</span>. Cette partition contient au moins une
+partie, disons de taille <span class="math inline">\(k\)</span>, où
+<span class="math inline">\(1 \leq k \leq n\)</span>. Nous pouvons alors
+écrire cette partition comme une somme de parties, dont l’une est <span
+class="math inline">\(k\)</span> et les autres forment une partition de
+<span class="math inline">\(n - k\)</span>.</p>
+<p>En utilisant le principe d’inclusion-exclusion, nous pouvons compter
+toutes les partitions de <span class="math inline">\(n\)</span> en
+sommant sur toutes les possibilités de parties et en comptant les
+partitions des restes. Cela donne : <span class="math display">\[p(n) =
+\sum_{k=1}^n p(n - k)\]</span> où <span class="math inline">\(p(0) =
+1\)</span>.</p>
+<p>En utilisant la série génératrice, nous avons : <span
+class="math display">\[\sum_{n=0}^{\infty} p(n) q^n =
+\sum_{n=0}^{\infty} \left( \sum_{k=1}^n p(n - k) \right) q^n = \left(
+\sum_{k=1}^{\infty} q^k \right) \left( \sum_{n=0}^{\infty} p(n) q^n
+\right)\]</span> En utilisant le fait que <span
+class="math inline">\(\sum_{k=1}^{\infty} q^k = \frac{q}{1 -
+q}\)</span>, nous obtenons : <span
+class="math display">\[\sum_{n=0}^{\infty} p(n) q^n = \frac{q}{1 - q}
+\sum_{n=0}^{\infty} p(n) q^n\]</span> En multipliant les deux côtés par
+<span class="math inline">\((1 - q)\)</span>, nous obtenons : <span
+class="math display">\[(1 - q) \sum_{n=0}^{\infty} p(n) q^n = q
+\sum_{n=0}^{\infty} p(n) q^n\]</span> En réarrangeant, nous obtenons :
+<span class="math display">\[\sum_{n=0}^{\infty} p(n) q^n = \frac{q}{1 -
+q} \sum_{n=0}^{\infty} p(n) q^n\]</span> En utilisant le fait que <span
+class="math inline">\(\frac{1}{1 - q} = \sum_{m=0}^{\infty}
+q^m\)</span>, nous obtenons : <span
+class="math display">\[\sum_{n=0}^{\infty} p(n) q^n = \left(
+\sum_{m=0}^{\infty} q^m \right) \left( \sum_{n=0}^{\infty} p(n) q^n
+\right)\]</span> En développant le produit, nous obtenons : <span
+class="math display">\[\sum_{n=0}^{\infty} p(n) q^n =
+\sum_{m=0}^{\infty} \sum_{n=0}^{\infty} p(n) q^{m + n}\]</span> En
+changeant l’ordre des sommations, nous obtenons : <span
+class="math display">\[\sum_{n=0}^{\infty} p(n) q^n =
+\sum_{k=0}^{\infty} \left( \sum_{m=0}^k p(k - m) \right) q^k\]</span> En
+utilisant l’hypothèse d’induction, nous avons <span
+class="math inline">\(\sum_{m=0}^k p(k - m) = p(k)\)</span>. Donc :
+<span class="math display">\[\sum_{n=0}^{\infty} p(n) q^n =
+\sum_{k=0}^{\infty} p(k) q^k\]</span> Ce qui achève la preuve par
+induction.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes des séries
+génératrices pour partitions.</p>
+<ol>
+<li><p>La série génératrice pour partitions est une fonction holomorphe
+dans le disque unité <span class="math inline">\(|q| &lt; 1\)</span>.
+Cela signifie que la série converge absolument pour ces valeurs de <span
+class="math inline">\(q\)</span>.</p></li>
+<li><p>La série génératrice pour partitions peut être exprimée en termes
+de fonctions thêta. En particulier, nous avons : <span
+class="math display">\[\sum_{n=0}^{\infty} p(n) q^n =
+\prod_{k=1}^{\infty} (1 - q^{2k})(1 + q^{2k-1})^2\]</span> Cette
+expression est utile pour étudier les propriétés analytiques de la série
+génératrice.</p></li>
+<li><p>La série génératrice pour partitions satisfait une relation de
+récurrence. En particulier, nous avons : <span
+class="math display">\[p(n) = \sum_{k=1}^n (-1)^{k+1} \left( p(n - k) +
+p(n - 2k) \right)\]</span> Cette relation est utile pour calculer les
+valeurs de <span class="math inline">\(p(n)\)</span> de manière
+récursive.</p></li>
+</ol>
+<p>Pour prouver la propriété (ii), nous utilisons l’identité suivante :
+<span class="math display">\[\prod_{k=1}^{\infty} \frac{1}{1 - q^k} =
+\prod_{k=1}^{\infty} (1 - q^{2k})(1 + q^{2k-1})^2\]</span> Cette
+identité peut être démontrée en utilisant les propriétés des fonctions
+thêta et des produits infinis.</p>
+<p>Pour prouver la propriété (iii), nous utilisons le théorème de Euler
+et les relations de récurrence pour les coefficients des séries
+génératrices. En particulier, nous avons : <span
+class="math display">\[p(n) = \sum_{k=1}^n (-1)^{k+1} \left( p(n - k) +
+p(n - 2k) \right)\]</span> Cette relation peut être démontrée en
+utilisant le principe d’inclusion-exclusion et les propriétés des
+partitions.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

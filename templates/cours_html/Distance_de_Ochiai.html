@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Ochiai : Une Métrique pour l’Analyse des Données Binaires</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Ochiai : Une Métrique pour l’Analyse des
+Données Binaires</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des données binaires est une discipline fondamentale en
+statistique, informatique et sciences des données. Parmi les nombreuses
+métriques proposées pour mesurer la dissimilarité entre vecteurs
+binaires, la distance de Ochiai se distingue par sa capacité à capturer
+des relations non linéaires. Introduite initialement dans le contexte de
+la classification automatique, cette distance a trouvé des applications
+dans divers domaines, allant de la bioinformatique à l’apprentissage
+automatique.</p>
+<p>L’émergence de la distance de Ochiai est motivée par le besoin de
+métriques robustes pour traiter des données binaires souvent bruitées ou
+incomplètes. Contrairement à la distance de Hamming, qui ne considère
+que les différences binaires, Ochiai intègre une notion de similarité
+proportionnelle. Cette approche est particulièrement utile dans les
+contextes où les vecteurs représentent des profils ou des comportements,
+et où une simple différence binaire ne suffit pas à capturer la
+complexité sous-jacente.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la distance de Ochiai, commençons par comprendre ce que
+nous cherchons à mesurer. Imaginons deux vecteurs binaires représentant
+des profils d’activité de gènes dans une étude biologique. Nous voulons
+une métrique qui ne se contente pas de compter les différences, mais qui
+prend en compte la proportion d’activités communes par rapport aux
+activités totales. Cela nous amène à la notion de similarité
+proportionnelle, qui est au cœur de la distance de Ochiai.</p>
+<p>Formellement, soit <span class="math inline">\(\mathbf{x}, \mathbf{y}
+\in \{0,1\}^n\)</span> deux vecteurs binaires. La distance de Ochiai
+entre <span class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span> est définie comme :</p>
+<p><span class="math display">\[d_{\text{Ochiai}}(\mathbf{x},
+\mathbf{y}) = 1 - \frac{\sum_{i=1}^n x_i y_i}{\sqrt{\left(\sum_{i=1}^n
+x_i\right) \left(\sum_{i=1}^n y_i\right)}}\]</span></p>
+<p>Cette définition peut être réécrite en utilisant des quantificateurs
+:</p>
+<p><span class="math display">\[d_{\text{Ochiai}}(\mathbf{x},
+\mathbf{y}) = 1 - \frac{\sum_{i=1}^n x_i y_i}{\sqrt{\left(\sum_{i=1}^n
+x_i\right) \left(\sum_{i=1}^n y_i\right)}} = 1 - \frac{\langle
+\mathbf{x}, \mathbf{y} \rangle}{\|\mathbf{x}\|_1
+\|\mathbf{y}\|_1}\]</span></p>
+<p>où <span class="math inline">\(\langle \mathbf{x}, \mathbf{y} \rangle
+= \sum_{i=1}^n x_i y_i\)</span> est le produit scalaire des vecteurs
+<span class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span>, et <span
+class="math inline">\(\|\mathbf{x}\|_1 = \sum_{i=1}^n x_i\)</span> est
+la norme <span class="math inline">\(L^1\)</span> de <span
+class="math inline">\(\mathbf{x}\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Ochiai est celui de sa
+normalisation. Ce théorème assure que la distance de Ochiai est bien
+définie et bornée entre 0 et 1.</p>
+<p>Commençons par comprendre ce que nous cherchons à prouver. Nous
+voulons montrer que pour tout couple de vecteurs binaires <span
+class="math inline">\(\mathbf{x}, \mathbf{y}\)</span>, la distance de
+Ochiai est comprise entre 0 et 1. Cela signifie que la similarité
+proportionnelle est normalisée, ce qui est crucial pour l’interprétation
+des résultats.</p>
+<p>Formellement, nous avons le théorème suivant :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\mathbf{x}, \mathbf{y} \in
+\{0,1\}^n\)</span> deux vecteurs binaires. Alors,</p>
+<p><span class="math display">\[0 \leq d_{\text{Ochiai}}(\mathbf{x},
+\mathbf{y}) \leq 1\]</span></p>
+<p>De plus, <span class="math inline">\(d_{\text{Ochiai}}(\mathbf{x},
+\mathbf{y}) = 0\)</span> si et seulement si <span
+class="math inline">\(\mathbf{x} = \mathbf{y}\)</span>, et <span
+class="math inline">\(d_{\text{Ochiai}}(\mathbf{x}, \mathbf{y}) =
+1\)</span> si et seulement si <span class="math inline">\(\langle
+\mathbf{x}, \mathbf{y} \rangle = 0\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de normalisation, nous procédons comme suit
+:</p>
+<p>1. **Bornes inférieures et supérieures** : Nous savons que le produit
+scalaire <span class="math inline">\(\langle \mathbf{x}, \mathbf{y}
+\rangle\)</span> est toujours non négatif, et que <span
+class="math inline">\(\|\mathbf{x}\|_1\)</span> et <span
+class="math inline">\(\|\mathbf{y}\|_1\)</span> sont des entiers
+positifs. Par conséquent, le terme <span
+class="math inline">\(\frac{\langle \mathbf{x}, \mathbf{y}
+\rangle}{\|\mathbf{x}\|_1 \|\mathbf{y}\|_1}\)</span> est compris entre 0
+et 1.</p>
+<p>2. **Cas d’égalité** : Si <span class="math inline">\(\mathbf{x} =
+\mathbf{y}\)</span>, alors <span class="math inline">\(\langle
+\mathbf{x}, \mathbf{y} \rangle = \|\mathbf{x}\|_1^2\)</span>, et donc
+<span class="math inline">\(d_{\text{Ochiai}}(\mathbf{x}, \mathbf{y}) =
+0\)</span>. Si <span class="math inline">\(\langle \mathbf{x},
+\mathbf{y} \rangle = 0\)</span>, alors <span
+class="math inline">\(d_{\text{Ochiai}}(\mathbf{x}, \mathbf{y}) =
+1\)</span>.</p>
+<p>Cette preuve repose sur les propriétés fondamentales des produits
+scalaires et des normes, ainsi que sur la définition même de la distance
+de Ochiai.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La distance de Ochiai possède plusieurs propriétés intéressantes, que
+nous énumérons et prouvons ci-dessous :</p>
+<ol>
+<li><p>**Invariance par translation** : La distance de Ochiai est
+invariante par ajout d’un vecteur constant à <span
+class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span>. Cela signifie que si nous
+ajoutons le même vecteur binaire à <span
+class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span>, la distance reste
+inchangée.</p>
+<p>Preuve : Soit <span class="math inline">\(\mathbf{c} \in
+\{0,1\}^n\)</span> un vecteur constant. Alors,</p>
+<p><span class="math display">\[d_{\text{Ochiai}}(\mathbf{x} +
+\mathbf{c}, \mathbf{y} + \mathbf{c}) = 1 - \frac{\langle \mathbf{x} +
+\mathbf{c}, \mathbf{y} + \mathbf{c} \rangle}{\|\mathbf{x} +
+\mathbf{c}\|_1 \|\mathbf{y} + \mathbf{c}\|_1}\]</span></p>
+<p>En développant le produit scalaire et les normes, nous voyons que les
+termes croisés s’annulent, laissant la distance inchangée.</p></li>
+<li><p>**Symétrie** : La distance de Ochiai est symétrique, c’est-à-dire
+que <span class="math inline">\(d_{\text{Ochiai}}(\mathbf{x},
+\mathbf{y}) = d_{\text{Ochiai}}(\mathbf{y}, \mathbf{x})\)</span>.</p>
+<p>Preuve : Par définition, le produit scalaire et les normes sont
+symétriques, donc la distance l’est également.</p></li>
+<li><p>**Triangulaire** : La distance de Ochiai satisfait l’inégalité
+triangulaire, c’est-à-dire que pour tout triplet de vecteurs <span
+class="math inline">\(\mathbf{x}, \mathbf{y}, \mathbf{z} \in
+\{0,1\}^n\)</span>,</p>
+<p><span class="math display">\[d_{\text{Ochiai}}(\mathbf{x},
+\mathbf{z}) \leq d_{\text{Ochiai}}(\mathbf{x}, \mathbf{y}) +
+d_{\text{Ochiai}}(\mathbf{y}, \mathbf{z})\]</span></p>
+<p>Preuve : Cette propriété découle de la structure métrique de la
+distance de Ochiai, bien que la preuve détaillée soit plus complexe et
+nécessite l’utilisation d’inégalités vectorielles.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Ochiai est une métrique puissante et élégante pour
+l’analyse des données binaires. Son utilisation permet de capturer des
+relations complexes qui échappent aux métriques plus simples comme la
+distance de Hamming. Les propriétés et théorèmes associés à cette
+distance en font un outil indispensable dans de nombreux domaines, des
+sciences biologiques à l’apprentissage automatique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

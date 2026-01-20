@@ -1,0 +1,382 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de binning par densité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de binning
+par densité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques de binning par densité
+est une technique avancée d’analyse de données qui combine les avantages
+du binning (regroupement des données en intervalles) et de l’extraction
+de caractéristiques pour améliorer la qualité des modèles prédictifs.
+Cette méthode est particulièrement utile dans les contextes où les
+données présentent des distributions complexes et non linéaires.</p>
+<p>Le binning par densité consiste à diviser les données en bins
+(intervalles) en fonction de leur distribution de probabilité. Cette
+approche permet de capturer des motifs et des tendances qui pourraient
+être négligés par des méthodes plus simples. L’extraction de
+caractéristiques ajoute une couche supplémentaire d’analyse en
+transformant ces bins en caractéristiques significatives, ce qui peut
+améliorer la performance des algorithmes d’apprentissage
+automatique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement l’encodage par extraction de
+caractéristiques de binning par densité, il est important de comprendre
+les concepts sous-jacents.</p>
+<h2 id="binning-par-densité">Binning par Densité</h2>
+<p>Le binning par densité est une technique de regroupement des données
+en intervalles basés sur leur distribution de probabilité. L’objectif
+est de créer des bins qui capturent les variations de densité des
+données.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+réelles. Un binning par densité divise <span
+class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> intervalles <span
+class="math inline">\(I_1, I_2, \ldots, I_k\)</span> tels que chaque
+intervalle <span class="math inline">\(I_i\)</span> contient un nombre
+approximativement égal de points de données, en fonction de leur densité
+de probabilité.</p>
+</div>
+<p>Formellement, pour un ensemble de données <span
+class="math inline">\(X = \{x_1, x_2, \ldots, x_n\}\)</span>, le binning
+par densité peut être défini comme suit :</p>
+<p><span class="math display">\[\forall i \in \{1, 2, \ldots, k\}, \quad
+I_i = [a_i, b_i] \text{ tel que } \int_{a_i}^{b_i} f(x) \, dx =
+\frac{1}{k}\]</span></p>
+<p>où <span class="math inline">\(f(x)\)</span> est la fonction de
+densité de probabilité estimée des données.</p>
+<h2 id="extraction-de-caractéristiques">Extraction de
+Caractéristiques</h2>
+<p>L’extraction de caractéristiques consiste à transformer les bins en
+un ensemble de caractéristiques significatives qui peuvent être
+utilisées pour l’apprentissage automatique.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(I_1, I_2, \ldots, I_k\)</span> les
+bins obtenus par binning par densité. L’extraction de caractéristiques
+transforme chaque bin <span class="math inline">\(I_i\)</span> en un
+vecteur de caractéristiques <span
+class="math inline">\(\mathbf{c}_i\)</span>.</p>
+</div>
+<p>Formellement, pour chaque bin <span
+class="math inline">\(I_i\)</span>, le vecteur de caractéristiques <span
+class="math inline">\(\mathbf{c}_i\)</span> peut être défini comme suit
+:</p>
+<p><span class="math display">\[\mathbf{c}_i = (m_i, \sigma_i,
+\text{skew}(I_i), \text{kurtosis}(I_i))\]</span></p>
+<p>où <span class="math inline">\(m_i\)</span> est la moyenne, <span
+class="math inline">\(\sigma_i\)</span> est l’écart-type, <span
+class="math inline">\(\text{skew}(I_i)\)</span> est l’asymétrie et <span
+class="math inline">\(\text{kurtosis}(I_i)\)</span> est l’aplatissement
+des données dans le bin <span class="math inline">\(I_i\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-convergence-du-binning-par-densité">Théorème de
+Convergence du Binning par Densité</h2>
+<p>Le théorème de convergence du binning par densité stipule que, sous
+certaines conditions, le binning par densité converge vers la véritable
+distribution de probabilité des données lorsque le nombre de bins tend
+vers l’infini.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+réelles avec une fonction de densité de probabilité <span
+class="math inline">\(f(x)\)</span>. Si le nombre de bins <span
+class="math inline">\(k\)</span> tend vers l’infini, alors le binning
+par densité converge vers <span class="math inline">\(f(x)\)</span>.</p>
+</div>
+<p>Preuve :</p>
+<p>1. Considérons un ensemble de données <span
+class="math inline">\(X\)</span> avec une fonction de densité de
+probabilité <span class="math inline">\(f(x)\)</span>. 2. Le binning par
+densité divise <span class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> intervalles <span
+class="math inline">\(I_1, I_2, \ldots, I_k\)</span> tels que chaque
+intervalle <span class="math inline">\(I_i\)</span> contient un nombre
+approximativement égal de points de données. 3. Lorsque <span
+class="math inline">\(k\)</span> tend vers l’infini, la taille de chaque
+intervalle <span class="math inline">\(I_i\)</span> tend vers zéro. 4.
+Par le théorème de la limite centrale, la distribution des données dans
+chaque intervalle <span class="math inline">\(I_i\)</span> converge vers
+une distribution normale centrée autour de la moyenne de l’intervalle.
+5. Par conséquent, le binning par densité converge vers <span
+class="math inline">\(f(x)\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-convergence-du-binning-par-densité">Preuve
+du Théorème de Convergence du Binning par Densité</h2>
+<p>Pour prouver le théorème de convergence du binning par densité, nous
+devons montrer que la distribution des données dans chaque intervalle
+<span class="math inline">\(I_i\)</span> converge vers une distribution
+normale lorsque le nombre de bins <span class="math inline">\(k\)</span>
+tend vers l’infini.</p>
+<p>1. Considérons un ensemble de données <span
+class="math inline">\(X\)</span> avec une fonction de densité de
+probabilité <span class="math inline">\(f(x)\)</span>. 2. Le binning par
+densité divise <span class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> intervalles <span
+class="math inline">\(I_1, I_2, \ldots, I_k\)</span> tels que chaque
+intervalle <span class="math inline">\(I_i\)</span> contient un nombre
+approximativement égal de points de données. 3. Lorsque <span
+class="math inline">\(k\)</span> tend vers l’infini, la taille de chaque
+intervalle <span class="math inline">\(I_i\)</span> tend vers zéro. 4.
+Par le théorème de la limite centrale, la distribution des données dans
+chaque intervalle <span class="math inline">\(I_i\)</span> converge vers
+une distribution normale centrée autour de la moyenne de l’intervalle.
+5. Par conséquent, le binning par densité converge vers <span
+class="math inline">\(f(x)\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-stabilité">Propriété de Stabilité</h2>
+<p>La propriété de stabilité stipule que l’encodage par extraction de
+caractéristiques de binning par densité est stable face aux petites
+perturbations des données.</p>
+<div class="property">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+réelles et <span class="math inline">\(X&#39;\)</span> une petite
+perturbation de <span class="math inline">\(X\)</span>. L’encodage par
+extraction de caractéristiques de binning par densité est stable si les
+caractéristiques extraites pour <span class="math inline">\(X\)</span>
+et <span class="math inline">\(X&#39;\)</span> sont proches.</p>
+</div>
+<p>Preuve :</p>
+<p>1. Considérons un ensemble de données <span
+class="math inline">\(X\)</span> et une petite perturbation <span
+class="math inline">\(X&#39;\)</span>. 2. Le binning par densité divise
+<span class="math inline">\(X\)</span> et <span
+class="math inline">\(X&#39;\)</span> en <span
+class="math inline">\(k\)</span> intervalles <span
+class="math inline">\(I_1, I_2, \ldots, I_k\)</span> et <span
+class="math inline">\(I&#39;_1, I&#39;_2, \ldots, I&#39;_k\)</span>
+respectivement. 3. Les caractéristiques extraites pour <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(X&#39;\)</span> sont proches si les intervalles
+<span class="math inline">\(I_i\)</span> et <span
+class="math inline">\(I&#39;_i\)</span> sont proches. 4. Par conséquent,
+l’encodage par extraction de caractéristiques de binning par densité est
+stable face aux petites perturbations des données.</p>
+<h2 id="corollaire-de-convergence">Corollaire de Convergence</h2>
+<p>Le corollaire de convergence stipule que l’encodage par extraction de
+caractéristiques de binning par densité converge vers la véritable
+distribution de probabilité des données lorsque le nombre de bins tend
+vers l’infini.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+réelles avec une fonction de densité de probabilité <span
+class="math inline">\(f(x)\)</span>. Si le nombre de bins <span
+class="math inline">\(k\)</span> tend vers l’infini, alors l’encodage
+par extraction de caractéristiques de binning par densité converge vers
+<span class="math inline">\(f(x)\)</span>.</p>
+</div>
+<p>Preuve :</p>
+<p>1. Considérons un ensemble de données <span
+class="math inline">\(X\)</span> avec une fonction de densité de
+probabilité <span class="math inline">\(f(x)\)</span>. 2. Le binning par
+densité divise <span class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> intervalles <span
+class="math inline">\(I_1, I_2, \ldots, I_k\)</span> tels que chaque
+intervalle <span class="math inline">\(I_i\)</span> contient un nombre
+approximativement égal de points de données. 3. Lorsque <span
+class="math inline">\(k\)</span> tend vers l’infini, la taille de chaque
+intervalle <span class="math inline">\(I_i\)</span> tend vers zéro. 4.
+Par le théorème de la limite centrale, la distribution des données dans
+chaque intervalle <span class="math inline">\(I_i\)</span> converge vers
+une distribution normale centrée autour de la moyenne de l’intervalle.
+5. Par conséquent, l’encodage par extraction de caractéristiques de
+binning par densité converge vers <span
+class="math inline">\(f(x)\)</span>.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

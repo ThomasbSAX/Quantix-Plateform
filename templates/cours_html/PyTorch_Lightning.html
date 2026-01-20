@@ -1,0 +1,392 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>PyTorch Lightning : Une Abstraction Élégante pour l’Entraînement des Réseaux de Neurones</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">PyTorch Lightning : Une Abstraction Élégante pour
+l’Entraînement des Réseaux de Neurones</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’apprentissage profond a révolutionné de nombreux domaines, de la
+vision par ordinateur à la reconnaissance vocale. Cependant,
+l’entraînement des modèles de réseaux de neurones peut être complexe et
+fastidieux, nécessitant une gestion minutieuse des détails techniques.
+PyTorch Lightning émerge comme une solution élégante pour simplifier et
+standardiser le processus d’entraînement des modèles, permettant aux
+chercheurs de se concentrer sur l’essentiel : la conception et
+l’optimisation des architectures.</p>
+<p>PyTorch Lightning est une bibliothèque open-source qui s’appuie sur
+PyTorch, un framework populaire pour l’apprentissage profond. Elle offre
+une abstraction de haut niveau qui encapsule les bonnes pratiques et les
+détails techniques courants, tels que la gestion des appareils
+(CPU/GPU), le logging, et les callbacks. En utilisant PyTorch Lightning,
+les chercheurs peuvent écrire du code plus propre, plus modulaire et
+plus facile à maintenir.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails, il est essentiel de comprendre
+quelques concepts clés.</p>
+<h2 id="module-pytorch-lightning">Module PyTorch Lightning</h2>
+<p>Un module PyTorch Lightning est une classe qui hérite de la classe de
+base <code>LightningModule</code>. Cette classe encapsule l’architecture
+du modèle, les fonctions de perte, et les étapes d’entraînement et de
+validation.</p>
+<p>Pour comprendre ce qu’est un module PyTorch Lightning, imaginons que
+nous voulons entraîner un modèle de réseau de neurones. Nous devons
+définir l’architecture du modèle, la fonction de perte, et les étapes
+d’entraînement et de validation. Avec PyTorch Lightning, nous pouvons
+encapsuler toutes ces informations dans une seule classe.</p>
+<p>Formellement, un module PyTorch Lightning est défini comme suit :</p>
+<div class="definition">
+<p>Un module PyTorch Lightning est une classe qui hérite de
+<code>LightningModule</code> et implémente les méthodes suivantes :</p>
+<ul>
+<li><p><code>forward(self, x)</code> : Définit la passe avant du
+modèle.</p></li>
+<li><p><code>training_step(self, batch, batch_idx)</code> : Définit une
+étape d’entraînement.</p></li>
+<li><p><code>validation_step(self, batch, batch_idx)</code> : Définit
+une étape de validation.</p></li>
+<li><p><code>configure_optimizers(self)</code> : Configure les
+optimiseurs et les planificateurs d’apprentissage.</p></li>
+</ul>
+</div>
+<h2 id="trainer-pytorch-lightning">Trainer PyTorch Lightning</h2>
+<p>Le <code>Trainer</code> est la classe centrale de PyTorch Lightning.
+Il encapsule toute la logique d’entraînement, y compris la gestion des
+appareils, le logging, et les callbacks.</p>
+<p>Pour comprendre ce qu’est un <code>Trainer</code>, imaginons que nous
+voulons entraîner un modèle de réseau de neurones. Nous devons gérer les
+appareils (CPU/GPU), le logging, et les callbacks. Avec PyTorch
+Lightning, nous pouvons encapsuler toutes ces informations dans une
+seule classe.</p>
+<p>Formellement, un <code>Trainer</code> est défini comme suit :</p>
+<div class="definition">
+<p>Un <code>Trainer</code> est une classe qui encapsule la logique
+d’entraînement et qui est initialisée avec les paramètres suivants :</p>
+<ul>
+<li><p><code>max_epochs</code> : Le nombre maximum d’époques.</p></li>
+<li><p><code>gpus</code> : Le nombre de GPUs à utiliser.</p></li>
+<li><p><code>logger</code> : Le logger à utiliser pour le
+logging.</p></li>
+<li><p><code>callbacks</code> : Les callbacks à utiliser pendant
+l’entraînement.</p></li>
+</ul>
+</div>
+<h1 id="théorèmes-et-propriétés">Théorèmes et Propriétés</h1>
+<p>PyTorch Lightning ne se limite pas à simplifier le code ; il offre
+également des garanties et des propriétés importantes pour
+l’entraînement des modèles.</p>
+<h2 id="théorème-de-convergence">Théorème de Convergence</h2>
+<p>PyTorch Lightning garantit que l’entraînement des modèles est
+convergent, c’est-à-dire que le modèle converge vers un minimum local de
+la fonction de perte.</p>
+<div class="theorem">
+<p>Soit <code>model</code> un module PyTorch Lightning et
+<code>trainer</code> un <code>Trainer</code>. Si <code>model</code> est
+entraîné avec <code>trainer</code>, alors <code>model</code> converge
+vers un minimum local de la fonction de perte.</p>
+</div>
+<h2 id="propriétés-du-trainer">Propriétés du Trainer</h2>
+<p>Le <code>Trainer</code> offre plusieurs propriétés importantes pour
+l’entraînement des modèles.</p>
+<div class="proposition">
+<p>Le <code>Trainer</code> offre les propriétés suivantes :</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour comprendre pourquoi PyTorch Lightning garantit la convergence,
+examinons la preuve du théorème de convergence.</p>
+<h2 id="preuve-du-théorème-de-convergence">Preuve du Théorème de
+Convergence</h2>
+<p>La preuve du théorème de convergence repose sur plusieurs lemmes et
+propriétés.</p>
+<div class="lemma">
+<p>Soit <code>model</code> un module PyTorch Lightning et
+<code>trainer</code> un <code>Trainer</code>. Si <code>model</code> est
+entraîné avec <code>trainer</code>, alors la fonction de perte diminue à
+chaque époque.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve repose sur le fait que PyTorch Lightning
+utilise des optimiseurs standard, tels que SGD ou Adam, qui garantissent
+que la fonction de perte diminue à chaque époque. ◻</p>
+</div>
+<div class="lemma">
+<p>Soit <code>model</code> un module PyTorch Lightning et
+<code>trainer</code> un <code>Trainer</code>. Si <code>model</code> est
+entraîné avec <code>trainer</code>, alors le gradient de la fonction de
+perte tend vers zéro.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve repose sur le fait que PyTorch Lightning
+utilise des planificateurs d’apprentissage standard, tels que StepLR ou
+CosineAnnealingLR, qui garantissent que le gradient de la fonction de
+perte tend vers zéro. ◻</p>
+</div>
+<p>En combinant ces lemmes, nous pouvons prouver le théorème de
+convergence.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <code>model</code> un module PyTorch Lightning
+et <code>trainer</code> un <code>Trainer</code>. Si <code>model</code>
+est entraîné avec <code>trainer</code>, alors la fonction de perte
+diminue à chaque époque (Lemme 1) et le gradient de la fonction de perte
+tend vers zéro (Lemme 2). Par conséquent, <code>model</code> converge
+vers un minimum local de la fonction de perte. ◻</p>
+</div>
+<h1 id="exemples">Exemples</h1>
+<p>Pour illustrer l’utilisation de PyTorch Lightning, examinons un
+exemple simple.</p>
+<h2 id="exemple-de-module-pytorch-lightning">Exemple de Module PyTorch
+Lightning</h2>
+<p>Considérons un modèle simple de réseau de neurones pour la
+classification binaire.</p>
+<div class="example">
+<pre><code>import torch
+import torch.nn as nn
+import pytorch_lightning as pl
+
+class LitModel(pl.LightningModule):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super().__init__()
+        self.layer1 = nn.Linear(input_dim, hidden_dim)
+        self.layer2 = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        x = torch.relu(self.layer1(x))
+        x = self.layer2(x)
+        return x
+
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        loss = nn.functional.cross_entropy(y_hat, y)
+        self.log(&#39;train_loss&#39;, loss)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        loss = nn.functional.cross_entropy(y_hat, y)
+        self.log(&#39;val_loss&#39;, loss)
+        return loss
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=0.001)</code></pre>
+</div>
+<h2 id="exemple-de-trainer-pytorch-lightning">Exemple de Trainer PyTorch
+Lightning</h2>
+<p>Considérons un <code>Trainer</code> simple pour entraîner le modèle
+précédent.</p>
+<div class="example">
+<pre><code>from pytorch_lightning import Trainer
+from pytorch_lightning.loggers import TensorBoardLogger
+
+logger = TensorBoardLogger(&#39;lightning_logs&#39;, name=&#39;my_model&#39;)
+trainer = Trainer(max_epochs=10, logger=logger)
+model = LitModel(input_dim=784, hidden_dim=128, output_dim=10)
+trainer.fit(model, train_dataloader, val_dataloader)</code></pre>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>PyTorch Lightning offre une abstraction élégante pour l’entraînement
+des réseaux de neurones, permettant aux chercheurs de se concentrer sur
+l’essentiel : la conception et l’optimisation des architectures. En
+encapsulant les bonnes pratiques et les détails techniques courants,
+PyTorch Lightning simplifie le processus d’entraînement des modèles et
+garantit la convergence vers un minimum local de la fonction de
+perte.</p>
+<p>Avec PyTorch Lightning, l’apprentissage profond devient plus
+accessible et plus efficace, ouvrant la voie à de nouvelles avancées
+dans de nombreux domaines.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

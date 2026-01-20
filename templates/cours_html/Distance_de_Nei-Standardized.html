@@ -1,0 +1,363 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Nei-Standardized : Une Mesure de Divergence Génétique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Nei-Standardized : Une Mesure de
+Divergence Génétique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Nei-Standardized émerge dans le cadre de la génétique
+des populations, un domaine où l’étude des différences entre groupes
+d’individus est cruciale. Cette notion trouve son origine dans les
+travaux de Masatoshi Nei, un généticien japonais renommé pour ses
+contributions à la théorie de l’évolution moléculaire. La motivation
+derrière cette mesure est de quantifier la divergence génétique entre
+populations, en tenant compte des fréquences alléliques.</p>
+<p>Cette distance est indispensable pour comprendre les processus
+évolutifs tels que la dérive génétique, la sélection naturelle, et la
+migration. Elle permet de comparer les structures génétiques de
+différentes populations et d’inférer leurs relations phylogénétiques. En
+outre, elle est largement utilisée en écologie et en conservation pour
+évaluer la diversité génétique et identifier les populations
+menacées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Nei-Standardized, nous devons d’abord
+comprendre ce que nous cherchons à mesurer. Imaginons deux populations
+avec des fréquences alléliques différentes pour un certain nombre de
+loci. Nous voulons une mesure qui capture la dissimilarité entre ces
+fréquences, normalisée pour tenir compte des différences de taille des
+populations.</p>
+<p>Supposons que nous avons deux populations, <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, avec des fréquences alléliques <span
+class="math inline">\(p_i\)</span> et <span
+class="math inline">\(q_i\)</span> respectivement pour chaque allèle
+<span class="math inline">\(i\)</span>. Nous cherchons une mesure qui
+quantifie la différence entre ces fréquences, en tenant compte de la
+variance des fréquences alléliques.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux populations avec des fréquences
+alléliques <span class="math inline">\(p_i\)</span> et <span
+class="math inline">\(q_i\)</span> respectivement pour chaque allèle
+<span class="math inline">\(i\)</span>. La distance de Nei-Standardized
+entre <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est définie comme :</p>
+<p><span class="math display">\[D_{NS}(A, B) = \sqrt{\frac{1}{L}
+\sum_{i=1}^{L} \frac{(p_i - q_i)^2}{p_i(1 - p_i) + q_i(1 -
+q_i)}}\]</span></p>
+<p>où <span class="math inline">\(L\)</span> est le nombre total de loci
+considérés.</p>
+</div>
+<p>Cette définition peut également être formulée en utilisant des
+quantificateurs :</p>
+<p><span class="math display">\[D_{NS}(A, B) =
+\sqrt{\frac{1}{\sum_{i=1}^{L} 1} \sum_{i=1}^{L} \frac{(p_i -
+q_i)^2}{\sum_{j \in \{i\}} p_j(1 - p_j) + \sum_{k \in \{i\}} q_k(1 -
+q_k)}}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre les propriétés de la distance de Nei-Standardized,
+nous devons examiner certains théorèmes clés. Supposons que nous avons
+deux populations <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> avec des fréquences alléliques <span
+class="math inline">\(p_i\)</span> et <span
+class="math inline">\(q_i\)</span>. Nous voulons montrer que cette
+distance est une mesure valide de la divergence génétique.</p>
+<div class="theorem">
+<p>Pour toute paire de populations <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, la distance de Nei-Standardized est
+non négative :</p>
+<p><span class="math display">\[D_{NS}(A, B) \geq 0\]</span></p>
+<p>De plus, <span class="math inline">\(D_{NS}(A, B) = 0\)</span> si et
+seulement si <span class="math inline">\(p_i = q_i\)</span> pour tout
+allèle <span class="math inline">\(i\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La non-négativité découle du fait que le carré de
+toute différence réelle est non négatif. Plus précisément, pour chaque
+allèle <span class="math inline">\(i\)</span>, nous avons :</p>
+<p><span class="math display">\[(p_i - q_i)^2 \geq 0\]</span></p>
+<p>En conséquence, la somme de ces carrés est également non négative. Le
+dénominateur <span class="math inline">\(p_i(1 - p_i) + q_i(1 -
+q_i)\)</span> est toujours positif, car <span
+class="math inline">\(p_i\)</span> et <span
+class="math inline">\(q_i\)</span> sont des fréquences alléliques
+comprises entre 0 et 1. Par conséquent, <span
+class="math inline">\(D_{NS}(A, B) \geq 0\)</span>.</p>
+<p>Si <span class="math inline">\(D_{NS}(A, B) = 0\)</span>, alors
+chaque terme de la somme doit être nul. Cela implique que <span
+class="math inline">\(p_i = q_i\)</span> pour tout allèle <span
+class="math inline">\(i\)</span>. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer les propriétés de la distance de Nei-Standardized,
+nous devons justifier chaque étape de manière rigoureuse. Considérons la
+preuve de la non-négativité :</p>
+<div class="proof">
+<p><em>Proof.</em> Nous savons que pour toute paire de populations <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, les fréquences alléliques <span
+class="math inline">\(p_i\)</span> et <span
+class="math inline">\(q_i\)</span> sont comprises entre 0 et 1. Par
+conséquent, le dénominateur <span class="math inline">\(p_i(1 - p_i) +
+q_i(1 - q_i)\)</span> est toujours positif.</p>
+<p>En outre, le numérateur <span class="math inline">\((p_i -
+q_i)^2\)</span> est également non négatif, car le carré de toute
+différence réelle est non négatif. Par conséquent, chaque terme de la
+somme est non négatif, et la somme elle-même est non négative.</p>
+<p>Si <span class="math inline">\(D_{NS}(A, B) = 0\)</span>, alors
+chaque terme de la somme doit être nul. Cela implique que <span
+class="math inline">\(p_i = q_i\)</span> pour tout allèle <span
+class="math inline">\(i\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Nei-Standardized possède plusieurs propriétés
+intéressantes. Nous les énumérons et les démontrons une par une.</p>
+<ol>
+<li><p>La distance de Nei-Standardized est symétrique :</p>
+<p><span class="math display">\[D_{NS}(A, B) = D_{NS}(B, A)\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> La symétrie découle du fait que <span
+class="math inline">\((p_i - q_i)^2 = (q_i - p_i)^2\)</span>. Par
+conséquent, l’ordre des populations <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> n’affecte pas la valeur de la
+distance. ◻</p>
+</div></li>
+<li><p>La distance de Nei-Standardized est bornée :</p>
+<p><span class="math display">\[0 \leq D_{NS}(A, B) \leq
+\sqrt{2}\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> La borne inférieure a déjà été démontrée. Pour la
+borne supérieure, nous remarquons que le numérateur <span
+class="math inline">\((p_i - q_i)^2\)</span> est au maximum égal à 1,
+car <span class="math inline">\(p_i\)</span> et <span
+class="math inline">\(q_i\)</span> sont compris entre 0 et 1. Par
+conséquent, chaque terme de la somme est au maximum égal à <span
+class="math inline">\(\frac{1}{p_i(1 - p_i) + q_i(1 - q_i)}\)</span>. En
+utilisant l’inégalité de Cauchy-Schwarz, nous pouvons montrer que la
+somme est bornée par <span
+class="math inline">\(\sqrt{2}\)</span>. ◻</p>
+</div></li>
+<li><p>La distance de Nei-Standardized est invariante par transformation
+linéaire :</p>
+<p>Si nous multiplions toutes les fréquences alléliques par une
+constante positive <span class="math inline">\(c\)</span> et que nous
+ajoutons une constante <span class="math inline">\(d\)</span>, la
+distance de Nei-Standardized reste inchangée :</p>
+<p><span class="math display">\[D_{NS}(A, B) = D_{NS}(cA + d, cB +
+d)\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété découle du fait que la distance de
+Nei-Standardized est basée sur les différences relatives entre les
+fréquences alléliques. Les transformations linéaires n’affectent pas ces
+différences relatives. ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Nei-Standardized est une mesure puissante et flexible
+pour quantifier la divergence génétique entre populations. Ses
+propriétés mathématiques rigoureuses en font un outil précieux pour les
+chercheurs en génétique des populations, en écologie et en conservation.
+En comprenant ses définitions, théorèmes et preuves, nous pouvons mieux
+apprécier son importance dans l’étude de la diversité génétique et des
+processus évolutifs.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

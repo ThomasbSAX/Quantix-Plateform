@@ -1,0 +1,308 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Prevosti : une mesure de divergence génétique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Prevosti : une mesure de divergence
+génétique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Prevosti émerge dans le cadre des études génétiques,
+particulièrement en biologie évolutive. Introduite par Prevosti en 1974,
+cette mesure vise à quantifier la divergence génétique entre populations
+ou espèces. L’origine de cette notion réside dans le besoin de
+comprendre les mécanismes sous-jacents à la spéciation et à l’évolution
+des populations. La distance de Prevosti est indispensable pour analyser
+les données génétiques et pour inférer les relations phylogénétiques.
+Elle offre une alternative aux autres mesures de distance génétique,
+telles que la distance de Nei ou celle de Fst, en se concentrant sur les
+différences absolues entre allèles.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Prevosti, commençons par comprendre ce
+que nous cherchons à mesurer. Imaginons deux populations, A et B, avec
+des fréquences alléliques différentes. Nous voulons quantifier la
+divergence entre ces populations en tenant compte des différences
+absolues entre les allèles. La distance de Prevosti est une mesure qui
+capture cette divergence.</p>
+<p>Formellement, soit deux populations <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, avec des fréquences alléliques
+respectives <span class="math inline">\(p_i^A\)</span> et <span
+class="math inline">\(p_i^B\)</span> pour chaque allèle <span
+class="math inline">\(i\)</span>. La distance de Prevosti <span
+class="math inline">\(D_P(A, B)\)</span> est définie comme suit :</p>
+<p><span class="math display">\[D_P(A, B) = \sum_{i} |p_i^A -
+p_i^B|\]</span></p>
+<p>où la somme est prise sur tous les allèles <span
+class="math inline">\(i\)</span>. Cette définition met en évidence la
+différence absolue entre les fréquences alléliques des deux
+populations.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la distance de Prevosti est celui de la
+borne supérieure. Ce théorème établit une limite supérieure pour la
+distance de Prevosti entre deux populations.</p>
+<p>Commençons par comprendre ce que nous cherchons à établir. Nous
+voulons montrer que la distance de Prevosti ne peut pas dépasser une
+certaine valeur maximale. Cette borne supérieure est cruciale pour
+interpréter les résultats de la distance de Prevosti.</p>
+<p>Formellement, le théorème de la borne supérieure s’énonce comme suit
+:</p>
+<div class="theorem">
+<p>Soient deux populations <span class="math inline">\(A\)</span> et
+<span class="math inline">\(B\)</span> avec des fréquences alléliques
+respectives <span class="math inline">\(p_i^A\)</span> et <span
+class="math inline">\(p_i^B\)</span>. Alors, la distance de Prevosti
+<span class="math inline">\(D_P(A, B)\)</span> satisfait l’inégalité
+suivante :</p>
+<p><span class="math display">\[D_P(A, B) \leq 2\]</span></p>
+<p>où la somme est prise sur tous les allèles <span
+class="math inline">\(i\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la borne supérieure, nous allons utiliser
+les propriétés des fréquences alléliques. Rappelons que pour chaque
+allèle <span class="math inline">\(i\)</span>, nous avons <span
+class="math inline">\(0 \leq p_i^A, p_i^B \leq 1\)</span>. Par
+conséquent, la différence absolue <span class="math inline">\(|p_i^A -
+p_i^B|\)</span> est également comprise entre 0 et 1.</p>
+<p>Considérons la somme des différences absolues sur tous les allèles
+:</p>
+<p><span class="math display">\[D_P(A, B) = \sum_{i} |p_i^A -
+p_i^B|\]</span></p>
+<p>Puisque chaque terme <span class="math inline">\(|p_i^A -
+p_i^B|\)</span> est au plus égal à 1, la somme totale est au plus égale
+au nombre total d’allèles. Si nous supposons qu’il y a <span
+class="math inline">\(n\)</span> allèles, alors :</p>
+<p><span class="math display">\[D_P(A, B) \leq n\]</span></p>
+<p>Cependant, en pratique, le nombre d’allèles est souvent fini et
+borné. Si nous considérons que les fréquences alléliques sont
+normalisées, c’est-à-dire que <span class="math inline">\(\sum_{i} p_i^A
+= 1\)</span> et <span class="math inline">\(\sum_{i} p_i^B = 1\)</span>,
+alors la somme des différences absolues est maximale lorsque les
+fréquences alléliques sont complémentaires. Dans ce cas, la distance de
+Prevosti atteint sa valeur maximale de 2.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés et corollaires importants
+de la distance de Prevosti :</p>
+<ol>
+<li><p>La distance de Prevosti est toujours non négative, c’est-à-dire
+<span class="math inline">\(D_P(A, B) \geq 0\)</span>.</p></li>
+<li><p>La distance de Prevosti est symétrique, c’est-à-dire <span
+class="math inline">\(D_P(A, B) = D_P(B, A)\)</span>.</p></li>
+<li><p>La distance de Prevosti satisfait l’inégalité triangulaire,
+c’est-à-dire <span class="math inline">\(D_P(A, C) \leq D_P(A, B) +
+D_P(B, C)\)</span>.</p></li>
+</ol>
+<p>Pour prouver la propriété (i), nous observons que les différences
+absolues <span class="math inline">\(|p_i^A - p_i^B|\)</span> sont
+toujours non négatives. Par conséquent, leur somme <span
+class="math inline">\(D_P(A, B)\)</span> est également non négative.</p>
+<p>Pour prouver la propriété (ii), nous utilisons la symétrie de la
+différence absolue :</p>
+<p><span class="math display">\[D_P(A, B) = \sum_{i} |p_i^A - p_i^B| =
+\sum_{i} |p_i^B - p_i^A| = D_P(B, A)\]</span></p>
+<p>Pour prouver la propriété (iii), nous utilisons l’inégalité
+triangulaire pour les différences absolues :</p>
+<p><span class="math display">\[|p_i^A - p_i^C| \leq |p_i^A - p_i^B| +
+|p_i^B - p_i^C|\]</span></p>
+<p>En sommant sur tous les allèles <span
+class="math inline">\(i\)</span>, nous obtenons :</p>
+<p><span class="math display">\[D_P(A, C) \leq D_P(A, B) + D_P(B,
+C)\]</span></p>
+</body>
+</html>
+{% include "footer.html" %}
+

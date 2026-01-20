@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Kendall : Une mesure topologique des permutations</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Kendall : Une mesure topologique des
+permutations</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La distance de Kendall, introduite par Maurice George Kendall dans
+les années 1940, est une mesure fondamentale en statistiques et en
+combinatoire. Elle émerge comme un outil indispensable pour quantifier
+la dissimilarité entre deux permutations d’un ensemble fini. Cette
+notion trouve ses racines dans l’analyse des rangements et des
+classifications, où elle permet de mesurer le nombre minimal d’échanges
+adjacents nécessaires pour transformer une permutation en une autre.</p>
+<p>L’intérêt historique de la distance de Kendall réside dans son
+application aux problèmes de tri et d’optimisation. Elle est
+particulièrement utile en bioinformatique pour comparer des génomes, en
+psychométrie pour analyser les préférences, et en théorie des graphes
+pour étudier les propriétés des permutations. La distance de Kendall est
+indispensable dans tout cadre où la structure topologique des
+permutations doit être prise en compte, offrant une métrique robuste et
+intuitive.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la distance de Kendall, considérons deux permutations
+<span class="math inline">\(\sigma\)</span> et <span
+class="math inline">\(\tau\)</span> d’un ensemble fini <span
+class="math inline">\(S = \{1, 2, \ldots, n\}\)</span>. Nous cherchons à
+mesurer combien ces deux permutations diffèrent en termes d’ordre des
+éléments.</p>
+<p>Supposons que nous ayons une paire ordonnée <span
+class="math inline">\((i, j)\)</span> telle que <span
+class="math inline">\(i &lt; j\)</span>. Dans la permutation <span
+class="math inline">\(\sigma\)</span>, l’ordre des éléments <span
+class="math inline">\(\sigma(i)\)</span> et <span
+class="math inline">\(\sigma(j)\)</span> peut être soit croissant (<span
+class="math inline">\(\sigma(i) &lt; \sigma(j)\)</span>), soit
+décroissant (<span class="math inline">\(\sigma(i) &gt;
+\sigma(j)\)</span>). Nous disons que la paire <span
+class="math inline">\((i, j)\)</span> est inversée dans <span
+class="math inline">\(\sigma\)</span> si <span
+class="math inline">\(\sigma(i) &gt; \sigma(j)\)</span>.</p>
+<p>La distance de Kendall entre deux permutations <span
+class="math inline">\(\sigma\)</span> et <span
+class="math inline">\(\tau\)</span> est le nombre minimal d’inversions
+nécessaires pour transformer <span class="math inline">\(\sigma\)</span>
+en <span class="math inline">\(\tau\)</span>. Formellement, nous avons
+:</p>
+<p><span class="math display">\[d_K(\sigma, \tau) = \min_{\pi \in \Pi}
+|\{(i,j) : i &lt; j, \pi(\sigma(i)) &gt; \pi(\sigma(j))\}|,\]</span></p>
+<p>où <span class="math inline">\(\Pi\)</span> est l’ensemble de toutes
+les permutations possibles.</p>
+<p>Une autre formulation équivalente est :</p>
+<p><span class="math display">\[d_K(\sigma, \tau) = \frac{1}{2}
+\sum_{i=1}^n \sum_{j=1}^n |\text{sgn}(\sigma(i) - \sigma(j)) -
+\text{sgn}(\tau(i) - \tau(j))|,\]</span></p>
+<p>où <span class="math inline">\(\text{sgn}\)</span> est la fonction
+signe.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Kendall est le théorème
+de l’inversion minimale, qui stipule que la distance de Kendall entre
+deux permutations est égale au nombre minimal d’inversions nécessaires
+pour transformer une permutation en une autre.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\sigma\)</span> et <span
+class="math inline">\(\tau\)</span> deux permutations d’un ensemble fini
+<span class="math inline">\(S = \{1, 2, \ldots, n\}\)</span>. La
+distance de Kendall entre <span class="math inline">\(\sigma\)</span> et
+<span class="math inline">\(\tau\)</span> est donnée par :</p>
+<p><span class="math display">\[d_K(\sigma, \tau) = \sum_{i &lt; j}
+|\text{sgn}(\sigma(j) - \sigma(i)) - \text{sgn}(\tau(j) -
+\tau(i))|.\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de l’inversion minimale, nous devons montrer
+que la distance de Kendall peut être exprimée en termes d’inversions.
+Considérons deux permutations <span
+class="math inline">\(\sigma\)</span> et <span
+class="math inline">\(\tau\)</span>. Nous voulons montrer que :</p>
+<p><span class="math display">\[d_K(\sigma, \tau) = \sum_{i &lt; j}
+|\text{sgn}(\sigma(j) - \sigma(i)) - \text{sgn}(\tau(j) -
+\tau(i))|.\]</span></p>
+<p>Commençons par noter que pour toute paire <span
+class="math inline">\((i, j)\)</span> avec <span class="math inline">\(i
+&lt; j\)</span>, la valeur <span
+class="math inline">\(\text{sgn}(\sigma(j) - \sigma(i))\)</span> est
+égale à 1 si <span class="math inline">\(\sigma(j) &gt;
+\sigma(i)\)</span> et -1 si <span class="math inline">\(\sigma(j) &lt;
+\sigma(i)\)</span>. De même pour <span
+class="math inline">\(\text{sgn}(\tau(j) - \tau(i))\)</span>.</p>
+<p>La différence <span class="math inline">\(|\text{sgn}(\sigma(j) -
+\sigma(i)) - \text{sgn}(\tau(j) - \tau(i))|\)</span> est égale à 2 si
+les ordres des éléments <span class="math inline">\(\sigma(i)\)</span>
+et <span class="math inline">\(\sigma(j)\)</span> diffèrent de ceux de
+<span class="math inline">\(\tau(i)\)</span> et <span
+class="math inline">\(\tau(j)\)</span>, et 0 sinon.</p>
+<p>Ainsi, la somme sur toutes les paires <span class="math inline">\((i,
+j)\)</span> donne le nombre total d’inversions nécessaires pour
+transformer <span class="math inline">\(\sigma\)</span> en <span
+class="math inline">\(\tau\)</span>, ce qui correspond à la distance de
+Kendall.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+distance de Kendall :</p>
+<ol>
+<li><p>La distance de Kendall est une métrique sur l’ensemble des
+permutations. Elle satisfait les propriétés de non-négativité, de
+symétrie et d’inégalité triangulaire.</p></li>
+<li><p>La distance de Kendall entre une permutation et elle-même est
+nulle :</p>
+<p><span class="math display">\[d_K(\sigma, \sigma) =
+0.\]</span></p></li>
+<li><p>La distance de Kendall est symétrique :</p>
+<p><span class="math display">\[d_K(\sigma, \tau) = d_K(\tau,
+\sigma).\]</span></p></li>
+<li><p>La distance de Kendall satisfait l’inégalité triangulaire :</p>
+<p><span class="math display">\[d_K(\sigma, \tau) \leq d_K(\sigma, \rho)
++ d_K(\rho, \tau).\]</span></p></li>
+</ol>
+<p>Pour prouver la propriété (i), nous devons montrer que la distance de
+Kendall satisfait les propriétés d’une métrique. La non-négativité est
+immédiate, car le nombre d’inversions est toujours non négatif. La
+symétrie découle du fait que l’ordre des paires <span
+class="math inline">\((i, j)\)</span> et <span class="math inline">\((j,
+i)\)</span> est symétrique. L’inégalité triangulaire peut être prouvée
+en utilisant les propriétés des inversions et la minimalité de la
+distance.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Kendall est un outil puissant pour mesurer la
+dissimilarité entre deux permutations. Son utilisation dans divers
+domaines, tels que la bioinformatique et la psychométrie, témoigne de
+son importance et de sa polyvalence. Les théorèmes et propriétés
+associés à la distance de Kendall fournissent une base solide pour des
+applications futures et des recherches approfondies.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

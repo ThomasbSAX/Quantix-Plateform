@@ -1,0 +1,319 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Coefficient de Variation : Une Mesure Relative de la Dispersion</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Coefficient de Variation : Une Mesure Relative de
+la Dispersion</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le coefficient de variation (CV) est une mesure statistique qui
+permet d’exprimer la dispersion relative des données par rapport à leur
+moyenne. Cette notion, introduite au début du XXe siècle, trouve ses
+racines dans les travaux de Karl Pearson sur l’analyse des données
+biologiques. Le CV est particulièrement utile lorsque l’on souhaite
+comparer la variabilité de plusieurs ensembles de données ayant des
+unités ou des échelles différentes.</p>
+<p>L’intérêt principal du CV réside dans sa capacité à normaliser
+l’écart-type par la moyenne, ce qui permet de rendre comparable des
+distributions dont les unités ou les ordres de grandeur diffèrent. Par
+exemple, comparer la variabilité des salaires moyens entre deux pays ou
+analyser la dispersion des tailles de plantes dans différentes
+conditions expérimentales.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire le coefficient de variation, considérons un ensemble
+de données <span class="math inline">\(X = \{x_1, x_2, \dots,
+x_n\}\)</span>. Nous cherchons une mesure qui capture la dispersion
+relative des données par rapport à leur moyenne. Idéalement, cette
+mesure devrait être sans unité et permettre une comparaison directe
+entre différents ensembles de données.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+avec une moyenne <span class="math inline">\(\mu_X &gt; 0\)</span> et un
+écart-type <span class="math inline">\(\sigma_X\)</span>. Le coefficient
+de variation <span class="math inline">\(CV(X)\)</span> est défini comme
+le rapport entre l’écart-type et la moyenne, exprimé en pourcentage
+:</p>
+<p><span class="math display">\[CV(X) = \left( \frac{\sigma_X}{\mu_X}
+\right) \times 100\]</span></p>
+<p>De manière équivalente, pour un ensemble de données <span
+class="math inline">\(X = \{x_1, x_2, \dots, x_n\}\)</span>, le
+coefficient de variation peut être exprimé comme :</p>
+<p><span class="math display">\[CV(X) = \frac{\sqrt{\frac{1}{n}
+\sum_{i=1}^n (x_i - \bar{x})^2}}{\left| \frac{1}{n} \sum_{i=1}^n x_i
+\right|} \times 100\]</span></p>
+<p>où <span class="math inline">\(\bar{x}\)</span> est la moyenne
+arithmétique des données.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes-et-propriétés">Théorèmes et
+Propriétés</h1>
+<p>Le coefficient de variation possède plusieurs propriétés
+intéressantes qui en font un outil puissant pour l’analyse des données.
+Nous en présentons quelques-unes ci-dessous.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données et
+<span class="math inline">\(a\)</span> une constante positive. Le
+coefficient de variation de l’ensemble <span class="math inline">\(aX =
+\{a x_1, a x_2, \dots, a x_n\}\)</span> est égal à celui de <span
+class="math inline">\(X\)</span>.</p>
+<p><span class="math display">\[CV(aX) = CV(X)\]</span></p>
+<p>Preuve : Soit <span class="math inline">\(\mu_{aX}\)</span> et <span
+class="math inline">\(\sigma_{aX}\)</span> la moyenne et l’écart-type de
+l’ensemble <span class="math inline">\(aX\)</span>. On a :</p>
+<p><span class="math display">\[\mu_{aX} = a \mu_X\]</span></p>
+<p><span class="math display">\[\sigma_{aX} = a \sigma_X\]</span></p>
+<p>Donc,</p>
+<p><span class="math display">\[CV(aX) = \frac{\sigma_{aX}}{\mu_{aX}}
+\times 100 = \frac{a \sigma_X}{a \mu_X} \times 100 = CV(X)\]</span></p>
+</div>
+<div class="corollary">
+<p>Soient <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux ensembles de données indépendants
+avec des coefficients de variation <span
+class="math inline">\(CV(X)\)</span> et <span
+class="math inline">\(CV(Y)\)</span>. Le coefficient de variation de la
+somme <span class="math inline">\(X + Y\)</span> est donné par :</p>
+<p><span class="math display">\[CV(X + Y) = \frac{\sqrt{CV(X)^2 +
+CV(Y)^2 + 2 CV(X) CV(Y) \rho_{XY}}}{1 +
+\frac{\mu_Y}{\mu_X}}\]</span></p>
+<p>où <span class="math inline">\(\rho_{XY}\)</span> est le coefficient
+de corrélation entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves-et-démonstrations">Preuves et
+Démonstrations</h1>
+<p>Pour illustrer l’utilité du coefficient de variation, considérons un
+exemple concret. Supposons que nous ayons deux ensembles de données
+représentant les hauteurs (en cm) et les poids (en kg) d’un échantillon
+de personnes.</p>
+<div class="example">
+<p>Soit <span class="math inline">\(H = \{170, 175, 180\}\)</span> les
+hauteurs en cm et <span class="math inline">\(P = \{60, 65,
+70\}\)</span> les poids en kg. Calculons les coefficients de variation
+pour ces deux ensembles.</p>
+<p>Pour <span class="math inline">\(H\)</span> :</p>
+<p><span class="math display">\[\mu_H = \frac{170 + 175 + 180}{3} = 175
+\text{ cm}\]</span></p>
+<p><span class="math display">\[\sigma_H = \sqrt{\frac{(170-175)^2 +
+(175-175)^2 + (180-175)^2}{3}} = \sqrt{\frac{25 + 0 + 25}{3}} \approx 5
+\text{ cm}\]</span></p>
+<p><span class="math display">\[CV(H) = \left( \frac{5}{175} \right)
+\times 100 \approx 2.86\%\]</span></p>
+<p>Pour <span class="math inline">\(P\)</span> :</p>
+<p><span class="math display">\[\mu_P = \frac{60 + 65 + 70}{3} \approx
+65 \text{ kg}\]</span></p>
+<p><span class="math display">\[\sigma_P = \sqrt{\frac{(60-65)^2 +
+(65-65)^2 + (70-65)^2}{3}} = \sqrt{\frac{25 + 0 + 25}{3}} \approx 5
+\text{ kg}\]</span></p>
+<p><span class="math display">\[CV(P) = \left( \frac{5}{65} \right)
+\times 100 \approx 7.69\%\]</span></p>
+<p>Ainsi, bien que les écarts-types soient identiques (5 cm et 5 kg), le
+coefficient de variation révèle que la dispersion relative est plus
+élevée pour les poids que pour les hauteurs.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le coefficient de variation est un outil puissant pour comparer la
+dispersion relative de différents ensembles de données. Sa capacité à
+normaliser l’écart-type par la moyenne en fait un indicateur précieux
+dans de nombreuses applications, notamment en biologie, en économie et
+en ingénierie. En comprenant les propriétés et les théorèmes associés au
+CV, nous pouvons mieux interpréter et analyser les données pour en tirer
+des conclusions significatives.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

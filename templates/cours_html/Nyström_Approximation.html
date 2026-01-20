@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Approximation de Nyström : Une Méthode Puissante pour les Problèmes à Grande Échelle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Approximation de Nyström : Une Méthode Puissante
+pour les Problèmes à Grande Échelle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’approximation de Nyström émerge dans le cadre des méthodes
+numériques pour résoudre des problèmes d’interpolation et d’intégration
+sur des espaces de grande dimension. Cette méthode, introduite par le
+mathématicien suédois Erik Ivar Fredrik Nyström en 1930, est
+particulièrement utile pour approximer des intégrales de fonctions sur
+des surfaces ou dans des espaces de grande dimension, où les méthodes
+classiques deviennent inefficaces en raison de leur complexité
+computationnelle.</p>
+<p>L’approximation de Nyström est indispensable dans des domaines tels
+que l’apprentissage automatique, la modélisation numérique et la
+physique computationnelle. Elle permet de réduire la complexité des
+calculs tout en conservant une bonne précision, ce qui est crucial pour
+traiter des problèmes à grande échelle.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’approximation de Nyström, nous devons d’abord
+définir quelques concepts clés. Considérons une fonction <span
+class="math inline">\(f\)</span> définie sur un espace <span
+class="math inline">\(X\)</span>, et supposons que nous voulons
+approximer l’intégrale de cette fonction sur <span
+class="math inline">\(X\)</span>.</p>
+<p>Nous cherchons à exprimer cette intégrale comme une somme pondérée de
+valeurs de la fonction en certains points. Plus précisément, nous
+voulons trouver des points <span class="math inline">\(x_1, x_2, \ldots,
+x_n\)</span> dans <span class="math inline">\(X\)</span> et des poids
+<span class="math inline">\(w_1, w_2, \ldots, w_n\)</span> tels que
+:</p>
+<p><span class="math display">\[\int_X f(x) \, dx \approx \sum_{i=1}^n
+w_i f(x_i)\]</span></p>
+<p>Cette approximation est appelée l’approximation de Nyström. Les
+points <span class="math inline">\(x_i\)</span> sont appelés les nœuds
+d’approximation, et les poids <span class="math inline">\(w_i\)</span>
+sont déterminés de manière à minimiser l’erreur d’approximation.</p>
+<p>Formellement, l’approximation de Nyström peut être définie comme suit
+:</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(K : X \times X \to
+\mathbb{R}\)</span> un noyau symétrique et positif. L’approximation de
+Nyström de l’opérateur intégral <span
+class="math inline">\(\mathcal{K}\)</span> défini par :</p>
+<p><span class="math display">\[\mathcal{K}f(x) = \int_X K(x, y) f(y) \,
+dy\]</span></p>
+<p>est donnée par :</p>
+<p><span class="math display">\[\mathcal{K}_n f(x) = \sum_{i=1}^n w_i
+K(x, x_i) f(x_i)\]</span></p>
+<p>où <span class="math inline">\(\{x_i\}_{i=1}^n\)</span> sont des
+points choisis dans <span class="math inline">\(X\)</span>, et <span
+class="math inline">\(\{w_i\}_{i=1}^n\)</span> sont des poids déterminés
+de manière à minimiser l’erreur d’approximation.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’approximation de Nyström est le
+théorème de convergence, qui garantit que l’erreur d’approximation tend
+vers zéro lorsque le nombre de nœuds <span
+class="math inline">\(n\)</span> tend vers l’infini.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(K : X \times X \to
+\mathbb{R}\)</span> un noyau symétrique et positif, et soit <span
+class="math inline">\(\mathcal{K}_n\)</span> l’approximation de Nyström
+de l’opérateur intégral <span
+class="math inline">\(\mathcal{K}\)</span>. Alors, pour toute fonction
+<span class="math inline">\(f\)</span> dans un espace de Hilbert
+approprié, nous avons :</p>
+<p><span class="math display">\[\lim_{n \to \infty} \|\mathcal{K} -
+\mathcal{K}_n\| = 0\]</span></p>
+<p>où <span class="math inline">\(\|\cdot\|\)</span> désigne la norme
+opérateur.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de convergence de Nyström, nous devons
+montrer que l’erreur d’approximation tend vers zéro lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini. Cela peut être fait
+en utilisant des techniques d’analyse fonctionnelle et de théorie des
+opérateurs.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons l’erreur d’approximation <span
+class="math inline">\(\mathcal{E}_n = \mathcal{K} -
+\mathcal{K}_n\)</span>. Nous voulons montrer que <span
+class="math inline">\(\|\mathcal{E}_n\| \to 0\)</span> lorsque <span
+class="math inline">\(n \to \infty\)</span>.</p>
+<p>D’abord, notons que <span
+class="math inline">\(\mathcal{K}_n\)</span> est un opérateur de rang
+fini, et donc compact. Puisque <span
+class="math inline">\(\mathcal{K}\)</span> est un opérateur intégral
+avec un noyau symétrique et positif, il est également compact.</p>
+<p>En utilisant le théorème de la trace, nous pouvons exprimer l’erreur
+d’approximation en termes des valeurs propres et des vecteurs propres de
+<span class="math inline">\(\mathcal{K}\)</span>. Plus précisément, nous
+avons :</p>
+<p><span class="math display">\[\|\mathcal{E}_n\| = \sup_{\|f\| = 1}
+|\langle \mathcal{E}_n f, f \rangle|\]</span></p>
+<p>où <span class="math inline">\(\langle \cdot, \cdot \rangle\)</span>
+désigne le produit scalaire dans l’espace de Hilbert.</p>
+<p>En utilisant les propriétés des opérateurs compacts, nous pouvons
+montrer que <span class="math inline">\(\|\mathcal{E}_n\| \to 0\)</span>
+lorsque <span class="math inline">\(n \to \infty\)</span>. Cela achève
+la preuve. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’approximation de Nyström possède plusieurs propriétés
+intéressantes, que nous allons maintenant discuter.</p>
+<ol>
+<li><p><strong>Stabilité Numérique</strong> : L’approximation de Nyström
+est stable numériquement, ce qui signifie que de petites perturbations
+dans les nœuds ou les poids n’entraînent pas de grandes erreurs dans
+l’approximation.</p></li>
+<li><p><strong>Efficacité Computationnelle</strong> : L’approximation de
+Nyström est efficace du point de vue computationnel, car elle permet de
+réduire la complexité des calculs tout en conservant une bonne
+précision.</p></li>
+<li><p><strong>Applications</strong> : L’approximation de Nyström a de
+nombreuses applications dans des domaines tels que l’apprentissage
+automatique, la modélisation numérique et la physique
+computationnelle.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’approximation de Nyström est une méthode puissante pour résoudre
+des problèmes d’interpolation et d’intégration sur des espaces de grande
+dimension. Elle possède plusieurs propriétés intéressantes, telles que
+la stabilité numérique et l’efficacité computationnelle, ce qui en fait
+un outil précieux pour les chercheurs et les ingénieurs.</p>
+<p>En conclusion, l’approximation de Nyström continue d’être un sujet de
+recherche actif, avec de nombreuses applications potentielles dans
+divers domaines. Les futures recherches pourraient se concentrer sur
+l’amélioration des algorithmes de sélection des nœuds et des poids,
+ainsi que sur l’extension de la méthode à des espaces encore plus grands
+et plus complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

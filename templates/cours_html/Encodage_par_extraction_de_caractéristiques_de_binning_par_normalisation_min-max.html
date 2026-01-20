@@ -1,0 +1,339 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de binning par normalisation min-max</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de binning
+par normalisation min-max</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’encodage par extraction de caractéristiques est une technique
+essentielle dans le traitement des données catégorielles, notamment en
+apprentissage automatique. L’objectif est de transformer ces variables
+en un format numérique exploitable par les algorithmes. Parmi les
+méthodes d’encodage, le binning (ou discrétisation) combiné à la
+normalisation min-max offre une approche robuste et efficace.</p>
+<p>Le binning consiste à diviser les données en intervalles (bins) de
+manière à réduire la variance au sein de chaque intervalle. La
+normalisation min-max, quant à elle, permet de transformer les données
+pour qu’elles se situent dans un intervalle prédéfini, souvent [0, 1].
+Cette combinaison permet non seulement de réduire la dimension des
+données mais aussi d’améliorer la performance des modèles
+prédictifs.</p>
+<p>Dans cet article, nous explorons les fondements théoriques de cette
+méthode, ses avantages et ses limitations, ainsi que son application
+pratique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de formaliser l’encodage par extraction de caractéristiques de
+binning par normalisation min-max, il est crucial de comprendre les
+concepts sous-jacents.</p>
+<h2 class="unnumbered" id="binning">Binning</h2>
+<p>Le binning est une technique de discrétisation qui consiste à diviser
+les données en intervalles. Soit <span class="math inline">\(X\)</span>
+une variable continue, nous cherchons à diviser l’ensemble des valeurs
+de <span class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> intervalles disjoints.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X = \{x_1, x_2, \ldots,
+x_n\}\)</span> un ensemble de valeurs réelles. Un binning de <span
+class="math inline">\(X\)</span> est une partition <span
+class="math inline">\(B = \{B_1, B_2, \ldots, B_k\}\)</span> telle que :
+<span class="math display">\[\bigcup_{i=1}^k B_i = X \quad \text{et}
+\quad \forall i \neq j, \, B_i \cap B_j = \emptyset.\]</span></p>
+</div>
+<h2 class="unnumbered" id="normalisation-min-max">Normalisation
+Min-Max</h2>
+<p>La normalisation min-max est une technique de transformation des
+données qui permet de les ramener dans un intervalle prédéfini,
+généralement [0, 1].</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X = \{x_1, x_2, \ldots,
+x_n\}\)</span> un ensemble de valeurs réelles. La normalisation min-max
+de <span class="math inline">\(X\)</span> est définie par : <span
+class="math display">\[x&#39;_i = \frac{x_i - \min(X)}{\max(X) -
+\min(X)}.\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered"
+id="théorème-de-lencodage-par-binning-et-normalisation-min-max">Théorème
+de l’encodage par binning et normalisation min-max</h2>
+<p>Nous cherchons à montrer que l’encodage par binning suivi d’une
+normalisation min-max préserve certaines propriétés des données
+originales.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de valeurs
+réelles et <span class="math inline">\(B\)</span> une partition de <span
+class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> intervalles. Soit <span
+class="math inline">\(Y\)</span> l’ensemble des valeurs normalisées par
+min-max de chaque intervalle. Alors, pour tout <span
+class="math inline">\(i\)</span>, on a : <span
+class="math display">\[y_i = \frac{\text{mean}(B_i) - \min(X)}{\max(X) -
+\min(X)}.\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-lencodage-par-binning-et-normalisation-min-max">Preuve
+du théorème de l’encodage par binning et normalisation min-max</h2>
+<p>Pour prouver ce théorème, nous devons montrer que la transformation
+par binning et normalisation min-max conserve les propriétés moyennes
+des intervalles.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(X = \{x_1, x_2,
+\ldots, x_n\}\)</span> un ensemble de valeurs réelles et <span
+class="math inline">\(B = \{B_1, B_2, \ldots, B_k\}\)</span> une
+partition de <span class="math inline">\(X\)</span>. Pour chaque
+intervalle <span class="math inline">\(B_i\)</span>, nous calculons la
+moyenne : <span class="math display">\[\text{mean}(B_i) =
+\frac{1}{|B_i|} \sum_{x_j \in B_i} x_j.\]</span></p>
+<p>Ensuite, nous appliquons la normalisation min-max à chaque moyenne :
+<span class="math display">\[y_i = \frac{\text{mean}(B_i) -
+\min(X)}{\max(X) - \min(X)}.\]</span></p>
+<p>Par construction, <span class="math inline">\(y_i \in [0, 1]\)</span>
+pour tout <span class="math inline">\(i\)</span>. Ainsi, la
+transformation préserve les propriétés moyennes des intervalles tout en
+normalisant les valeurs dans un intervalle prédéfini. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriété-de-préservation-des-intervalles">Propriété de préservation
+des intervalles</h2>
+<div class="proposition">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de valeurs
+réelles et <span class="math inline">\(B\)</span> une partition de <span
+class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> intervalles. La transformation par
+binning et normalisation min-max préserve les intervalles disjoints.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Par définition du binning, les intervalles <span
+class="math inline">\(B_i\)</span> sont disjoints. La normalisation
+min-max ne modifie pas cette propriété, car elle est appliquée
+indépendamment à chaque intervalle. ◻</p>
+</div>
+<h2 class="unnumbered" id="corollaire-de-la-normalisation">Corollaire de
+la normalisation</h2>
+<div class="corollary">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de valeurs
+réelles et <span class="math inline">\(Y\)</span> l’ensemble des valeurs
+normalisées par min-max. Alors, pour tout <span
+class="math inline">\(y_i \in Y\)</span>, on a : <span
+class="math display">\[0 \leq y_i \leq 1.\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La normalisation min-max garantit que chaque valeur
+<span class="math inline">\(y_i\)</span> est comprise entre 0 et 1, car
+: <span class="math display">\[y_i = \frac{\text{mean}(B_i) -
+\min(X)}{\max(X) - \min(X)}.\]</span> Puisque <span
+class="math inline">\(\text{mean}(B_i) \in [\min(X), \max(X)]\)</span>,
+il s’ensuit que <span class="math inline">\(y_i \in [0,
+1]\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de binning par
+normalisation min-max est une méthode puissante pour transformer les
+données catégorielles en un format numérique exploitable. Cette
+technique combine les avantages du binning et de la normalisation
+min-max pour améliorer la performance des modèles prédictifs. Les
+théorèmes et propriétés présentés dans cet article montrent que cette
+méthode préserve les caractéristiques essentielles des données tout en
+les normalisant dans un intervalle prédéfini.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

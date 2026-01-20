@@ -1,0 +1,374 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Quantile Loss: A Fundamental Concept in Statistical Learning</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Quantile Loss: A Fundamental Concept in Statistical
+Learning</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’émergence des quantiles dans l’analyse statistique remonte aux
+travaux pionniers de Francis Galton et Karl Pearson à la fin du XIXème
+siècle. Cependant, c’est avec l’avènement des méthodes de régression
+quantile par Koenker et Bassett en 1978 que cette notion a pris une
+dimension nouvelle, particulièrement dans le cadre de l’apprentissage
+statistique. Les quantiles offrent une alternative robuste aux
+estimateurs classiques basés sur la moyenne, permettant de capturer des
+informations essentielles sur la distribution sous-jacente des données.
+Le concept de <em>quantile loss</em> est au cœur de ces méthodes,
+fournissant un critère d’optimisation adapté à l’estimation des
+quantiles.</p>
+<p>Dans un contexte où les données sont souvent bruitées, hétérogènes ou
+soumises à des outliers, l’utilisation de la fonction de perte quantile
+devient indispensable. Elle permet non seulement d’estimer des quantiles
+spécifiques, mais aussi de construire des modèles prédictifs robustes.
+Par exemple, en finance, l’estimation du quantile à 95% de la
+distribution des rendements permet d’évaluer le Value-at-Risk (VaR), une
+mesure cruciale pour la gestion des risques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire le concept de quantile loss, commençons par rappeler
+ce qu’est un quantile. Supposons que nous ayons une variable aléatoire
+<span class="math inline">\(X\)</span> de fonction de répartition <span
+class="math inline">\(F_X\)</span>. Nous cherchons à trouver une valeur
+<span class="math inline">\(q_\tau\)</span> telle que la probabilité que
+<span class="math inline">\(X\)</span> soit inférieure ou égale à <span
+class="math inline">\(q_\tau\)</span> soit exactement <span
+class="math inline">\(\tau\)</span>, où <span class="math inline">\(0
+&lt; \tau &lt; 1\)</span>. En d’autres termes, nous voulons que :</p>
+<p><span class="math display">\[F_X(q_\tau) = P(X \leq q_\tau) =
+\tau\]</span></p>
+<p>Cette valeur <span class="math inline">\(q_\tau\)</span> est appelée
+le <span class="math inline">\(\tau\)</span>-quantile de la distribution
+de <span class="math inline">\(X\)</span>.</p>
+<p>Formellement, nous définissons le <span
+class="math inline">\(\tau\)</span>-quantile comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+réelle de fonction de répartition <span
+class="math inline">\(F_X\)</span>. Pour un niveau <span
+class="math inline">\(\tau \in (0,1)\)</span>, le <span
+class="math inline">\(\tau\)</span>-quantile de <span
+class="math inline">\(X\)</span> est un réel <span
+class="math inline">\(q_\tau\)</span> tel que :</p>
+<p><span class="math display">\[F_X(q_\tau) = \tau\]</span></p>
+<p>Autrement dit, <span class="math inline">\(q_\tau\)</span> vérifie
+:</p>
+<p><span class="math display">\[P(X \leq q_\tau) = \tau\]</span></p>
+</div>
+<p>Pour une variable aléatoire discrète, le <span
+class="math inline">\(\tau\)</span>-quantile peut être défini comme la
+plus petite valeur <span class="math inline">\(q_\tau\)</span> telle que
+:</p>
+<p><span class="math display">\[P(X &lt; q_\tau) \leq \tau \leq P(X \leq
+q_\tau)\]</span></p>
+<p>Maintenant, passons à la définition de la fonction de perte quantile.
+Considérons un couple <span class="math inline">\((Y, \hat{Y})\)</span>
+où <span class="math inline">\(Y\)</span> est la vraie valeur et <span
+class="math inline">\(\hat{Y}\)</span> est une prédiction. La fonction
+de perte quantile pour un niveau <span
+class="math inline">\(\tau\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>La fonction de perte quantile pour un niveau <span
+class="math inline">\(\tau \in (0,1)\)</span> est donnée par :</p>
+<p><span class="math display">\[L_\tau(Y, \hat{Y}) = \begin{cases}
+\tau |Y - \hat{Y}| &amp; \text{si } Y \geq \hat{Y} \\
+(1 - \tau) |Y - \hat{Y}| &amp; \text{si } Y &lt; \hat{Y}
+\end{cases}\]</span></p>
+<p>Cette fonction peut également être exprimée de manière compacte comme
+:</p>
+<p><span class="math display">\[L_\tau(Y, \hat{Y}) = (1 - \mathbb{I}_{Y
+&lt; \hat{Y}}) \tau |Y - \hat{Y}| + \mathbb{I}_{Y &lt; \hat{Y}} (1 -
+\tau) |Y - \hat{Y}|\]</span></p>
+<p>où <span class="math inline">\(\mathbb{I}_{Y &lt; \hat{Y}}\)</span>
+est l’indicatrice de l’événement <span class="math inline">\(Y &lt;
+\hat{Y}\)</span>.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la fonction de perte quantile est le
+suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(Y\)</span> une variable aléatoire
+réelle et <span class="math inline">\(\tau \in (0,1)\)</span>. Supposons
+que la fonction de densité <span class="math inline">\(f_Y\)</span>
+existe et est continue au point <span
+class="math inline">\(q_\tau\)</span>, où <span
+class="math inline">\(q_\tau\)</span> est le <span
+class="math inline">\(\tau\)</span>-quantile de <span
+class="math inline">\(Y\)</span>. Alors, la minimisation de l’espérance
+de la perte quantile :</p>
+<p><span class="math display">\[\mathbb{E}[L_\tau(Y, q)] =
+\int_{-\infty}^{\infty} L_\tau(y, q) f_Y(y) dy\]</span></p>
+<p>est atteinte pour <span class="math inline">\(q =
+q_\tau\)</span>.</p>
+</div>
+<p>Pour démontrer ce théorème, nous procédons comme suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Nous voulons montrer que <span
+class="math inline">\(q_\tau\)</span> minimise l’espérance de la perte
+quantile. Considérons d’abord le cas où <span class="math inline">\(q
+\geq q_\tau\)</span>. Nous avons :</p>
+<p><span class="math display">\[\begin{aligned}
+\mathbb{E}[L_\tau(Y, q)] &amp;= \int_{-\infty}^{q} (1 - \tau) (q - y)
+f_Y(y) dy + \int_{q}^{\infty} \tau (y - q) f_Y(y) dy \\
+&amp;= (1 - \tau) \int_{-\infty}^{q} (q - y) f_Y(y) dy + \tau
+\int_{q}^{\infty} (y - q) f_Y(y) dy
+\end{aligned}\]</span></p>
+<p>En utilisant l’intégrabilité par parties, nous obtenons :</p>
+<p><span class="math display">\[\begin{aligned}
+\mathbb{E}[L_\tau(Y, q)] &amp;= (1 - \tau) \left[ Q(+\infty) - Q(q) +
+q(F_Y(q) - F_Y(-\infty)) \right] \\
+&amp;\quad + \tau \left[ Q(+\infty) - Q(q) - q(F_Y(+\infty) - F_Y(q))
+\right] \\
+&amp;= (1 - \tau)(Q(+\infty) - Q(q) + q(F_Y(q) - 0)) \\
+&amp;\quad + \tau(Q(+\infty) - Q(q) - q(1 - F_Y(q))) \\
+&amp;= (Q(+\infty) - Q(q)) + q((1 - \tau)F_Y(q) - \tau(1 - F_Y(q))) \\
+&amp;= (Q(+\infty) - Q(q)) + q(F_Y(q) - \tau)
+\end{aligned}\]</span></p>
+<p>où <span class="math inline">\(Q(y) = \int_{-\infty}^y y f_Y(y)
+dy\)</span>.</p>
+<p>Pour minimiser cette expression, nous devons choisir <span
+class="math inline">\(q\)</span> tel que le terme <span
+class="math inline">\(F_Y(q) - \tau\)</span> soit nul, c’est-à-dire
+<span class="math inline">\(q = q_\tau\)</span>.</p>
+<p>Le cas où <span class="math inline">\(q &lt; q_\tau\)</span> est
+similaire et conduit à la même conclusion. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+fonction de perte quantile :</p>
+<div class="proposition">
+<p>La fonction de perte quantile <span class="math inline">\(L_\tau(Y,
+\hat{Y})\)</span> vérifie les propriétés suivantes :</p>
+<ol>
+<li><p>Pour tout <span class="math inline">\(Y, \hat{Y} \in
+\mathbb{R}\)</span>, nous avons <span class="math inline">\(L_\tau(Y, Y)
+= 0\)</span>.</p></li>
+<li><p>La fonction <span class="math inline">\(L_\tau(Y,
+\hat{Y})\)</span> est convexe en <span
+class="math inline">\(\hat{Y}\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(Y, \hat{Y}_1, \hat{Y}_2 \in
+\mathbb{R}\)</span>, nous avons : <span class="math display">\[L_\tau(Y,
+\hat{Y}_1) + L_\tau(Y, \hat{Y}_2) = 2\tau |\hat{Y}_1 - \hat{Y}_2| +
+L_\tau(Y, (\hat{Y}_1 + \hat{Y}_2)/2)\]</span></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>Si <span class="math inline">\(Y = \hat{Y}\)</span>, alors <span
+class="math inline">\(L_\tau(Y, Y) = 0\)</span> par définition.</p></li>
+<li><p>La convexité de <span class="math inline">\(L_\tau(Y,
+\hat{Y})\)</span> en <span class="math inline">\(\hat{Y}\)</span>
+découle du fait que la fonction de perte quantile est une combinaison
+convexe des fonctions <span class="math inline">\(|Y - \hat{Y}|\)</span>
+et <span class="math inline">\(0\)</span>.</p></li>
+<li><p>Cette propriété est une conséquence directe de la définition de
+<span class="math inline">\(L_\tau(Y, \hat{Y})\)</span> et peut être
+vérifiée par un calcul simple.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le concept de quantile loss est central dans l’analyse statistique et
+l’apprentissage automatique, offrant une alternative robuste aux
+méthodes classiques basées sur la moyenne. Les propriétés et théorèmes
+associés à cette fonction de perte permettent de développer des modèles
+prédictifs performants et robustes, particulièrement utiles dans des
+contextes où les données sont bruitées ou hétérogènes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

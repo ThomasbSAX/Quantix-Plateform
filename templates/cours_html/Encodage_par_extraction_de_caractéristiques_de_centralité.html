@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Extraction de Caractéristiques de Centralité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Extraction de Caractéristiques de
+Centralité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des réseaux est devenue un domaine central en sciences
+sociales, en biologie, et même en informatique. Parmi les nombreux
+outils disponibles pour comprendre la structure d’un réseau, l’encodage
+par extraction de caractéristiques de centralité se distingue comme une
+méthode puissante pour identifier les nœuds les plus influents. Cette
+technique trouve ses racines dans la théorie des graphes et a été
+développée pour répondre à un besoin croissant de modélisation précise
+des interactions complexes au sein des réseaux.</p>
+<p>L’idée fondamentale derrière l’encodage par extraction de
+caractéristiques de centralité est de transformer les données brutes
+d’un réseau en un ensemble de caractéristiques qui capturent
+l’importance relative des nœuds. Ces caractéristiques peuvent ensuite
+être utilisées pour diverses applications, telles que la détection de
+communautés, l’analyse des risques, ou même la prédiction de
+comportements.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’aborder l’encodage par extraction de caractéristiques de
+centralité, il est essentiel de définir quelques concepts clés.</p>
+<h2 class="unnumbered" id="graphes-et-nœuds">Graphes et Nœuds</h2>
+<p>Considérons un graphe <span class="math inline">\(G = (V,
+E)\)</span>, où <span class="math inline">\(V\)</span> est l’ensemble
+des nœuds et <span class="math inline">\(E\)</span> est l’ensemble des
+arêtes. Un graphe peut être représenté par sa matrice d’adjacence <span
+class="math inline">\(A\)</span>, où <span class="math inline">\(A_{ij}
+= 1\)</span> si une arête existe entre les nœuds <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, et <span class="math inline">\(A_{ij}
+= 0\)</span> sinon.</p>
+<h2 class="unnumbered" id="centralité">Centralité</h2>
+<p>La centralité d’un nœud dans un graphe est une mesure de son
+importance. Il existe plusieurs types de centralité, chacun capturant un
+aspect différent de l’importance d’un nœud.</p>
+<h3 class="unnumbered" id="centralité-de-degré">Centralité de Degré</h3>
+<p>La centralité de degré d’un nœud <span
+class="math inline">\(v\)</span> est définie comme le nombre de ses
+voisins directs. Formellement, pour un graphe <span
+class="math inline">\(G = (V, E)\)</span>, la centralité de degré d’un
+nœud <span class="math inline">\(v \in V\)</span> est donnée par :</p>
+<p><span class="math display">\[C_D(v) = \sum_{u \in V} A(u,
+v)\]</span></p>
+<h3 class="unnumbered" id="centralité-de-closeness">Centralité de
+Closeness</h3>
+<p>La centralité de closeness d’un nœud <span
+class="math inline">\(v\)</span> est définie comme l’inverse de la somme
+des distances les plus courtes entre <span
+class="math inline">\(v\)</span> et tous les autres nœuds du graphe.
+Formellement, pour un graphe <span class="math inline">\(G = (V,
+E)\)</span>, la centralité de closeness d’un nœud <span
+class="math inline">\(v \in V\)</span> est donnée par :</p>
+<p><span class="math display">\[C_C(v) = \frac{1}{\sum_{u \in V, u \neq
+v} d(v, u)}\]</span></p>
+<p>où <span class="math inline">\(d(v, u)\)</span> représente la
+distance la plus courte entre les nœuds <span
+class="math inline">\(v\)</span> et <span
+class="math inline">\(u\)</span>.</p>
+<h3 class="unnumbered" id="centralité-de-betweenness">Centralité de
+Betweenness</h3>
+<p>La centralité de betweenness d’un nœud <span
+class="math inline">\(v\)</span> est définie comme la proportion des
+plus courts chemins entre toutes les paires de nœuds qui passent par
+<span class="math inline">\(v\)</span>. Formellement, pour un graphe
+<span class="math inline">\(G = (V, E)\)</span>, la centralité de
+betweenness d’un nœud <span class="math inline">\(v \in V\)</span> est
+donnée par :</p>
+<p><span class="math display">\[C_B(v) = \sum_{s, t \in V}
+\frac{\sigma_{st}(v)}{\sigma_{st}}\]</span></p>
+<p>où <span class="math inline">\(\sigma_{st}\)</span> est le nombre de
+plus courts chemins entre les nœuds <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>, et <span
+class="math inline">\(\sigma_{st}(v)\)</span> est le nombre de ces
+chemins qui passent par le nœud <span
+class="math inline">\(v\)</span>.</p>
+<h1 class="unnumbered"
+id="encodage-par-extraction-de-caractéristiques-de-centralité">Encodage
+par Extraction de Caractéristiques de Centralité</h1>
+<p>L’encodage par extraction de caractéristiques de centralité consiste
+à transformer les données d’un graphe en un ensemble de caractéristiques
+qui capturent la centralité des nœuds. Ces caractéristiques peuvent
+ensuite être utilisées pour diverses applications, telles que la
+classification ou la prédiction.</p>
+<h2 class="unnumbered" id="processus-dextraction">Processus
+d’Extraction</h2>
+<p>Le processus d’extraction de caractéristiques de centralité peut être
+divisé en plusieurs étapes :</p>
+<p>1. **Représentation du Graphe** : Le graphe est représenté par sa
+matrice d’adjacence <span class="math inline">\(A\)</span>.</p>
+<p>2. **Calcul des Mesures de Centralité** : Pour chaque nœud du graphe,
+les mesures de centralité (degré, closeness, betweenness) sont
+calculées.</p>
+<p>3. **Normalisation des Caractéristiques** : Les caractéristiques de
+centralité sont normalisées pour permettre une comparaison équitable
+entre les nœuds.</p>
+<p>4. **Encodage des Caractéristiques** : Les caractéristiques
+normalisées sont utilisées pour encoder chaque nœud du graphe.</p>
+<h2 class="unnumbered" id="exemple-dencodage">Exemple d’Encodage</h2>
+<p>Considérons un graphe <span class="math inline">\(G = (V, E)\)</span>
+avec <span class="math inline">\(V = \{1, 2, 3\}\)</span> et <span
+class="math inline">\(E = \{(1, 2), (2, 3)\}\)</span>. La matrice
+d’adjacence <span class="math inline">\(A\)</span> de ce graphe est
+:</p>
+<p><span class="math display">\[A = \begin{pmatrix}
+0 &amp; 1 &amp; 0 \\
+1 &amp; 0 &amp; 1 \\
+0 &amp; 1 &amp; 0
+\end{pmatrix}\]</span></p>
+<p>Les caractéristiques de centralité pour chaque nœud sont calculées
+comme suit :</p>
+<p>- **Centralité de Degré** : <span class="math display">\[C_D(1) = 1,
+\quad C_D(2) = 2, \quad C_D(3) = 1\]</span></p>
+<p>- **Centralité de Closeness** : <span class="math display">\[C_C(1) =
+\frac{1}{2}, \quad C_C(2) = 1, \quad C_C(3) = \frac{1}{2}\]</span></p>
+<p>- **Centralité de Betweenness** : <span class="math display">\[C_B(1)
+= 0, \quad C_B(2) = 1, \quad C_B(3) = 0\]</span></p>
+<p>Les caractéristiques normalisées sont ensuite utilisées pour encoder
+chaque nœud.</p>
+<h1 class="unnumbered" id="applications">Applications</h1>
+<p>L’encodage par extraction de caractéristiques de centralité a de
+nombreuses applications dans divers domaines. Par exemple, en sciences
+sociales, il peut être utilisé pour identifier les individus les plus
+influents dans un réseau social. En biologie, il peut aider à comprendre
+les interactions entre différentes protéines dans un réseau de
+signalisation cellulaire.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de centralité est une
+méthode puissante pour analyser les réseaux et identifier les nœuds les
+plus influents. En transformant les données brutes d’un graphe en un
+ensemble de caractéristiques significatives, cette technique offre des
+insights précieux pour diverses applications. À mesure que les réseaux
+deviennent de plus en plus complexes, l’importance de telles méthodes ne
+fera que croître.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

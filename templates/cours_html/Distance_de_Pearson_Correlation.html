@@ -1,0 +1,375 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Pearson Correlation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Pearson Correlation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Pearson Correlation, ou simplement la corrélation de
+Pearson, est une mesure statistique fondamentale qui quantifie le degré
+de relation linéaire entre deux variables aléatoires. Son origine
+remonte aux travaux pionniers de Karl Pearson à la fin du XIXe siècle,
+où il cherchait à formaliser mathématiquement l’intuition de dépendance
+entre des phénomènes observés. Cette notion émerge comme une réponse à
+la nécessité de mesurer l’association linéaire, indispensable dans des
+domaines aussi variés que la biologie, l’économie, ou les sciences
+sociales.</p>
+<p>La corrélation de Pearson est indispensable pour plusieurs raisons.
+Tout d’abord, elle permet de capturer l’intuition géométrique de la
+colinéarité entre des points dans un espace multidimensionnel. Ensuite,
+elle fournit une base pour des techniques avancées d’analyse de données,
+comme la régression linéaire ou l’analyse en composantes principales.
+Enfin, son interprétation intuitive et sa normalisation entre -1 et 1 en
+font un outil accessible et puissant pour les chercheurs.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Pearson Correlation, commençons par
+comprendre ce que nous cherchons à mesurer. Imaginons deux variables
+aléatoires <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Nous voulons quantifier à quel point
+ces variables varient ensemble de manière linéaire. Si <span
+class="math inline">\(X\)</span> augmente, <span
+class="math inline">\(Y\)</span> devrait augmenter ou diminuer de
+manière prévisible. La corrélation de Pearson capture précisément cette
+idée.</p>
+<p>Formellement, la corrélation de Pearson entre deux variables
+aléatoires <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> est définie comme suit :</p>
+<p><span class="math display">\[\rho_{X,Y} = \frac{\text{Cov}(X,
+Y)}{\sigma_X \sigma_Y}\]</span></p>
+<p>où <span class="math inline">\(\text{Cov}(X, Y)\)</span> est la
+covariance entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, et <span
+class="math inline">\(\sigma_X\)</span> et <span
+class="math inline">\(\sigma_Y\)</span> sont les écarts-types de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, respectivement.</p>
+<p>En termes de quantificateurs, nous pouvons écrire :</p>
+<p><span class="math display">\[\rho_{X,Y} = \frac{\mathbb{E}[(X -
+\mu_X)(Y - \mu_Y)]}{\sqrt{\mathbb{E}[(X - \mu_X)^2]} \sqrt{\mathbb{E}[(Y
+- \mu_Y)^2]}}\]</span></p>
+<p>où <span class="math inline">\(\mu_X\)</span> et <span
+class="math inline">\(\mu_Y\)</span> sont les espérances de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, respectivement, et <span
+class="math inline">\(\mathbb{E}\)</span> désigne l’espérance
+mathématique.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la corrélation de Pearson est le
+théorème de Cauchy-Schwarz, qui fournit une borne supérieure pour la
+corrélation.</p>
+<p>Commençons par comprendre ce que nous cherchons à établir. Nous
+voulons montrer que la corrélation de Pearson est toujours comprise
+entre -1 et 1. Cela signifie que deux variables ne peuvent pas être
+parfaitement corrélées de manière positive ou négative au-delà de ces
+limites.</p>
+<p>Formellement, le théorème de Cauchy-Schwarz pour la corrélation de
+Pearson s’énonce comme suit :</p>
+<p><span class="math display">\[-1 \leq \rho_{X,Y} \leq 1\]</span></p>
+<p>La preuve de ce théorème repose sur l’inégalité de Cauchy-Schwarz,
+qui stipule que pour tout vecteur <span
+class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span>, nous avons :</p>
+<p><span class="math display">\[|\mathbf{u} \cdot \mathbf{v}| \leq
+\|\mathbf{u}\| \|\mathbf{v}\|\]</span></p>
+<p>En appliquant cette inégalité à la définition de la corrélation de
+Pearson, nous obtenons :</p>
+<p><span class="math display">\[|\mathbb{E}[(X - \mu_X)(Y - \mu_Y)]|
+\leq \sqrt{\mathbb{E}[(X - \mu_X)^2]} \sqrt{\mathbb{E}[(Y -
+\mu_Y)^2]}\]</span></p>
+<p>En divisant les deux côtés par <span
+class="math inline">\(\sqrt{\mathbb{E}[(X - \mu_X)^2]}
+\sqrt{\mathbb{E}[(Y - \mu_Y)^2]}\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\left| \frac{\mathbb{E}[(X - \mu_X)(Y -
+\mu_Y)]}{\sqrt{\mathbb{E}[(X - \mu_X)^2]} \sqrt{\mathbb{E}[(Y -
+\mu_Y)^2]}} \right| \leq 1\]</span></p>
+<p>Ce qui est équivalent à :</p>
+<p><span class="math display">\[|\rho_{X,Y}| \leq 1\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver que la corrélation de Pearson est effectivement une
+mesure de distance, nous devons montrer qu’elle satisfait les propriétés
+d’une distance. Cependant, la corrélation de Pearson n’est pas une
+distance au sens strict, car elle ne satisfait pas la propriété de
+séparation (deux points distincts peuvent avoir une corrélation
+nulle).</p>
+<p>Néanmoins, nous pouvons définir une distance basée sur la corrélation
+de Pearson en utilisant la transformation suivante :</p>
+<p><span class="math display">\[d_{X,Y} = \sqrt{2(1 -
+\rho_{X,Y})}\]</span></p>
+<p>Pour prouver que <span class="math inline">\(d_{X,Y}\)</span> est une
+distance, nous devons vérifier les propriétés suivantes :</p>
+<p>1. **Non-négativité** : <span class="math inline">\(d_{X,Y} \geq
+0\)</span> 2. **Identité des indiscernables** : <span
+class="math inline">\(d_{X,Y} = 0\)</span> si et seulement si <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont parfaitement corrélés. 3.
+**Symétrie** : <span class="math inline">\(d_{X,Y} = d_{Y,X}\)</span> 4.
+**Inégalité triangulaire** : <span class="math inline">\(d_{X,Z} \leq
+d_{X,Y} + d_{Y,Z}\)</span></p>
+<p>Nous allons prouver chacune de ces propriétés.</p>
+<h2 id="non-négativité">Non-négativité</h2>
+<p>La non-négativité découle directement de la définition de <span
+class="math inline">\(d_{X,Y}\)</span> :</p>
+<p><span class="math display">\[d_{X,Y} = \sqrt{2(1 - \rho_{X,Y})} \geq
+0\]</span></p>
+<p>puisque <span class="math inline">\(\rho_{X,Y} \leq 1\)</span>.</p>
+<h2 id="identité-des-indiscernables">Identité des indiscernables</h2>
+<p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont parfaitement corrélés, alors <span
+class="math inline">\(\rho_{X,Y} = 1\)</span>, et donc :</p>
+<p><span class="math display">\[d_{X,Y} = \sqrt{2(1 - 1)} =
+0\]</span></p>
+<p>Réciproquement, si <span class="math inline">\(d_{X,Y} = 0\)</span>,
+alors :</p>
+<p><span class="math display">\[\sqrt{2(1 - \rho_{X,Y})} = 0 \implies 1
+- \rho_{X,Y} = 0 \implies \rho_{X,Y} = 1\]</span></p>
+<h2 id="symétrie">Symétrie</h2>
+<p>La symétrie découle de la symétrie de la corrélation de Pearson :</p>
+<p><span class="math display">\[d_{X,Y} = \sqrt{2(1 - \rho_{X,Y})} =
+\sqrt{2(1 - \rho_{Y,X})} = d_{Y,X}\]</span></p>
+<h2 id="inégalité-triangulaire">Inégalité triangulaire</h2>
+<p>L’inégalité triangulaire est plus complexe à établir. Elle repose sur
+le fait que la corrélation de Pearson satisfait certaines propriétés
+géométriques. Cependant, une preuve rigoureuse dépasse le cadre de cet
+article.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+distance basée sur la corrélation de Pearson.</p>
+<ol>
+<li><p>**Invariance par translation** : La distance <span
+class="math inline">\(d_{X,Y}\)</span> est invariante par translation
+des variables. Cela signifie que si nous ajoutons une constante à <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, la distance reste inchangée.</p>
+<p>Preuve : Soit <span class="math inline">\(a, b \in
+\mathbb{R}\)</span>. Alors :</p>
+<p><span class="math display">\[d_{X+a,Y+b} = \sqrt{2(1 -
+\rho_{X+a,Y+b})} = \sqrt{2(1 - \rho_{X,Y})} = d_{X,Y}\]</span></p></li>
+<li><p>**Invariance par échelle** : La distance <span
+class="math inline">\(d_{X,Y}\)</span> est invariante par multiplication
+des variables par une constante positive. Cela signifie que si nous
+multiplions <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> par une constante positive, la distance
+reste inchangée.</p>
+<p>Preuve : Soit <span class="math inline">\(c &gt; 0\)</span>. Alors
+:</p>
+<p><span class="math display">\[d_{cX,cY} = \sqrt{2(1 - \rho_{cX,cY})} =
+\sqrt{2(1 - \rho_{X,Y})} = d_{X,Y}\]</span></p></li>
+<li><p>**Lien avec la régression linéaire** : La distance <span
+class="math inline">\(d_{X,Y}\)</span> est liée à la régression
+linéaire. Plus précisément, elle mesure l’écart entre les variables et
+leur meilleure approximation linéaire.</p>
+<p>Preuve : Considérons la régression linéaire de <span
+class="math inline">\(Y\)</span> sur <span
+class="math inline">\(X\)</span>. La distance <span
+class="math inline">\(d_{X,Y}\)</span> mesure l’écart entre <span
+class="math inline">\(Y\)</span> et sa meilleure approximation linéaire
+en termes de corrélation.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Pearson Correlation est un outil fondamental pour
+mesurer la relation linéaire entre deux variables. Son interprétation
+intuitive et ses propriétés mathématiques en font un instrument
+indispensable dans de nombreux domaines scientifiques. Bien qu’elle ne
+soit pas une distance au sens strict, la transformation <span
+class="math inline">\(d_{X,Y} = \sqrt{2(1 - \rho_{X,Y})}\)</span> permet
+de définir une distance basée sur la corrélation de Pearson, ouvrant
+ainsi des perspectives pour des applications en analyse de données et en
+apprentissage automatique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

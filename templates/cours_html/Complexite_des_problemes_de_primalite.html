@@ -1,0 +1,326 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de primalité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de primalité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude de la complexité des problèmes de primalité est un sujet
+central en théorie des nombres et en informatique théorique.
+Historiquement, la question de déterminer si un nombre est premier ou
+non remonte à l’Antiquité, avec des contributions notables d’Euclide et
+d’Ératosthène. Cependant, c’est avec l’avènement de l’informatique que
+cette question a pris une dimension nouvelle, notamment en
+cryptographie.</p>
+<p>Les problèmes de primalité sont indispensables dans le cadre de la
+sécurité informatique. Par exemple, les protocoles de cryptographie à
+clé publique comme RSA reposent sur la difficulté supposée de factoriser
+de grands nombres entiers, ce qui est lié à la primalité. Comprendre la
+complexité de ces problèmes permet non seulement d’optimiser les
+algorithmes existants, mais aussi de garantir la robustesse des systèmes
+cryptographiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour aborder la complexité des problèmes de primalité, commençons par
+définir ce qu’est un nombre premier. Intuitivement, un nombre premier
+est un nombre entier qui n’a pas d’autres diviseurs que 1 et lui-même.
+Mais comment formaliser cette idée ?</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(n\)</span> un entier naturel
+supérieur ou égal à 2. On dit que <span class="math inline">\(n\)</span>
+est premier si et seulement si : <span class="math display">\[\forall d
+\in \mathbb{N}^*, (d \mid n) \Rightarrow (d = 1 \lor d = n)\]</span>
+Autrement dit, <span class="math inline">\(n\)</span> est premier si le
+seul diviseur positif de <span class="math inline">\(n\)</span> autre
+que 1 et <span class="math inline">\(n\)</span> lui-même.</p>
+</div>
+<p>Un problème central en théorie des nombres est celui de la primalité
+:</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(n\)</span> un entier naturel. Le
+problème de primalité consiste à déterminer si <span
+class="math inline">\(n\)</span> est premier ou non.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en théorie des nombres est le petit théorème
+de Fermat, qui fournit une condition nécessaire pour qu’un nombre soit
+premier.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(p\)</span> un nombre premier et soit
+<span class="math inline">\(a\)</span> un entier naturel premier avec
+<span class="math inline">\(p\)</span>. Alors : <span
+class="math display">\[a^{p-1} \equiv 1 \pmod{p}\]</span></p>
+</div>
+<p>Ce théorème est à la base de nombreux tests de primalité, comme le
+test de Fermat.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le petit théorème de Fermat, nous allons utiliser des
+propriétés fondamentales de l’arithmétique modulo un nombre premier.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(p\)</span> un nombre
+premier et soit <span class="math inline">\(a\)</span> un entier naturel
+premier avec <span class="math inline">\(p\)</span>. Considérons
+l’ensemble des restes de la division de <span class="math inline">\(a,
+2a, \ldots, (p-1)a\)</span> par <span class="math inline">\(p\)</span>.
+Cet ensemble est exactement l’ensemble des entiers de 1 à <span
+class="math inline">\(p-1\)</span> permuté. En effet, si deux de ces
+produits étaient congruents modulo <span
+class="math inline">\(p\)</span>, disons <span class="math inline">\(ia
+\equiv ja \pmod{p}\)</span> avec <span class="math inline">\(1 \leq i
+&lt; j \leq p-1\)</span>, alors <span class="math inline">\((i-j)a
+\equiv 0 \pmod{p}\)</span>. Comme <span class="math inline">\(p\)</span>
+est premier et <span class="math inline">\(a\)</span> n’est pas
+divisible par <span class="math inline">\(p\)</span>, on aurait <span
+class="math inline">\(i-j \equiv 0 \pmod{p}\)</span>, ce qui est
+impossible car <span class="math inline">\(1 \leq i &lt; j \leq
+p-1\)</span>.</p>
+<p>Ainsi, le produit de tous les éléments de cet ensemble est congru à
+<span class="math inline">\((p-1)!\)</span> modulo <span
+class="math inline">\(p\)</span>. D’autre part, ce produit est aussi
+congru à <span class="math inline">\(a^{p-1}(p-1)!\)</span> modulo <span
+class="math inline">\(p\)</span>. En multipliant les deux côtés de cette
+congruence par l’inverse de <span class="math inline">\((p-1)!\)</span>
+modulo <span class="math inline">\(p\)</span>, qui existe car <span
+class="math inline">\((p-1)!\)</span> est premier avec <span
+class="math inline">\(p\)</span>, on obtient : <span
+class="math display">\[a^{p-1} \equiv 1 \pmod{p}\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le petit théorème de Fermat a plusieurs conséquences
+intéressantes.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(n\)</span> un entier naturel
+supérieur ou égal à 2. Si <span class="math inline">\(n\)</span> est
+premier, alors pour tout entier <span class="math inline">\(a\)</span>
+premier avec <span class="math inline">\(n\)</span>, on a : <span
+class="math display">\[a^{n-1} \equiv 1 \pmod{n}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Ceci est une généralisation directe du petit théorème
+de Fermat. Si <span class="math inline">\(n\)</span> est premier, alors
+pour tout entier <span class="math inline">\(a\)</span> premier avec
+<span class="math inline">\(n\)</span>, le théorème s’applique et on
+obtient la conclusion désirée. ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(n\)</span> un entier naturel
+supérieur ou égal à 2. Si pour tout entier <span
+class="math inline">\(a\)</span> premier avec <span
+class="math inline">\(n\)</span>, on a : <span
+class="math display">\[a^{n-1} \equiv 1 \pmod{n}\]</span> alors <span
+class="math inline">\(n\)</span> est premier.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cette implication est fausse en général. Les nombres
+qui satisfont cette condition mais ne sont pas premiers sont appelés
+pseudoprimes de Fermat. Par exemple, 561 est un pseudoprime de Fermat
+car il satisfait la condition pour <span class="math inline">\(a =
+2\)</span>, mais 561 n’est pas premier. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’étude de la complexité des problèmes de primalité est un domaine
+riche et fascinant, à la croisée de la théorie des nombres et de
+l’informatique théorique. Les résultats obtenus ont des applications
+pratiques importantes, notamment en cryptographie. Les théorèmes et
+propriétés présentés ici ne sont qu’un aperçu de ce domaine, mais ils
+illustrent bien la profondeur et la beauté des mathématiques
+sous-jacentes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

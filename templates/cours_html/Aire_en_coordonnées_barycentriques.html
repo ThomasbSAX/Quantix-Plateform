@@ -1,0 +1,332 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’aire en coordonnées barycentriques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’aire en coordonnées barycentriques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’aire en coordonnées barycentriques est un concept fondamental en
+géométrie, particulièrement utile dans l’étude des triangles et des
+polynômes. Ce cadre permet de simplifier les calculs d’aire en utilisant
+des coordonnées barycentriques, qui sont souvent plus intuitives et
+manipulables que les coordonnées cartésiennes classiques. L’origine de
+ce concept remonte aux travaux pionniers sur la géométrie affine et
+projective, où les coordonnées barycentriques ont été introduites pour
+faciliter l’analyse des propriétés géométriques.</p>
+<p>Les coordonnées barycentriques sont indispensables dans de nombreux
+domaines, notamment en géométrie algorithmique, en infographie et en
+analyse numérique. Elles permettent de représenter des points à
+l’intérieur d’un triangle de manière unique, ce qui simplifie grandement
+les calculs d’aire et d’autres propriétés géométriques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’aire en coordonnées barycentriques, commençons par
+définir les coordonnées barycentriques elles-mêmes. Imaginons que nous
+avons un triangle <span class="math inline">\(ABC\)</span> et un point
+<span class="math inline">\(P\)</span> à l’intérieur de ce triangle.
+Nous cherchons une manière de représenter <span
+class="math inline">\(P\)</span> en termes des sommets du triangle.</p>
+<p>Les coordonnées barycentriques de <span
+class="math inline">\(P\)</span> par rapport au triangle <span
+class="math inline">\(ABC\)</span> sont des nombres réels <span
+class="math inline">\((\alpha, \beta, \gamma)\)</span> tels que : <span
+class="math display">\[P = \frac{\alpha A + \beta B + \gamma C}{\alpha +
+\beta + \gamma}\]</span> où <span class="math inline">\(A, B, C\)</span>
+sont les vecteurs position des sommets du triangle.</p>
+<p>Formellement, nous avons : <span class="math display">\[P = \alpha A
++ \beta B + \gamma C\]</span> avec <span class="math inline">\(\alpha,
+\beta, \gamma &gt; 0\)</span> et <span class="math inline">\(\alpha +
+\beta + \gamma = 1\)</span>.</p>
+<p>Les coordonnées barycentriques normalisées sont définies comme :
+<span class="math display">\[(u, v, w) = \left( \frac{\alpha}{\alpha +
+\beta + \gamma}, \frac{\beta}{\alpha + \beta + \gamma},
+\frac{\gamma}{\alpha + \beta + \gamma} \right)\]</span> de sorte que
+<span class="math inline">\(u + v + w = 1\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en coordonnées barycentriques est celui qui
+relie l’aire d’un triangle à ses coordonnées barycentriques. Supposons
+que nous avons un triangle <span class="math inline">\(ABC\)</span> et
+un point <span class="math inline">\(P\)</span> à l’intérieur de ce
+triangle avec des coordonnées barycentriques <span
+class="math inline">\((u, v, w)\)</span>.</p>
+<p>Le théorème de l’aire en coordonnées barycentriques stipule que
+l’aire du triangle <span class="math inline">\(PBC\)</span> est
+proportionnelle à la coordonnée barycentrique <span
+class="math inline">\(u\)</span> de <span
+class="math inline">\(P\)</span>. Plus précisément, nous avons : <span
+class="math display">\[\text{Aire}(PBC) = u \cdot
+\text{Aire}(ABC)\]</span></p>
+<p>De même, nous avons : <span class="math display">\[\text{Aire}(PCA) =
+v \cdot \text{Aire}(ABC)\]</span> <span
+class="math display">\[\text{Aire}(PAB) = w \cdot
+\text{Aire}(ABC)\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de l’aire en coordonnées barycentriques,
+commençons par rappeler que les coordonnées barycentriques <span
+class="math inline">\((u, v, w)\)</span> de <span
+class="math inline">\(P\)</span> satisfont <span class="math inline">\(u
++ v + w = 1\)</span>.</p>
+<p>Considérons le triangle <span class="math inline">\(ABC\)</span> et
+un point <span class="math inline">\(P\)</span> à l’intérieur de ce
+triangle. Les aires des triangles <span class="math inline">\(PBC,
+PCA\)</span> et <span class="math inline">\(PAB\)</span> sont
+proportionnelles aux hauteurs correspondantes par rapport à la base
+commune.</p>
+<p>En utilisant les coordonnées barycentriques, nous pouvons exprimer
+ces hauteurs en termes des coordonnées <span class="math inline">\(u, v,
+w\)</span>. Par exemple, la hauteur de <span
+class="math inline">\(P\)</span> par rapport à <span
+class="math inline">\(BC\)</span> est proportionnelle à <span
+class="math inline">\(u\)</span>.</p>
+<p>Ainsi, nous avons : <span class="math display">\[\text{Aire}(PBC) =
+\frac{1}{2} \cdot BC \cdot h_{PBC}\]</span> où <span
+class="math inline">\(h_{PBC}\)</span> est la hauteur de <span
+class="math inline">\(P\)</span> par rapport à <span
+class="math inline">\(BC\)</span>.</p>
+<p>Puisque <span class="math inline">\(h_{PBC} = u \cdot
+h_{ABC}\)</span>, où <span class="math inline">\(h_{ABC}\)</span> est la
+hauteur de <span class="math inline">\(A\)</span> par rapport à <span
+class="math inline">\(BC\)</span>, nous obtenons : <span
+class="math display">\[\text{Aire}(PBC) = u \cdot \left( \frac{1}{2}
+\cdot BC \cdot h_{ABC} \right) = u \cdot \text{Aire}(ABC)\]</span></p>
+<p>De même, nous pouvons prouver les autres relations pour <span
+class="math inline">\(\text{Aire}(PCA)\)</span> et <span
+class="math inline">\(\text{Aire}(PAB)\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes des aires en
+coordonnées barycentriques :</p>
+<ol>
+<li><p>Si <span class="math inline">\(P\)</span> est un point à
+l’intérieur du triangle <span class="math inline">\(ABC\)</span>, alors
+les aires des sous-triangles <span class="math inline">\(PBC,
+PCA\)</span> et <span class="math inline">\(PAB\)</span> sont
+proportionnelles aux coordonnées barycentriques de <span
+class="math inline">\(P\)</span>.</p></li>
+<li><p>La somme des aires des sous-triangles est égale à l’aire du
+triangle <span class="math inline">\(ABC\)</span> : <span
+class="math display">\[\text{Aire}(PBC) + \text{Aire}(PCA) +
+\text{Aire}(PAB) = \text{Aire}(ABC)\]</span></p></li>
+<li><p>Les coordonnées barycentriques d’un point <span
+class="math inline">\(P\)</span> peuvent être déterminées en utilisant
+les aires des sous-triangles : <span class="math display">\[u =
+\frac{\text{Aire}(PBC)}{\text{Aire}(ABC)}, \quad v =
+\frac{\text{Aire}(PCA)}{\text{Aire}(ABC)}, \quad w =
+\frac{\text{Aire}(PAB)}{\text{Aire}(ABC)}\]</span></p></li>
+</ol>
+<p>Pour prouver la propriété (ii), nous utilisons le fait que <span
+class="math inline">\(u + v + w = 1\)</span> et les relations : <span
+class="math display">\[\text{Aire}(PBC) = u \cdot
+\text{Aire}(ABC)\]</span> <span class="math display">\[\text{Aire}(PCA)
+= v \cdot \text{Aire}(ABC)\]</span> <span
+class="math display">\[\text{Aire}(PAB) = w \cdot
+\text{Aire}(ABC)\]</span></p>
+<p>En additionnant ces relations, nous obtenons : <span
+class="math display">\[\text{Aire}(PBC) + \text{Aire}(PCA) +
+\text{Aire}(PAB) = (u + v + w) \cdot \text{Aire}(ABC) = 1 \cdot
+\text{Aire}(ABC)\]</span></p>
+<p>Pour prouver la propriété (iii), nous inversons les relations du
+théorème de l’aire : <span class="math display">\[u =
+\frac{\text{Aire}(PBC)}{\text{Aire}(ABC)}\]</span> <span
+class="math display">\[v =
+\frac{\text{Aire}(PCA)}{\text{Aire}(ABC)}\]</span> <span
+class="math display">\[w =
+\frac{\text{Aire}(PAB)}{\text{Aire}(ABC)}\]</span></p>
+<p>Ces relations montrent comment les coordonnées barycentriques peuvent
+être déterminées à partir des aires des sous-triangles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

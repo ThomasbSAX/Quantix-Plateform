@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Chapitre </title>
+
+<link rel="stylesheet" href="../css/cours.css">
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="navbar">
+  <div class="container">
+    <nav class="nav">
+      <a href="{{ url_for('home') }}" class="nav-brand">
+        <div class="nav-logo"></div>
+        <span>Quantix</span>
+      </a>
+      <ul class="nav-menu">
+        <li><a href="{{ url_for('fonctionnalites') }}" class="nav-link">Fonctionnalités</a></li>
+        <li><a href="{{ url_for('confidentialite') }}" class="nav-link">Confidentialité</a></li>
+        <li><a href="{{ url_for('essayer') }}" class="btn btn-get-started">Essayer</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/quantix-history.css') }}">
+<script>
+  if (typeof initHeaderPage === 'function') {
+    initHeaderPage();
+  }
+</script>
+
+<div class="page">
+
+<div class="header-meta">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2025-12-05" />
+  <title>Le Coefficient de Corrélation de Spearman : Une Mesure Non Paramétrique de la Relation Monotone</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Coefficient de Corrélation de Spearman : Une Mesure
+Non Paramétrique de la Relation Monotone</h1>
+<p class="author">Quantix</p>
+<p class="date">2025-12-05</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des relations entre variables quantitatives est un pilier
+fondamental de la statistique. Le coefficient de corrélation de Pearson,
+bien que largement utilisé, suppose une relation linéaire et la
+normalité des distributions. Face à ces contraintes, le coefficient de
+corrélation de Spearman émerge comme une alternative non paramétrique,
+capable de capturer des relations monotones sans ces hypothèses
+restrictives.</p>
+<p>Historiquement, Charles Edward Spearman, psychologue et statisticien
+britannique, a introduit ce coefficient en 1904 pour mesurer la
+corrélation entre deux variables ordinales ou continues. Son approche
+révolutionnaire a permis d’explorer des relations complexes, notamment
+dans les sciences sociales et comportementales.</p>
+<p>Ce chapitre explore en profondeur le coefficient de corrélation de
+Spearman, depuis ses définitions formelles jusqu’à ses propriétés
+théoriques et pratiques. Nous mettrons en lumière son utilité dans
+l’analyse des données réelles, où les relations linéaires sont souvent
+absentes ou masquées par des transformations non linéaires.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire le coefficient de corrélation de Spearman,
+considérons deux échantillons de données <span
+class="math inline">\((X_1, Y_1), \ldots, (X_n, Y_n)\)</span>. Nous
+cherchons une mesure de la force et de la direction d’une relation
+monotone entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Une relation monotone signifie que
+lorsque <span class="math inline">\(X\)</span> augmente, <span
+class="math inline">\(Y\)</span> tend à augmenter ou à diminuer de
+manière cohérente, sans nécessairement suivre une ligne droite.</p>
+<p>Formellement, le coefficient de corrélation de Spearman <span
+class="math inline">\(\rho_s\)</span> est défini comme le coefficient de
+corrélation de Pearson appliqué aux rangs des données <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Plus précisément, soit <span
+class="math inline">\(R(X_i)\)</span> le rang de <span
+class="math inline">\(X_i\)</span> parmi <span
+class="math inline">\(X_1, \ldots, X_n\)</span>, et <span
+class="math inline">\(R(Y_i)\)</span> le rang de <span
+class="math inline">\(Y_i\)</span> parmi <span
+class="math inline">\(Y_1, \ldots, Y_n\)</span>. Le coefficient de
+Spearman est alors donné par :</p>
+<p><span class="math display">\[\rho_s = \frac{\sum_{i=1}^n (R(X_i) -
+\bar{R})(R(Y_i) - \bar{R})}{\sqrt{\sum_{i=1}^n (R(X_i) - \bar{R})^2}
+\sqrt{\sum_{i=1}^n (R(Y_i) - \bar{R})^2}}\]</span></p>
+<p>où <span class="math inline">\(\bar{R} = \frac{n+1}{2}\)</span> est
+la moyenne des rangs.</p>
+<p>Une autre formulation équivalente, souvent plus pratique pour les
+calculs manuels, est :</p>
+<p><span class="math display">\[\rho_s = 1 - \frac{6 \sum_{i=1}^n
+d_i^2}{n(n^2 - 1)}\]</span></p>
+<p>où <span class="math inline">\(d_i = R(X_i) - R(Y_i)\)</span> est la
+différence des rangs pour chaque paire <span class="math inline">\((X_i,
+Y_i)\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant le coefficient de corrélation de
+Spearman est celui de sa consistance. Ce théorème affirme que, sous
+certaines conditions, le coefficient de Spearman converge vers une
+constante lorsque la taille de l’échantillon tend vers l’infini.</p>
+<p>Pour énoncer ce théorème, nous avons besoin de quelques notions
+préliminaires. Soit <span class="math inline">\((X, Y)\)</span> un
+couple de variables aléatoires continues avec une fonction de densité
+conjointe <span class="math inline">\(f(x, y)\)</span>. La relation
+entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> est dite monotone si <span
+class="math inline">\(f(x, y) &gt; 0\)</span> implique que <span
+class="math inline">\((x - x&#39;) (y - y&#39;) \geq 0\)</span> pour
+tout <span class="math inline">\((x&#39;, y&#39;)\)</span> tel que <span
+class="math inline">\(f(x&#39;, y&#39;) &gt; 0\)</span>.</p>
+<p>Théorème (Consistance du coefficient de Spearman) : Si <span
+class="math inline">\((X, Y)\)</span> est un couple de variables
+aléatoires continues avec une relation monotone, alors le coefficient de
+corrélation de Spearman <span class="math inline">\(\rho_s\)</span>
+calculé sur un échantillon de taille <span
+class="math inline">\(n\)</span> converge presque sûrement vers 1 ou -1
+lorsque <span class="math inline">\(n \to \infty\)</span>.</p>
+<p>Preuve : La preuve de ce théorème repose sur le fait que, sous
+l’hypothèse de monotonicité, les rangs <span
+class="math inline">\(R(X_i)\)</span> et <span
+class="math inline">\(R(Y_i)\)</span> sont presque parfaitement corrélés
+lorsque <span class="math inline">\(n\)</span> est grand. En effet, la
+relation monotone implique que les rangs de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont ordonnés de manière similaire, ce
+qui conduit à une somme des carrés des différences de rangs <span
+class="math inline">\(\sum_{i=1}^n d_i^2\)</span> qui tend vers zéro.
+Par conséquent, le coefficient de Spearman <span
+class="math inline">\(\rho_s\)</span> tend vers 1 ou -1, selon la
+direction de la relation monotone.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour illustrer les preuves détaillées, considérons la démonstration
+de l’équivalence entre les deux formulations du coefficient de Spearman.
+Nous voulons montrer que :</p>
+<p><span class="math display">\[\rho_s = \frac{\sum_{i=1}^n (R(X_i) -
+\bar{R})(R(Y_i) - \bar{R})}{\sqrt{\sum_{i=1}^n (R(X_i) - \bar{R})^2}
+\sqrt{\sum_{i=1}^n (R(Y_i) - \bar{R})^2}} = 1 - \frac{6 \sum_{i=1}^n
+d_i^2}{n(n^2 - 1)}\]</span></p>
+<p>Commençons par développer le numérateur et le dénominateur de la
+première formulation. Le numérateur est :</p>
+<p><span class="math display">\[\sum_{i=1}^n (R(X_i) - \bar{R})(R(Y_i) -
+\bar{R}) = \sum_{i=1}^n R(X_i) R(Y_i) - \bar{R} \sum_{i=1}^n (R(X_i) +
+R(Y_i)) + n \bar{R}^2\]</span></p>
+<p>En utilisant le fait que <span class="math inline">\(\sum_{i=1}^n
+R(X_i) = \sum_{i=1}^n R(Y_i) = \frac{n(n+1)}{2}\)</span>, nous obtenons
+:</p>
+<p><span class="math display">\[\sum_{i=1}^n (R(X_i) - \bar{R})(R(Y_i) -
+\bar{R}) = \sum_{i=1}^n R(X_i) R(Y_i) - (n+1) \frac{n(n+1)}{2} + n
+\left( \frac{n+1}{2} \right)^2\]</span></p>
+<p>Simplifions cette expression :</p>
+<p><span class="math display">\[\sum_{i=1}^n (R(X_i) - \bar{R})(R(Y_i) -
+\bar{R}) = \sum_{i=1}^n R(X_i) R(Y_i) - \frac{n(n+1)^2}{4}\]</span></p>
+<p>De même, le dénominateur est :</p>
+<p><span class="math display">\[\sqrt{\sum_{i=1}^n (R(X_i) - \bar{R})^2}
+\sqrt{\sum_{i=1}^n (R(Y_i) - \bar{R})^2} = \sqrt{\sum_{i=1}^n R(X_i)^2 -
+n \bar{R}^2} \sqrt{\sum_{i=1}^n R(Y_i)^2 - n \bar{R}^2}\]</span></p>
+<p>En utilisant <span class="math inline">\(\sum_{i=1}^n R(X_i)^2 =
+\frac{n(n+1)(2n+1)}{6}\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\sqrt{\sum_{i=1}^n (R(X_i) - \bar{R})^2}
+= \sqrt{\frac{n(n+1)(2n+1)}{6} - n \left( \frac{n+1}{2} \right)^2} =
+\sqrt{\frac{n(n^2 - 1)}{12}}\]</span></p>
+<p>Ainsi, le dénominateur devient :</p>
+<p><span class="math display">\[\sqrt{\frac{n(n^2 - 1)}{12}}
+\sqrt{\frac{n(n^2 - 1)}{12}} = \frac{n(n^2 - 1)}{12}\]</span></p>
+<p>En substituant ces expressions dans la première formulation, nous
+obtenons :</p>
+<p><span class="math display">\[\rho_s = \frac{\sum_{i=1}^n R(X_i)
+R(Y_i) - \frac{n(n+1)^2}{4}}{\frac{n(n^2 - 1)}{12}} = \frac{12}{n(n^2 -
+1)} \left( \sum_{i=1}^n R(X_i) R(Y_i) - \frac{n(n+1)^2}{4}
+\right)\]</span></p>
+<p>En développant <span class="math inline">\(\sum_{i=1}^n R(X_i)
+R(Y_i)\)</span>, nous pouvons écrire :</p>
+<p><span class="math display">\[\sum_{i=1}^n R(X_i) R(Y_i) = \frac{1}{2}
+\left( \sum_{i=1}^n (R(X_i) + R(Y_i))^2 - \sum_{i=1}^n (R(X_i)^2 +
+R(Y_i)^2) \right)\]</span></p>
+<p>En substituant les expressions pour <span
+class="math inline">\(\sum_{i=1}^n R(X_i)^2\)</span> et <span
+class="math inline">\(\sum_{i=1}^n (R(X_i) + R(Y_i))^2\)</span>, nous
+obtenons :</p>
+<p><span class="math display">\[\sum_{i=1}^n R(X_i) R(Y_i) = \frac{1}{2}
+\left( \sum_{i=1}^n d_i^2 + 2 \sum_{i &lt; j} (R(X_i) - R(Y_i))(R(X_j) -
+R(Y_j)) \right)\]</span></p>
+<p>En simplifiant, nous trouvons que :</p>
+<p><span class="math display">\[\rho_s = 1 - \frac{6 \sum_{i=1}^n
+d_i^2}{n(n^2 - 1)}\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le coefficient de corrélation de Spearman possède plusieurs
+propriétés importantes, que nous énumérons et démontrons ci-dessous.</p>
+<p>(i) <strong>Invariance par transformation monotone</strong> : Le
+coefficient de Spearman est invariant sous toute transformation monotone
+des variables <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Cela signifie que si <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> sont des fonctions monotones, alors
+:</p>
+<p><span class="math display">\[\rho_s(f(X), g(Y)) = \rho_s(X,
+Y)\]</span></p>
+<p>Preuve : Soit <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> des fonctions monotones. Les rangs de
+<span class="math inline">\(f(X_i)\)</span> sont les mêmes que ceux de
+<span class="math inline">\(X_i\)</span>, et de même pour <span
+class="math inline">\(g(Y_i)\)</span>. Par conséquent, les différences
+de rangs <span class="math inline">\(d_i\)</span> restent inchangées, et
+le coefficient de Spearman est invariant.</p>
+<p>(ii) <strong>Consistance</strong> : Comme mentionné précédemment, le
+coefficient de Spearman est consistant sous l’hypothèse de monotonicité.
+Cela signifie que lorsque la taille de l’échantillon tend vers l’infini,
+<span class="math inline">\(\rho_s\)</span> converge vers 1 ou -1.</p>
+<p>Preuve : La preuve repose sur le fait que, sous l’hypothèse de
+monotonicité, les rangs <span class="math inline">\(R(X_i)\)</span> et
+<span class="math inline">\(R(Y_i)\)</span> sont presque parfaitement
+corrélés lorsque <span class="math inline">\(n\)</span> est grand.
+Ainsi, la somme des carrés des différences de rangs <span
+class="math inline">\(\sum_{i=1}^n d_i^2\)</span> tend vers zéro, ce qui
+conduit à <span class="math inline">\(\rho_s \to 1\)</span> ou <span
+class="math inline">\(\rho_s \to -1\)</span>.</p>
+<p>(iii) <strong>Interprétation géométrique</strong> : Le coefficient de
+Spearman peut être interprété comme le cosinus de l’angle entre les
+vecteurs des rangs <span class="math inline">\((R(X_1), \ldots,
+R(X_n))\)</span> et <span class="math inline">\((R(Y_1), \ldots,
+R(Y_n))\)</span>. Cette interprétation est similaire à celle du
+coefficient de corrélation de Pearson, mais appliquée aux rangs.</p>
+<p>Preuve : En effet, le coefficient de Spearman est défini comme le
+produit scalaire des vecteurs de rangs normalisés par la norme de ces
+vecteurs. Ainsi, il représente le cosinus de l’angle entre ces deux
+vecteurs.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le coefficient de corrélation de Spearman est un outil puissant pour
+mesurer la relation monotone entre deux variables. Son indépendance
+vis-à-vis des hypothèses de linéarité et de normalité en fait un choix
+privilégié pour l’analyse des données réelles. Les propriétés et
+théorèmes présentés dans ce chapitre soulignent sa robustesse et son
+utilité dans diverses applications statistiques.</p>
+</body>
+</html>
+</div> <!-- end header-meta -->
+
+</div> <!-- end page -->
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="container footer-grid">
+
+    <div class="footer-col footer-branding">
+      <a href="{{ url_for('home') }}" class="footer-logo-link" style="font-size: 1.5rem;">  
+        <div class="nav-logo"></div>
+        <span class="footer-title">Quantix</span>
+      </a>
+      <p class="footer-tagline">
+        Open-source & souveraineté des données.<br>
+        Un outil simple et efficace pour analyser vos données.
+      </p>
+    </div>
+
+    <div class="footer-col">
+      <h3 class="footer-heading">Produit</h3>
+      <ul class="footer-links">
+        <li><a href="{{ url_for('fonctionnalites') }}">Fonctionnalités</a></li>
+        <li><a href="{{ url_for('essayer') }}">Essayer gratuitement</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3 class="footer-heading">Ressources</h3>
+      <ul class="footer-links">
+        <li><a href="{{ url_for('docs') }}">Documentation</a></li>
+        <li><a href="{{ url_for('biblio') }}">Bibliothèque</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3 class="footer-heading">Quantix-Plateform</h3>
+      <ul class="footer-links">
+        <li><a href="{{ url_for('saphir') }}">Saphir</a></li>
+        <li><a href="{{ url_for('lab') }}">Lab</a></li>
+        <li><a href="{{ url_for('logos') }}">Logos</a></li>
+        <li><a href="{{ url_for('sonar') }}">Sonar</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3 class="footer-heading">Légal</h3>
+      <ul class="footer-links">
+        <li><a href="{{ url_for('confidentialite') }}">Confidentialité</a></li>
+        <li><a href="{{ url_for('mentions') }}">Mentions légales</a></li>
+        <li><a href="{{ url_for('apropos') }}">À propos de nous</a></li>
+        <li><a href="{{ url_for('contact') }}">Contact</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container footer-bottom-grid">
+      <p>&copy; <span id="year"></span> Quantix — Tous droits réservés.</p>
+    </div>
+  </div>
+</footer>
+
+<button class="scroll-top" aria-label="Revenir en haut">↑</button>
+
+<!-- JS -->
+<script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+
+</body>
+</html>

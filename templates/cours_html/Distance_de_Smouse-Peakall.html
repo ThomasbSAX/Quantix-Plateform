@@ -1,0 +1,353 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Smouse-Peakall : Une mesure de la dissimilarité génétique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Smouse-Peakall : Une mesure de la
+dissimilarité génétique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude de la diversité génétique au sein des populations est un
+domaine central en biologie évolutive et en génétique des populations.
+La distance de Smouse-Peakall, introduite par Smouse et Peakall en 1999,
+est une mesure de dissimilarité génétique qui permet de quantifier les
+différences entre individus ou populations en tenant compte de la
+structure génétique. Cette mesure est particulièrement utile pour
+analyser les flux génétiques, les structures spatiales et temporelles
+des populations, ainsi que pour détecter des événements de sélection ou
+de dérive génétique.</p>
+<p>L’origine de cette notion trouve ses racines dans les travaux
+pionniers sur la génétique des populations, notamment ceux de Sewall
+Wright et son concept de coefficient de parenté. La distance de
+Smouse-Peakall généralise ces idées en intégrant des informations sur
+les allèles et leurs fréquences, permettant ainsi une analyse plus fine
+de la structure génétique des populations.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la distance de Smouse-Peakall, commençons par comprendre
+ce que nous cherchons à mesurer. Nous voulons quantifier la
+dissimilarité génétique entre deux individus ou deux populations en
+tenant compte de la distribution des allèles dans la population. Cette
+mesure doit être sensible aux différences dans les fréquences alléliques
+et prendre en compte la structure génétique globale.</p>
+<p>Formellement, soit <span class="math inline">\(G\)</span> une matrice
+de génotypes pour un ensemble d’individus, où chaque ligne représente un
+individu et chaque colonne représente un locus. La distance de
+Smouse-Peakall entre deux individus <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> est définie comme suit :</p>
+<p><span class="math display">\[d_{ij} = \sum_{k=1}^{L} \frac{(G_{ik} -
+G_{jk})^2}{2p_k(1-p_k)}\]</span></p>
+<p>où <span class="math inline">\(L\)</span> est le nombre de loci,
+<span class="math inline">\(G_{ik}\)</span> et <span
+class="math inline">\(G_{jk}\)</span> sont les génotypes des individus
+<span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> au locus <span
+class="math inline">\(k\)</span>, et <span
+class="math inline">\(p_k\)</span> est la fréquence de l’allèle dominant
+au locus <span class="math inline">\(k\)</span>.</p>
+<p>Une autre formulation, plus générale, pour deux populations <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est :</p>
+<p><span class="math display">\[D_{AB} = \sum_{k=1}^{L} \frac{(p_{Ak} -
+p_{Bk})^2}{2p_k(1-p_k)}\]</span></p>
+<p>où <span class="math inline">\(p_{Ak}\)</span> et <span
+class="math inline">\(p_{Bk}\)</span> sont les fréquences de l’allèle
+dominant au locus <span class="math inline">\(k\)</span> dans les
+populations <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, respectivement.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Smouse-Peakall est le
+suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(G\)</span> une matrice de génotypes
+pour un ensemble d’individus, et soit <span
+class="math inline">\(p_k\)</span> la fréquence de l’allèle dominant au
+locus <span class="math inline">\(k\)</span>. Alors, la distance de
+Smouse-Peakall entre deux individus <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> est donnée par :</p>
+<p><span class="math display">\[d_{ij} = \sum_{k=1}^{L} \frac{(G_{ik} -
+G_{jk})^2}{2p_k(1-p_k)}\]</span></p>
+<p>De plus, cette distance satisfait les propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(d_{ij} \geq 0\)</span> pour tout
+<span class="math inline">\(i, j\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ij} = 0\)</span> si et seulement
+si <span class="math inline">\(i = j\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ij} = d_{ji}\)</span> pour tout
+<span class="math inline">\(i, j\)</span>.</p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème, nous procédons comme suit :</p>
+<div class="proof">
+<p><em>Proof.</em> La preuve repose sur les propriétés fondamentales des
+fréquences alléliques et des génotypes. Commençons par montrer que <span
+class="math inline">\(d_{ij} \geq 0\)</span>. Puisque <span
+class="math inline">\((G_{ik} - G_{jk})^2\)</span> est toujours non
+négatif et que <span class="math inline">\(2p_k(1-p_k) &gt; 0\)</span>
+pour tout <span class="math inline">\(k\)</span>, il suit que chaque
+terme de la somme est non négatif. Donc, <span
+class="math inline">\(d_{ij} \geq 0\)</span>.</p>
+<p>Ensuite, montrons que <span class="math inline">\(d_{ij} = 0\)</span>
+si et seulement si <span class="math inline">\(i = j\)</span>. Si <span
+class="math inline">\(i = j\)</span>, alors <span
+class="math inline">\(G_{ik} = G_{jk}\)</span> pour tout <span
+class="math inline">\(k\)</span>, ce qui implique que <span
+class="math inline">\(d_{ij} = 0\)</span>. Réciproquement, si <span
+class="math inline">\(d_{ij} = 0\)</span>, alors <span
+class="math inline">\((G_{ik} - G_{jk})^2 = 0\)</span> pour tout <span
+class="math inline">\(k\)</span>, ce qui signifie que <span
+class="math inline">\(G_{ik} = G_{jk}\)</span> pour tout <span
+class="math inline">\(k\)</span>. Par conséquent, <span
+class="math inline">\(i = j\)</span>.</p>
+<p>Enfin, montrons que <span class="math inline">\(d_{ij} =
+d_{ji}\)</span>. Puisque <span class="math inline">\((G_{ik} - G_{jk})^2
+= (G_{jk} - G_{ik})^2\)</span>, il suit que <span
+class="math inline">\(d_{ij} = d_{ji}\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+distance de Smouse-Peakall :</p>
+<ol>
+<li><p><strong>Invariance par translation</strong> : La distance de
+Smouse-Peakall est invariante par ajout d’une constante à tous les
+génotypes. Cela signifie que si nous ajoutons une constante <span
+class="math inline">\(c\)</span> à chaque élément de la matrice <span
+class="math inline">\(G\)</span>, la distance entre deux individus reste
+inchangée.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(G&#39; = G +
+c\)</span>. Alors, pour tout <span class="math inline">\(i, j\)</span>
+et <span class="math inline">\(k\)</span>, nous avons : <span
+class="math display">\[(G&#39;_{ik} - G&#39;_{jk})^2 = (G_{ik} + c -
+G_{jk} - c)^2 = (G_{ik} - G_{jk})^2\]</span> Par conséquent, <span
+class="math inline">\(d_{ij}\)</span> reste inchangé. ◻</p>
+</div></li>
+<li><p><strong>Homogénéité</strong> : La distance de Smouse-Peakall est
+homogène de degré 1. Cela signifie que si nous multiplions tous les
+génotypes par une constante <span
+class="math inline">\(\lambda\)</span>, la distance est multipliée par
+le même facteur.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(G&#39; = \lambda
+G\)</span>. Alors, pour tout <span class="math inline">\(i, j\)</span>
+et <span class="math inline">\(k\)</span>, nous avons : <span
+class="math display">\[(G&#39;_{ik} - G&#39;_{jk})^2 = (\lambda G_{ik} -
+\lambda G_{jk})^2 = \lambda^2 (G_{ik} - G_{jk})^2\]</span> Par
+conséquent, <span class="math inline">\(d&#39;_{ij} = \lambda^2
+d_{ij}\)</span>. ◻</p>
+</div></li>
+<li><p><strong>Sensibilité aux fréquences alléliques</strong> : La
+distance de Smouse-Peakall est sensible aux différences dans les
+fréquences alléliques. Plus la différence entre les fréquences
+alléliques de deux individus ou populations est grande, plus la distance
+sera élevée.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Smouse-Peakall est une mesure puissante et flexible
+pour quantifier la dissimilarité génétique entre individus ou
+populations. Ses propriétés mathématiques et ses applications pratiques
+en font un outil précieux pour les chercheurs en biologie évolutive et
+en génétique des populations. En comprenant cette mesure, nous pouvons
+mieux appréhender la structure génétique des populations et les
+processus évolutifs qui les façonnent.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

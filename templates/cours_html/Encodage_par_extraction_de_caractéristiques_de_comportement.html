@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Extraction de Caractéristiques de Comportement</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Extraction de Caractéristiques de
+Comportement</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques de comportement
+(Behavioral Feature Encoding) est une technique puissante en
+apprentissage automatique et en traitement du signal. Son origine
+remonte aux premières tentatives de modélisation des signaux
+biologiques, où l’on cherchait à capturer les motifs temporels
+caractéristiques. Aujourd’hui, cette méthode est indispensable dans des
+domaines variés tels que la reconnaissance de motifs, l’analyse de
+séries temporelles et la bio-informatique.</p>
+<p>L’émergence de cette technique répond à un besoin crucial :
+représenter des données complexes sous une forme compréhensible par les
+algorithmes d’apprentissage. Les caractéristiques de comportement,
+telles que les tendances, les saisons et les ruptures, permettent de
+décrire le comportement dynamique des données. Cette représentation est
+indispensable pour des tâches telles que la classification, la
+prédiction et la segmentation.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’encodage par extraction de caractéristiques de
+comportement, commençons par définir ce que nous cherchons à capturer.
+Imaginons un signal temporel : nous voulons identifier les motifs
+récurrents, les changements abrupts et les tendances à long terme. Ces
+éléments sont les caractéristiques de comportement que nous souhaitons
+extraire et encoder.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X = \{x_1, x_2, \dots,
+x_n\}\)</span> une série temporelle. Une caractéristique de comportement
+est une mesure quantitative qui capture un aspect spécifique du
+comportement dynamique de <span class="math inline">\(X\)</span>.</p>
+<p>Formellement, une caractéristique de comportement peut être définie
+comme une fonction <span class="math inline">\(f : \mathbb{R}^n
+\rightarrow \mathbb{R}\)</span> telle que : <span
+class="math display">\[\forall X \in \mathbb{R}^n, f(X) \text{ mesure un
+aspect spécifique du comportement de } X.\]</span></p>
+</div>
+<div class="definition">
+<p>Soit <span class="math inline">\(X = \{x_1, x_2, \dots,
+x_n\}\)</span> une série temporelle et <span class="math inline">\(F =
+\{f_1, f_2, \dots, f_m\}\)</span> un ensemble de fonctions de
+caractéristiques. L’encodage par extraction de caractéristiques de
+comportement est une transformation <span class="math inline">\(E :
+\mathbb{R}^n \rightarrow \mathbb{R}^m\)</span> définie par : <span
+class="math display">\[E(X) = (f_1(X), f_2(X), \dots,
+f_m(X)).\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental dans ce domaine est le théorème de
+représentation de Kolmogorov, qui stipule que toute fonction continue de
+plusieurs variables peut être représentée comme une composition de
+fonctions continues d’une seule variable. Ce théorème est crucial pour
+comprendre comment les caractéristiques de comportement peuvent être
+combinées pour représenter des données complexes.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f : [0,1]^n \rightarrow
+\mathbb{R}\)</span> une fonction continue. Il existe des fonctions
+continues <span class="math inline">\(g_1, g_2, \dots, g_n : [0,1]
+\rightarrow \mathbb{R}\)</span> et <span class="math inline">\(h :
+\mathbb{R}^n \rightarrow \mathbb{R}\)</span> telles que : <span
+class="math display">\[f(x_1, x_2, \dots, x_n) = h(g_1(x_1), g_2(x_2),
+\dots, g_n(x_n)).\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de représentation de Kolmogorov, nous devons
+montrer que toute fonction continue peut être décomposée en fonctions
+d’une seule variable. La preuve repose sur le théorème de
+Stone-Weierstrass, qui stipule que les polynômes peuvent approximer
+uniformément toute fonction continue sur un intervalle compact.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(f : [0,1]^n
+\rightarrow \mathbb{R}\)</span> une fonction continue. Par le théorème
+de Stone-Weierstrass, pour chaque <span class="math inline">\(i \in \{1,
+2, \dots, n\}\)</span>, il existe une suite de polynômes <span
+class="math inline">\(P_k^i\)</span> telle que : <span
+class="math display">\[\lim_{k \rightarrow \infty} P_k^i(x_i) = f(x_1,
+x_2, \dots, x_n).\]</span> En utilisant une transformation appropriée,
+nous pouvons définir les fonctions <span
+class="math inline">\(g_i\)</span> et <span
+class="math inline">\(h\)</span> telles que : <span
+class="math display">\[f(x_1, x_2, \dots, x_n) = h(g_1(x_1), g_2(x_2),
+\dots, g_n(x_n)).\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’encodage par extraction de caractéristiques de comportement possède
+plusieurs propriétés intéressantes :</p>
+<ol>
+<li><p><strong>Invariance par Translation</strong> : Si <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont des séries temporelles telles que
+<span class="math inline">\(Y = X + c\)</span> pour une constante <span
+class="math inline">\(c\)</span>, alors <span class="math inline">\(E(Y)
+= E(X)\)</span>.</p></li>
+<li><p><strong>Invariance par Échelle</strong> : Si <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont des séries temporelles telles que
+<span class="math inline">\(Y = aX\)</span> pour une constante <span
+class="math inline">\(a\)</span>, alors <span class="math inline">\(E(Y)
+= aE(X)\)</span>.</p></li>
+<li><p><strong>Stabilité</strong> : L’encodage est stable par rapport
+aux petites perturbations des données. Formellement, si <span
+class="math inline">\(\|X - Y\| &lt; \epsilon\)</span>, alors <span
+class="math inline">\(\|E(X) - E(Y)\| &lt; C\epsilon\)</span> pour une
+constante <span class="math inline">\(C\)</span>.</p></li>
+</ol>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver l’invariance par translation, supposons
+que <span class="math inline">\(Y = X + c\)</span>. Alors, pour toute
+fonction de caractéristique <span class="math inline">\(f_i\)</span>,
+nous avons : <span class="math display">\[f_i(Y) = f_i(X + c) =
+f_i(X).\]</span> Par conséquent, <span class="math inline">\(E(Y) =
+E(X)\)</span>.</p>
+<p>Pour prouver l’invariance par échelle, supposons que <span
+class="math inline">\(Y = aX\)</span>. Alors, pour toute fonction de
+caractéristique <span class="math inline">\(f_i\)</span>, nous avons :
+<span class="math display">\[f_i(Y) = f_i(aX) = a f_i(X).\]</span> Par
+conséquent, <span class="math inline">\(E(Y) = aE(X)\)</span>.</p>
+<p>Pour prouver la stabilité, nous utilisons le fait que les fonctions
+de caractéristiques sont Lipschitz continues. Cela signifie qu’il existe
+une constante <span class="math inline">\(L\)</span> telle que : <span
+class="math display">\[|f_i(X) - f_i(Y)| \leq L \|X - Y\|.\]</span> Par
+conséquent, <span class="math inline">\(\|E(X) - E(Y)\| \leq L \|X -
+Y\|\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de comportement est une
+technique puissante et polyvalente pour représenter des données
+temporelles. Ses applications vont de la reconnaissance de motifs à
+l’analyse de séries temporelles, en passant par la bio-informatique. Les
+théorèmes et propriétés présentés dans cet article montrent que cette
+méthode est non seulement intuitive, mais aussi rigoureusement fondée
+sur des principes mathématiques solides.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

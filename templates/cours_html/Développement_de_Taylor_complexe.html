@@ -1,0 +1,358 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Développement de Taylor complexe</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Développement de Taylor complexe</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le développement de Taylor, bien connu dans le cadre des fonctions
+réelles, trouve une généralisation naturelle et puissante dans l’univers
+des fonctions complexes. Cette extension permet non seulement de
+comprendre le comportement local d’une fonction complexe, mais aussi
+d’explorer des propriétés globales grâce à l’analyticité de ces
+fonctions. L’origine historique de ce développement remonte aux travaux
+de Brook Taylor au XVIIIe siècle, mais c’est avec les contributions
+d’Augustin-Louis Cauchy et Bernhard Riemann que cette théorie a pris
+toute son ampleur dans le contexte complexe.</p>
+<p>L’importance du développement de Taylor complexe réside dans sa
+capacité à fournir une approximation locale précise des fonctions
+analytiques, tout en révélant des singularités et des comportements
+asymptotiques. Ce cadre est indispensable dans de nombreuses branches
+des mathématiques, notamment en analyse complexe, en théorie des
+équations différentielles et en physique théorique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire le développement de Taylor complexe, commençons par
+rappeler ce que nous cherchons à obtenir. Nous voulons approximer une
+fonction complexe <span class="math inline">\(f\)</span> autour d’un
+point <span class="math inline">\(z_0\)</span> dans le plan complexe.
+Cette approximation doit capturer le comportement de <span
+class="math inline">\(f\)</span> au voisinage de <span
+class="math inline">\(z_0\)</span> en utilisant des puissances
+successives de <span class="math inline">\((z - z_0)\)</span>.</p>
+<p>Formellement, le développement de Taylor d’une fonction complexe
+<span class="math inline">\(f\)</span> autour d’un point <span
+class="math inline">\(z_0\)</span> est donné par :</p>
+<p><span class="math display">\[f(z) = \sum_{n=0}^{\infty}
+\frac{f^{(n)}(z_0)}{n!} (z - z_0)^n\]</span></p>
+<p>où <span class="math inline">\(f^{(n)}(z_0)\)</span> désigne la <span
+class="math inline">\(n\)</span>-ième dérivée de <span
+class="math inline">\(f\)</span> en <span
+class="math inline">\(z_0\)</span>, et <span
+class="math inline">\(n!\)</span> est la factorielle de <span
+class="math inline">\(n\)</span>.</p>
+<p>Pour une fonction analytique <span class="math inline">\(f\)</span>,
+ce développement converge dans un certain disque centré en <span
+class="math inline">\(z_0\)</span>. Le rayon de convergence de cette
+série est le plus petit rayon <span class="math inline">\(R\)</span>
+pour lequel la fonction reste analytique dans le disque de rayon <span
+class="math inline">\(R\)</span> centré en <span
+class="math inline">\(z_0\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en analyse complexe est le théorème de
+Taylor, qui garantit l’existence d’un développement de Taylor pour les
+fonctions analytiques.</p>
+<p>Commençons par expliquer ce que nous cherchons à obtenir. Nous
+voulons montrer qu’une fonction analytique peut être exprimée comme une
+série de puissances autour d’un point.</p>
+<p>Formellement, le théorème de Taylor s’énonce comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> une fonction analytique
+sur un domaine <span class="math inline">\(D \subset
+\mathbb{C}\)</span>, et soit <span class="math inline">\(z_0 \in
+D\)</span>. Alors, il existe un rayon <span class="math inline">\(R &gt;
+0\)</span> tel que pour tout <span class="math inline">\(z\)</span> dans
+le disque <span class="math inline">\(\{ z \in \mathbb{C} : |z - z_0|
+&lt; R \}\)</span>, on a :</p>
+<p><span class="math display">\[f(z) = \sum_{n=0}^{\infty}
+\frac{f^{(n)}(z_0)}{n!} (z - z_0)^n\]</span></p>
+<p>où la série converge absolument et uniformément sur tout disque fermé
+de rayon <span class="math inline">\(r &lt; R\)</span> centré en <span
+class="math inline">\(z_0\)</span>.</p>
+</div>
+<p>Pour démontrer ce théorème, nous utilisons le fait que <span
+class="math inline">\(f\)</span> est analytique et donc dérivable à
+l’infini dans <span class="math inline">\(D\)</span>. Nous pouvons alors
+appliquer la formule intégrale de Cauchy pour exprimer les dérivées de
+<span class="math inline">\(f\)</span> en <span
+class="math inline">\(z_0\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve du théorème de Taylor repose sur plusieurs étapes clés.
+Tout d’abord, nous utilisons la formule intégrale de Cauchy pour
+exprimer <span class="math inline">\(f^{(n)}(z_0)\)</span>. Ensuite,
+nous montrons que la série de Taylor converge vers <span
+class="math inline">\(f(z)\)</span> dans le disque de convergence.</p>
+<p>Commençons par la formule intégrale de Cauchy :</p>
+<p><span class="math display">\[f^{(n)}(z_0) = \frac{n!}{2\pi i}
+\oint_{\gamma} \frac{f(\zeta)}{(\zeta - z_0)^{n+1}} d\zeta\]</span></p>
+<p>où <span class="math inline">\(\gamma\)</span> est un contour simple
+fermé autour de <span class="math inline">\(z_0\)</span> dans <span
+class="math inline">\(D\)</span>.</p>
+<p>En substituant cette expression dans la série de Taylor, nous
+obtenons :</p>
+<p><span class="math display">\[\sum_{n=0}^{\infty}
+\frac{f^{(n)}(z_0)}{n!} (z - z_0)^n = \sum_{n=0}^{\infty} \left(
+\frac{1}{2\pi i} \oint_{\gamma} \frac{f(\zeta)}{(\zeta - z_0)^{n+1}}
+d\zeta \right) (z - z_0)^n\]</span></p>
+<p>En échangeant la somme et l’intégrale, nous avons :</p>
+<p><span class="math display">\[\sum_{n=0}^{\infty}
+\frac{f^{(n)}(z_0)}{n!} (z - z_0)^n = \frac{1}{2\pi i} \oint_{\gamma}
+f(\zeta) \sum_{n=0}^{\infty} \frac{(z - z_0)^n}{(\zeta - z_0)^{n+1}}
+d\zeta\]</span></p>
+<p>La série à l’intérieur de l’intégrale est une série géométrique, qui
+converge pour <span class="math inline">\(|z - z_0| &lt; |\zeta -
+z_0|\)</span>. En utilisant la formule de la somme d’une série
+géométrique, nous obtenons :</p>
+<p><span class="math display">\[\sum_{n=0}^{\infty} \frac{(z -
+z_0)^n}{(\zeta - z_0)^{n+1}} = \frac{1}{\zeta - z_0} \cdot \frac{1}{1 -
+\frac{z - z_0}{\zeta - z_0}} = \frac{1}{\zeta - z}\]</span></p>
+<p>Ainsi, nous avons :</p>
+<p><span class="math display">\[\sum_{n=0}^{\infty}
+\frac{f^{(n)}(z_0)}{n!} (z - z_0)^n = \frac{1}{2\pi i} \oint_{\gamma}
+\frac{f(\zeta)}{\zeta - z} d\zeta\]</span></p>
+<p>En utilisant à nouveau la formule intégrale de Cauchy, nous obtenons
+:</p>
+<p><span class="math display">\[\frac{1}{2\pi i} \oint_{\gamma}
+\frac{f(\zeta)}{\zeta - z} d\zeta = f(z)\]</span></p>
+<p>Ce qui achève la preuve du théorème de Taylor.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le développement de Taylor complexe possède plusieurs propriétés
+importantes. En voici quelques-unes :</p>
+<ol>
+<li><p><strong>Convergence absolue et uniforme</strong> : La série de
+Taylor converge absolument et uniformément dans tout disque fermé de
+rayon <span class="math inline">\(r &lt; R\)</span> centré en <span
+class="math inline">\(z_0\)</span>, où <span
+class="math inline">\(R\)</span> est le rayon de convergence.</p></li>
+<li><p><strong>Unicité du développement</strong> : Le développement de
+Taylor d’une fonction analytique est unique. Cela signifie que si deux
+séries de Taylor convergent vers la même fonction dans un voisinage de
+<span class="math inline">\(z_0\)</span>, alors elles sont
+identiques.</p></li>
+<li><p><strong>Extension analytique</strong> : Le développement de
+Taylor peut être utilisé pour prolonger une fonction analytique définie
+sur un domaine à un domaine plus grand, en utilisant le principe de
+prolongement analytique.</p></li>
+</ol>
+<p>Pour démontrer la propriété (i), nous utilisons le fait que la série
+de Taylor est obtenue à partir d’une intégrale de Cauchy, qui converge
+absolument et uniformément dans tout disque fermé de rayon <span
+class="math inline">\(r &lt; R\)</span> centré en <span
+class="math inline">\(z_0\)</span>.</p>
+<p>Pour la propriété (ii), nous utilisons le principe de l’identité des
+fonctions analytiques. Si deux séries de Taylor convergent vers la même
+fonction dans un voisinage de <span class="math inline">\(z_0\)</span>,
+alors leurs coefficients doivent être identiques.</p>
+<p>Enfin, pour la propriété (iii), nous utilisons le fait que le
+développement de Taylor d’une fonction analytique est valable dans tout
+disque de convergence, ce qui permet de prolonger la fonction à un
+domaine plus grand.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le développement de Taylor complexe est un outil puissant et élégant
+pour étudier les fonctions analytiques. Il permet non seulement
+d’approximer ces fonctions localement, mais aussi de révéler des
+propriétés globales grâce à l’analyticité. Les applications de ce
+développement sont vastes et variées, allant de la théorie des équations
+différentielles à la physique théorique.</p>
+<p>En conclusion, le développement de Taylor complexe est un pilier
+fondamental de l’analyse complexe, offrant des perspectives profondes et
+riches pour la compréhension des fonctions analytiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

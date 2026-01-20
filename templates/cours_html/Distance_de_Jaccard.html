@@ -1,0 +1,337 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Jaccard : Une Mesure Fondamentale en Analyse des Données</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Jaccard : Une Mesure Fondamentale en
+Analyse des Données</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Jaccard émerge comme une notion fondamentale dans le
+domaine de l’analyse des données et de la théorie des ensembles. Son
+origine historique remonte aux travaux du botaniste Paul Jaccard au
+début du XXème siècle, qui cherchait à mesurer la similarité entre des
+échantillons de flore. Conceptuellement, cette distance capture l’idée
+intuitive de proximité entre deux ensembles en se basant sur leurs
+éléments communs et distincts. Techniquement, elle est indispensable
+dans des domaines variés tels que la bioinformatique, la recommandation
+de produits, ou encore l’apprentissage automatique. La distance de
+Jaccard résout le problème crucial de la comparaison d’ensembles finis,
+offrant une mesure robuste et intuitive qui transcende les limites des
+distances euclidiennes classiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Jaccard, considérons deux ensembles
+finis <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>. Intuitivement, nous cherchons une
+mesure qui quantifie à quel point ces deux ensembles sont similaires.
+Cette similarité devrait dépendre des éléments qu’ils partagent et de
+ceux qui les différencient.</p>
+<p>Formellement, la distance de Jaccard entre deux ensembles <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux ensembles finis. La distance de
+Jaccard entre <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, notée <span
+class="math inline">\(d_J(A, B)\)</span>, est donnée par : <span
+class="math display">\[d_J(A, B) = 1 - \frac{|A \cap B|}{|A \cup
+B|}\]</span> où <span class="math inline">\(|A \cap B|\)</span> désigne
+le cardinal de l’intersection de <span class="math inline">\(A\)</span>
+et <span class="math inline">\(B\)</span>, et <span
+class="math inline">\(|A \cup B|\)</span> désigne le cardinal de leur
+union.</p>
+</div>
+<p>Une autre formulation équivalente, souvent utilisée en pratique, est
+:</p>
+<p><span class="math display">\[d_J(A, B) = \frac{|A \setminus B| + |B
+\setminus A|}{|A| + |B| - |A \cap B|}\]</span></p>
+<p>où <span class="math inline">\(A \setminus B\)</span> et <span
+class="math inline">\(B \setminus A\)</span> représentent les
+différences symétriques entre <span class="math inline">\(A\)</span> et
+<span class="math inline">\(B\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Jaccard est celui de sa
+métrique. En effet, la distance de Jaccard satisfait les propriétés
+d’une distance au sens mathématique.</p>
+<div class="theorem">
+<p>La fonction <span class="math inline">\(d_J\)</span> définie par :
+<span class="math display">\[d_J(A, B) = 1 - \frac{|A \cap B|}{|A \cup
+B|}\]</span> est une distance au sens où elle satisfait les propriétés
+suivantes pour tout triplet d’ensembles <span class="math inline">\(A,
+B, C\)</span> :</p>
+<ol>
+<li><p><span class="math inline">\(d_J(A, A) = 0\)</span>
+(réflexivité),</p></li>
+<li><p><span class="math inline">\(d_J(A, B) = d_J(B, A)\)</span>
+(symétrie),</p></li>
+<li><p><span class="math inline">\(d_J(A, C) \leq d_J(A, B) + d_J(B,
+C)\)</span> (inégalité triangulaire).</p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver que la distance de Jaccard est une métrique, nous devons
+vérifier chacune des propriétés énumérées dans le théorème.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Preuve de la réflexivité :</strong> Par
+définition, <span class="math inline">\(A \cap A = A\)</span> et <span
+class="math inline">\(A \cup A = A\)</span>. Donc, <span
+class="math display">\[d_J(A, A) = 1 - \frac{|A|}{|A|} = 0.\]</span></p>
+<p><strong>Preuve de la symétrie :</strong> Par définition, <span
+class="math inline">\(|A \cap B| = |B \cap A|\)</span> et <span
+class="math inline">\(|A \cup B| = |B \cup A|\)</span>. Donc, <span
+class="math display">\[d_J(A, B) = 1 - \frac{|A \cap B|}{|A \cup B|} = 1
+- \frac{|B \cap A|}{|B \cup A|} = d_J(B, A).\]</span></p>
+<p><strong>Preuve de l’inégalité triangulaire :</strong> Considérons les
+ensembles <span class="math inline">\(A, B, C\)</span>. Nous devons
+montrer que : <span class="math display">\[d_J(A, C) \leq d_J(A, B) +
+d_J(B, C).\]</span> En utilisant les définitions, cela équivaut à :
+<span class="math display">\[1 - \frac{|A \cap C|}{|A \cup C|} \leq
+\left(1 - \frac{|A \cap B|}{|A \cup B|}\right) + \left(1 - \frac{|B \cap
+C|}{|B \cup C|}\right).\]</span> Cette preuve est plus complexe et
+nécessite l’utilisation de propriétés des ensembles et de la théorie des
+probabilités. Elle repose sur le fait que les intersections et unions
+d’ensembles satisfont certaines inégalités qui garantissent la validité
+de l’inégalité triangulaire. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Jaccard possède plusieurs propriétés intéressantes qui
+en font un outil puissant pour l’analyse des données.</p>
+<div class="proposition">
+<p>Les propriétés suivantes découlent directement de la définition de la
+distance de Jaccard :</p>
+<ol>
+<li><p>Si <span class="math inline">\(A \subseteq B\)</span>, alors
+<span class="math inline">\(d_J(A, B) = 1 -
+\frac{|A|}{|B|}\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> sont disjoints, alors <span
+class="math inline">\(d_J(A, B) = 1\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(A = B\)</span>, alors <span
+class="math inline">\(d_J(A, B) = 0\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> <strong>Preuve de (i) :</strong> Si <span
+class="math inline">\(A \subseteq B\)</span>, alors <span
+class="math inline">\(A \cap B = A\)</span> et <span
+class="math inline">\(A \cup B = B\)</span>. Donc, <span
+class="math display">\[d_J(A, B) = 1 - \frac{|A|}{|B|}.\]</span></p>
+<p><strong>Preuve de (ii) :</strong> Si <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> sont disjoints, alors <span
+class="math inline">\(A \cap B = \emptyset\)</span> et <span
+class="math inline">\(A \cup B = A \dot{\cup} B\)</span>. Donc, <span
+class="math display">\[d_J(A, B) = 1 - \frac{0}{|A| + |B|} =
+1.\]</span></p>
+<p><strong>Preuve de (iii) :</strong> Si <span class="math inline">\(A =
+B\)</span>, alors <span class="math inline">\(A \cap B = A\)</span> et
+<span class="math inline">\(A \cup B = A\)</span>. Donc, <span
+class="math display">\[d_J(A, B) = 1 - \frac{|A|}{|A|} =
+0.\]</span> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Jaccard est un outil essentiel pour la comparaison
+d’ensembles finis. Son utilisation s’étend à de nombreux domaines,
+notamment en bioinformatique et en apprentissage automatique. Les
+propriétés métriques qu’elle satisfait en font une mesure robuste et
+fiable pour évaluer la similarité entre des ensembles. Les
+démonstrations détaillées de ses propriétés fondamentales renforcent sa
+crédibilité et son utilité pratique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

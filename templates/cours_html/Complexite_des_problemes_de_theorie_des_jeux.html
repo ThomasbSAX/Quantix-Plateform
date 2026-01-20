@@ -1,0 +1,339 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de théorie des jeux</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de théorie des jeux</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<p>Voici un article complet en LaTeX sur la complexité des problèmes de
+théorie des jeux :</p>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La théorie des jeux, née au milieu du XXe siècle avec les travaux
+fondateurs de John von Neumann et Oskar Morgenstern, s’est imposée comme
+un outil essentiel pour modéliser les interactions stratégiques entre
+agents rationnels. Son développement a été motivé par des questions
+fondamentales en économie, en biologie évolutive et en sciences
+politiques. Cependant, l’analyse des jeux complexes a rapidement révélé
+des défis computationnels majeurs.</p>
+<p>En effet, la recherche d’équilibres de Nash dans des jeux non
+coopératifs, ou l’optimisation des coalitions dans les jeux coopératifs,
+sont souvent des problèmes NP-difficiles. Cette observation a donné
+naissance à un champ de recherche interdisciplinaire où la théorie des
+jeux rencontre l’informatique théorique. L’étude de la complexité
+computationnelle des problèmes de théorie des jeux vise à comprendre les
+limites fondamentales de l’optimisation stratégique et à développer des
+algorithmes efficaces pour des classes spécifiques de jeux.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Commençons par comprendre ce que nous cherchons à capturer. En
+théorie des jeux, nous modélisons des situations où plusieurs agents
+prennent des décisions qui influencent mutuellement leurs résultats. La
+complexité computationnelle de ces problèmes émerge lorsque nous
+cherchons à déterminer des solutions optimales, comme les équilibres de
+Nash.</p>
+<p>Nous voulons formaliser ce que signifie "résoudre" un problème de
+théorie des jeux. Cela implique généralement de trouver une stratégie
+pour chaque joueur qui soit optimale face aux stratégies des autres
+joueurs. La complexité mesure alors la difficulté de cette tâche en
+termes de temps et d’espace de calcul.</p>
+<div class="definition">
+<p><strong>Définition 1</strong>. <em>Soit <span class="math inline">\(G
+= (N, (S_i)_{i \in N}, (u_i)_{i \in N})\)</span> un jeu normalisé avec
+<span class="math inline">\(N = \{1, 2, \dots, n\}\)</span> l’ensemble
+des joueurs, <span class="math inline">\(S_i\)</span> l’ensemble des
+stratégies du joueur <span class="math inline">\(i\)</span>, et <span
+class="math inline">\(u_i: \prod_{j=1}^n S_j \rightarrow
+\mathbb{R}\)</span> la fonction d’utilité du joueur <span
+class="math inline">\(i\)</span>.</em></p>
+<p><em>Un profil de stratégies <span class="math inline">\(s^* = (s^*_1,
+s^*_2, \dots, s^*_n) \in \prod_{i=1}^n S_i\)</span> est un équilibre de
+Nash si pour tout <span class="math inline">\(i \in N\)</span> et pour
+toute stratégie <span class="math inline">\(s_i \in S_i\)</span>, on a :
+<span class="math display">\[u_i(s^*_i, s^*_{-i}) \geq u_i(s_i,
+s^*_{-i})\]</span> où <span class="math inline">\(s^*_{-i}\)</span>
+désigne le profil de stratégies des joueurs autres que <span
+class="math inline">\(i\)</span>.</em></p>
+</div>
+<p>Une autre manière de formuler cela est la suivante : un équilibre de
+Nash est un profil de stratégies où aucun joueur ne peut améliorer son
+utilité en changeant unilatéralement sa stratégie.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Considérons maintenant les propriétés fondamentales des jeux et leur
+complexité. Nous cherchons à comprendre sous quelles conditions un jeu
+admet un équilibre de Nash, et comment nous pouvons en trouver un.</p>
+<p>Un résultat central est le théorème suivant :</p>
+<div class="theorem">
+<p><strong>Théorème 1</strong> (Théorème de Nash). <em>Soit <span
+class="math inline">\(G\)</span> un jeu fini, c’est-à-dire où chaque
+ensemble de stratégies <span class="math inline">\(S_i\)</span> est
+fini. Alors <span class="math inline">\(G\)</span> admet au moins un
+équilibre de Nash.</em></p>
+</div>
+<p>Pour comprendre ce théorème, réfléchissons à ce que signifie un jeu
+fini. Chaque joueur a un nombre fini de choix possibles, et les utilités
+sont définies pour chaque combinaison possible de stratégies. Le
+théorème de Nash nous assure que dans un tel cadre, il existe toujours
+une situation où aucun joueur n’a intérêt à dévier de sa stratégie.</p>
+<h1 id="preuves">Preuves</h1>
+<p>La preuve du théorème de Nash repose sur des outils d’analyse convexe
+et de théorie des points fixes. Voici une esquisse de la démonstration
+:</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(G\)</span> un jeu
+fini. Pour chaque joueur <span class="math inline">\(i\)</span>,
+définissons la fonction de meilleure réponse <span
+class="math inline">\(B_i: \prod_{j \neq i} S_j \rightarrow
+2^{S_i}\)</span> qui associe à chaque profil de stratégies des autres
+joueurs l’ensemble des stratégies de <span
+class="math inline">\(i\)</span> qui maximisent son utilité.</p>
+<p>Considérons l’ensemble des profils de stratégies mixtes <span
+class="math inline">\(\Delta = \prod_{i=1}^n \Delta(S_i)\)</span>, où
+<span class="math inline">\(\Delta(S_i)\)</span> est le simplexe des
+distributions de probabilité sur <span
+class="math inline">\(S_i\)</span>. Cet ensemble est compact et
+convexe.</p>
+<p>Pour chaque joueur <span class="math inline">\(i\)</span>,
+définissons la fonction de meilleure réponse mixte <span
+class="math inline">\(B_i^m: \prod_{j \neq i} \Delta(S_j) \rightarrow
+\Delta(S_i)\)</span> qui associe à chaque profil de stratégies mixtes
+des autres joueurs une stratégie mixte de <span
+class="math inline">\(i\)</span> qui maximise son utilité attendue.</p>
+<p>Par le théorème du point fixe de Brouwer, il existe un point fixe
+<span class="math inline">\(\sigma^* = (\sigma^*_1, \dots, \sigma^*_n)
+\in \Delta\)</span> tel que pour tout <span
+class="math inline">\(i\)</span>, on a : <span
+class="math display">\[\sigma^*_i = B_i^m(\sigma^*_{-i})\]</span> Cela
+signifie que pour chaque joueur <span class="math inline">\(i\)</span>,
+la stratégie mixte <span class="math inline">\(\sigma^*_i\)</span> est
+une meilleure réponse à <span
+class="math inline">\(\sigma^*_{-i}\)</span>. Par conséquent, <span
+class="math inline">\(\sigma^*\)</span> est un équilibre de Nash en
+stratégies mixtes. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le théorème de Nash a plusieurs conséquences importantes. En voici
+quelques-unes :</p>
+<div class="corollary">
+<p><strong>Corollaire 1</strong>. <em>Tout jeu fini admet un équilibre
+de Nash en stratégies mixtes.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> C’est une conséquence directe du théorème de Nash,
+car les stratégies mixtes sont des distributions de probabilité sur les
+stratégies pures. ◻</p>
+</div>
+<div class="corollary">
+<p><strong>Corollaire 2</strong>. <em>La recherche d’un équilibre de
+Nash dans un jeu fini est un problème décisionnel dans la classe
+PPAD.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La classe PPAD (Polynomial Parity Argument with
+Directed graphs) est une classe de complexité qui capture les problèmes
+de points fixes dans des graphes dirigés. La recherche d’un équilibre de
+Nash peut être formulée comme un problème de point fixe, et il est connu
+que ce problème est PPAD-complet. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’étude de la complexité des problèmes de théorie des jeux est un
+domaine riche et actif. Les résultats présentés ici montrent que, bien
+que les équilibres de Nash existent toujours dans les jeux finis, leur
+recherche peut être computationnellement difficile. Cela ouvre des
+pistes de recherche pour développer des algorithmes efficaces et
+comprendre les limites fondamentales de l’optimisation stratégique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

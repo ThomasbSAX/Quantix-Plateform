@@ -1,0 +1,313 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Fonction de Lyapunov : Une approche géométrique de la stabilité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Fonction de Lyapunov : Une approche géométrique de la
+stabilité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’étude de la stabilité des systèmes dynamiques est une question
+fondamentale en mathématiques appliquées, en physique et en ingénierie.
+La fonction de Lyapunov, introduite par le mathématicien russe Aleksandr
+Mikhailovich Lyapunov en 1892, offre un cadre théorique puissant pour
+analyser la stabilité des points d’équilibre. Cette notion émerveilla
+les mathématiciens par sa simplicité et son efficacité, permettant de
+déterminer la stabilité sans résoudre explicitement les équations
+différentielles.</p>
+<p>La fonction de Lyapunov est indispensable dans l’analyse des systèmes
+non linéaires, où les méthodes classiques de linéarisation peuvent
+s’avérer insuffisantes. Elle permet de conclure sur la stabilité d’un
+système en se basant sur des critères énergétiques, offrant ainsi une
+interprétation physique intuitive.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la fonction de Lyapunov, considérons un système
+dynamique donné par : <span class="math display">\[\dot{x} = f(x), \quad
+x \in \mathbb{R}^n,\]</span> où <span class="math inline">\(f :
+\mathbb{R}^n \rightarrow \mathbb{R}^n\)</span> est une fonction
+continue. Nous cherchons à étudier la stabilité du point d’équilibre
+<span class="math inline">\(x = 0\)</span>.</p>
+<p>Une fonction de Lyapunov est une fonction scalaire <span
+class="math inline">\(V : \mathbb{R}^n \rightarrow \mathbb{R}\)</span>
+qui mesure l’énergie du système. Idéalement, cette fonction doit être
+positive définie et décroissante le long des trajectoires du
+système.</p>
+<div class="definition">
+<p>Une fonction <span class="math inline">\(V : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> est appelée fonction de Lyapunov pour le système
+<span class="math inline">\(\dot{x} = f(x)\)</span> si elle satisfait
+les conditions suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(V(0) = 0\)</span>,</p></li>
+<li><p><span class="math inline">\(V(x) &gt; 0\)</span> pour tout <span
+class="math inline">\(x \neq 0\)</span>,</p></li>
+<li><p>La dérivée de <span class="math inline">\(V\)</span> le long des
+trajectoires du système est négative semi-définie, c’est-à-dire : <span
+class="math display">\[\dot{V}(x) = \nabla V(x) \cdot f(x) \leq 0, \quad
+\forall x \in \mathbb{R}^n.\]</span></p></li>
+</ol>
+</div>
+<h1 id="théorèmes-de-stabilité">Théorèmes de Stabilité</h1>
+<p>Le théorème fondamental de Lyapunov établit un lien entre l’existence
+d’une fonction de Lyapunov et la stabilité du point d’équilibre.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(V\)</span> une fonction de Lyapunov
+pour le système <span class="math inline">\(\dot{x} = f(x)\)</span>.
+Alors :</p>
+<ol>
+<li><p>Le point d’équilibre <span class="math inline">\(x = 0\)</span>
+est stable.</p></li>
+<li><p>Si de plus <span class="math inline">\(\dot{V}(x) &lt; 0\)</span>
+pour tout <span class="math inline">\(x \neq 0\)</span>, alors le point
+d’équilibre est asymptotiquement stable.</p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Lyapunov, nous utilisons les concepts
+d’énergie et de décroissance. Supposons que <span
+class="math inline">\(V\)</span> soit une fonction de Lyapunov.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour montrer la stabilité, considérons un <span
+class="math inline">\(\epsilon &gt; 0\)</span>. Puisque <span
+class="math inline">\(V\)</span> est continue et <span
+class="math inline">\(V(0) = 0\)</span>, il existe un <span
+class="math inline">\(\delta &gt; 0\)</span> tel que pour tout <span
+class="math inline">\(x\)</span> avec <span class="math inline">\(\|x\|
+&lt; \delta\)</span>, on a <span class="math inline">\(V(x) &lt;
+\epsilon\)</span>.</p>
+<p>Supposons que <span class="math inline">\(\|x(0)\| &lt;
+\delta\)</span>. Alors, <span class="math inline">\(V(x(t)) \leq V(x(0))
+&lt; \epsilon\)</span> pour tout <span class="math inline">\(t \geq
+0\)</span>, car <span class="math inline">\(\dot{V}(x(t)) \leq
+0\)</span>. Par conséquent, <span class="math inline">\(\|x(t)\| &lt;
+\epsilon\)</span> pour tout <span class="math inline">\(t \geq
+0\)</span>, ce qui prouve la stabilité.</p>
+<p>Pour montrer l’asymptoticité, supposons que <span
+class="math inline">\(\dot{V}(x) &lt; 0\)</span> pour tout <span
+class="math inline">\(x \neq 0\)</span>. Alors, <span
+class="math inline">\(V(x(t))\)</span> est strictement décroissante et
+bornée inférieurement par 0. Par conséquent, <span
+class="math inline">\(V(x(t))\)</span> converge vers une limite finie
+lorsque <span class="math inline">\(t \rightarrow \infty\)</span>.
+Puisque <span class="math inline">\(\dot{V}(x(t)) &lt; 0\)</span>, cela
+implique que <span class="math inline">\(x(t) \rightarrow 0\)</span>
+lorsque <span class="math inline">\(t \rightarrow \infty\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<ol>
+<li><p>Si <span class="math inline">\(V\)</span> est une fonction de
+Lyapunov et <span class="math inline">\(V(x) \rightarrow \infty\)</span>
+lorsque <span class="math inline">\(\|x\| \rightarrow \infty\)</span>,
+alors le point d’équilibre est globalement stable.</p></li>
+<li><p>Si <span class="math inline">\(V\)</span> est une fonction de
+Lyapunov et <span class="math inline">\(\dot{V}(x) = 0\)</span>
+seulement sur un ensemble mesurable de Lebesgue nul, alors le point
+d’équilibre est exponentiellement stable.</p></li>
+<li><p>La fonction de Lyapunov peut être utilisée pour estimer le
+domaine de stabilité du point d’équilibre.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La fonction de Lyapunov est un outil puissant et élégant pour
+l’analyse de la stabilité des systèmes dynamiques. Son utilisation
+permet de déterminer la stabilité sans résoudre explicitement les
+équations différentielles, offrant ainsi une méthode générale et
+efficace. Les théorèmes de Lyapunov fournissent des critères clairs pour
+la stabilité et l’asymptoticité, faisant de cette notion un pilier de la
+théorie des systèmes dynamiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

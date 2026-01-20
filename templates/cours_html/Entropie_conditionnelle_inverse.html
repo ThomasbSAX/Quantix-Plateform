@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’entropie conditionnelle inverse : une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’entropie conditionnelle inverse : une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’entropie conditionnelle inverse émerge comme un concept fondamental
+dans l’étude des systèmes dynamiques et de la théorie de l’information.
+Son origine remonte aux travaux pionniers de Claude Shannon sur
+l’entropie, mais c’est dans le cadre des systèmes dynamiques que cette
+notion a trouvé une application profonde et significative. L’entropie
+conditionnelle inverse permet de quantifier l’incertitude d’un système
+en fonction de son passé, offrant ainsi une mesure précise de la
+complexité et de la prévisibilité des phénomènes dynamiques.</p>
+<p>Cette notion est indispensable dans divers domaines tels que la
+cryptographie, le traitement du signal et l’analyse des séries
+temporelles. Elle permet de comprendre comment l’information se propage
+à travers un système et comment les états passés influencent les états
+futurs. L’entropie conditionnelle inverse est donc un outil puissant
+pour analyser la structure et le comportement des systèmes
+complexes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’entropie conditionnelle inverse, commençons par
+rappeler quelques notions fondamentales. Considérons un système
+dynamique défini par une application <span class="math inline">\(T: X
+\rightarrow X\)</span> sur un espace mesurable <span
+class="math inline">\((X, \mathcal{A}, \mu)\)</span>. Nous cherchons à
+quantifier l’incertitude de <span class="math inline">\(T\)</span> en
+fonction des états passés.</p>
+<p>Supposons que nous ayons une partition mesurable <span
+class="math inline">\(\alpha = \{A_1, A_2, \ldots, A_n\}\)</span> de
+<span class="math inline">\(X\)</span>. L’entropie conditionnelle
+inverse mesure l’incertitude moyenne de la partition <span
+class="math inline">\(T^{-1}\alpha\)</span> sachant la partition <span
+class="math inline">\(\alpha\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((X, \mathcal{A}, \mu)\)</span> un
+espace mesurable et <span class="math inline">\(T: X \rightarrow
+X\)</span> une application mesurable. Pour une partition mesurable <span
+class="math inline">\(\alpha = \{A_1, A_2, \ldots, A_n\}\)</span> de
+<span class="math inline">\(X\)</span>, l’entropie conditionnelle
+inverse est définie par :</p>
+<p><span class="math display">\[H(T^{-1}\alpha | \alpha) = -\sum_{i=1}^n
+\mu(A_i) \sum_{j=1}^n \mu(T^{-1}A_j | A_i) \log \mu(T^{-1}A_j |
+A_i)\]</span></p>
+<p>où <span class="math inline">\(\mu(T^{-1}A_j | A_i) = \frac{\mu(A_i
+\cap T^{-1}A_j)}{\mu(A_i)}\)</span> est la probabilité conditionnelle de
+<span class="math inline">\(T^{-1}A_j\)</span> sachant <span
+class="math inline">\(A_i\)</span>.</p>
+</div>
+<p>Cette définition peut être généralisée à des partitions plus
+complexes et à des espaces mesurables de dimension supérieure.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’entropie conditionnelle inverse est
+le théorème de Kolmogorov-Sinai. Ce théorème établit une relation entre
+l’entropie conditionnelle inverse et l’entropie topologique d’un système
+dynamique.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((X, T)\)</span> un système dynamique
+et <span class="math inline">\(\alpha\)</span> une partition mesurable
+de <span class="math inline">\(X\)</span>. Alors, l’entropie
+conditionnelle inverse satisfait la propriété suivante :</p>
+<p><span class="math display">\[h(T) = \sup_{\alpha} H(T^{-1}\alpha |
+\alpha)\]</span></p>
+<p>où <span class="math inline">\(h(T)\)</span> est l’entropie
+topologique de <span class="math inline">\(T\)</span> et la supériorité
+est prise sur toutes les partitions mesurables de <span
+class="math inline">\(X\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve du théorème de Kolmogorov-Sinai repose sur plusieurs étapes
+clés. Commençons par rappeler que l’entropie topologique <span
+class="math inline">\(h(T)\)</span> est définie comme la limite
+supérieure de l’entropie des partitions finies lorsque la taille des
+éléments de la partition tend vers zéro.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer le théorème, nous devons montrer que
+pour toute partition mesurable <span
+class="math inline">\(\alpha\)</span>, l’entropie conditionnelle inverse
+<span class="math inline">\(H(T^{-1}\alpha | \alpha)\)</span> est bornée
+supérieurement par l’entropie topologique <span
+class="math inline">\(h(T)\)</span>.</p>
+<p>1. Considérons une partition mesurable <span
+class="math inline">\(\alpha = \{A_1, A_2, \ldots, A_n\}\)</span> de
+<span class="math inline">\(X\)</span>. L’entropie conditionnelle
+inverse est donnée par :</p>
+<p><span class="math display">\[H(T^{-1}\alpha | \alpha) = -\sum_{i=1}^n
+\mu(A_i) \sum_{j=1}^n \mu(T^{-1}A_j | A_i) \log \mu(T^{-1}A_j |
+A_i)\]</span></p>
+<p>2. En utilisant la définition de l’entropie topologique, nous avons
+:</p>
+<p><span class="math display">\[h(T) = \sup_{\alpha}
+H(\alpha)\]</span></p>
+<p>où <span class="math inline">\(H(\alpha)\)</span> est l’entropie de
+la partition <span class="math inline">\(\alpha\)</span>.</p>
+<p>3. Par la propriété de subadditivité de l’entropie, nous savons que
+:</p>
+<p><span class="math display">\[H(T^{-1}\alpha | \alpha) \leq
+H(\alpha)\]</span></p>
+<p>4. En prenant la supériorité sur toutes les partitions mesurables
+<span class="math inline">\(\alpha\)</span>, nous obtenons :</p>
+<p><span class="math display">\[h(T) = \sup_{\alpha} H(T^{-1}\alpha |
+\alpha)\]</span></p>
+<p>Ceci achève la preuve du théorème de Kolmogorov-Sinai. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’entropie conditionnelle inverse possède plusieurs propriétés
+intéressantes qui en font un outil puissant pour l’analyse des systèmes
+dynamiques.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\((X, T)\)</span> un système dynamique
+et <span class="math inline">\(\alpha\)</span> une partition mesurable
+de <span class="math inline">\(X\)</span>. Alors, les propriétés
+suivantes sont satisfaites :</p>
+<ol>
+<li><p>Si <span class="math inline">\(T\)</span> est une application
+bijective et mesurable, alors <span class="math inline">\(H(T^{-1}\alpha
+| \alpha) = H(\alpha | T^{-1}\alpha)\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\alpha\)</span> est une partition
+triviale, alors <span class="math inline">\(H(T^{-1}\alpha | \alpha) =
+0\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(T\)</span> est une application
+ergodique, alors l’entropie conditionnelle inverse est invariante sous
+les transformations mesurables.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> 1. Pour la propriété (i), nous utilisons le fait que
+<span class="math inline">\(T\)</span> est bijective et mesurable. Cela
+implique que :</p>
+<p><span class="math display">\[\mu(T^{-1}A_j | A_i) = \mu(A_j | T
+A_i)\]</span></p>
+<p>En conséquence, nous avons :</p>
+<p><span class="math display">\[H(T^{-1}\alpha | \alpha) = H(\alpha |
+T^{-1}\alpha)\]</span></p>
+<p>2. Pour la propriété (ii), si <span
+class="math inline">\(\alpha\)</span> est une partition triviale, alors
+tous les ensembles <span class="math inline">\(A_i\)</span> sont de
+mesure pleine ou nulle. Par conséquent :</p>
+<p><span class="math display">\[H(T^{-1}\alpha | \alpha) =
+0\]</span></p>
+<p>3. Pour la propriété (iii), si <span class="math inline">\(T\)</span>
+est ergodique, alors l’entropie conditionnelle inverse est invariante
+sous les transformations mesurables. Cela découle du fait que l’entropie
+topologique est invariante sous les transformations mesurables. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’entropie conditionnelle inverse est un concept fondamental dans
+l’étude des systèmes dynamiques et de la théorie de l’information. Elle
+permet de quantifier l’incertitude d’un système en fonction de son
+passé, offrant ainsi une mesure précise de la complexité et de la
+prévisibilité des phénomènes dynamiques. Les théorèmes et propriétés
+associés à l’entropie conditionnelle inverse en font un outil puissant
+pour analyser la structure et le comportement des systèmes
+complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

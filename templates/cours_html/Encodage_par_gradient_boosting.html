@@ -1,0 +1,341 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Gradient Boosting : Une Approche Innovante pour les Données Catégorielles</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Gradient Boosting : Une Approche
+Innovante pour les Données Catégorielles</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des données catégorielles est un défi majeur dans de
+nombreux domaines, notamment en apprentissage automatique et en
+statistique. Les méthodes traditionnelles d’encodage des variables
+catégorielles, telles que l’encodage one-hot ou l’encodage par moyenne,
+présentent des limitations importantes. L’encodage par gradient boosting
+émerge comme une solution prometteuse pour surmonter ces défis.</p>
+<p>Cette technique combine la puissance des modèles de boosting avec
+l’encodage des variables catégorielles, permettant ainsi une meilleure
+représentation des données et une amélioration significative des
+performances des modèles prédictifs. L’objectif de cet article est
+d’explorer en profondeur cette méthode innovante, ses fondements
+théoriques et ses applications pratiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’encodage par gradient boosting, il est essentiel de
+définir quelques concepts clés.</p>
+<h2 class="unnumbered"
+id="encodage-des-variables-catégorielles">Encodage des Variables
+Catégorielles</h2>
+<p>Considérons un ensemble de données <span
+class="math inline">\(\mathcal{D} = \{(x_i, y_i)\}_{i=1}^n\)</span>, où
+<span class="math inline">\(x_i\)</span> est un vecteur de
+caractéristiques et <span class="math inline">\(y_i\)</span> est la
+variable cible. Supposons que l’une des caractéristiques <span
+class="math inline">\(x_i^{(j)}\)</span> soit une variable catégorielle
+prenant ses valeurs dans un ensemble fini <span
+class="math inline">\(\mathcal{C}_j = \{c_1, c_2, \ldots,
+c_k\}\)</span>.</p>
+<p>L’objectif de l’encodage est de transformer cette variable
+catégorielle en une représentation numérique qui capture les relations
+sous-jacentes entre les catégories et la variable cible.</p>
+<h2 class="unnumbered" id="gradient-boosting">Gradient Boosting</h2>
+<p>Le gradient boosting est une technique d’apprentissage ensembliste
+qui construit un modèle prédictif en ajoutant successivement des modèles
+simples, tels que des arbres de décision, pour corriger les erreurs des
+modèles précédents. Formellement, un modèle de gradient boosting peut
+être défini comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{L}(y, F(x))\)</span> une
+fonction de perte. Le modèle de gradient boosting est défini par
+l’algorithme suivant :</p>
+<ol>
+<li><p>Initialiser le modèle <span class="math inline">\(F_0(x) =
+\argmin_\theta \sum_{i=1}^n \mathcal{L}(y_i, \theta)\)</span>.</p></li>
+<li><p>Pour <span class="math inline">\(m = 1\)</span> à <span
+class="math inline">\(M\)</span> :</p>
+<ol>
+<li><p>Calculer les résidus négatifs des gradients : <span
+class="math inline">\(r_{im} = -\left[\frac{\partial \mathcal{L}(y_i,
+F(x_i))}{\partial F(x_i)}\right]_{F(x) = F_{m-1}(x)}\)</span>.</p></li>
+<li><p>Ajuster un modèle simple <span
+class="math inline">\(h_m(x)\)</span> aux résidus <span
+class="math inline">\(r_{im}\)</span>.</p></li>
+<li><p>Mettre à jour le modèle : <span class="math inline">\(F_m(x) =
+F_{m-1}(x) + \nu h_m(x)\)</span>, où <span
+class="math inline">\(\nu\)</span> est un taux d’apprentissage.</p></li>
+</ol></li>
+</ol>
+<p>Le modèle final est donné par <span class="math inline">\(F_M(x) =
+F_0(x) + \nu \sum_{m=1}^M h_m(x)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="encodage-par-gradient-boosting">Encodage par
+Gradient Boosting</h1>
+<p>L’encodage par gradient boosting combine les concepts d’encodage des
+variables catégorielles et de gradient boosting pour créer une
+représentation numérique optimale des variables catégorielles.</p>
+<h2 class="unnumbered" id="définition-formelle">Définition Formelle</h2>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{D}\)</span> un ensemble de
+données avec une variable catégorielle <span
+class="math inline">\(x^{(j)}\)</span> prenant ses valeurs dans <span
+class="math inline">\(\mathcal{C}_j\)</span>. L’encodage par gradient
+boosting de <span class="math inline">\(x^{(j)}\)</span> est défini
+comme suit :</p>
+<ol>
+<li><p>Pour chaque catégorie <span class="math inline">\(c \in
+\mathcal{C}_j\)</span>, entraîner un modèle de gradient boosting pour
+prédire la variable cible <span class="math inline">\(y\)</span> en
+utilisant toutes les caractéristiques sauf <span
+class="math inline">\(x^{(j)}\)</span>.</p></li>
+<li><p>La valeur encodée pour la catégorie <span
+class="math inline">\(c\)</span> est la prédiction moyenne du modèle de
+gradient boosting pour cette catégorie.</p></li>
+</ol>
+<p>Formellement, l’encodage <span class="math inline">\(E_j(c)\)</span>
+pour une catégorie <span class="math inline">\(c \in
+\mathcal{C}_j\)</span> est donné par : <span
+class="math display">\[E_j(c) = \frac{1}{|\mathcal{D}_c|} \sum_{(x_i,
+y_i) \in \mathcal{D}_c} F(x_i^{(1)}, \ldots, x_i^{(j-1)}, x_i^{(j+1)},
+\ldots, x_i^{(d)})\]</span> où <span
+class="math inline">\(\mathcal{D}_c\)</span> est l’ensemble des
+échantillons pour lesquels <span class="math inline">\(x^{(j)} =
+c\)</span>, et <span class="math inline">\(F\)</span> est le modèle de
+gradient boosting entraîné sur toutes les caractéristiques sauf <span
+class="math inline">\(x^{(j)}\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes-et-propriétés">Théorèmes et
+Propriétés</h1>
+<h2 class="unnumbered" id="théorème-de-convergence">Théorème de
+Convergence</h2>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{D}\)</span> un ensemble de
+données avec une variable catégorielle <span
+class="math inline">\(x^{(j)}\)</span>. Si le modèle de gradient
+boosting converge vers un optimum local, alors l’encodage par gradient
+boosting de <span class="math inline">\(x^{(j)}\)</span> minimise la
+fonction de perte <span class="math inline">\(\mathcal{L}(y,
+F(x))\)</span> par rapport aux encodages possibles.</p>
+</div>
+<h2 class="unnumbered" id="preuve-du-théorème">Preuve du Théorème</h2>
+<p>La preuve repose sur les propriétés de convergence des algorithmes de
+gradient boosting et l’optimisation de la fonction de perte. En effet,
+le modèle de gradient boosting minimise itérativement la fonction de
+perte en ajustant les résidus. Par conséquent, l’encodage basé sur les
+prédictions de ce modèle est optimal par rapport à la fonction de perte
+considérée.</p>
+<h2 class="unnumbered" id="propriétés">Propriétés</h2>
+<ol>
+<li><p><strong>Stabilité</strong> : L’encodage par gradient boosting est
+stable, c’est-à-dire que de petites variations dans les données
+entraînent de petites variations dans l’encodage.</p></li>
+<li><p><strong>Interprétabilité</strong> : L’encodage peut être
+interprété comme une mesure de l’effet moyen de chaque catégorie sur la
+variable cible.</p></li>
+<li><p><strong>Adaptabilité</strong> : La méthode s’adapte bien à
+différentes fonctions de perte et types de données.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par gradient boosting représente une avancée significative
+dans le traitement des variables catégorielles. En combinant les forces
+du gradient boosting et de l’encodage, cette méthode offre une
+représentation numérique optimale des données catégorielles, améliorant
+ainsi les performances des modèles prédictifs. Les propriétés de
+stabilité, d’interprétabilité et d’adaptabilité en font un outil
+précieux pour les analystes de données et les chercheurs.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

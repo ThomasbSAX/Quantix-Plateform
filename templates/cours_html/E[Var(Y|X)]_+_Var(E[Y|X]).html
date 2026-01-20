@@ -1,0 +1,364 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Decomposition of Variance: The Law of Total Variance</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Decomposition of Variance: The Law of Total
+Variance</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-and-motivations">Introduction
+and Motivations</h1>
+<p>The study of variance decomposition is a fundamental topic in
+probability theory and statistics. It provides insights into how the
+variability of a random variable can be partitioned into components that
+are explainable by another random variable and those that remain
+unexplained. The law of total variance, expressed as <span
+class="math inline">\(E[\text{Var}(Y|X)] + \text{Var}(E[Y|X])\)</span>,
+is a cornerstone in understanding the relationship between two random
+variables <span class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span>. This decomposition not only simplifies
+complex probabilistic problems but also has wide-ranging applications in
+fields such as econometrics, machine learning, and signal
+processing.</p>
+<h1 class="unnumbered" id="definitions">Definitions</h1>
+<p>To understand the law of total variance, we first need to define
+conditional expectation and conditional variance.</p>
+<h2 class="unnumbered" id="conditional-expectation">Conditional
+Expectation</h2>
+<p>Consider a random variable <span class="math inline">\(Y\)</span> and
+another random variable <span class="math inline">\(X\)</span>. The
+conditional expectation of <span class="math inline">\(Y\)</span> given
+<span class="math inline">\(X\)</span>, denoted <span
+class="math inline">\(E[Y|X]\)</span>, is a function of <span
+class="math inline">\(X\)</span> that provides the expected value of
+<span class="math inline">\(Y\)</span> for each possible value of <span
+class="math inline">\(X\)</span>.</p>
+<div class="definition">
+<p>The conditional expectation <span
+class="math inline">\(E[Y|X]\)</span> is defined as the unique random
+variable such that for any measurable function <span
+class="math inline">\(g\)</span>, <span class="math display">\[E[g(X)Y]
+= E[g(X)E[Y|X]].\]</span></p>
+</div>
+<h2 class="unnumbered" id="conditional-variance">Conditional
+Variance</h2>
+<p>The conditional variance of <span class="math inline">\(Y\)</span>
+given <span class="math inline">\(X\)</span>, denoted <span
+class="math inline">\(\text{Var}(Y|X)\)</span>, measures the variability
+of <span class="math inline">\(Y\)</span> around its conditional
+expectation <span class="math inline">\(E[Y|X]\)</span>.</p>
+<div class="definition">
+<p>The conditional variance <span
+class="math inline">\(\text{Var}(Y|X)\)</span> is defined as <span
+class="math display">\[\text{Var}(Y|X) = E[(Y - E[Y|X])^2 |
+X].\]</span></p>
+</div>
+<h1 class="unnumbered" id="the-law-of-total-variance">The Law of Total
+Variance</h1>
+<p>The law of total variance decomposes the total variance of <span
+class="math inline">\(Y\)</span> into two components: the expected
+conditional variance and the variance of the conditional
+expectation.</p>
+<div class="theorem">
+<p>For any two random variables <span class="math inline">\(X\)</span>
+and <span class="math inline">\(Y\)</span>, the following holds: <span
+class="math display">\[\text{Var}(Y) = E[\text{Var}(Y|X)] +
+\text{Var}(E[Y|X]).\]</span></p>
+</div>
+<h2 class="unnumbered" id="proof-of-the-law-of-total-variance">Proof of
+the Law of Total Variance</h2>
+<p>We provide a detailed proof of the law of total variance.</p>
+<div class="proof">
+<p><em>Proof.</em> Let’s start by expressing <span
+class="math inline">\(Y\)</span> in terms of its conditional expectation
+and a residual term: <span class="math display">\[Y = E[Y|X] + (Y -
+E[Y|X]).\]</span></p>
+<p>Now, compute the variance of <span class="math inline">\(Y\)</span>:
+<span class="math display">\[\text{Var}(Y) = E[(Y -
+E[Y])^2].\]</span></p>
+<p>Substitute <span class="math inline">\(Y\)</span> from the previous
+equation: <span class="math display">\[\begin{aligned}
+\text{Var}(Y) &amp;= E[(E[Y|X] + (Y - E[Y|X]) - E[Y])^2] \\
+&amp;= E[(E[Y|X] - E[Y] + (Y - E[Y|X]))^2].
+\end{aligned}\]</span></p>
+<p>Expand the square: <span class="math display">\[\begin{aligned}
+\text{Var}(Y) &amp;= E[(E[Y|X] - E[Y])^2 + (Y - E[Y|X])^2 + 2(E[Y|X] -
+E[Y])(Y - E[Y|X])].
+\end{aligned}\]</span></p>
+<p>Take the expectation inside: <span
+class="math display">\[\begin{aligned}
+\text{Var}(Y) &amp;= E[(E[Y|X] - E[Y])^2] + E[(Y - E[Y|X])^2] \\
+&amp;\quad + 2E[(E[Y|X] - E[Y])(Y - E[Y|X])].
+\end{aligned}\]</span></p>
+<p>Notice that the last term is zero because: <span
+class="math display">\[\begin{aligned}
+E[(E[Y|X] - E[Y])(Y - E[Y|X])] &amp;= E[(E[Y|X] - E[Y])(Y)] - E[(E[Y|X]
+- E[Y])E[Y|X]] \\
+&amp;= E[(E[Y|X] - E[Y])(Y)] - E[(E[Y|X] - E[Y])^2].
+\end{aligned}\]</span></p>
+<p>Using the definition of conditional expectation: <span
+class="math display">\[\begin{aligned}
+E[(E[Y|X] - E[Y])(Y)] &amp;= E[E[Y|X]Y] - E[E[Y]Y] \\
+&amp;= E[E[Y|X]E[Y|X]] - (E[Y])^2 \\
+&amp;= E[(E[Y|X])^2] - (E[Y])^2.
+\end{aligned}\]</span></p>
+<p>Similarly: <span class="math display">\[\begin{aligned}
+E[(E[Y|X] - E[Y])^2] &amp;= E[(E[Y|X])^2] - 2E[E[Y|X]]E[Y] + (E[Y])^2 \\
+&amp;= E[(E[Y|X])^2] - 2(E[Y])^2 + (E[Y])^2 \\
+&amp;= E[(E[Y|X])^2] - (E[Y])^2.
+\end{aligned}\]</span></p>
+<p>Thus, the last term is indeed zero: <span
+class="math display">\[\begin{aligned}
+E[(E[Y|X] - E[Y])(Y - E[Y|X])] &amp;= (E[(E[Y|X])^2] - (E[Y])^2) -
+(E[(E[Y|X])^2] - (E[Y])^2) \\
+&amp;= 0.
+\end{aligned}\]</span></p>
+<p>Therefore, we have: <span class="math display">\[\text{Var}(Y) =
+E[(E[Y|X] - E[Y])^2] + E[(Y - E[Y|X])^2].\]</span></p>
+<p>Recognize that: <span class="math display">\[\begin{aligned}
+E[(E[Y|X] - E[Y])^2] &amp;= \text{Var}(E[Y|X]), \\
+E[(Y - E[Y|X])^2] &amp;= E[\text{Var}(Y|X)].
+\end{aligned}\]</span></p>
+<p>Thus, we obtain the law of total variance: <span
+class="math display">\[\text{Var}(Y) = E[\text{Var}(Y|X)] +
+\text{Var}(E[Y|X]).\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="properties-and-corollaries">Properties and
+Corollaries</h1>
+<p>The law of total variance has several important properties and
+corollaries.</p>
+<h2 class="unnumbered" id="property-1-non-negativity">Property 1:
+Non-Negativity</h2>
+<p>The expected conditional variance <span
+class="math inline">\(E[\text{Var}(Y|X)]\)</span> is always
+non-negative: <span class="math display">\[E[\text{Var}(Y|X)] \geq
+0.\]</span></p>
+<h2 class="unnumbered"
+id="property-2-total-variance-decomposition">Property 2: Total Variance
+Decomposition</h2>
+<p>The law of total variance provides a complete decomposition of the
+total variance: <span class="math display">\[\text{Var}(Y) =
+E[\text{Var}(Y|X)] + \text{Var}(E[Y|X]).\]</span></p>
+<p>This decomposition shows that the total variance of <span
+class="math inline">\(Y\)</span> is the sum of the variance explained by
+<span class="math inline">\(X\)</span> and the unexplained variance.</p>
+<h2 class="unnumbered" id="property-3-independence-implication">Property
+3: Independence Implication</h2>
+<p>If <span class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> are independent, then the conditional
+expectation <span class="math inline">\(E[Y|X]\)</span> is equal to the
+unconditional expectation <span class="math inline">\(E[Y]\)</span>, and
+the conditional variance <span
+class="math inline">\(\text{Var}(Y|X)\)</span> is equal to the
+unconditional variance <span
+class="math inline">\(\text{Var}(Y)\)</span>. Therefore, the law of
+total variance simplifies to: <span class="math display">\[\text{Var}(Y)
+= E[\text{Var}(Y|X)] + \text{Var}(E[Y|X]) = \text{Var}(Y) +
+0.\]</span></p>
+<p>This shows that the variance of <span
+class="math inline">\(Y\)</span> is entirely unexplained by <span
+class="math inline">\(X\)</span>.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>The law of total variance is a powerful tool in probability theory
+and statistics. It provides a clear and concise way to understand the
+relationship between two random variables by decomposing the total
+variance into explainable and unexplained components. This decomposition
+has wide-ranging applications in various fields, making it an essential
+concept for researchers and practitioners alike.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

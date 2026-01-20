@@ -1,0 +1,312 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Formules de convolution binomiale</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Formules de convolution binomiale</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les formules de convolution binomiale émergent naturellement dans
+l’étude des lois discrètes en probabilités. Elles permettent de calculer
+la somme de produits de coefficients binomiaux, ce qui est essentiel
+pour comprendre les propriétés des lois binomiales et multinomiales. Ces
+formules trouvent leurs racines dans le développement du binôme de
+Newton, généralisé par Euler et d’autres mathématiciens. Elles sont
+indispensables pour résoudre des problèmes de combinatoire, de
+probabilités et même d’analyse numérique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Considérons deux suites de coefficients binomiaux <span
+class="math inline">\((a_k)_{k \geq 0}\)</span> et <span
+class="math inline">\((b_l)_{l \geq 0}\)</span>. Nous cherchons à
+comprendre la somme des produits <span class="math inline">\(a_k
+b_l\)</span> pour <span class="math inline">\(k + l = n\)</span>, où
+<span class="math inline">\(n\)</span> est un entier fixé.
+Intuitivement, cette somme représente une sorte de convolution des deux
+suites.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\((a_k)_{k \geq 0}\)</span> et <span
+class="math inline">\((b_l)_{l \geq 0}\)</span> deux suites de nombres
+complexes. La convolution binomiale des deux suites est définie par :
+<span class="math display">\[(c_n)_{n \geq 0} = \left( \sum_{k=0}^n a_k
+b_{n-k} \right)_{n \geq 0}\]</span></p>
+</div>
+<p>Une autre manière de formuler cette définition est : <span
+class="math display">\[c_n = \sum_{k=0}^n a_k b_{n-k} \quad \text{pour
+tout } n \geq 0\]</span> avec la convention que <span
+class="math inline">\(a_k = 0\)</span> pour <span
+class="math inline">\(k &lt; 0\)</span> et <span
+class="math inline">\(b_l = 0\)</span> pour <span
+class="math inline">\(l &lt; 0\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le théorème central concernant les formules de convolution binomiale
+est le suivant, souvent attribué à Euler :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\((a_k)_{k \geq 0}\)</span> et <span
+class="math inline">\((b_l)_{l \geq 0}\)</span> deux suites de nombres
+complexes. Alors, pour tout <span class="math inline">\(n \geq
+0\)</span>, on a : <span class="math display">\[\sum_{k=0}^n
+\binom{n}{k} a_k b_{n-k} = \sum_{m=0}^n \binom{n}{m} (a + b)^m\]</span>
+où <span class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> sont des variables formelles.</p>
+</div>
+<p>Une autre formulation de ce théorème est : <span
+class="math display">\[\sum_{k=0}^n \binom{n}{k} a_k b_{n-k} = (a +
+b)^n\]</span> où <span class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> sont des nombres complexes.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de convolution binomiale, nous procédons
+par récurrence sur <span class="math inline">\(n\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Initialisation</strong> : Pour <span
+class="math inline">\(n = 0\)</span>, on a : <span
+class="math display">\[\sum_{k=0}^0 \binom{0}{k} a_k b_{0-k} = a_0
+b_0\]</span> et <span class="math inline">\((a + b)^0 = 1\)</span>. Si
+<span class="math inline">\(a_0 b_0 = 1\)</span>, l’initialisation est
+vérifiée.</p>
+<p><strong>Hérédité</strong> : Supposons que le théorème soit vrai pour
+un certain <span class="math inline">\(n \geq 0\)</span>. Montrons qu’il
+est alors vrai pour <span class="math inline">\(n + 1\)</span> : <span
+class="math display">\[\sum_{k=0}^{n+1} \binom{n+1}{k} a_k b_{n+1-k} =
+\sum_{k=0}^{n+1} \left( \binom{n}{k} + \binom{n}{k-1} \right) a_k
+b_{n+1-k}\]</span> En utilisant l’hypothèse de récurrence et les
+propriétés des coefficients binomiaux, on obtient : <span
+class="math display">\[= \sum_{k=0}^n \binom{n}{k} a_k b_{n+1-k} +
+\sum_{k=1}^{n+1} \binom{n}{k-1} a_k b_{n+1-k}\]</span> En changeant
+l’indice de sommation dans la deuxième somme, on a : <span
+class="math display">\[= \sum_{k=0}^n \binom{n}{k} a_k b_{n+1-k} +
+\sum_{k=0}^n \binom{n}{k} a_{k+1} b_{n-k}\]</span> En utilisant
+l’hypothèse de récurrence, on obtient : <span class="math display">\[=
+(a + b)^n \sum_{k=0}^n a_k b_{n+1-k} + (a + b)^n \sum_{k=0}^n a_{k+1}
+b_{n-k}\]</span> En combinant les deux sommes, on obtient : <span
+class="math display">\[= (a + b)^n \sum_{k=0}^n (a_k b_{n+1-k} + a_{k+1}
+b_{n-k}) = (a + b)^{n+1}\]</span> Ce qui achève la démonstration par
+récurrence. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons quelques propriétés importantes des formules de
+convolution binomiale :</p>
+<ol>
+<li><p>La convolution binomiale est commutative, c’est-à-dire que pour
+toutes suites <span class="math inline">\((a_k)_{k \geq 0}\)</span> et
+<span class="math inline">\((b_l)_{l \geq 0}\)</span>, on a : <span
+class="math display">\[\sum_{k=0}^n \binom{n}{k} a_k b_{n-k} =
+\sum_{k=0}^n \binom{n}{k} b_k a_{n-k}\]</span></p></li>
+<li><p>La convolution binomiale est associative, c’est-à-dire que pour
+toutes suites <span class="math inline">\((a_k)_{k \geq 0}\)</span>,
+<span class="math inline">\((b_l)_{l \geq 0}\)</span> et <span
+class="math inline">\((c_m)_{m \geq 0}\)</span>, on a : <span
+class="math display">\[\sum_{k=0}^n \binom{n}{k} \left( \sum_{l=0}^k
+\binom{k}{l} a_l b_{k-l} \right) c_{n-k} = \sum_{k=0}^n \binom{n}{k} a_k
+\left( \sum_{l=0}^{n-k} \binom{n-k}{l} b_l c_{n-k-l}
+\right)\]</span></p></li>
+<li><p>Si <span class="math inline">\((a_k)_{k \geq 0}\)</span> et <span
+class="math inline">\((b_l)_{l \geq 0}\)</span> sont des suites de
+coefficients binomiaux, alors leur convolution est aussi une suite de
+coefficients binomiaux.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les formules de convolution binomiale sont des outils puissants en
+combinatoire et en probabilités. Elles permettent de calculer
+efficacement des sommes de produits de coefficients binomiaux et
+trouvent des applications dans divers domaines des mathématiques. Leur
+étude approfondie permet de mieux comprendre les propriétés des lois
+discrètes et des polynômes orthogonaux.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

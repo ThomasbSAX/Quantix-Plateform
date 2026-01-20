@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes co-NP : Une exploration approfondie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes co-NP : Une exploration
+approfondie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude de la complexité computationnelle est un pilier fondamental
+de l’informatique théorique. Parmi les classes de complexité les plus
+étudiées, la classe NP et sa duale co-NP occupent une place centrale. La
+classe co-NP, introduite dans les années 1970 par Stephen Cook et
+Richard Karp, est définie comme l’ensemble des problèmes de décision
+dont un "non" peut être vérifié rapidement. Cette notion émerge
+naturellement comme le dual de la classe NP, où un "oui" peut être
+vérifié rapidement.</p>
+<p>Pourquoi cette notion est-elle indispensable ? La classe co-NP
+capture des problèmes fondamentaux en logique, en théorie des graphes et
+en cryptographie. Par exemple, la validité d’une formule booléenne (SAT)
+est dans NP, tandis que l’invalidité de cette même formule est dans
+co-NP. Comprendre la relation entre NP et co-NP est crucial pour
+résoudre le problème P vs NP, l’un des problèmes non résolus les plus
+importants en informatique théorique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la classe co-NP, commençons par comprendre ce que nous
+cherchons à capturer. Nous voulons identifier les problèmes pour
+lesquels, si la réponse est "non", nous pouvons fournir un certificat
+qui permet de vérifier cette réponse rapidement. En d’autres termes,
+nous cherchons une classe où la vérification de la négation est
+efficace.</p>
+<p>Formellement, un problème de décision <span
+class="math inline">\(L\)</span> appartient à co-NP si et seulement s’il
+existe une machine de Turing déterministe <span
+class="math inline">\(M\)</span> et un polynôme <span
+class="math inline">\(p\)</span> tels que pour tout mot <span
+class="math inline">\(x\)</span>,</p>
+<p><span class="math display">\[x \in L \iff \exists w \text{ tel que }
+|w| \leq p(|x|) \text{ et } M(x, w) \text{ accepte.}\]</span></p>
+<p>Autrement dit,</p>
+<p><span class="math display">\[L \in \text{co-NP} \iff \exists M, p. \,
+\forall x \in \{0,1\}^*, x \notin L \implies \exists w \text{ tel que }
+|w| \leq p(|x|) \text{ et } M(x, w) \text{ rejette.}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la classe co-NP est le suivant :
+si NP = co-NP, alors P = NP. Ce théorème relie directement la question
+de l’égalité entre NP et co-NP à la célèbre conjecture P vs NP.</p>
+<p>Pour comprendre ce théorème, considérons d’abord que si NP = co-NP,
+alors pour tout problème dans NP, il existe un certificat pour la
+réponse "non" qui peut être vérifié rapidement. Cela implique que nous
+pouvons décider si une instance a une solution en temps polynomial, ce
+qui est l’essence de la classe P.</p>
+<p>Formellement,</p>
+<p><span class="math display">\[\text{Si } NP = co-NP, \text{ alors } P
+= NP.\]</span></p>
+<p>Preuve :</p>
+<p>Supposons que <span class="math inline">\(NP = co-NP\)</span>. Soit
+<span class="math inline">\(L\)</span> un problème dans NP. Par
+définition, il existe une machine de Turing non déterministe <span
+class="math inline">\(M\)</span> et un polynôme <span
+class="math inline">\(p\)</span> tels que pour tout mot <span
+class="math inline">\(x\)</span>,</p>
+<p><span class="math display">\[x \in L \iff \exists w \text{ tel que }
+|w| \leq p(|x|) \text{ et } M(x, w) \text{ accepte.}\]</span></p>
+<p>De plus, comme <span class="math inline">\(NP = co-NP\)</span>, il
+existe une machine de Turing non déterministe <span
+class="math inline">\(M&#39;\)</span> et un polynôme <span
+class="math inline">\(q\)</span> tels que pour tout mot <span
+class="math inline">\(x\)</span>,</p>
+<p><span class="math display">\[x \notin L \iff \exists w&#39; \text{
+tel que } |w&#39;| \leq q(|x|) \text{ et } M&#39;(x, w&#39;) \text{
+accepte.}\]</span></p>
+<p>Nous pouvons construire une machine de Turing déterministe <span
+class="math inline">\(M&#39;&#39;\)</span> qui, pour un mot <span
+class="math inline">\(x\)</span>, simule d’abord <span
+class="math inline">\(M(x, w)\)</span> pour tous les mots <span
+class="math inline">\(w\)</span> de longueur inférieure ou égale à <span
+class="math inline">\(p(|x|)\)</span>. Si aucune simulation n’accepte,
+alors <span class="math inline">\(M&#39;&#39;\)</span> simule <span
+class="math inline">\(M&#39;(x, w&#39;)\)</span> pour tous les mots
+<span class="math inline">\(w&#39;\)</span> de longueur inférieure ou
+égale à <span class="math inline">\(q(|x|)\)</span>. Si une simulation
+accepte, alors <span class="math inline">\(M&#39;&#39;\)</span> rejette
+; sinon, <span class="math inline">\(M&#39;&#39;\)</span> accepte.</p>
+<p>La machine <span class="math inline">\(M&#39;&#39;\)</span>
+fonctionne en temps polynomial et décide donc <span
+class="math inline">\(L\)</span>. Par conséquent, <span
+class="math inline">\(L \in P\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer que la classe co-NP est fermée sous complémentation,
+nous devons montrer que si un problème <span
+class="math inline">\(L\)</span> appartient à co-NP, alors son
+complément <span class="math inline">\(\overline{L}\)</span> appartient
+également à co-NP.</p>
+<p>Preuve :</p>
+<p>Soit <span class="math inline">\(L \in \text{co-NP}\)</span>. Par
+définition, il existe une machine de Turing déterministe <span
+class="math inline">\(M\)</span> et un polynôme <span
+class="math inline">\(p\)</span> tels que pour tout mot <span
+class="math inline">\(x\)</span>,</p>
+<p><span class="math display">\[x \in L \iff \exists w \text{ tel que }
+|w| \leq p(|x|) \text{ et } M(x, w) \text{ accepte.}\]</span></p>
+<p>Nous devons montrer que <span class="math inline">\(\overline{L} \in
+\text{co-NP}\)</span>. Considérons la machine de Turing <span
+class="math inline">\(M&#39;\)</span> qui, pour un mot <span
+class="math inline">\(x\)</span>, rejette si et seulement s’il existe un
+mot <span class="math inline">\(w\)</span> de longueur inférieure ou
+égale à <span class="math inline">\(p(|x|)\)</span> tel que <span
+class="math inline">\(M(x, w)\)</span> rejette.</p>
+<p>Formellement,</p>
+<p><span class="math display">\[x \in \overline{L} \iff \exists w \text{
+tel que } |w| \leq p(|x|) \text{ et } M(x, w) \text{
+rejette.}\]</span></p>
+<p>Ainsi, <span class="math inline">\(\overline{L} \in
+\text{co-NP}\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la classe
+co-NP :</p>
+<p>(i) <strong>Propriété de fermeture sous complémentation :</strong> Si
+<span class="math inline">\(L \in \text{co-NP}\)</span>, alors <span
+class="math inline">\(\overline{L} \in \text{co-NP}\)</span>.</p>
+<p>Preuve : Cette propriété a été démontrée dans la section
+précédente.</p>
+<p>(ii) <strong>Relation avec NP :</strong> Si <span
+class="math inline">\(NP = co-NP\)</span>, alors <span
+class="math inline">\(P = NP\)</span>.</p>
+<p>Preuve : Cette propriété a été démontrée dans la section sur les
+théorèmes.</p>
+<p>(iii) <strong>Exemples de problèmes dans co-NP :</strong> Le problème
+de l’invalidité d’une formule booléenne (UNSAT) est dans co-NP.</p>
+<p>Preuve : Pour une formule booléenne <span
+class="math inline">\(\phi\)</span>, un certificat pour l’invalidité est
+une affectation des variables qui rend <span
+class="math inline">\(\phi\)</span> faux. La vérification de ce
+certificat peut être effectuée en temps polynomial.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’étude de la classe co-NP est essentielle pour comprendre les
+limites de la vérification computationnelle. Bien que de nombreuses
+questions restent ouvertes, les propriétés et théorèmes présentés dans
+cet article fournissent une base solide pour l’exploration future de
+cette classe de complexité. La résolution du problème P vs NP, et par
+conséquent de la question NP = co-NP, reste l’un des défis les plus
+captivants en informatique théorique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

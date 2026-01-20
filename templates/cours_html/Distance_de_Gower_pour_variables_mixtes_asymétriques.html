@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Gower pour variables mixtes asymétriques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Gower pour variables mixtes
+asymétriques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Gower émerge dans un contexte où les données
+présentent des caractéristiques mixtes et asymétriques. Historiquement,
+cette notion a été introduite pour répondre à des besoins spécifiques en
+analyse de données multivariées, où les variables ne sont pas toutes de
+même nature. En effet, dans de nombreux domaines tels que la biologie,
+l’économie ou les sciences sociales, il est courant de se retrouver
+confronté à des jeux de données contenant à la fois des variables
+quantitatives et qualitatives, voire ordinales.</p>
+<p>L’asymétrie des données ajoute une couche de complexité
+supplémentaire. Les méthodes classiques de distance, comme la distance
+euclidienne ou la distance de Manhattan, ne sont pas adaptées pour
+traiter ces types de données. La distance de Gower propose une solution
+élégante en normalisant les contributions des différentes variables,
+qu’elles soient quantitatives ou qualitatives.</p>
+<p>Cette distance est indispensable dans le cadre de l’analyse des
+données multivariées, où la compréhension des relations entre les
+individus et les variables est cruciale. Elle permet de comparer des
+objets décrits par des variables de nature différente, tout en tenant
+compte de l’asymétrie potentielle des données.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Gower, commençons par comprendre ce que
+nous cherchons à mesurer. Nous voulons une distance qui soit capable de
+comparer des individus décrits par des variables de nature différente,
+tout en tenant compte de l’échelle et de la nature de chaque variable.
+La distance doit également être insensible aux asymétries dans les
+données.</p>
+<p>Formellement, la distance de Gower entre deux individus <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une matrice de données de
+taille <span class="math inline">\(n \times p\)</span>, où <span
+class="math inline">\(n\)</span> est le nombre d’individus et <span
+class="math inline">\(p\)</span> est le nombre de variables. Pour chaque
+variable <span class="math inline">\(k\)</span>, définissons une
+fonction de distance <span class="math inline">\(d_k\)</span> adaptée à
+sa nature.</p>
+<p>Pour les variables quantitatives, la distance est normalisée par
+l’écart interquartile : <span class="math display">\[d_k(x_{ik}, x_{jk})
+= \frac{|x_{ik} - x_{jk}|}{Q_k^3 - Q_k^1}\]</span> où <span
+class="math inline">\(Q_k^1\)</span> et <span
+class="math inline">\(Q_k^3\)</span> sont les premier et troisième
+quartiles de la variable <span class="math inline">\(k\)</span>.</p>
+<p>Pour les variables qualitatives, la distance est binaire : <span
+class="math display">\[d_k(x_{ik}, x_{jk}) = \begin{cases}
+0 &amp; \text{si } x_{ik} = x_{jk} \\
+1 &amp; \text{sinon}
+\end{cases}\]</span></p>
+<p>Pour les variables ordinales, la distance est normalisée par le
+nombre de catégories : <span class="math display">\[d_k(x_{ik}, x_{jk})
+= \frac{|x_{ik} - x_{jk}|}{\text{nombre de catégories}}\]</span></p>
+<p>La distance de Gower globale est alors définie comme la moyenne des
+distances normalisées sur toutes les variables : <span
+class="math display">\[d_{Gower}(i, j) = \frac{\sum_{k=1}^p w_k
+d_k(x_{ik}, x_{jk})}{\sum_{k=1}^p w_k}\]</span> où <span
+class="math inline">\(w_k\)</span> est le poids de la variable <span
+class="math inline">\(k\)</span>, souvent pris égal à 1 si toutes les
+variables sont considérées comme égales.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre les propriétés de la distance de Gower, examinons
+quelques théorèmes importants.</p>
+<div class="theorem">
+<p>La distance de Gower satisfait les propriétés suivantes :</p>
+<ol>
+<li><p><strong>Identité des indifférents</strong> : <span
+class="math inline">\(d_{Gower}(i, j) = 0\)</span> si et seulement si
+<span class="math inline">\(i = j\)</span>.</p></li>
+<li><p><strong>Symétrie</strong> : <span
+class="math inline">\(d_{Gower}(i, j) = d_{Gower}(j,
+i)\)</span>.</p></li>
+<li><p><strong>Inégalité triangulaire</strong> : <span
+class="math inline">\(d_{Gower}(i, j) + d_{Gower}(j, k) \geq
+d_{Gower}(i, k)\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver ces propriétés, nous procédons comme
+suit :</p>
+<p>1. <strong>Identité des indifférents</strong> : Par définition, si
+<span class="math inline">\(i = j\)</span>, alors <span
+class="math inline">\(d_k(x_{ik}, x_{jk}) = 0\)</span> pour toutes les
+variables <span class="math inline">\(k\)</span>. Ainsi, <span
+class="math inline">\(d_{Gower}(i, j) = 0\)</span>.</p>
+<p>2. <strong>Symétrie</strong> : La symétrie découle directement de la
+définition des distances <span class="math inline">\(d_k\)</span>, qui
+sont toutes symétriques.</p>
+<p>3. <strong>Inégalité triangulaire</strong> : Pour chaque variable
+<span class="math inline">\(k\)</span>, l’inégalité triangulaire est
+satisfaite pour la distance <span class="math inline">\(d_k\)</span>. En
+prenant la moyenne pondérée, l’inégalité triangulaire est
+préservée. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer les preuves, prenons l’exemple de la propriété
+d’identité des indifférents.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(i = j\)</span>.
+Alors, pour chaque variable <span class="math inline">\(k\)</span>, nous
+avons <span class="math inline">\(x_{ik} = x_{jk}\)</span>. Par
+définition des distances <span class="math inline">\(d_k\)</span>, nous
+avons : <span class="math display">\[d_k(x_{ik}, x_{jk}) =
+0\]</span></p>
+<p>En prenant la moyenne pondérée sur toutes les variables, nous
+obtenons : <span class="math display">\[d_{Gower}(i, j) =
+\frac{\sum_{k=1}^p w_k \cdot 0}{\sum_{k=1}^p w_k} = 0\]</span></p>
+<p>Réciproquement, si <span class="math inline">\(d_{Gower}(i, j) =
+0\)</span>, alors pour chaque variable <span
+class="math inline">\(k\)</span>, nous devons avoir <span
+class="math inline">\(d_k(x_{ik}, x_{jk}) = 0\)</span>. Cela implique
+que <span class="math inline">\(x_{ik} = x_{jk}\)</span> pour toutes les
+variables <span class="math inline">\(k\)</span>, donc <span
+class="math inline">\(i = j\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Gower possède plusieurs propriétés intéressantes, que
+nous listons ci-dessous :</p>
+<ol>
+<li><p><strong>Normalisation</strong> : La distance de Gower est
+normalisée par les caractéristiques des variables, ce qui permet de
+comparer des individus décrits par des variables de nature
+différente.</p></li>
+<li><p><strong>Robustesse aux asymétries</strong> : La distance de Gower
+est robuste aux asymétries dans les données, grâce à l’utilisation de
+mesures de dispersion adaptées.</p></li>
+<li><p><strong>Flexibilité</strong> : La distance de Gower peut être
+adaptée en ajustant les poids <span class="math inline">\(w_k\)</span>
+des variables, permettant ainsi de donner plus ou moins d’importance à
+certaines variables.</p></li>
+</ol>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver ces propriétés, nous procédons comme
+suit :</p>
+<p>1. <strong>Normalisation</strong> : La normalisation est assurée par
+les fonctions de distance <span class="math inline">\(d_k\)</span>, qui
+sont définies en fonction des caractéristiques spécifiques de chaque
+variable.</p>
+<p>2. <strong>Robustesse aux asymétries</strong> : L’utilisation des
+quartiles pour les variables quantitatives et la normalisation par le
+nombre de catégories pour les variables ordinales rend la distance
+insensible aux asymétries.</p>
+<p>3. <strong>Flexibilité</strong> : La flexibilité est assurée par les
+poids <span class="math inline">\(w_k\)</span>, qui peuvent être ajustés
+en fonction des besoins de l’analyse. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Gower est un outil puissant pour l’analyse des données
+multivariées, permettant de comparer des individus décrits par des
+variables de nature différente. Ses propriétés métriques et sa
+robustesse aux asymétries en font un choix privilégié dans de nombreux
+domaines d’application.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

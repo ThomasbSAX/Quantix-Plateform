@@ -1,0 +1,326 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>BYOL: Bootstrap Your Own Latent - Une révolution dans l’apprentissage non supervisé</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">BYOL: Bootstrap Your Own Latent - Une révolution dans
+l’apprentissage non supervisé</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’apprentissage non supervisé est un domaine crucial de
+l’intelligence artificielle, permettant aux modèles d’apprendre des
+représentations utiles à partir de données non étiquetées. Cependant,
+les méthodes traditionnelles comme l’auto-encodeur ou le contraste de
+paires souffrent souvent d’une instabilité numérique et d’une
+convergence lente. C’est dans ce contexte que la méthode <em>BYOL</em>
+(Bootstrap Your Own Latent) émerge, proposant une approche innovante qui
+surmonte ces défis.</p>
+<p>BYOL est inspiré par l’idée de <em>prédiction d’image</em> et utilise
+une architecture basée sur deux réseaux neuronaux, un <em>online
+network</em> et un <em>target network</em>, qui sont mis à jour de
+manière asynchrone. Cette méthode a démontré des performances
+exceptionnelles sur divers benchmarks, rivalisant même avec les méthodes
+supervisées.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre BYOL, il est essentiel de définir quelques concepts
+clés. Considérons un ensemble de données <span
+class="math inline">\(\mathcal{D} = \{x_i\}_{i=1}^N\)</span> où chaque
+<span class="math inline">\(x_i \in \mathbb{R}^d\)</span> est une
+observation non étiquetée.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f_\theta: \mathbb{R}^d \rightarrow
+\mathbb{R}^k\)</span> un réseau neuronal paramétré par <span
+class="math inline">\(\theta\)</span>, appelé <em>online network</em>.
+Soit <span class="math inline">\(g_\xi: \mathbb{R}^k \rightarrow
+\mathbb{R}^m\)</span> un projeteur paramétré par <span
+class="math inline">\(\xi\)</span>. De même, soit <span
+class="math inline">\(f_{\theta&#39;}: \mathbb{R}^d \rightarrow
+\mathbb{R}^k\)</span> un réseau neuronal paramétré par <span
+class="math inline">\(\theta&#39;\)</span>, appelé <em>target
+network</em>, et <span class="math inline">\(g_{\xi&#39;}: \mathbb{R}^k
+\rightarrow \mathbb{R}^m\)</span> un projeteur paramétré par <span
+class="math inline">\(\xi&#39;\)</span>.</p>
+<p>Les paramètres du <em>target network</em> sont mis à jour de manière
+exponentiellement lissée: <span class="math display">\[\theta&#39;
+\leftarrow \tau \theta + (1 - \tau) \theta&#39;, \quad \xi&#39;
+\leftarrow \tau \xi + (1 - \tau) \xi&#39;\]</span> où <span
+class="math inline">\(\tau\)</span> est un hyperparamètre de
+lissage.</p>
+</div>
+<div class="definition">
+<p>Pour une observation <span class="math inline">\(x\)</span>, la
+représentation latente est donnée par: <span class="math display">\[z =
+f_\theta(x), \quad z&#39; = f_{\theta&#39;}(x&#39;)\]</span> où <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(x&#39;\)</span> sont deux vues augmentées de la
+même observation.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes-et-propriétés">Théorèmes et
+Propriétés</h1>
+<p>BYOL repose sur une fonction de perte qui maximise l’accord entre les
+représentations latentes des deux vues augmentées. Cette perte est
+définie comme suit:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(h_\psi: \mathbb{R}^m \rightarrow
+\mathbb{R}^m\)</span> un prédicteur paramétré par <span
+class="math inline">\(\psi\)</span>. La fonction de perte BYOL est
+définie par: <span class="math display">\[\mathcal{L}_{\text{BYOL}} =
+-\frac{1}{N} \sum_{i=1}^N \left[ z_i^\top h_\psi(g_\xi(z_i)) - z_i^\top
+g_{\xi&#39;}(z_i&#39;) \right]\]</span> où <span
+class="math inline">\(z_i = f_\theta(x_i)\)</span> et <span
+class="math inline">\(z_i&#39; = f_{\theta&#39;}(x_i&#39;)\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La perte BYOL est conçue pour maximiser l’accord
+entre les représentations latentes des deux vues augmentées. En effet,
+la première partie de la perte <span class="math inline">\(z_i^\top
+h_\psi(g_\xi(z_i))\)</span> encourage le réseau à prédire sa propre
+représentation latente, tandis que la deuxième partie <span
+class="math inline">\(z_i^\top g_{\xi&#39;}(z_i&#39;)\)</span> encourage
+l’accord entre les représentations latentes des deux vues.</p>
+<p>Pour minimiser cette perte, le réseau online <span
+class="math inline">\(f_\theta\)</span> et le projeteur <span
+class="math inline">\(g_\xi\)</span> doivent apprendre des
+représentations latentes qui sont à la fois prédictibles et cohérentes
+entre les deux vues. Le réseau target <span
+class="math inline">\(f_{\theta&#39;}\)</span> et le projeteur <span
+class="math inline">\(g_{\xi&#39;}\)</span> sont mis à jour de manière
+exponentiellement lissée pour stabiliser l’apprentissage. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>BYOL possède plusieurs propriétés intéressantes qui contribuent à son
+succès:</p>
+<div class="proposition">
+<ul>
+<li><p>BYOL ne nécessite pas de mémoire négative, contrairement aux
+méthodes de contraste de paires.</p></li>
+<li><p>BYOL est stable numériquement grâce à la mise à jour
+exponentiellement lissée du réseau target.</p></li>
+<li><p>BYOL peut être utilisé pour des tâches de transfert
+d’apprentissage, en utilisant les représentations latentes apprises
+comme caractéristiques pour des modèles supervisés.</p></li>
+</ul>
+</div>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ul>
+<li><p>La perte BYOL est définie uniquement en termes des
+représentations latentes des deux vues augmentées, sans nécessiter de
+comparaison avec des exemples négatifs.</p></li>
+<li><p>La mise à jour exponentiellement lissée du réseau target permet
+de stabiliser l’apprentissage, en évitant les oscillations qui peuvent
+survenir dans les méthodes traditionnelles.</p></li>
+<li><p>Les représentations latentes apprises par BYOL sont riches en
+informations et peuvent être utilisées comme caractéristiques pour des
+modèles supervisés, améliorant ainsi les performances sur diverses
+tâches.</p></li>
+</ul>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>BYOL représente une avancée significative dans le domaine de
+l’apprentissage non supervisé. En combinant les idées de prédiction
+d’image et de mise à jour exponentiellement lissée, BYOL surmonte les
+défis traditionnels des méthodes non supervisées et ouvre de nouvelles
+perspectives pour l’apprentissage automatique. Les performances
+exceptionnelles de BYOL sur divers benchmarks en font une méthode
+prometteuse pour les applications pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

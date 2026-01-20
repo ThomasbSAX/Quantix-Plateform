@@ -1,0 +1,373 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Extraction de Caractéristiques : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Extraction de Caractéristiques : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’extraction de caractéristiques, ou <em>feature extraction</em> en
+anglais, est un processus fondamental dans le traitement du signal et de
+l’image, ainsi que dans l’apprentissage automatique. Elle consiste à
+transformer des données brutes en un ensemble de caractéristiques
+pertinentes pour une tâche donnée. Cette transformation est cruciale
+pour réduire la dimensionnalité des données, améliorer les performances
+des algorithmes et faciliter l’interprétation des résultats.</p>
+<p>L’origine de cette notion remonte aux années 1960 avec les travaux
+pionniers en reconnaissance des formes. Aujourd’hui, elle est
+indispensable dans des domaines variés tels que la vision par
+ordinateur, le traitement du langage naturel et la bioinformatique.
+L’extraction de caractéristiques permet de capturer l’essence des
+données tout en éliminant le bruit et les redondances.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’extraction de caractéristiques, commençons par
+définir ce que nous cherchons à obtenir. Imaginons que nous avons un
+ensemble de données brutes, par exemple une image ou un signal audio.
+Notre objectif est d’identifier les éléments les plus informatifs de ces
+données, ceux qui permettent de distinguer différentes catégories ou
+classes.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> un ensemble
+de données brutes et <span class="math inline">\(F\)</span> un ensemble
+de caractéristiques. L’extraction de caractéristiques est une fonction
+<span class="math inline">\(\phi : X \rightarrow F\)</span> qui
+transforme <span class="math inline">\(X\)</span> en <span
+class="math inline">\(F\)</span>. Nous cherchons une fonction <span
+class="math inline">\(\phi\)</span> telle que :</p>
+<p><span class="math display">\[\phi(x) = \{ f_1(x), f_2(x), \ldots,
+f_n(x) \}\]</span></p>
+<p>où <span class="math inline">\(f_i(x)\)</span> représente la <span
+class="math inline">\(i\)</span>-ème caractéristique de l’échantillon
+<span class="math inline">\(x\)</span>.</p>
+<p>Une autre manière de formuler cette définition est la suivante : soit
+<span class="math inline">\(X\)</span> un espace de données et <span
+class="math inline">\(F\)</span> un espace de caractéristiques.
+L’extraction de caractéristiques est une application linéaire ou non
+linéaire <span class="math inline">\(\phi : X \rightarrow F\)</span> qui
+maximise l’information pertinente tout en minimisant la
+dimensionnalité.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental dans le domaine de l’extraction de
+caractéristiques est celui de la réduction de dimension. Ce théorème
+stipule que, sous certaines conditions, il est possible de représenter
+les données dans un espace de dimension inférieure sans perdre
+d’information significative.</p>
+<p>Formulons ce théorème de manière rigoureuse. Soit <span
+class="math inline">\(X\)</span> un ensemble de données de dimension
+<span class="math inline">\(d\)</span> et <span
+class="math inline">\(F\)</span> un espace de caractéristiques de
+dimension <span class="math inline">\(k\)</span>, avec <span
+class="math inline">\(k &lt; d\)</span>. Supposons que les données <span
+class="math inline">\(X\)</span> peuvent être projetées sur <span
+class="math inline">\(F\)</span> par une fonction <span
+class="math inline">\(\phi\)</span>. Alors, il existe une projection
+<span class="math inline">\(\phi\)</span> telle que :</p>
+<p><span class="math display">\[\forall x \in X, \quad \| x - \phi(x)
+\|^2 \leq \epsilon\]</span></p>
+<p>où <span class="math inline">\(\epsilon\)</span> est une constante
+représentant l’erreur de reconstruction.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous allons utiliser des concepts de
+l’analyse des composantes principales (PCA). La PCA est une technique
+d’extraction de caractéristiques qui projette les données sur un
+sous-espace de dimension inférieure en maximisant la variance.</p>
+<p>Soit <span class="math inline">\(X\)</span> une matrice de données
+centrée de taille <span class="math inline">\(n \times d\)</span>, où
+<span class="math inline">\(n\)</span> est le nombre d’échantillons et
+<span class="math inline">\(d\)</span> la dimension des données. La
+matrice de covariance <span class="math inline">\(C\)</span> est définie
+par :</p>
+<p><span class="math display">\[C = \frac{1}{n} X^T X\]</span></p>
+<p>Les composantes principales sont les vecteurs propres de <span
+class="math inline">\(C\)</span> associés aux plus grandes valeurs
+propres. Soit <span class="math inline">\(U\)</span> une matrice
+orthonormale dont les colonnes sont les vecteurs propres de <span
+class="math inline">\(C\)</span>. La projection des données sur le
+sous-espace de dimension <span class="math inline">\(k\)</span> est
+donnée par :</p>
+<p><span class="math display">\[\phi(X) = X U_k\]</span></p>
+<p>où <span class="math inline">\(U_k\)</span> est la matrice formée des
+<span class="math inline">\(k\)</span> premières colonnes de <span
+class="math inline">\(U\)</span>.</p>
+<p>Pour montrer que cette projection minimise l’erreur de
+reconstruction, nous utilisons le théorème d’Eckart-Young-Mirsky. Ce
+théorème stipule que la meilleure approximation de rang <span
+class="math inline">\(k\)</span> d’une matrice <span
+class="math inline">\(X\)</span> est obtenue en tronquant sa
+décomposition en valeurs singulières (SVD) à <span
+class="math inline">\(k\)</span> termes.</p>
+<p>La SVD de <span class="math inline">\(X\)</span> est donnée par :</p>
+<p><span class="math display">\[X = U \Sigma V^T\]</span></p>
+<p>où <span class="math inline">\(U\)</span> et <span
+class="math inline">\(V\)</span> sont des matrices orthonormales et
+<span class="math inline">\(\Sigma\)</span> est une matrice diagonale
+contenant les valeurs singulières de <span
+class="math inline">\(X\)</span>. La meilleure approximation de rang
+<span class="math inline">\(k\)</span> est alors :</p>
+<p><span class="math display">\[X_k = U_k \Sigma_k V_k^T\]</span></p>
+<p>où <span class="math inline">\(U_k\)</span>, <span
+class="math inline">\(\Sigma_k\)</span> et <span
+class="math inline">\(V_k\)</span> sont les matrices tronquées à <span
+class="math inline">\(k\)</span> termes. L’erreur de reconstruction est
+donnée par :</p>
+<p><span class="math display">\[\| X - X_k \|^2 = \sum_{i=k+1}^d
+\sigma_i^2\]</span></p>
+<p>où <span class="math inline">\(\sigma_i\)</span> sont les valeurs
+singulières de <span class="math inline">\(X\)</span>. Cette erreur est
+minimisée lorsque <span class="math inline">\(U_k\)</span> est formé des
+<span class="math inline">\(k\)</span> premières colonnes de <span
+class="math inline">\(U\)</span>, c’est-à-dire les vecteurs propres
+associés aux plus grandes valeurs singulières.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant énumérer quelques propriétés importantes de
+l’extraction de caractéristiques, suivies de leurs preuves
+détaillées.</p>
+<ol>
+<li><p>La projection sur les composantes principales maximise la
+variance des données projetées.</p>
+<p><strong>Preuve :</strong> Soit <span class="math inline">\(X\)</span>
+une matrice de données centrée et <span
+class="math inline">\(U_k\)</span> la matrice des <span
+class="math inline">\(k\)</span> premières composantes principales. La
+variance des données projetées est donnée par :</p>
+<p><span class="math display">\[\text{Var}(\phi(X)) = \text{tr}(U_k^T
+X^T X U_k)\]</span></p>
+<p>En utilisant la décomposition en valeurs propres de <span
+class="math inline">\(C = \frac{1}{n} X^T X\)</span>, nous avons :</p>
+<p><span class="math display">\[\text{Var}(\phi(X)) = n \sum_{i=1}^k
+\lambda_i\]</span></p>
+<p>où <span class="math inline">\(\lambda_i\)</span> sont les valeurs
+propres de <span class="math inline">\(C\)</span>. La somme des <span
+class="math inline">\(k\)</span> plus grandes valeurs propres est
+maximisée lorsque <span class="math inline">\(U_k\)</span> est formé des
+<span class="math inline">\(k\)</span> premières colonnes de la matrice
+des vecteurs propres.</p></li>
+<li><p>L’extraction de caractéristiques par PCA est équivalente à la
+minimisation de l’erreur de reconstruction.</p>
+<p><strong>Preuve :</strong> Comme nous l’avons vu dans la section
+précédente, la minimisation de l’erreur de reconstruction est
+équivalente à la maximisation de la variance des données projetées. Par
+conséquent, l’extraction de caractéristiques par PCA minimise l’erreur
+de reconstruction.</p></li>
+<li><p>Les caractéristiques extraites par PCA sont non corrélées.</p>
+<p><strong>Preuve :</strong> Soit <span class="math inline">\(Z =
+\phi(X)\)</span> les données projetées sur les composantes principales.
+La matrice de covariance de <span class="math inline">\(Z\)</span> est
+donnée par :</p>
+<p><span class="math display">\[C_Z = \frac{1}{n} Z^T Z = U_k^T C
+U_k\]</span></p>
+<p>Puisque <span class="math inline">\(U_k\)</span> est une matrice
+orthonormale et <span class="math inline">\(C\)</span> est une matrice
+diagonale, <span class="math inline">\(C_Z\)</span> est également une
+matrice diagonale. Cela signifie que les caractéristiques extraites sont
+non corrélées.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’extraction de caractéristiques est un processus essentiel dans le
+traitement des données. Elle permet de réduire la dimensionnalité tout
+en conservant l’information pertinente. Les techniques d’extraction de
+caractéristiques, telles que la PCA, sont largement utilisées dans
+divers domaines et continuent de faire l’objet de recherches
+actives.</p>
+<p>En conclusion, l’extraction de caractéristiques est une discipline
+riche et complexe qui joue un rôle central dans l’analyse des données et
+l’apprentissage automatique. Les théorèmes et propriétés présentés dans
+cet article fournissent une base solide pour comprendre et appliquer ces
+techniques dans des contextes variés.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

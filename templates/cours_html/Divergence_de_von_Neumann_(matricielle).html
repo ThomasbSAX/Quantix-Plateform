@@ -1,0 +1,352 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de von Neumann (matricielle)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de von Neumann (matricielle)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La divergence de von Neumann, également connue sous le nom de
+divergence matricielle, est un concept fondamental en théorie des
+matrices et en analyse numérique. Elle trouve ses racines dans les
+travaux de John von Neumann, un mathématicien et physicien d’origine
+hongroise qui a apporté des contributions majeures à divers domaines des
+mathématiques et de l’informatique.</p>
+<p>L’émergence de la divergence matricielle est motivée par le besoin de
+quantifier la différence entre deux matrices. Dans de nombreuses
+applications, notamment en traitement du signal, en apprentissage
+automatique et en mécanique quantique, il est crucial de mesurer la
+distance entre deux matrices pour évaluer l’efficacité des algorithmes
+ou la précision des modèles.</p>
+<p>La divergence de von Neumann est indispensable dans le cadre de
+l’optimisation matricielle, où elle permet de définir des critères de
+convergence pour les algorithmes itératifs. Elle est également utilisée
+dans la théorie de l’information quantique pour mesurer la distance
+entre deux états quantiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la divergence de von Neumann, commençons par rappeler
+quelques notions préliminaires. Considérons deux matrices hermitiennes
+<span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> de même taille. Nous cherchons à
+mesurer la différence entre ces deux matrices.</p>
+<p>La divergence de von Neumann est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices hermitiennes de taille
+<span class="math inline">\(n \times n\)</span>. La divergence de von
+Neumann entre <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est donnée par : <span
+class="math display">\[D(A \| B) = \text{Tr}(A - A
+\log(B^{-1}A))\]</span> où <span
+class="math inline">\(\text{Tr}\)</span> désigne la trace d’une matrice,
+et <span class="math inline">\(\log\)</span> est le logarithme
+matriciel.</p>
+</div>
+<p>Une autre formulation équivalente de la divergence de von Neumann est
+:</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices hermitiennes de taille
+<span class="math inline">\(n \times n\)</span>. La divergence de von
+Neumann entre <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> peut également s’exprimer comme : <span
+class="math display">\[D(A \| B) = \sum_{i=1}^n (\lambda_i - \lambda_i
+\log(\mu_i))\]</span> où <span class="math inline">\(\lambda_i\)</span>
+sont les valeurs propres de <span class="math inline">\(A\)</span>, et
+<span class="math inline">\(\mu_i\)</span> sont les valeurs propres de
+<span class="math inline">\(B\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la divergence de von Neumann est
+le suivant :</p>
+<div class="theorem">
+<p>Pour toute paire de matrices hermitiennes <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, la divergence de von Neumann est non
+négative, c’est-à-dire : <span class="math display">\[D(A \| B) \geq
+0\]</span> De plus, <span class="math inline">\(D(A \| B) = 0\)</span>
+si et seulement si <span class="math inline">\(A = B\)</span>.</p>
+</div>
+<p>Une autre propriété importante est la convexité de la divergence de
+von Neumann :</p>
+<div class="theorem">
+<p>La fonction <span class="math inline">\(D(A \| B)\)</span> est
+convexe en <span class="math inline">\(A\)</span> pour une matrice fixe
+<span class="math inline">\(B\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver la non-négativité de la divergence de von Neumann, nous
+utilisons le fait que pour toute matrice hermitienne <span
+class="math inline">\(X\)</span>, la trace de <span
+class="math inline">\(X \log(X)\)</span> est réelle et positive.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la décomposition spectrale de <span
+class="math inline">\(B^{-1}A\)</span> : <span
+class="math display">\[B^{-1}A = U \Lambda U^*\]</span> où <span
+class="math inline">\(U\)</span> est une matrice unitaire et <span
+class="math inline">\(\Lambda\)</span> est une matrice diagonale
+contenant les valeurs propres de <span
+class="math inline">\(B^{-1}A\)</span>.</p>
+<p>La divergence de von Neumann peut alors s’écrire : <span
+class="math display">\[D(A \| B) = \text{Tr}(A - A U \log(\Lambda)
+U^*)\]</span></p>
+<p>En utilisant les propriétés de la trace, nous obtenons : <span
+class="math display">\[D(A \| B) = \text{Tr}(A (I - U \log(\Lambda)
+U^*))\]</span></p>
+<p>Puisque <span class="math inline">\(I - U \log(\Lambda) U^* = B^{-1}A
+(I - \log(B^{-1}A))\)</span>, nous avons : <span
+class="math display">\[D(A \| B) = \text{Tr}(B^{-1}A (I -
+\log(B^{-1}A)))\]</span></p>
+<p>En utilisant le fait que <span class="math inline">\(\text{Tr}(X
+\log(X))\)</span> est réel et positif pour toute matrice hermitienne
+positive <span class="math inline">\(X\)</span>, nous concluons que :
+<span class="math display">\[D(A \| B) \geq 0\]</span></p>
+<p>De plus, si <span class="math inline">\(D(A \| B) = 0\)</span>, alors
+<span class="math inline">\(I - \log(B^{-1}A) = 0\)</span>, ce qui
+implique que <span class="math inline">\(B^{-1}A = I\)</span>, et donc
+<span class="math inline">\(A = B\)</span>. ◻</p>
+</div>
+<p>Pour prouver la convexité de la divergence de von Neumann, nous
+utilisons le fait que la fonction <span class="math inline">\(x \mapsto
+x \log(x)\)</span> est convexe pour <span class="math inline">\(x &gt;
+0\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soient <span class="math inline">\(A_1, A_2\)</span>
+deux matrices hermitiennes et <span class="math inline">\(t \in [0,
+1]\)</span>. Nous devons montrer que : <span
+class="math display">\[D(tA_1 + (1-t)A_2 \| B) \leq t D(A_1 \| B) +
+(1-t) D(A_2 \| B)\]</span></p>
+<p>En utilisant la définition de la divergence de von Neumann, nous
+avons : <span class="math display">\[D(tA_1 + (1-t)A_2 \| B) =
+\text{Tr}(tA_1 + (1-t)A_2 - (tA_1 + (1-t)A_2) \log(B^{-1}(tA_1 +
+(1-t)A_2)))\]</span></p>
+<p>En développant et en utilisant la convexité de <span
+class="math inline">\(x \mapsto x \log(x)\)</span>, nous obtenons :
+<span class="math display">\[D(tA_1 + (1-t)A_2 \| B) \leq t
+\text{Tr}(A_1 - A_1 \log(B^{-1}A_1)) + (1-t) \text{Tr}(A_2 - A_2
+\log(B^{-1}A_2))\]</span></p>
+<p>Ce qui prouve la convexité de la divergence de von Neumann. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La divergence de von Neumann possède plusieurs propriétés
+intéressantes :</p>
+<ol>
+<li><p><strong>Invariance par transformation unitaire</strong> : Pour
+toute matrice unitaire <span class="math inline">\(U\)</span>, nous
+avons : <span class="math display">\[D(U A U^* \| U B U^*) = D(A \|
+B)\]</span></p></li>
+<li><p><strong>Inégalité de Klein</strong> : Pour toute paire de
+matrices hermitiennes <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, nous avons : <span
+class="math display">\[D(A \| B) \leq -\frac{1}{2}
+\log(\det(B^{-1}A)^2)\]</span></p></li>
+<li><p><strong>Inégalité de Pinsker</strong> : Pour toute paire de
+matrices hermitiennes <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, nous avons : <span
+class="math display">\[D(A \| B) \geq \frac{1}{2} \|A - B\|_F^2\]</span>
+où <span class="math inline">\(\| \cdot \|_F\)</span> désigne la norme
+de Frobenius.</p></li>
+</ol>
+<p>La preuve de ces propriétés repose sur des techniques avancées
+d’analyse matricielle et d’algèbre linéaire. Elles illustrent la
+richesse et la profondeur de la divergence de von Neumann en tant
+qu’outil fondamental dans l’étude des matrices.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

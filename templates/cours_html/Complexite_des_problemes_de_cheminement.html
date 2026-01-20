@@ -1,0 +1,406 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de cheminement : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de cheminement : Une
+exploration mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les problèmes de cheminement constituent un pilier fondamental des
+sciences informatiques théoriques et appliquées. Leur origine remonte
+aux premiers travaux sur les graphes, notamment avec les contributions
+de Leonhard Euler au XVIIIe siècle. Ces problèmes émergent naturellement
+dans la modélisation des réseaux, qu’ils soient physiques (réseaux
+routiers, circuits électroniques) ou abstraits (internet, réseaux
+sociaux).</p>
+<p>Leur importance réside dans leur capacité à capturer l’essence de
+nombreux problèmes d’optimisation et de décision. Par exemple, le
+problème du plus court chemin est central dans la logistique, tandis que
+le problème du voyageur de commerce (TSP) est un paradigme des problèmes
+NP-difficiles. Ces problèmes sont indispensables dans le cadre de
+l’algorithmique, où ils servent souvent de bancs d’essai pour les
+nouvelles méthodes et techniques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour aborder la complexité des problèmes de cheminement, il est
+essentiel de définir rigoureusement les concepts clés. Commençons par le
+problème du plus court chemin.</p>
+<h2 class="unnumbered" id="problème-du-plus-court-chemin">Problème du
+Plus Court Chemin</h2>
+<p>Nous cherchons à trouver un chemin entre deux sommets d’un graphe
+pondéré, de sorte que la somme des poids des arêtes traversées soit
+minimale. Intuitivement, cela revient à minimiser le coût total du
+trajet.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un graphe
+pondéré avec <span class="math inline">\(V\)</span> l’ensemble des
+sommets et <span class="math inline">\(E\)</span> l’ensemble des arêtes,
+et soit <span class="math inline">\(w : E \rightarrow
+\mathbb{R}^+\)</span> une fonction de poids. Pour deux sommets <span
+class="math inline">\(s, t \in V\)</span>, le problème du plus court
+chemin consiste à trouver un chemin <span
+class="math inline">\(P\)</span> de <span
+class="math inline">\(s\)</span> à <span
+class="math inline">\(t\)</span> tel que : <span
+class="math display">\[\forall P&#39; \text{ chemin de } s \text{ à } t,
+\sum_{e \in P} w(e) \leq \sum_{e \in P&#39;} w(e).\]</span> En notation
+formelle, on cherche : <span class="math display">\[P = \argmin_{P&#39;}
+\sum_{e \in P&#39;} w(e).\]</span></p>
+</div>
+<h2 class="unnumbered"
+id="problème-du-voyageur-de-commerce-tsp">Problème du Voyageur de
+Commerce (TSP)</h2>
+<p>Le TSP est un problème classique d’optimisation combinatoire. Nous
+cherchons à trouver le chemin le plus court qui visite chaque sommet
+exactement une fois et revient au point de départ.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un graphe
+complet pondéré avec <span class="math inline">\(V\)</span> l’ensemble
+des sommets et <span class="math inline">\(E\)</span> l’ensemble des
+arêtes, et soit <span class="math inline">\(w : E \rightarrow
+\mathbb{R}^+\)</span> une fonction de poids. Le problème du voyageur de
+commerce consiste à trouver un cycle hamiltonien <span
+class="math inline">\(C\)</span> tel que : <span
+class="math display">\[\forall C&#39; \text{ cycle hamiltonien}, \sum_{e
+\in C} w(e) \leq \sum_{e \in C&#39;} w(e).\]</span> En notation
+formelle, on cherche : <span class="math display">\[C = \argmin_{C&#39;}
+\sum_{e \in C&#39;} w(e).\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-bellman-ford">Théorème de
+Bellman-Ford</h2>
+<p>Le théorème de Bellman-Ford est fondamental pour résoudre le problème
+du plus court chemin dans les graphes pondérés. Il permet de déterminer
+si un graphe contient des cycles de poids négatif et de calculer les
+plus courts chemins depuis une source donnée.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un graphe
+pondéré avec <span class="math inline">\(V\)</span> l’ensemble des
+sommets et <span class="math inline">\(E\)</span> l’ensemble des arêtes,
+et soit <span class="math inline">\(w : E \rightarrow
+\mathbb{R}\)</span> une fonction de poids. Pour un sommet source <span
+class="math inline">\(s \in V\)</span>, les distances minimales <span
+class="math inline">\(d : V \rightarrow \mathbb{R}\)</span> satisfont :
+<span class="math display">\[d(s) = 0,\]</span> <span
+class="math display">\[\forall v \in V, d(v) = \min_{u \in V} \{ d(u) +
+w((u, v)) \}.\]</span> De plus, si <span
+class="math inline">\(G\)</span> ne contient pas de cycles de poids
+négatif atteignables depuis <span class="math inline">\(s\)</span>,
+alors les distances minimales sont calculées en <span
+class="math inline">\(|V| - 1\)</span> itérations.</p>
+</div>
+<h2 class="unnumbered" id="théorème-de-dijkstra">Théorème de
+Dijkstra</h2>
+<p>Le théorème de Dijkstra est une variante du théorème de Bellman-Ford
+pour les graphes à poids non négatifs. Il fournit un algorithme efficace
+pour calculer les plus courts chemins.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un graphe
+pondéré avec <span class="math inline">\(V\)</span> l’ensemble des
+sommets et <span class="math inline">\(E\)</span> l’ensemble des arêtes,
+et soit <span class="math inline">\(w : E \rightarrow
+\mathbb{R}^+\)</span> une fonction de poids. Pour un sommet source <span
+class="math inline">\(s \in V\)</span>, les distances minimales <span
+class="math inline">\(d : V \rightarrow \mathbb{R}^+\)</span> satisfont
+: <span class="math display">\[d(s) = 0,\]</span> <span
+class="math display">\[\forall v \in V, d(v) = \min_{u \in V} \{ d(u) +
+w((u, v)) \}.\]</span> De plus, les distances minimales sont calculées
+en utilisant une file de priorité.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered" id="preuve-du-théorème-de-bellman-ford">Preuve du
+Théorème de Bellman-Ford</h2>
+<div class="proof">
+<p><em>Proof.</em> Nous procédons par induction sur le nombre de sommets
+<span class="math inline">\(|V|\)</span>. Pour un graphe avec un seul
+sommet, la distance est triviale. Supposons que le théorème soit vrai
+pour un graphe avec <span class="math inline">\(n\)</span> sommets. Pour
+un graphe avec <span class="math inline">\(n + 1\)</span> sommets, nous
+utilisons l’algorithme de Bellman-Ford :</p>
+<p>1. Initialiser <span class="math inline">\(d(s) = 0\)</span> et <span
+class="math inline">\(d(v) = \infty\)</span> pour tout <span
+class="math inline">\(v \neq s\)</span>. 2. Pour chaque arête <span
+class="math inline">\((u, v)\)</span>, mettre à jour <span
+class="math inline">\(d(v) = \min \{ d(v), d(u) + w((u, v)) \}\)</span>.
+3. Répéter <span class="math inline">\(|V| - 1\)</span> fois.</p>
+<p>Si après <span class="math inline">\(|V| - 1\)</span> itérations,
+aucune mise à jour n’est possible, alors les distances sont minimales.
+Sinon, un cycle de poids négatif est détecté. ◻</p>
+</div>
+<h2 class="unnumbered" id="preuve-du-théorème-de-dijkstra">Preuve du
+Théorème de Dijkstra</h2>
+<div class="proof">
+<p><em>Proof.</em> Nous utilisons une file de priorité pour sélectionner
+le sommet avec la distance minimale non définitive. L’algorithme est le
+suivant :</p>
+<p>1. Initialiser <span class="math inline">\(d(s) = 0\)</span> et <span
+class="math inline">\(d(v) = \infty\)</span> pour tout <span
+class="math inline">\(v \neq s\)</span>. 2. Ajouter tous les sommets à
+la file de priorité. 3. Tant que la file n’est pas vide : - Extraire le
+sommet <span class="math inline">\(u\)</span> avec la distance minimale.
+- Pour chaque voisin <span class="math inline">\(v\)</span> de <span
+class="math inline">\(u\)</span>, mettre à jour <span
+class="math inline">\(d(v) = \min \{ d(v), d(u) + w((u, v))
+\}\)</span>.</p>
+<p>L’algorithme se termine lorsque tous les sommets ont été traités. Les
+distances minimales sont alors calculées. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriétés-du-problème-du-plus-court-chemin">Propriétés du Problème
+du Plus Court Chemin</h2>
+<ol>
+<li><p><strong>Propriété de Triangularité</strong> : Pour tout triplet
+de sommets <span class="math inline">\(u, v, w \in V\)</span>, la
+distance minimale <span class="math inline">\(d(u, w) \leq d(u, v) +
+d(v, w)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Cela découle directement de la définition des
+distances minimales. Si <span class="math inline">\(d(u, w) &gt; d(u, v)
++ d(v, w)\)</span>, alors le chemin passant par <span
+class="math inline">\(v\)</span> serait plus court, ce qui contredit la
+minimalité de <span class="math inline">\(d(u, w)\)</span>. ◻</p>
+</div></li>
+<li><p><strong>Propriété de Transitivité</strong> : Si <span
+class="math inline">\(d(u, v) + d(v, w) = d(u, w)\)</span>, alors le
+chemin optimal de <span class="math inline">\(u\)</span> à <span
+class="math inline">\(w\)</span> passe par <span
+class="math inline">\(v\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que le chemin optimal de <span
+class="math inline">\(u\)</span> à <span
+class="math inline">\(w\)</span> ne passe pas par <span
+class="math inline">\(v\)</span>. Alors, en ajoutant le segment de <span
+class="math inline">\(u\)</span> à <span
+class="math inline">\(v\)</span> et de <span
+class="math inline">\(v\)</span> à <span
+class="math inline">\(w\)</span>, nous obtenons un chemin plus long, ce
+qui contredit l’hypothèse. ◻</p>
+</div></li>
+</ol>
+<h2 class="unnumbered"
+id="corollaires-du-problème-du-voyageur-de-commerce">Corollaires du
+Problème du Voyageur de Commerce</h2>
+<ol>
+<li><p><strong>Corollaire de la Symétrie</strong> : Si le graphe est non
+orienté, alors le problème du voyageur de commerce est symétrique.</p>
+<div class="proof">
+<p><em>Proof.</em> Dans un graphe non orienté, les poids des arêtes sont
+symétriques. Par conséquent, le cycle hamiltonien minimal est le même
+dans les deux sens. ◻</p>
+</div></li>
+<li><p><strong>Corollaire de la NP-Difficulté</strong> : Le problème du
+voyageur de commerce est NP-difficile.</p>
+<div class="proof">
+<p><em>Proof.</em> Cela découle du fait que le problème de décision
+associé (existence d’un cycle hamiltonien de longueur inférieure ou
+égale à un seuil donné) est NP-complet. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les problèmes de cheminement sont d’une importance capitale en
+algorithmique et en optimisation. Les théorèmes de Bellman-Ford et
+Dijkstra fournissent des outils puissants pour résoudre le problème du
+plus court chemin, tandis que le TSP reste un défi majeur en raison de
+sa NP-difficulté. Les propriétés et corollaires associés enrichissent
+notre compréhension de ces problèmes et ouvrent la voie à de nouvelles
+recherches.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

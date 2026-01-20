@@ -1,0 +1,384 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Polytopes convexes : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Polytopes convexes : Une exploration mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les polytopes convexes, objets géométriques fondamentaux en
+mathématiques, émergent naturellement dans de nombreux domaines tels que
+l’optimisation, la géométrie algorithmique et même en physique
+théorique. Leur étude remonte à l’antiquité avec les travaux d’Euclide
+sur les polyèdres réguliers, mais c’est au XIXème siècle que la théorie
+des polytopes a commencé à se structurer grâce aux contributions de
+Steinitz, Minkowski et d’autres.</p>
+<p>Un polytope convexe est une généralisation en dimension quelconque
+des polygones convexes du plan et des polyèdres convexes de l’espace.
+Ils apparaissent dans des problèmes d’optimisation linéaire, où ils
+représentent l’ensemble des solutions réalisables. Leur compréhension
+est cruciale pour développer des algorithmes efficaces de résolution de
+ces problèmes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de polytope convexe, commençons par
+comprendre ce que nous cherchons à capturer. Nous voulons décrire des
+objets géométriques qui sont convexes, c’est-à-dire que pour tout couple
+de points appartenant à l’objet, le segment les reliant est entièrement
+contenu dans cet objet. De plus, nous voulons que ces objets soient
+bornés et définis par un nombre fini d’équations linéaires.</p>
+<p>Nous pouvons maintenant annoncer formellement la définition :</p>
+<div class="definition">
+<p>Un <strong>polytope convexe</strong> <span
+class="math inline">\(P\)</span> dans <span
+class="math inline">\(\mathbb{R}^n\)</span> est l’intersection d’un
+nombre fini de demi-espaces fermés. Autrement dit, il existe des
+vecteurs <span class="math inline">\(a_i \in \mathbb{R}^n\)</span> et
+des scalaires <span class="math inline">\(b_i \in \mathbb{R}\)</span>
+tels que : <span class="math display">\[P = \{ x \in \mathbb{R}^n \mid
+a_i^T x \leq b_i, \, i = 1, \ldots, m \}.\]</span></p>
+</div>
+<p>Une autre manière de définir un polytope convexe est via ses sommets.
+Un polytope convexe est l’enveloppe convexe d’un nombre fini de points,
+appelés ses sommets. Formellement :</p>
+<div class="definition">
+<p>Un <strong>polytope convexe</strong> <span
+class="math inline">\(P\)</span> dans <span
+class="math inline">\(\mathbb{R}^n\)</span> est l’enveloppe convexe d’un
+ensemble fini de points <span class="math inline">\(\{v_1, \ldots, v_k\}
+\subset \mathbb{R}^n\)</span>. Autrement dit : <span
+class="math display">\[P = \left\{ \sum_{i=1}^k \lambda_i v_i \mid
+\lambda_i \geq 0, \, \sum_{i=1}^k \lambda_i = 1 \right\}.\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant les polytopes convexes est le
+théorème de Weyl-Minkowski, qui établit une équivalence entre les deux
+définitions que nous avons données.</p>
+<div class="theorem">
+<p>Un ensemble <span class="math inline">\(P \subset
+\mathbb{R}^n\)</span> est un polytope convexe si et seulement si :</p>
+<ol>
+<li><p><span class="math inline">\(P\)</span> est borné,</p></li>
+<li><p><span class="math inline">\(P\)</span> est convexe,</p></li>
+<li><p><span class="math inline">\(P\)</span> est l’intersection d’un
+nombre fini de demi-espaces fermés.</p></li>
+</ol>
+</div>
+<p>Une autre formulation de ce théorème est la suivante :</p>
+<div class="theorem">
+<p>Un ensemble <span class="math inline">\(P \subset
+\mathbb{R}^n\)</span> est un polytope convexe si et seulement s’il
+existe des vecteurs <span class="math inline">\(a_i \in
+\mathbb{R}^n\)</span> et des scalaires <span class="math inline">\(b_i
+\in \mathbb{R}\)</span> tels que : <span class="math display">\[P = \{ x
+\in \mathbb{R}^n \mid a_i^T x \leq b_i, \, i = 1, \ldots, m \},\]</span>
+et si et seulement s’il existe un ensemble fini de points <span
+class="math inline">\(\{v_1, \ldots, v_k\} \subset \mathbb{R}^n\)</span>
+tels que : <span class="math display">\[P = \left\{ \sum_{i=1}^k
+\lambda_i v_i \mid \lambda_i \geq 0, \, \sum_{i=1}^k \lambda_i = 1
+\right\}.\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Weyl-Minkowski, nous allons montrer les
+deux implications.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Preuve que tout polytope convexe défini par
+ses inégalités est l’enveloppe convexe de ses sommets :</strong></p>
+<p>Soit <span class="math inline">\(P\)</span> un polytope convexe
+défini par : <span class="math display">\[P = \{ x \in \mathbb{R}^n \mid
+a_i^T x \leq b_i, \, i = 1, \ldots, m \}.\]</span></p>
+<p>Nous voulons montrer que <span class="math inline">\(P\)</span> est
+l’enveloppe convexe de ses sommets. Pour cela, nous utilisons le fait
+que tout polytope convexe borné est l’enveloppe convexe de ses points
+extrémaux. Les points extrémaux de <span
+class="math inline">\(P\)</span> sont les solutions des systèmes
+d’équations linéaires obtenus en prenant un sous-ensemble maximal de
+contraintes actives. Ces points sont finis en nombre, et <span
+class="math inline">\(P\)</span> est donc l’enveloppe convexe de ces
+points.</p>
+<p><strong>Preuve que tout polytope convexe défini par ses sommets est
+l’intersection de demi-espaces fermés :</strong></p>
+<p>Soit <span class="math inline">\(P\)</span> un polytope convexe
+défini par : <span class="math display">\[P = \left\{ \sum_{i=1}^k
+\lambda_i v_i \mid \lambda_i \geq 0, \, \sum_{i=1}^k \lambda_i = 1
+\right\}.\]</span></p>
+<p>Nous voulons montrer que <span class="math inline">\(P\)</span> est
+l’intersection de demi-espaces fermés. Pour cela, nous utilisons le fait
+que pour chaque facette de <span class="math inline">\(P\)</span>, il
+existe une inégalité linéaire qui la définit. En prenant toutes ces
+inégalités, nous obtenons que <span class="math inline">\(P\)</span> est
+l’intersection des demi-espaces fermés correspondants. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les polytopes convexes possèdent de nombreuses propriétés
+intéressantes. En voici quelques-unes :</p>
+<ol>
+<li><p><strong>Propriété de représentation duale :</strong> Tout
+polytope convexe peut être représenté à la fois par ses inégalités
+(formulation primale) et par ses sommets (formulation duale). Cette
+dualité est cruciale en optimisation linéaire.</p></li>
+<li><p><strong>Propriété de convexité :</strong> Tout sous-ensemble d’un
+polytope convexe est lui-même convexe. De plus, l’intersection de
+polytopes convexes est un polytope convexe.</p></li>
+<li><p><strong>Propriété de projection :</strong> La projection d’un
+polytope convexe sur un sous-espace affine est elle-même un polytope
+convexe.</p></li>
+</ol>
+<p>Nous allons maintenant prouver chacune de ces propriétés.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Preuve de la propriété de représentation
+duale :</strong></p>
+<p>La représentation d’un polytope convexe par ses inégalités et par ses
+sommets est donnée par le théorème de Weyl-Minkowski. La dualité entre
+ces deux représentations est un résultat fondamental en optimisation
+linéaire, où les inégalités représentent les contraintes du problème et
+les sommets représentent les solutions extrémales.</p>
+<p><strong>Preuve de la propriété de convexité :</strong></p>
+<p>Soit <span class="math inline">\(P\)</span> un polytope convexe et
+soit <span class="math inline">\(S \subset P\)</span>. Nous voulons
+montrer que <span class="math inline">\(S\)</span> est convexe. Soient
+<span class="math inline">\(x, y \in S\)</span> et <span
+class="math inline">\(\lambda \in [0, 1]\)</span>. Alors <span
+class="math inline">\(x, y \in P\)</span> et comme <span
+class="math inline">\(P\)</span> est convexe, <span
+class="math inline">\(\lambda x + (1 - \lambda) y \in P\)</span>. De
+plus, comme <span class="math inline">\(S\)</span> est un sous-ensemble
+de <span class="math inline">\(P\)</span>, <span
+class="math inline">\(\lambda x + (1 - \lambda) y \in S\)</span>. Donc
+<span class="math inline">\(S\)</span> est convexe.</p>
+<p>De plus, soit <span class="math inline">\(\{P_i\}_{i \in I}\)</span>
+une famille de polytopes convexes. Nous voulons montrer que <span
+class="math inline">\(P = \bigcap_{i \in I} P_i\)</span> est un polytope
+convexe. Soient <span class="math inline">\(x, y \in P\)</span> et <span
+class="math inline">\(\lambda \in [0, 1]\)</span>. Alors pour tout <span
+class="math inline">\(i \in I\)</span>, <span class="math inline">\(x, y
+\in P_i\)</span> et comme <span class="math inline">\(P_i\)</span> est
+convexe, <span class="math inline">\(\lambda x + (1 - \lambda) y \in
+P_i\)</span>. Donc <span class="math inline">\(\lambda x + (1 - \lambda)
+y \in P\)</span>, et <span class="math inline">\(P\)</span> est
+convexe.</p>
+<p><strong>Preuve de la propriété de projection :</strong></p>
+<p>Soit <span class="math inline">\(P \subset \mathbb{R}^n\)</span> un
+polytope convexe et soit <span class="math inline">\(L\)</span> un
+sous-espace affine de <span class="math inline">\(\mathbb{R}^n\)</span>.
+Nous voulons montrer que la projection <span
+class="math inline">\(\pi_L(P)\)</span> de <span
+class="math inline">\(P\)</span> sur <span
+class="math inline">\(L\)</span> est un polytope convexe. Pour cela,
+nous utilisons le fait que la projection d’un ensemble convexe est
+convexe. De plus, comme <span class="math inline">\(P\)</span> est
+borné, sa projection <span class="math inline">\(\pi_L(P)\)</span> est
+également bornée. Enfin, comme <span class="math inline">\(P\)</span>
+est l’intersection de demi-espaces fermés, sa projection <span
+class="math inline">\(\pi_L(P)\)</span> est l’intersection des
+projections de ces demi-espaces, qui sont également des demi-espaces
+fermés. Donc <span class="math inline">\(\pi_L(P)\)</span> est un
+polytope convexe. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les polytopes convexes sont des objets mathématiques riches et
+fascinants, avec des applications dans de nombreux domaines. Leur étude
+combine des outils de géométrie, d’algèbre linéaire et d’optimisation.
+Les résultats présentés dans cet article ne sont qu’un aperçu des
+nombreuses propriétés et théorèmes qui les concernent. Leur
+compréhension approfondie ouvre la voie à des avancées significatives
+dans des domaines tels que l’optimisation, la géométrie algorithmique et
+même les sciences des données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

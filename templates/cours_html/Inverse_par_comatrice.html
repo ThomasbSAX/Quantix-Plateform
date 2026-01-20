@@ -1,0 +1,372 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Inverse par Comatrice : Une Exploration Théorique et Pratique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Inverse par Comatrice : Une Exploration Théorique et
+Pratique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’inverse d’une matrice est un concept fondamental en algèbre
+linéaire, permettant de résoudre des systèmes d’équations linéaires et
+de définir des transformations inverses. Parmi les méthodes pour
+calculer l’inverse d’une matrice carrée, la méthode par comatrice se
+distingue par son élégance théorique et son importance historique. Cette
+approche, bien que moins efficace pour les grandes matrices en pratique,
+offre une compréhension profonde des propriétés structurelles des
+matrices.</p>
+<p>L’origine de cette méthode remonte aux travaux des mathématiciens du
+XIXe siècle, notamment Cauchy et Jacobi. Elle est particulièrement utile
+pour les matrices de petite taille et permet de comprendre la structure
+des déterminants et des mineurs. Dans cet article, nous explorerons en
+détail cette méthode, ses définitions, ses théorèmes associés, et ses
+preuves.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir l’inverse par comatrice, il est essentiel de
+comprendre les concepts de déterminant et de comatrice.</p>
+<h2 id="déterminant-dune-matrice">Déterminant d’une Matrice</h2>
+<p>Le déterminant est une fonction qui associe à toute matrice carrée un
+scalaire, encapsulant des propriétés cruciales de la matrice. Pour une
+matrice <span class="math inline">\(A\)</span> de taille <span
+class="math inline">\(n \times n\)</span>, le déterminant est défini
+récursivement en utilisant les mineurs et les cofacteurs.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span>. Le déterminant
+de <span class="math inline">\(A\)</span>, noté <span
+class="math inline">\(\det(A)\)</span>, est défini par : <span
+class="math display">\[\det(A) = \sum_{\sigma \in S_n}
+\text{sgn}(\sigma) \prod_{i=1}^n a_{i, \sigma(i)}\]</span> où <span
+class="math inline">\(S_n\)</span> est le groupe symétrique d’ordre
+<span class="math inline">\(n\)</span>, et <span
+class="math inline">\(\text{sgn}(\sigma)\)</span> est la signature de la
+permutation <span class="math inline">\(\sigma\)</span>.</p>
+</div>
+<h2 id="comatrice-dune-matrice">Comatrice d’une Matrice</h2>
+<p>La comatrice est un outil essentiel pour le calcul de l’inverse par
+comatrice. Elle est construite à partir des cofacteurs de la
+matrice.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span>. Le cofacteur
+d’un élément <span class="math inline">\(a_{ij}\)</span> de <span
+class="math inline">\(A\)</span>, noté <span
+class="math inline">\(C_{ij}\)</span>, est défini par : <span
+class="math display">\[C_{ij} = (-1)^{i+j} M_{ij}\]</span> où <span
+class="math inline">\(M_{ij}\)</span> est le mineur de <span
+class="math inline">\(a_{ij}\)</span>, c’est-à-dire le déterminant de la
+sous-matrice obtenue en supprimant la <span
+class="math inline">\(i\)</span>-ème ligne et la <span
+class="math inline">\(j\)</span>-ème colonne de <span
+class="math inline">\(A\)</span>.</p>
+</div>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span>. La comatrice de
+<span class="math inline">\(A\)</span>, notée <span
+class="math inline">\(\text{com}(A)\)</span>, est la matrice des
+cofacteurs de <span class="math inline">\(A\)</span>. Si <span
+class="math inline">\(C_{ij}\)</span> est le cofacteur de <span
+class="math inline">\(a_{ij}\)</span>, alors la comatrice est définie
+par : <span class="math display">\[\text{com}(A) = (C_{ij})_{1 \leq i, j
+\leq n}\]</span></p>
+</div>
+<h2 id="inverse-par-comatrice">Inverse par Comatrice</h2>
+<p>L’inverse d’une matrice peut être exprimé en fonction de sa comatrice
+et de son déterminant.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée
+inversible de taille <span class="math inline">\(n \times n\)</span>.
+L’inverse de <span class="math inline">\(A\)</span>, notée <span
+class="math inline">\(A^{-1}\)</span>, est donnée par : <span
+class="math display">\[A^{-1} = \frac{1}{\det(A)}
+\text{com}(A)^T\]</span> où <span
+class="math inline">\(\text{com}(A)^T\)</span> est la transposée de la
+comatrice de <span class="math inline">\(A\)</span>.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-linverse-par-comatrice">Théorème de l’Inverse par
+Comatrice</h2>
+<p>Le théorème central de cette méthode est le suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée
+inversible de taille <span class="math inline">\(n \times n\)</span>.
+Alors : <span class="math display">\[A^{-1} = \frac{1}{\det(A)}
+\text{com}(A)^T\]</span></p>
+</div>
+<h2
+id="démonstration-du-théorème-de-linverse-par-comatrice">Démonstration
+du Théorème de l’Inverse par Comatrice</h2>
+<p>Pour démontrer ce théorème, nous devons montrer que <span
+class="math inline">\(A \cdot A^{-1} = I_n\)</span>, où <span
+class="math inline">\(I_n\)</span> est la matrice identité de taille
+<span class="math inline">\(n \times n\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(A\)</span> une
+matrice carrée inversible de taille <span class="math inline">\(n \times
+n\)</span>. Considérons la matrice <span class="math inline">\(B =
+\frac{1}{\det(A)} \text{com}(A)^T\)</span>. Nous devons montrer que
+<span class="math inline">\(A \cdot B = I_n\)</span>.</p>
+<p>Calculons le produit <span class="math inline">\(A \cdot B\)</span> :
+<span class="math display">\[(A \cdot B)_{ij} = \sum_{k=1}^n a_{ik}
+b_{kj}\]</span> En substituant <span class="math inline">\(B\)</span>
+par son expression en termes de la comatrice : <span
+class="math display">\[(A \cdot B)_{ij} = \sum_{k=1}^n a_{ik} \left(
+\frac{1}{\det(A)} C_{jk} \right)\]</span> où <span
+class="math inline">\(C_{jk}\)</span> est le cofacteur de <span
+class="math inline">\(a_{jk}\)</span>.</p>
+<p>En utilisant la propriété des cofacteurs, nous savons que : <span
+class="math display">\[\sum_{k=1}^n a_{ik} C_{jk} = \det(A)
+\delta_{ij}\]</span> où <span class="math inline">\(\delta_{ij}\)</span>
+est le symbole de Kronecker.</p>
+<p>Ainsi, nous avons : <span class="math display">\[(A \cdot B)_{ij} =
+\frac{1}{\det(A)} \sum_{k=1}^n a_{ik} C_{jk} = \frac{1}{\det(A)} \det(A)
+\delta_{ij} = \delta_{ij}\]</span> Par conséquent, <span
+class="math inline">\(A \cdot B = I_n\)</span>, ce qui prouve que <span
+class="math inline">\(B = A^{-1}\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-la-comatrice">Propriété de la Comatrice</h2>
+<p>La comatrice possède plusieurs propriétés intéressantes :</p>
+<ol>
+<li><p>Pour toute matrice carrée <span class="math inline">\(A\)</span>
+de taille <span class="math inline">\(n \times n\)</span>, la comatrice
+de <span class="math inline">\(A\)</span> est donnée par : <span
+class="math display">\[\text{com}(A) = (C_{ij})_{1 \leq i, j \leq
+n}\]</span> où <span class="math inline">\(C_{ij} = (-1)^{i+j}
+M_{ij}\)</span>.</p></li>
+<li><p>La comatrice de la transposée d’une matrice <span
+class="math inline">\(A\)</span> est égale à la transposée de la
+comatrice de <span class="math inline">\(A\)</span> : <span
+class="math display">\[\text{com}(A^T) =
+(\text{com}(A))^T\]</span></p></li>
+<li><p>Si <span class="math inline">\(A\)</span> est une matrice
+inversible, alors : <span class="math display">\[A^{-1} =
+\frac{1}{\det(A)} \text{com}(A)^T\]</span></p></li>
+</ol>
+<h2 id="démonstration-des-propriétés-de-la-comatrice">Démonstration des
+Propriétés de la Comatrice</h2>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer la propriété (ii), considérons une
+matrice <span class="math inline">\(A\)</span> de taille <span
+class="math inline">\(n \times n\)</span>. Le cofacteur de l’élément
+<span class="math inline">\((A^T)_{ij}\)</span> est donné par : <span
+class="math display">\[C_{ij}(A^T) = (-1)^{i+j} M_{ij}(A^T)\]</span> où
+<span class="math inline">\(M_{ij}(A^T)\)</span> est le mineur de <span
+class="math inline">\((A^T)_{ij}\)</span>.</p>
+<p>Or, <span class="math inline">\(M_{ij}(A^T) = M_{ji}(A)\)</span>, car
+la transposée d’une sous-matrice est la sous-matrice de la transposée.
+Ainsi : <span class="math display">\[C_{ij}(A^T) = (-1)^{i+j} M_{ji}(A)
+= C_{ji}^T(A)\]</span> où <span
+class="math inline">\(C_{ji}^T(A)\)</span> est le cofacteur de <span
+class="math inline">\(a_{ji}\)</span> dans la transposée de <span
+class="math inline">\(A\)</span>.</p>
+<p>Par conséquent, nous avons : <span
+class="math display">\[\text{com}(A^T) =
+(\text{com}(A))^T\]</span> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’inverse par comatrice est une méthode élégante et théorique pour
+calculer l’inverse d’une matrice carrée. Bien que moins efficace pour
+les grandes matrices, elle offre une compréhension profonde des
+propriétés structurelles des matrices et des déterminants. Les théorèmes
+et les preuves présentés dans cet article illustrent la beauté et la
+puissance de cette approche, tout en mettant en lumière son importance
+historique et conceptuelle.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

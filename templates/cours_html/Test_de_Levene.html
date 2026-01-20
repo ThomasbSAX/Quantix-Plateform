@@ -1,0 +1,297 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Test de Levene : Une Analyse de l’Homogénéité des Variances</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Test de Levene : Une Analyse de l’Homogénéité des
+Variances</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le test de Levene, introduit par le statisticien Horace Levene en
+1960, est un outil fondamental dans l’analyse des données. Il évalue
+l’homogénéité des variances entre plusieurs groupes, une condition
+cruciale pour de nombreuses techniques statistiques comme l’analyse de
+variance (ANOVA). L’importance de ce test réside dans sa capacité à
+détecter les violations de l’hypothèse d’homogénéité des variances, ce
+qui permet aux chercheurs de choisir les méthodes appropriées pour leurs
+analyses.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de formuler le test de Levene, il est essentiel de comprendre
+les concepts sous-jacents. Supposons que nous ayons <span
+class="math inline">\(k\)</span> groupes de données, avec <span
+class="math inline">\(n_i\)</span> observations dans le groupe <span
+class="math inline">\(i\)</span>, pour <span class="math inline">\(i =
+1, 2, \dots, k\)</span>. Nous cherchons à tester si les variances de ces
+groupes sont égales.</p>
+<p>Pour ce faire, nous définissons d’abord les résidus pour chaque
+observation <span class="math inline">\(X_{ij}\)</span> par rapport à la
+médiane de son groupe : <span class="math display">\[Z_{ij} = |X_{ij} -
+\text{Med}(X_i)|\]</span> où <span
+class="math inline">\(\text{Med}(X_i)\)</span> est la médiane du groupe
+<span class="math inline">\(i\)</span>.</p>
+<p>Le test de Levene repose sur une régression des résidus <span
+class="math inline">\(Z_{ij}\)</span> sur les indicateurs de groupe.
+Plus formellement, nous modélisons : <span class="math display">\[Z_{ij}
+= \beta_0 + \beta_i I_i + \epsilon_{ij}\]</span> où <span
+class="math inline">\(I_i\)</span> est un indicateur égal à 1 si
+l’observation appartient au groupe <span
+class="math inline">\(i\)</span> et 0 sinon, et <span
+class="math inline">\(\epsilon_{ij}\)</span> est le terme d’erreur.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le test de Levene peut être formulé comme un test d’hypothèse. Nous
+voulons tester : <span class="math display">\[H_0 : \sigma_1^2 =
+\sigma_2^2 = \dots = \sigma_k^2\]</span> contre l’hypothèse alternative
+: <span class="math display">\[H_1 : \text{Au moins deux variances sont
+différentes}\]</span></p>
+<p>Pour ce faire, nous utilisons une ANOVA sur les résidus <span
+class="math inline">\(Z_{ij}\)</span>. Le statisticien Horace Levene a
+montré que sous l’hypothèse nulle, le ratio des variances entre-groupes
+et dans les groupes suit une distribution <span
+class="math inline">\(F\)</span> avec <span
+class="math inline">\(k-1\)</span> et <span
+class="math inline">\(N-k\)</span> degrés de liberté, où <span
+class="math inline">\(N = \sum_{i=1}^k n_i\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer la validité du test de Levene, nous devons montrer que
+sous <span class="math inline">\(H_0\)</span>, le statisticien <span
+class="math inline">\(F\)</span> suit bien une distribution <span
+class="math inline">\(F\)</span>. Commençons par calculer la somme des
+carrés entre-groupes : <span class="math display">\[SSB = \sum_{i=1}^k
+n_i (\bar{Z}_i - \bar{Z})^2\]</span> où <span
+class="math inline">\(\bar{Z}_i\)</span> est la moyenne des résidus pour
+le groupe <span class="math inline">\(i\)</span>, et <span
+class="math inline">\(\bar{Z}\)</span> est la moyenne globale des
+résidus.</p>
+<p>Ensuite, calculons la somme des carrés dans les groupes : <span
+class="math display">\[SSW = \sum_{i=1}^k \sum_{j=1}^{n_i} (Z_{ij} -
+\bar{Z}_i)^2\]</span></p>
+<p>Le statisticien <span class="math inline">\(F\)</span> est alors
+donné par : <span class="math display">\[F = \frac{SSB / (k-1)}{SSW /
+(N-k)}\]</span></p>
+<p>Sous <span class="math inline">\(H_0\)</span>, les résidus <span
+class="math inline">\(Z_{ij}\)</span> sont indépendants et identiquement
+distribués, ce qui implique que <span class="math inline">\(SSB\)</span>
+et <span class="math inline">\(SSW\)</span> sont indépendants. De plus,
+<span class="math inline">\(SSB / (k-1)\)</span> et <span
+class="math inline">\(SSW / (N-k)\)</span> suivent des distributions du
+chi-carré, ce qui permet de conclure que <span
+class="math inline">\(F\)</span> suit une distribution <span
+class="math inline">\(F\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le test de Levene possède plusieurs propriétés importantes :</p>
+<p>(i) **Robustesse** : Le test de Levene est robuste aux violations de
+la normalité, ce qui le rend particulièrement utile pour les données non
+normales.</p>
+<p>(ii) **Puissance** : Le test est puissant pour détecter les
+différences de variances, surtout lorsque les tailles des groupes sont
+égales.</p>
+<p>(iii) **Alternatives** : Il existe plusieurs variantes du test de
+Levene, comme le test de Brown-Forsythe qui utilise la moyenne au lieu
+de la médiane. Ces variantes peuvent être plus appropriées dans certains
+contextes.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le test de Levene est un outil indispensable pour évaluer
+l’homogénéité des variances. Sa simplicité et sa robustesse en font un
+choix privilégié pour de nombreuses applications statistiques. En
+comprenant ses fondements théoriques et ses propriétés, les chercheurs
+peuvent mieux interpréter leurs résultats et choisir les méthodes
+d’analyse appropriées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

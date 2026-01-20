@@ -1,0 +1,344 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Log Loss : Une Mesure Fondamentale en Apprentissage Automatique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Log Loss : Une Mesure Fondamentale en Apprentissage
+Automatique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’apprentissage automatique, en tant que discipline à l’intersection
+de la statistique et de l’informatique, repose sur des mesures de
+performance capables de quantifier avec précision la qualité d’un modèle
+prédictif. Parmi ces mesures, le <em>Log Loss</em>, ou perte
+logarithmique, occupe une place centrale. Son origine remonte aux
+travaux fondateurs en théorie de l’information et en statistique
+bayésienne, où la notion d’entropie croisée a été formalisée pour
+évaluer la divergence entre deux distributions de probabilité.</p>
+<p>Le <em>Log Loss</em> émerge comme une réponse naturelle aux défis
+posés par la classification binaire et multiclasse. Il résout le
+problème de l’évaluation des probabilités prédites par un modèle, en
+pénalisant sévèrement les prédictions trop confiantes mais erronées.
+Dans un cadre où la prise de décision repose sur des probabilités, le
+<em>Log Loss</em> devient indispensable pour guider l’optimisation des
+modèles vers une meilleure calibration.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le <em>Log Loss</em>, commençons par nous interroger
+sur la manière dont nous pouvons mesurer l’erreur entre une distribution
+de probabilité vraie et une distribution prédite. Intuitivement, nous
+cherchons une mesure qui reflète la surprise engendrée par l’observation
+d’un événement, sachant les probabilités prédites.</p>
+<p>Considérons un ensemble de données <span
+class="math inline">\(\mathcal{D} = \{(x_i, y_i)\}_{i=1}^n\)</span>, où
+<span class="math inline">\(y_i\)</span> est la classe vraie et <span
+class="math inline">\(\hat{p}_i\)</span> est la probabilité prédite pour
+la classe <span class="math inline">\(y_i\)</span>. Nous voulons une
+mesure qui soit sensible à la fois à l’erreur de classification et à la
+confiance du modèle.</p>
+<p>La définition formelle du <em>Log Loss</em> pour un ensemble de
+données est donnée par :</p>
+<p><span class="math display">\[\begin{equation}
+    \text{Log Loss} = -\frac{1}{n} \sum_{i=1}^n \sum_{j=1}^c y_{i,j}
+\log(\hat{p}_{i,j})
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(c\)</span> est le nombre de classes,
+<span class="math inline">\(y_{i,j}\)</span> est un indicateur valant 1
+si l’observation <span class="math inline">\(i\)</span> appartient à la
+classe <span class="math inline">\(j\)</span> et 0 sinon, et <span
+class="math inline">\(\hat{p}_{i,j}\)</span> est la probabilité prédite
+pour l’observation <span class="math inline">\(i\)</span> d’appartenir à
+la classe <span class="math inline">\(j\)</span>.</p>
+<p>En termes quantifiés, nous pouvons également écrire :</p>
+<p><span class="math display">\[\begin{equation}
+    \text{Log Loss} = -\frac{1}{n} \sum_{i=1}^n \log(\hat{p}_{i,y_i})
+\end{equation}\]</span></p>
+<p>pour le cas binaire, où <span class="math inline">\(y_i\)</span> est
+soit 0 soit 1.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié au <em>Log Loss</em> est le lien entre
+cette mesure et l’entropie croisée. L’entropie croisée mesure la
+différence entre deux distributions de probabilité, et le <em>Log
+Loss</em> peut être vu comme une instance spécifique de l’entropie
+croisée.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(P\)</span> la distribution de
+probabilité vraie et <span class="math inline">\(\hat{P}\)</span> la
+distribution prédite. Le <em>Log Loss</em> est l’entropie croisée entre
+<span class="math inline">\(P\)</span> et <span
+class="math inline">\(\hat{P}\)</span> :</p>
+<p><span class="math display">\[\begin{equation}
+        \text{Log Loss} = H(P, \hat{P}) = -\sum_{i=1}^n P(i)
+\log(\hat{P}(i))
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(H(P, \hat{P})\)</span> est l’entropie
+croisée.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve découle directement de la définition de
+l’entropie croisée. En effet, pour chaque observation <span
+class="math inline">\(i\)</span>, nous avons :</p>
+<p><span class="math display">\[\begin{equation}
+        H(P, \hat{P}) = -\sum_{i=1}^n P(i) \log(\hat{P}(i)) =
+-\frac{1}{n} \sum_{i=1}^n \log(\hat{P}(i))
+\end{equation}\]</span></p>
+<p>si <span class="math inline">\(P(i) = \frac{1}{n}\)</span> pour tout
+<span class="math inline">\(i\)</span>, ce qui est le cas lorsque les
+observations sont équiprobables. Ainsi, nous avons bien :</p>
+<p><span class="math display">\[\begin{equation}
+        \text{Log Loss} = H(P, \hat{P})
+\end{equation}\]</span></p>
+<p>ce qui conclut la preuve. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer l’importance du <em>Log Loss</em>, considérons un
+exemple simple. Supposons que nous avons un modèle qui prédit une
+probabilité <span class="math inline">\(\hat{p}\)</span> pour la classe
+positive, et que la vraie classe est positive. Le <em>Log Loss</em> pour
+cette observation est :</p>
+<p><span class="math display">\[\begin{equation}
+    -\log(\hat{p})
+\end{equation}\]</span></p>
+<p>Si le modèle prédit <span class="math inline">\(\hat{p} =
+0.9\)</span>, alors le <em>Log Loss</em> est <span
+class="math inline">\(-\log(0.9) \approx 0.1054\)</span>. Si le modèle
+prédit <span class="math inline">\(\hat{p} = 0.5\)</span>, alors le
+<em>Log Loss</em> est <span class="math inline">\(-\log(0.5) \approx
+0.6931\)</span>. Nous voyons que le <em>Log Loss</em> pénalise plus
+sévèrement les prédictions moins confiantes mais correctes.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le <em>Log Loss</em> possède plusieurs propriétés intéressantes :</p>
+<ul>
+<li><p>**Sensibilité à la Confiance** : Le <em>Log Loss</em> pénalise
+les prédictions trop confiantes mais erronées. Par exemple, une
+prédiction de 0.9 pour une classe incorrecte est pénalisée plus
+sévèrement qu’une prédiction de 0.6.</p></li>
+<li><p>**Calibration des Probabilités** : Le <em>Log Loss</em> encourage
+les modèles à produire des probabilités bien calibrées, c’est-à-dire que
+la probabilité prédite pour une classe devrait refléter la fréquence
+réelle de cette classe.</p></li>
+<li><p>**Lien avec l’Entropie** : Le <em>Log Loss</em> est lié à
+l’entropie de la distribution prédite. Plus la distribution prédite est
+concentrée (faible entropie), plus le <em>Log Loss</em> est faible si
+les prédictions sont correctes.</p></li>
+</ul>
+<p>Pour la propriété (i), considérons deux prédictions <span
+class="math inline">\(\hat{p}_1 = 0.9\)</span> et <span
+class="math inline">\(\hat{p}_2 = 0.6\)</span> pour une classe
+incorrecte. Le <em>Log Loss</em> pour <span
+class="math inline">\(\hat{p}_1\)</span> est <span
+class="math inline">\(-\log(0.1) \approx 2.3026\)</span>, tandis que
+pour <span class="math inline">\(\hat{p}_2\)</span> il est <span
+class="math inline">\(-\log(0.4) \approx 0.9163\)</span>. Ainsi, <span
+class="math inline">\(\hat{p}_1\)</span> est pénalisée plus
+sévèrement.</p>
+<p>Pour la propriété (ii), un modèle bien calibré minimise le <em>Log
+Loss</em> en produisant des probabilités qui reflètent la réalité. Par
+exemple, si une classe apparaît 30% du temps, un modèle bien calibré
+devrait prédire une probabilité de 0.3 pour cette classe.</p>
+<p>Pour la propriété (iii), l’entropie de la distribution prédite est
+donnée par :</p>
+<p><span class="math display">\[\begin{equation}
+    H(\hat{P}) = -\sum_{j=1}^c \hat{p}_j \log(\hat{p}_j)
+\end{equation}\]</span></p>
+<p>Le <em>Log Loss</em> est minimal lorsque <span
+class="math inline">\(\hat{P} = P\)</span>, c’est-à-dire lorsque la
+distribution prédite coincide avec la distribution vraie. Dans ce cas,
+l’entropie de <span class="math inline">\(\hat{P}\)</span> est également
+minimale.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

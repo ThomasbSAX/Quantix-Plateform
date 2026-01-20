@@ -1,0 +1,351 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de binning égal</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de binning
+égal</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques est une technique
+fondamentale en traitement du signal et en apprentissage automatique.
+Elle permet de transformer des données brutes en caractéristiques
+significatives, facilitant ainsi leur analyse et leur interprétation.
+Parmi les méthodes d’extraction de caractéristiques, le binning égal se
+distingue par sa simplicité et son efficacité. Cette technique consiste
+à diviser les données en intervalles de même taille, ou bins, et à
+agréger les valeurs dans chaque intervalle pour en extraire des
+caractéristiques pertinentes.</p>
+<p>L’origine du binning égal remonte aux premières méthodes de
+discrétisation en statistiques. Elle a été popularisée par son
+utilisation dans les histogrammes, où les données sont regroupées en
+classes de même amplitude pour visualiser leur distribution. Avec
+l’avènement des techniques d’apprentissage automatique, le binning égal
+a trouvé de nouvelles applications dans la réduction de dimension et la
+préparation des données pour les algorithmes d’apprentissage.</p>
+<p>Dans cet article, nous explorons en détail l’encodage par extraction
+de caractéristiques de binning égal. Nous commençons par définir
+formellement cette technique et ses variantes, puis nous présentons les
+théorèmes et propriétés qui en découlent. Enfin, nous illustrons son
+utilisation par des exemples concrets et discutons de ses avantages et
+limitations.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement l’encodage par extraction de
+caractéristiques de binning égal, il est essentiel de comprendre le
+concept sous-jacent. Supposons que nous ayons un ensemble de données
+continues, par exemple des mesures de température prises à différents
+moments. Notre objectif est de transformer ces mesures en
+caractéristiques discrètes qui capturent l’information essentielle tout
+en réduisant la complexité des données.</p>
+<p>Pour ce faire, nous divisons l’intervalle de valeurs possibles en
+sous-intervalles de même taille, appelés bins. Chaque bin est défini par
+une plage de valeurs, et toutes les données tombant dans cette plage
+sont regroupées. Ensuite, nous extrayons des caractéristiques de chaque
+bin, telles que la moyenne, l’écart-type, ou le nombre
+d’observations.</p>
+<p>Formellement, soit <span class="math inline">\(X = \{x_1, x_2,
+\ldots, x_n\}\)</span> un ensemble de <span
+class="math inline">\(n\)</span> observations réelles. Soit <span
+class="math inline">\(k\)</span> le nombre de bins souhaité. Nous
+définissons les bornes des bins comme suit :</p>
+<p><span class="math display">\[b_0 = \min(X), \quad b_i = b_0 + i \cdot
+\frac{\max(X) - \min(X)}{k}, \quad i = 1, \ldots, k-1\]</span></p>
+<p>Les bins sont alors définis par les intervalles <span
+class="math inline">\([b_{i-1}, b_i)\)</span> pour <span
+class="math inline">\(i = 1, \ldots, k\)</span>. Pour chaque bin <span
+class="math inline">\(i\)</span>, nous extrayons une caractéristique
+<span class="math inline">\(f_i\)</span> qui peut être, par exemple, la
+moyenne des observations dans ce bin :</p>
+<p><span class="math display">\[f_i = \frac{1}{|B_i|} \sum_{x_j \in B_i}
+x_j\]</span></p>
+<p>où <span class="math inline">\(B_i\)</span> est l’ensemble des
+observations tombant dans le bin <span
+class="math inline">\(i\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’encodage par extraction de
+caractéristiques de binning égal est le théorème de la loi des grands
+nombres. Ce théorème garantit que, lorsque le nombre d’observations dans
+chaque bin tend vers l’infini, la moyenne des observations dans un bin
+converge vers la moyenne de la distribution sous-jacente.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> une
+variable aléatoire réelle avec une espérance <span
+class="math inline">\(\mu\)</span>. Soit <span
+class="math inline">\(B_i\)</span> un bin contenant <span
+class="math inline">\(n_i\)</span> observations. Alors, la moyenne des
+observations dans le bin <span class="math inline">\(B_i\)</span>
+converge vers <span class="math inline">\(\mu\)</span> lorsque <span
+class="math inline">\(n_i\)</span> tend vers l’infini :</p>
+<p><span class="math display">\[\lim_{n_i \to \infty} \frac{1}{n_i}
+\sum_{x_j \in B_i} x_j = \mu\]</span></p>
+<p>Ce théorème justifie l’utilisation du binning égal pour estimer les
+caractéristiques de la distribution sous-jacente à partir des données
+observées.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la loi des grands nombres dans le
+contexte du binning égal, nous utilisons les propriétés classiques de la
+convergence en probabilité. Supposons que <span
+class="math inline">\(X_1, X_2, \ldots, X_n\)</span> sont des variables
+aléatoires indépendantes et identiquement distribuées (i.i.d.) avec une
+espérance <span class="math inline">\(\mu\)</span>. Pour chaque bin
+<span class="math inline">\(B_i\)</span>, nous avons un sous-ensemble de
+ces variables.</p>
+<p>La moyenne des observations dans le bin <span
+class="math inline">\(B_i\)</span> est donnée par :</p>
+<p><span class="math display">\[\bar{X}_{B_i} = \frac{1}{n_i} \sum_{x_j
+\in B_i} x_j\]</span></p>
+<p>où <span class="math inline">\(n_i\)</span> est le nombre
+d’observations dans le bin <span class="math inline">\(B_i\)</span>.
+Selon la loi des grands nombres, lorsque <span
+class="math inline">\(n_i\)</span> tend vers l’infini, <span
+class="math inline">\(\bar{X}_{B_i}\)</span> converge presque sûrement
+vers <span class="math inline">\(\mu\)</span>.</p>
+<p>Pour voir cela, remarquons que chaque <span
+class="math inline">\(X_j\)</span> est une réalisation de la variable
+aléatoire <span class="math inline">\(X\)</span>. Par conséquent, la
+moyenne empirique <span class="math inline">\(\bar{X}_{B_i}\)</span> est
+une estimation de l’espérance <span class="math inline">\(\mu\)</span>.
+La convergence de <span class="math inline">\(\bar{X}_{B_i}\)</span>
+vers <span class="math inline">\(\mu\)</span> est garantie par la loi
+des grands nombres, qui s’applique ici car les <span
+class="math inline">\(X_j\)</span> sont i.i.d.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’encodage par extraction de caractéristiques de binning égal possède
+plusieurs propriétés intéressantes, que nous énumérons et démontrons
+ci-dessous.</p>
+<ol>
+<li><p><strong>Consistance</strong> : La méthode de binning égal est
+consistante, c’est-à-dire que lorsque le nombre de bins <span
+class="math inline">\(k\)</span> tend vers l’infini, les
+caractéristiques extraites convergent vers les véritables
+caractéristiques de la distribution sous-jacente.</p></li>
+<li><p><strong>Stabilité</strong> : La méthode est stable en présence de
+bruit, car le regroupement des observations dans des bins atténue les
+variations individuelles.</p></li>
+<li><p><strong>Efficacité</strong> : Le binning égal est computationally
+efficace, car il nécessite seulement <span
+class="math inline">\(O(n)\)</span> opérations pour regrouper les
+données et extraire les caractéristiques.</p></li>
+</ol>
+<p>Pour démontrer la propriété de consistance, supposons que <span
+class="math inline">\(k\)</span> tend vers l’infini. Chaque bin devient
+de plus en plus petit, et le nombre d’observations dans chaque bin <span
+class="math inline">\(n_i\)</span> tend vers l’infini. Par la loi des
+grands nombres, la moyenne dans chaque bin converge vers l’espérance de
+la distribution sous-jacente.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de binning égal est une
+technique puissante et polyvalente pour transformer des données
+continues en caractéristiques discrètes. Elle trouve des applications
+dans divers domaines, allant de la visualisation des données à
+l’apprentissage automatique. Bien que simple dans son principe, cette
+méthode repose sur des fondements théoriques solides, tels que la loi
+des grands nombres.</p>
+<p>Dans cet article, nous avons exploré les définitions, théorèmes et
+propriétés du binning égal. Nous avons vu comment cette technique permet
+d’estimer les caractéristiques de la distribution sous-jacente et
+discuté de ses avantages en termes de consistance, stabilité et
+efficacité. Les exemples et preuves présentés illustrent la robustesse
+de cette méthode et son utilité pratique.</p>
+<p>Pour les recherches futures, il serait intéressant d’explorer des
+variantes du binning égal, telles que le binning adaptatif, où la taille
+des bins est ajustée en fonction de la densité des données. Une autre
+direction prometteuse est l’intégration du binning égal dans des
+pipelines d’apprentissage automatique avancés, où il pourrait servir de
+pré-traitement pour des algorithmes plus complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

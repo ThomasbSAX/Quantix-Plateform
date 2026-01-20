@@ -1,0 +1,347 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Extraction de Caractéristiques de Skewness</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Extraction de Caractéristiques de
+Skewness</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques de skewness (EECS)
+émerge comme une technique puissante dans le domaine du traitement des
+données et de l’apprentissage automatique. À l’ère où les données sont
+omniprésentes mais souvent bruitées, cette méthode offre une approche
+robuste pour extraire des informations pertinentes. Le skewness, ou
+asymétrie, est une mesure statistique qui capture la distribution des
+données autour de leur moyenne. En exploitant cette caractéristique,
+l’EECS permet de transformer les données brutes en un format plus
+informatif et compressé, facilitant ainsi l’analyse et la
+modélisation.</p>
+<p>L’origine de cette technique remonte aux travaux pionniers en
+statistique descriptive, où l’asymétrie était utilisée pour décrire la
+forme des distributions. Avec l’avènement de l’apprentissage
+automatique, cette notion a été adaptée pour améliorer la représentation
+des données. L’EECS est indispensable dans les contextes où les données
+présentent des asymétries marquées, comme en finance, en biologie, ou en
+ingénierie.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’EECS, il est essentiel de définir quelques concepts
+clés. Commençons par le skewness.</p>
+<h2 id="skewness">Skewness</h2>
+<p>Le skewness mesure l’asymétrie d’une distribution. Intuitivement, si
+une distribution est symétrique, le skewness est nul. Si la queue droite
+est plus longue que la gauche, le skewness est positif, et
+inversement.</p>
+<p>Formellement, pour une variable aléatoire <span
+class="math inline">\(X\)</span> avec moyenne <span
+class="math inline">\(\mu\)</span>, variance <span
+class="math inline">\(\sigma^2\)</span>, et moment d’ordre trois <span
+class="math inline">\(m_3\)</span>, le skewness <span
+class="math inline">\(\gamma\)</span> est défini par :</p>
+<p><span class="math display">\[\gamma = \frac{m_3}{\sigma^3} \quad
+\text{où} \quad m_3 = E[(X - \mu)^3]\]</span></p>
+<p>En termes quantifiés, pour une distribution <span
+class="math inline">\(X\)</span> avec fonction de densité <span
+class="math inline">\(f(x)\)</span>, le skewness est :</p>
+<p><span class="math display">\[\gamma = \frac{\int_{-\infty}^{\infty}
+(x - \mu)^3 f(x) \, dx}{\sigma^3}\]</span></p>
+<h2 id="encodage-par-extraction-de-caractéristiques">Encodage par
+Extraction de Caractéristiques</h2>
+<p>L’encodage par extraction de caractéristiques consiste à transformer
+des données brutes en un ensemble de caractéristiques pertinentes. Dans
+le cas de l’EECS, ces caractéristiques sont basées sur le skewness.</p>
+<p>Pour un ensemble de données <span class="math inline">\(D = \{x_1,
+x_2, \ldots, x_n\}\)</span>, l’EECS transforme chaque point <span
+class="math inline">\(x_i\)</span> en un vecteur de caractéristiques
+basé sur le skewness :</p>
+<p><span class="math display">\[\text{EECS}(D) = \{\gamma_1, \gamma_2,
+\ldots, \gamma_k\}\]</span></p>
+<p>où <span class="math inline">\(\gamma_i\)</span> est le skewness
+calculé sur une sous-partie des données.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-lasymétrie">Théorème de l’Asymétrie</h2>
+<p>Un théorème fondamental en statistique est celui de l’asymétrie, qui
+relie le skewness à la distribution des données.</p>
+<p><strong>Théorème :</strong> Soit <span
+class="math inline">\(X\)</span> une variable aléatoire avec moyenne
+<span class="math inline">\(\mu\)</span>, variance <span
+class="math inline">\(\sigma^2\)</span>, et skewness <span
+class="math inline">\(\gamma\)</span>. Si <span
+class="math inline">\(\gamma &gt; 0\)</span>, alors la distribution de
+<span class="math inline">\(X\)</span> est asymétrique à droite. Si
+<span class="math inline">\(\gamma &lt; 0\)</span>, alors la
+distribution de <span class="math inline">\(X\)</span> est asymétrique à
+gauche.</p>
+<p><strong>Démonstration :</strong> Considérons la fonction de densité
+<span class="math inline">\(f(x)\)</span>. Le skewness est donné par
+:</p>
+<p><span class="math display">\[\gamma = \frac{\int_{-\infty}^{\infty}
+(x - \mu)^3 f(x) \, dx}{\sigma^3}\]</span></p>
+<p>Si <span class="math inline">\(\gamma &gt; 0\)</span>, cela signifie
+que la queue droite de la distribution est plus longue que la gauche,
+d’où l’asymétrie à droite. De même, si <span
+class="math inline">\(\gamma &lt; 0\)</span>, la queue gauche est plus
+longue.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-lasymétrie">Preuve du Théorème de
+l’Asymétrie</h2>
+<p>Pour prouver le théorème de l’asymétrie, nous devons analyser la
+définition du skewness.</p>
+<p>Considérons une variable aléatoire <span
+class="math inline">\(X\)</span> avec moyenne <span
+class="math inline">\(\mu\)</span>, variance <span
+class="math inline">\(\sigma^2\)</span>, et skewness <span
+class="math inline">\(\gamma\)</span>. Le moment d’ordre trois est
+défini par :</p>
+<p><span class="math display">\[m_3 = E[(X - \mu)^3] =
+\int_{-\infty}^{\infty} (x - \mu)^3 f(x) \, dx\]</span></p>
+<p>Le skewness est alors :</p>
+<p><span class="math display">\[\gamma =
+\frac{m_3}{\sigma^3}\]</span></p>
+<p>Si <span class="math inline">\(\gamma &gt; 0\)</span>, alors <span
+class="math inline">\(m_3 &gt; 0\)</span>. Cela implique que la fonction
+de densité <span class="math inline">\(f(x)\)</span> a une queue plus
+longue à droite qu’à gauche, car les valeurs positives de <span
+class="math inline">\((x - \mu)^3\)</span> contribuent davantage à
+l’intégrale. Inversement, si <span class="math inline">\(\gamma &lt;
+0\)</span>, la queue gauche est plus longue.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-1-invariance-par-translation">Propriété 1 : Invariance
+par Translation</h2>
+<p><strong>(i)</strong> Le skewness est invariant par translation. Si
+<span class="math inline">\(Y = X + c\)</span>, alors le skewness de
+<span class="math inline">\(Y\)</span> est égal au skewness de <span
+class="math inline">\(X\)</span>.</p>
+<p><strong>Preuve :</strong> Considérons <span class="math inline">\(Y =
+X + c\)</span>. La moyenne de <span class="math inline">\(Y\)</span> est
+<span class="math inline">\(\mu_Y = \mu_X + c\)</span>. Le moment
+d’ordre trois de <span class="math inline">\(Y\)</span> est :</p>
+<p><span class="math display">\[m_3^Y = E[(Y - \mu_Y)^3] = E[(X + c -
+(\mu_X + c))^3] = E[(X - \mu_X)^3] = m_3^X\]</span></p>
+<p>La variance de <span class="math inline">\(Y\)</span> est <span
+class="math inline">\(\sigma_Y^2 = \sigma_X^2\)</span>. Ainsi, le
+skewness de <span class="math inline">\(Y\)</span> est :</p>
+<p><span class="math display">\[\gamma_Y = \frac{m_3^Y}{\sigma_Y^3} =
+\frac{m_3^X}{\sigma_X^3} = \gamma_X\]</span></p>
+<h2 id="propriété-2-invariance-par-échelle">Propriété 2 : Invariance par
+Échelle</h2>
+<p><strong>(ii)</strong> Le skewness est invariant par échelle. Si <span
+class="math inline">\(Y = aX\)</span>, alors le skewness de <span
+class="math inline">\(Y\)</span> est égal au skewness de <span
+class="math inline">\(X\)</span>.</p>
+<p><strong>Preuve :</strong> Considérons <span class="math inline">\(Y =
+aX\)</span>. La moyenne de <span class="math inline">\(Y\)</span> est
+<span class="math inline">\(\mu_Y = a\mu_X\)</span>. Le moment d’ordre
+trois de <span class="math inline">\(Y\)</span> est :</p>
+<p><span class="math display">\[m_3^Y = E[(Y - \mu_Y)^3] = E[(aX -
+a\mu_X)^3] = a^3 E[(X - \mu_X)^3] = a^3 m_3^X\]</span></p>
+<p>La variance de <span class="math inline">\(Y\)</span> est <span
+class="math inline">\(\sigma_Y^2 = a^2 \sigma_X^2\)</span>. Ainsi, le
+skewness de <span class="math inline">\(Y\)</span> est :</p>
+<p><span class="math display">\[\gamma_Y = \frac{m_3^Y}{\sigma_Y^3} =
+\frac{a^3 m_3^X}{(a^2 \sigma_X^2)^{3/2}} = \frac{a^3 m_3^X}{a^3
+\sigma_X^3} = \frac{m_3^X}{\sigma_X^3} = \gamma_X\]</span></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de skewness est une
+technique puissante pour transformer les données brutes en un format
+plus informatif. En exploitant l’asymétrie des distributions, cette
+méthode permet de capturer des informations pertinentes et de faciliter
+l’analyse. Les propriétés d’invariance par translation et par échelle en
+font un outil robuste pour diverses applications.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

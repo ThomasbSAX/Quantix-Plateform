@@ -1,0 +1,485 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Modèle SIR en Épidémiologie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Modèle SIR en Épidémiologie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des maladies infectieuses est un domaine crucial en santé
+publique. Pour comprendre la dynamique de propagation d’une maladie, les
+épidémiologistes utilisent des modèles mathématiques. Parmi ceux-ci, le
+modèle SIR (Susceptible-Infected-Recovered) est l’un des plus
+fondamentaux et largement utilisés. Introduit par Kermack et McKendrick
+en 1927, ce modèle permet de décrire l’évolution d’une maladie dans une
+population en divisant celle-ci en trois catégories : les individus
+susceptibles, infectés et guéris.</p>
+<p>Le modèle SIR est indispensable pour plusieurs raisons. Tout d’abord,
+il permet de prédire l’évolution temporelle d’une épidémie et d’estimer
+son impact potentiel. Ensuite, il offre un cadre théorique pour évaluer
+l’efficacité des interventions sanitaires telles que la vaccination ou
+la quarantaine. Enfin, il fournit une base pour le développement de
+modèles plus complexes intégrant des facteurs tels que la structure
+d’âge, les réseaux de contacts ou l’hétérogénéité des comportements.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de formaliser le modèle SIR, il est essentiel de comprendre les
+concepts sous-jacents. Nous cherchons à modéliser la dynamique d’une
+maladie dans une population fermée, c’est-à-dire sans naissances ni
+décès autres que ceux liés à la maladie. La population est divisée en
+trois compartiments :</p>
+<ul>
+<li><p>Les individus susceptibles (S) : ceux qui n’ont pas encore été
+exposés à la maladie et peuvent donc être infectés.</p></li>
+<li><p>Les individus infectés (I) : ceux qui ont contracté la maladie et
+peuvent la transmettre.</p></li>
+<li><p>Les individus guéris (R) : ceux qui ont surmonté la maladie et
+sont désormais immunisés.</p></li>
+</ul>
+<p>Nous cherchons à décrire comment ces trois compartiments évoluent au
+cours du temps. Pour cela, nous introduisons les notations suivantes
+:</p>
+<ul>
+<li><p><span class="math inline">\(S(t)\)</span> : nombre d’individus
+susceptibles à l’instant <span
+class="math inline">\(t\)</span>.</p></li>
+<li><p><span class="math inline">\(I(t)\)</span> : nombre d’individus
+infectés à l’instant <span class="math inline">\(t\)</span>.</p></li>
+<li><p><span class="math inline">\(R(t)\)</span> : nombre d’individus
+guéris à l’instant <span class="math inline">\(t\)</span>.</p></li>
+<li><p><span class="math inline">\(N = S(t) + I(t) + R(t)\)</span> :
+taille totale de la population, supposée constante.</p></li>
+<li><p><span class="math inline">\(\beta\)</span> : taux de transmission
+de la maladie.</p></li>
+<li><p><span class="math inline">\(\gamma\)</span> : taux de
+guérison.</p></li>
+</ul>
+<p>La définition formelle du modèle SIR est donnée par le système
+d’équations différentielles ordinaires suivant :</p>
+<p><span class="math display">\[\begin{cases}
+\frac{dS}{dt} = -\beta \frac{S I}{N} \\
+\frac{dI}{dt} = \beta \frac{S I}{N} - \gamma I \\
+\frac{dR}{dt} = \gamma I
+\end{cases}\]</span></p>
+<p>Ce système d’équations décrit l’évolution des trois compartiments au
+cours du temps. La première équation indique que le nombre d’individus
+susceptibles diminue proportionnellement au produit du nombre de
+susceptibles et d’infectés. La deuxième équation montre que le nombre
+d’individus infectés augmente en fonction du taux de transmission et
+diminue en fonction du taux de guérison. La troisième équation indique
+que le nombre d’individus guéris augmente proportionnellement au nombre
+d’infectés.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le modèle SIR admet plusieurs propriétés importantes qui peuvent être
+énoncées sous forme de théorèmes. Nous commençons par le théorème
+suivant, qui décrit la dynamique du système.</p>
+<div class="theorem">
+<p>Le système SIR admet un point d’équilibre unique <span
+class="math inline">\((S^*, I^*, R^*)\)</span> tel que :</p>
+<p><span class="math display">\[\begin{cases}
+S^* = N - \frac{\gamma}{\beta} \\
+I^* = 0 \\
+R^* = \frac{\gamma}{\beta}
+\end{cases}\]</span></p>
+<p>où <span class="math inline">\(N\)</span> est la taille totale de la
+population, <span class="math inline">\(\beta\)</span> le taux de
+transmission et <span class="math inline">\(\gamma\)</span> le taux de
+guérison.</p>
+</div>
+<p>La démonstration de ce théorème repose sur l’analyse des conditions
+d’équilibre du système. Un point d’équilibre est atteint lorsque les
+dérivées temporelles de <span class="math inline">\(S\)</span>, <span
+class="math inline">\(I\)</span> et <span
+class="math inline">\(R\)</span> sont nulles. En résolvant le système
+d’équations obtenu, nous trouvons les valeurs de <span
+class="math inline">\(S^*\)</span>, <span
+class="math inline">\(I^*\)</span> et <span
+class="math inline">\(R^*\)</span>.</p>
+<p>Un autre théorème important concerne la stabilité de ce point
+d’équilibre.</p>
+<div class="theorem">
+<p>Le point d’équilibre <span class="math inline">\((S^*, I^*,
+R^*)\)</span> est stable si et seulement si le nombre de reproduction
+basique <span class="math inline">\(R_0 = \frac{\beta
+N}{\gamma}\)</span> est inférieur à 1.</p>
+</div>
+<p>La démonstration de ce théorème repose sur l’analyse des valeurs
+propres de la matrice jacobienne du système SIR. Si <span
+class="math inline">\(R_0 &lt; 1\)</span>, toutes les valeurs propres
+sont négatives, ce qui implique la stabilité du point d’équilibre. Si
+<span class="math inline">\(R_0 &gt; 1\)</span>, au moins une valeur
+propre est positive, ce qui implique l’instabilité du point
+d’équilibre.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Nous commençons par démontrer le premier théorème. Pour cela, nous
+cherchons les conditions d’équilibre du système SIR.</p>
+<p><span class="math display">\[\begin{cases}
+\frac{dS}{dt} = -\beta \frac{S I}{N} = 0 \\
+\frac{dI}{dt} = \beta \frac{S I}{N} - \gamma I = 0 \\
+\frac{dR}{dt} = \gamma I = 0
+\end{cases}\]</span></p>
+<p>La première équation implique que <span class="math inline">\(S I =
+0\)</span>. La deuxième équation implique que <span
+class="math inline">\((\beta \frac{S}{N} - \gamma) I = 0\)</span>. La
+troisième équation implique que <span class="math inline">\(I =
+0\)</span>.</p>
+<p>Si <span class="math inline">\(I = 0\)</span>, alors la deuxième
+équation est satisfaite pour toute valeur de <span
+class="math inline">\(S\)</span>. Cependant, nous cherchons un point
+d’équilibre unique. Pour cela, nous considérons la troisième équation
+<span class="math inline">\(\frac{dR}{dt} = 0\)</span>, qui implique que
+<span class="math inline">\(R\)</span> est constant. Comme <span
+class="math inline">\(N = S + I + R\)</span>, nous avons <span
+class="math inline">\(S = N - R\)</span>.</p>
+<p>En substituant <span class="math inline">\(I = 0\)</span> et <span
+class="math inline">\(S = N - R\)</span> dans la première équation, nous
+obtenons :</p>
+<p><span class="math display">\[-\beta \frac{(N - R) \cdot 0}{N} =
+0\]</span></p>
+<p>Cette équation est toujours satisfaite. Cependant, nous cherchons un
+point d’équilibre unique. Pour cela, nous considérons la deuxième
+équation <span class="math inline">\(\frac{dI}{dt} = 0\)</span>, qui
+implique que <span class="math inline">\(\beta \frac{S}{N} - \gamma =
+0\)</span>.</p>
+<p>En substituant <span class="math inline">\(S = N - R\)</span> dans
+cette équation, nous obtenons :</p>
+<p><span class="math display">\[\beta \frac{N - R}{N} - \gamma = 0
+\implies R = N - \frac{\gamma N}{\beta}\]</span></p>
+<p>Ainsi, le point d’équilibre unique est donné par :</p>
+<p><span class="math display">\[\begin{cases}
+S^* = N - \frac{\gamma}{\beta} \\
+I^* = 0 \\
+R^* = \frac{\gamma}{\beta}
+\end{cases}\]</span></p>
+<p>Nous passons maintenant à la démonstration du deuxième théorème. Pour
+cela, nous analysons les valeurs propres de la matrice jacobienne du
+système SIR.</p>
+<p>La matrice jacobienne <span class="math inline">\(J\)</span> est
+donnée par :</p>
+<p><span class="math display">\[J = \begin{pmatrix}
+-\beta \frac{I}{N} &amp; -\beta \frac{S}{N} &amp; 0 \\
+\beta \frac{I}{N} &amp; \beta \frac{S}{N} - \gamma &amp; 0 \\
+0 &amp; \gamma &amp; 0
+\end{pmatrix}\]</span></p>
+<p>Au point d’équilibre <span class="math inline">\((S^*, I^*,
+R^*)\)</span>, cette matrice devient :</p>
+<p><span class="math display">\[J^* = \begin{pmatrix}
+0 &amp; -\beta \frac{S^*}{N} &amp; 0 \\
+0 &amp; \beta \frac{S^*}{N} - \gamma &amp; 0 \\
+0 &amp; \gamma &amp; 0
+\end{pmatrix}\]</span></p>
+<p>Les valeurs propres de cette matrice sont données par :</p>
+<p><span class="math display">\[\det(J^* - \lambda I) = 0\]</span></p>
+<p>où <span class="math inline">\(\lambda\)</span> est une valeur propre
+et <span class="math inline">\(I\)</span> est la matrice identité. En
+développant ce déterminant, nous obtenons :</p>
+<p><span class="math display">\[\lambda \left( \lambda - (\beta
+\frac{S^*}{N} - \gamma) \right) = 0\]</span></p>
+<p>Ainsi, les valeurs propres sont <span class="math inline">\(\lambda_1
+= 0\)</span> et <span class="math inline">\(\lambda_2 = \beta
+\frac{S^*}{N} - \gamma\)</span>.</p>
+<p>Pour que le point d’équilibre soit stable, toutes les valeurs propres
+doivent être négatives ou nulles. Comme <span
+class="math inline">\(\lambda_1 = 0\)</span> est toujours nulle, nous
+devons avoir <span class="math inline">\(\lambda_2 &lt; 0\)</span>.</p>
+<p>En substituant <span class="math inline">\(S^* = N -
+\frac{\gamma}{\beta}\)</span> dans cette condition, nous obtenons :</p>
+<p><span class="math display">\[\beta \frac{N - \frac{\gamma}{\beta}}{N}
+- \gamma &lt; 0 \implies \beta - \frac{\gamma}{N} - \gamma &lt; 0
+\implies \beta &lt; \gamma \left(1 + \frac{1}{N}\right)\]</span></p>
+<p>Comme <span class="math inline">\(N\)</span> est grand, nous pouvons
+approximer cette condition par :</p>
+<p><span class="math display">\[\beta &lt; \gamma \implies R_0 =
+\frac{\beta N}{\gamma} &lt; 1\]</span></p>
+<p>Ainsi, le point d’équilibre est stable si et seulement si <span
+class="math inline">\(R_0 &lt; 1\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés et corollaires importants
+du modèle SIR.</p>
+<ol>
+<li><p>Si <span class="math inline">\(R_0 &gt; 1\)</span>, le système
+SIR admet une épidémie. Cela signifie que le nombre d’individus infectés
+augmente initialement avant de diminuer.</p></li>
+<li><p>Si <span class="math inline">\(R_0 &lt; 1\)</span>, le système
+SIR n’admet pas d’épidémie. Cela signifie que le nombre d’individus
+infectés diminue initialement.</p></li>
+<li><p>La taille finale de l’épidémie est donnée par <span
+class="math inline">\(S_{\infty} = N - \frac{\gamma}{\beta}\)</span>.
+Cela signifie que le nombre d’individus susceptibles à la fin de
+l’épidémie est indépendant du nombre initial d’individus
+infectés.</p></li>
+</ol>
+<p>Nous démontrons maintenant ces propriétés.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour la propriété (i), nous considérons le cas où
+<span class="math inline">\(R_0 &gt; 1\)</span>. Cela signifie que <span
+class="math inline">\(\beta &gt; \gamma\)</span>. En analysant les
+valeurs propres de la matrice jacobienne, nous avons vu que <span
+class="math inline">\(\lambda_2 = \beta \frac{S^*}{N} - \gamma &gt;
+0\)</span>. Ainsi, le point d’équilibre est instable et le système admet
+une épidémie.</p>
+<p>Pour la propriété (ii), nous considérons le cas où <span
+class="math inline">\(R_0 &lt; 1\)</span>. Cela signifie que <span
+class="math inline">\(\beta &lt; \gamma\)</span>. En analysant les
+valeurs propres de la matrice jacobienne, nous avons vu que <span
+class="math inline">\(\lambda_2 = \beta \frac{S^*}{N} - \gamma &lt;
+0\)</span>. Ainsi, le point d’équilibre est stable et le système n’admet
+pas d’épidémie.</p>
+<p>Pour la propriété (iii), nous considérons l’équation <span
+class="math inline">\(\frac{dS}{dt} = -\beta \frac{S I}{N}\)</span>. En
+intégrant cette équation, nous obtenons :</p>
+<p><span class="math display">\[S(t) = S(0) e^{-\beta \int_0^t
+\frac{I(\tau)}{N} d\tau}\]</span></p>
+<p>En prenant la limite <span class="math inline">\(t \to
+\infty\)</span>, nous obtenons :</p>
+<p><span class="math display">\[S_{\infty} = S(0) e^{-\beta
+\int_0^{\infty} \frac{I(\tau)}{N} d\tau}\]</span></p>
+<p>En utilisant la troisième équation du système SIR, nous avons <span
+class="math inline">\(\int_0^{\infty} I(\tau) d\tau =
+\frac{R_{\infty}}{\gamma}\)</span>. Ainsi,</p>
+<p><span class="math display">\[S_{\infty} = S(0) e^{-\frac{\beta
+R_{\infty}}{\gamma N}}\]</span></p>
+<p>En utilisant la relation <span class="math inline">\(S_{\infty} +
+I_{\infty} + R_{\infty} = N\)</span> et <span
+class="math inline">\(I_{\infty} = 0\)</span>, nous obtenons :</p>
+<p><span class="math display">\[S_{\infty} + R_{\infty} = N\]</span></p>
+<p>En substituant <span class="math inline">\(S_{\infty}\)</span> dans
+cette équation, nous obtenons :</p>
+<p><span class="math display">\[S(0) e^{-\frac{\beta R_{\infty}}{\gamma
+N}} + R_{\infty} = N\]</span></p>
+<p>En résolvant cette équation pour <span
+class="math inline">\(R_{\infty}\)</span>, nous obtenons :</p>
+<p><span class="math display">\[R_{\infty} = N - S(0) e^{-\frac{\beta
+R_{\infty}}{\gamma N}}\]</span></p>
+<p>En utilisant l’approximation <span class="math inline">\(e^x \approx
+1 + x\)</span> pour <span class="math inline">\(x\)</span> petit, nous
+obtenons :</p>
+<p><span class="math display">\[R_{\infty} \approx N - S(0) \left(1 -
+\frac{\beta R_{\infty}}{\gamma N}\right)\]</span></p>
+<p>En résolvant cette équation pour <span
+class="math inline">\(R_{\infty}\)</span>, nous obtenons :</p>
+<p><span class="math display">\[R_{\infty} \approx N - S(0) +
+\frac{\beta R_{\infty}}{\gamma}\]</span></p>
+<p>En réarrangeant cette équation, nous obtenons :</p>
+<p><span class="math display">\[R_{\infty} \left(1 -
+\frac{\beta}{\gamma}\right) \approx N - S(0)\]</span></p>
+<p>En utilisant <span class="math inline">\(R_0 = \frac{\beta N}{\gamma}
+&lt; 1\)</span>, nous avons <span
+class="math inline">\(\frac{\beta}{\gamma} &lt; \frac{1}{N}\)</span>.
+Ainsi,</p>
+<p><span class="math display">\[R_{\infty} \approx N - S(0)\]</span></p>
+<p>En utilisant <span class="math inline">\(S_{\infty} + R_{\infty} =
+N\)</span>, nous obtenons :</p>
+<p><span class="math display">\[S_{\infty} \approx S(0) - R_{\infty} = N
+- \frac{\gamma}{\beta}\]</span></p>
+<p>Ainsi, la taille finale de l’épidémie est donnée par <span
+class="math inline">\(S_{\infty} = N -
+\frac{\gamma}{\beta}\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le modèle SIR est un outil fondamental en épidémiologie pour
+comprendre la dynamique des maladies infectieuses. Il permet de prédire
+l’évolution d’une épidémie et d’évaluer l’efficacité des interventions
+sanitaires. Cependant, il présente certaines limitations, notamment
+l’hypothèse d’une population fermée et homogène. Des modèles plus
+complexes intégrant des facteurs tels que la structure d’âge, les
+réseaux de contacts ou l’hétérogénéité des comportements sont
+nécessaires pour une modélisation plus réaliste.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,287 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Analyse de la Variance Multivariée (MANOVA)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Analyse de la Variance Multivariée (MANOVA)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’Analyse de la Variance Multivariée (MANOVA) est une généralisation
+de l’Analyse de la Variance (ANOVA) à plusieurs variables dépendantes.
+Cette technique statistique est indispensable dans les situations où
+l’on souhaite tester l’effet d’un facteur (ou de plusieurs facteurs) sur
+plusieurs variables dépendantes simultanément.</p>
+<p>L’émergence de la MANOVA est motivée par le besoin d’éviter les
+problèmes liés aux multiples tests statistiques indépendants, qui
+augmentent le risque de fausses conclusions. En effet, lorsque plusieurs
+ANOVA univariées sont effectuées sur les mêmes données, le taux global
+d’erreur de type I peut devenir inacceptable. La MANOVA permet de tester
+l’effet global du facteur sur l’ensemble des variables dépendantes,
+réduisant ainsi ce risque.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la MANOVA, commençons par définir les concepts
+fondamentaux.</p>
+<p>Supposons que nous avons <span class="math inline">\(p\)</span>
+variables dépendantes et <span class="math inline">\(k\)</span> niveaux
+d’un facteur. Nous notons <span class="math inline">\(Y_{ij}\)</span> le
+vecteur des observations pour la <span
+class="math inline">\(i\)</span>-ème répétition du <span
+class="math inline">\(j\)</span>-ème niveau du facteur, où <span
+class="math inline">\(Y_{ij} = (Y_{ij1}, Y_{ij2}, \ldots,
+Y_{ijp})^T\)</span>.</p>
+<p>Nous cherchons à tester l’hypothèse nulle <span
+class="math inline">\(H_0 : \mu_1 = \mu_2 = \ldots = \mu_k\)</span>, où
+<span class="math inline">\(\mu_j\)</span> est le vecteur moyen des
+observations pour le <span class="math inline">\(j\)</span>-ème niveau
+du facteur.</p>
+<p>Formellement, la MANOVA teste l’hypothèse nulle suivante :</p>
+<p><span class="math display">\[H_0 : \mu_1 = \mu_2 = \ldots =
+\mu_k\]</span></p>
+<p>où <span class="math inline">\(\mu_j = E[Y_{ij}]\)</span> pour tout
+<span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour effectuer la MANOVA, nous utilisons plusieurs théorèmes et
+concepts statistiques. L’un des principaux outils est le test de Wilks’
+Lambda.</p>
+<p>Le théorème de Wilks’ Lambda stipule que, sous l’hypothèse nulle
+<span class="math inline">\(H_0\)</span>, la statistique de Wilks’
+Lambda suit une distribution connue.</p>
+<p>La statistique de Wilks’ Lambda est définie comme :</p>
+<p><span class="math display">\[\Lambda =
+\frac{|\mathbf{W}|}{|\mathbf{T}|}\]</span></p>
+<p>où <span class="math inline">\(\mathbf{W}\)</span> est la matrice de
+somme des carrés et produits croisés intra-groupe, et <span
+class="math inline">\(\mathbf{T}\)</span> est la matrice de somme des
+carrés et produits croisés totale.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver que la statistique de Wilks’ Lambda suit une
+distribution connue sous l’hypothèse nulle, nous devons utiliser
+plusieurs propriétés statistiques.</p>
+<p>Premièrement, nous savons que sous <span
+class="math inline">\(H_0\)</span>, les matrices <span
+class="math inline">\(\mathbf{W}\)</span> et <span
+class="math inline">\(\mathbf{T}\)</span> suivent des distributions de
+Wishart.</p>
+<p>Ensuite, nous utilisons le théorème de Bartlett pour déduire la
+distribution de <span class="math inline">\(\Lambda\)</span>.</p>
+<p>La preuve détaillée est complexe et nécessite des connaissances
+avancées en statistique multivariée.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La MANOVA possède plusieurs propriétés intéressantes :</p>
+<ol>
+<li><p>La MANOVA est plus puissante que les ANOVA univariées
+individuelles lorsque les variables dépendantes sont corrélées.</p></li>
+<li><p>La MANOVA permet de contrôler le taux global d’erreur de type
+I.</p></li>
+<li><p>La MANOVA peut être étendue à des modèles avec plusieurs facteurs
+et interactions.</p></li>
+</ol>
+<p>Pour chaque propriété, des preuves détaillées peuvent être fournies
+en utilisant les théorèmes et concepts mentionnés précédemment.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La MANOVA est une technique statistique puissante pour analyser
+l’effet d’un facteur sur plusieurs variables dépendantes simultanément.
+Elle évite les problèmes liés aux multiples tests statistiques
+indépendants et permet de contrôler le taux global d’erreur de type I.
+Les théorèmes et propriétés de la MANOVA en font un outil indispensable
+dans de nombreuses applications statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Test de White : Une Approche Robuste pour l’Hétéroscédasticité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Test de White : Une Approche Robuste pour
+l’Hétéroscédasticité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des données économiques et financières est souvent
+confrontée à un défi fondamental : l’hétéroscédasticité. Ce phénomène,
+où la variance des erreurs n’est pas constante à travers les
+observations, peut fausser les inférences statistiques et rendre les
+estimations inefficaces. Le test de White, développé par Halbert White
+en 1980, offre une solution robuste pour détecter cette
+hétéroscédasticité.</p>
+<p>Le test de White est indispensable dans le cadre des modèles
+économétriques, où l’hypothèse d’homoscedasticité est souvent trop
+restrictive. Il permet de valider ou d’invalider cette hypothèse, ce qui
+est crucial pour choisir les méthodes d’estimation appropriées. Par
+exemple, en présence d’hétéroscédasticité, les estimateurs par moindres
+carrés ordinaires ne sont plus efficaces, et des techniques alternatives
+comme les moindres carrés pondérés ou les méthodes robustes doivent être
+employées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le test de White, il est essentiel de définir
+quelques concepts clés.</p>
+<h2 id="hétéroscédasticité">Hétéroscédasticité</h2>
+<p>Supposons que nous avons un modèle linéaire général :</p>
+<p><span class="math display">\[y_i = x_i&#39; \beta + u_i\]</span></p>
+<p>où <span class="math inline">\(y_i\)</span> est la variable
+dépendante, <span class="math inline">\(x_i\)</span> est le vecteur des
+variables explicatives, <span class="math inline">\(\beta\)</span> est
+le vecteur des coefficients, et <span class="math inline">\(u_i\)</span>
+est le terme d’erreur. L’hétéroscédasticité se produit lorsque la
+variance de <span class="math inline">\(u_i\)</span> n’est pas constante
+pour toutes les observations. Formellement, nous disons qu’il y a
+hétéroscédasticité si :</p>
+<p><span class="math display">\[\text{Var}(u_i | x_i) =
+\sigma_i^2\]</span></p>
+<p>où <span class="math inline">\(\sigma_i^2\)</span> dépend de <span
+class="math inline">\(x_i\)</span>.</p>
+<h2 id="test-de-white">Test de White</h2>
+<p>Le test de White est un test statistique pour détecter
+l’hétéroscédasticité dans les modèles de régression. Il repose sur une
+régression auxiliaire des carrés des résidus au carré sur les variables
+explicatives et leurs carrés. Formellement, le test de White peut être
+décrit comme suit :</p>
+<p>Soit <span class="math inline">\(\hat{u}_i\)</span> les résidus
+obtenus à partir de l’estimation du modèle initial. Le test de White
+consiste à estimer le modèle auxiliaire :</p>
+<p><span class="math display">\[\hat{u}_i^2 = x_i&#39; \gamma + z_i&#39;
+\delta + v_i\]</span></p>
+<p>où <span class="math inline">\(z_i\)</span> est un vecteur contenant
+les carrés et les produits croisés des variables explicatives. Le test
+statistique est basé sur le test de l’hypothèse nulle que tous les
+coefficients <span class="math inline">\(\gamma\)</span> et <span
+class="math inline">\(\delta\)</span> sont nuls.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-white">Théorème de White</h2>
+<p>Le théorème central du test de White peut être énoncé comme suit
+:</p>
+<p><strong>Théorème 1 (White)</strong>. Soit <span
+class="math inline">\(y_i = x_i&#39; \beta + u_i\)</span> un modèle
+linéaire général, où <span class="math inline">\(u_i\)</span> est un
+terme d’erreur. Supposons que les conditions habituelles de régression
+linéaire sont satisfaites, sauf l’hypothèse d’homoscedasticité. Alors,
+le test de White pour l’hétéroscédasticité est asymptotiquement
+distribué selon une loi du chi-deux avec <span
+class="math inline">\(k\)</span> degrés de liberté, où <span
+class="math inline">\(k\)</span> est le nombre de restrictions
+testées.</p>
+<p><strong>Démonstration.</strong> La démonstration repose sur les
+propriétés asymptotiques des tests de régression. Sous l’hypothèse nulle
+d’homoscedasticité, les résidus <span
+class="math inline">\(\hat{u}_i\)</span> sont indépendants et
+identiquement distribués avec une variance constante. Le test de White
+consiste à régresser les résidus au carré sur les variables explicatives
+et leurs carrés.</p>
+<p>En utilisant le théorème de la limite centrale, nous pouvons montrer
+que le test statistique suit asymptotiquement une loi du chi-deux. Plus
+précisément, sous l’hypothèse nulle, le test statistique <span
+class="math inline">\(T\)</span> est donné par :</p>
+<p><span class="math display">\[T = n R^2\]</span></p>
+<p>où <span class="math inline">\(n\)</span> est le nombre
+d’observations et <span class="math inline">\(R^2\)</span> est le
+coefficient de détermination du modèle auxiliaire. Sous l’hypothèse
+nulle, <span class="math inline">\(T\)</span> suit une loi du chi-deux
+avec <span class="math inline">\(k\)</span> degrés de liberté.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="justification-du-test-de-white">Justification du Test de
+White</h2>
+<p>Pour justifier le test de White, nous devons montrer que sous
+l’hypothèse nulle d’homoscedasticité, le test statistique suit une loi
+du chi-deux. Considérons le modèle auxiliaire :</p>
+<p><span class="math display">\[\hat{u}_i^2 = x_i&#39; \gamma + z_i&#39;
+\delta + v_i\]</span></p>
+<p>Sous l’hypothèse nulle, <span class="math inline">\(\gamma =
+0\)</span> et <span class="math inline">\(\delta = 0\)</span>. Les
+résidus <span class="math inline">\(v_i\)</span> sont alors indépendants
+et identiquement distribués avec une variance constante. En utilisant le
+théorème de la limite centrale, nous pouvons montrer que le test
+statistique <span class="math inline">\(T\)</span> est asymptotiquement
+distribué selon une loi du chi-deux.</p>
+<p>Plus précisément, nous avons :</p>
+<p><span class="math display">\[T = n R^2\]</span></p>
+<p>où <span class="math inline">\(R^2\)</span> est le coefficient de
+détermination du modèle auxiliaire. Sous l’hypothèse nulle, <span
+class="math inline">\(R^2\)</span> est asymptotiquement distribué selon
+une loi du chi-deux avec <span class="math inline">\(k\)</span> degrés
+de liberté.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriétés-du-test-de-white">Propriétés du Test de White</h2>
+<p>Le test de White possède plusieurs propriétés importantes :</p>
+<ol>
+<li><p><strong>Consistance.</strong> Le test de White est consistant
+pour détecter l’hétéroscédasticité. Cela signifie que sous l’hypothèse
+alternative, la probabilité de rejeter l’hypothèse nulle tend vers 1
+lorsque le nombre d’observations tend vers l’infini.</p></li>
+<li><p><strong>Robustesse.</strong> Le test de White est robuste à la
+présence de multicolinéarité dans les variables explicatives. Cela
+signifie que même si les variables explicatives sont fortement
+corrélées, le test reste valide.</p></li>
+<li><p><strong>Asymptoticité.</strong> Le test de White est
+asymptotiquement distribué selon une loi du chi-deux. Cela signifie que
+pour un grand nombre d’observations, la distribution du test statistique
+est bien approchée par une loi du chi-deux.</p></li>
+</ol>
+<h2 id="corollaires">Corollaires</h2>
+<p><strong>Corollaire 1.</strong> Si le test de White rejette
+l’hypothèse nulle d’homoscedasticité, alors les estimateurs par moindres
+carrés ordinaires ne sont plus efficaces. Des méthodes alternatives
+comme les moindres carrés pondérés ou les méthodes robustes doivent être
+employées.</p>
+<p><strong>Corollaire 2.</strong> Si le test de White ne rejette pas
+l’hypothèse nulle d’homoscedasticité, alors les estimateurs par moindres
+carrés ordinaires sont efficaces et peuvent être utilisés pour
+l’estimation du modèle.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le test de White est un outil puissant pour détecter
+l’hétéroscédasticité dans les modèles de régression. Il offre une
+solution robuste et asymptotiquement valide pour tester l’hypothèse
+d’homoscedasticité. En comprenant les définitions, les théorèmes et les
+propriétés du test de White, les chercheurs peuvent mieux analyser leurs
+données et choisir les méthodes d’estimation appropriées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

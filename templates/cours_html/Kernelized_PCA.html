@@ -1,0 +1,362 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized Principal Component Analysis: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized Principal Component Analysis: A
+Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>Principal Component Analysis (PCA) stands as a cornerstone in the
+realm of dimensionality reduction and feature extraction, offering a
+powerful means to uncover latent structures within high-dimensional
+data. However, its linear nature often falls short in capturing the
+intricate, nonlinear relationships that permeate real-world datasets.
+The advent of Kernelized PCA (KPCA) has addressed this limitation by
+embedding the data into a higher-dimensional feature space, where linear
+separation becomes feasible. This transformation is facilitated through
+the use of kernel functions, which implicitly map data into this
+enriched space without the need for explicit computation.</p>
+<p>The origins of KPCA trace back to the foundational work on kernel
+methods in machine learning, notably the development of Support Vector
+Machines (SVMs) by Vapnik and colleagues. The synergy between kernel
+functions and PCA was first formalized in the seminal work of Scholkopf
+et al. (1998), who demonstrated that the kernel trick could be applied
+to PCA, thereby extending its applicability to nonlinear problems. This
+innovation has proven indispensable in fields ranging from
+bioinformatics to computer vision, where the complexity of data demands
+sophisticated analytical tools.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To grasp the essence of Kernelized PCA, we must first understand the
+concept of a kernel function. Intuitively, a kernel function measures
+the similarity between pairs of data points. Formally, let <span
+class="math inline">\(\mathcal{X}\)</span> be a set of input patterns
+and <span class="math inline">\(\Phi: \mathcal{X} \rightarrow
+\mathcal{H}\)</span> be a mapping from the input space to a
+higher-dimensional feature space <span
+class="math inline">\(\mathcal{H}\)</span>. A kernel function <span
+class="math inline">\(k: \mathcal{X} \times \mathcal{X} \rightarrow
+\mathbb{R}\)</span> is defined as:</p>
+<p><span class="math display">\[k(\mathbf{x}_i, \mathbf{x}_j) = \langle
+\Phi(\mathbf{x}_i), \Phi(\mathbf{x}_j)
+\rangle_{\mathcal{H}}\]</span></p>
+<p>where <span class="math inline">\(\langle \cdot, \cdot
+\rangle_{\mathcal{H}}\)</span> denotes the inner product in the feature
+space <span class="math inline">\(\mathcal{H}\)</span>. This function
+must satisfy the condition of being positive semi-definite, ensuring
+that it can be expressed as an inner product in some feature space.</p>
+<p>The kernel trick allows us to compute the inner products in <span
+class="math inline">\(\mathcal{H}\)</span> without explicitly knowing
+the mapping <span class="math inline">\(\Phi\)</span>. This is
+particularly advantageous when <span
+class="math inline">\(\mathcal{H}\)</span> is of very high, or even
+infinite, dimensionality. Common examples of kernel functions include
+the polynomial kernel:</p>
+<p><span class="math display">\[k(\mathbf{x}_i, \mathbf{x}_j) = (\langle
+\mathbf{x}_i, \mathbf{x}_j \rangle + c)^d\]</span></p>
+<p>and the Gaussian Radial Basis Function (RBF) kernel:</p>
+<p><span class="math display">\[k(\mathbf{x}_i, \mathbf{x}_j) =
+\exp\left(-\frac{\|\mathbf{x}_i -
+\mathbf{x}_j\|^2}{2\sigma^2}\right)\]</span></p>
+<h1 id="the-kernelized-pca-algorithm">The Kernelized PCA Algorithm</h1>
+<p>The KPCA algorithm extends the traditional PCA by performing
+eigenvalue decomposition in the feature space <span
+class="math inline">\(\mathcal{H}\)</span>. Given a dataset <span
+class="math inline">\(\mathbf{X} = \{\mathbf{x}_1, \mathbf{x}_2, \ldots,
+\mathbf{x}_n\}\)</span> with <span class="math inline">\(d\)</span>
+dimensions, the goal is to find the principal components in <span
+class="math inline">\(\mathcal{H}\)</span>.</p>
+<p>The steps of KPCA can be outlined as follows:</p>
+<p>1. **Center the Data**: Compute the centered kernel matrix <span
+class="math inline">\(\mathbf{K}\)</span> where <span
+class="math inline">\(K_{ij} = k(\mathbf{x}_i, \mathbf{x}_j) -
+\frac{1}{n}\sum_{l=1}^n k(\mathbf{x}_i, \mathbf{x}_l) -
+\frac{1}{n}\sum_{m=1}^n k(\mathbf{x}_m, \mathbf{x}_j) +
+\frac{1}{n^2}\sum_{l,m=1}^n k(\mathbf{x}_l, \mathbf{x}_m)\)</span>.</p>
+<p>2. **Eigenvalue Decomposition**: Perform eigenvalue decomposition on
+the centered kernel matrix <span
+class="math inline">\(\mathbf{K}\)</span> to obtain eigenvalues <span
+class="math inline">\(\lambda_1 \geq \lambda_2 \geq \ldots \geq
+\lambda_n\)</span> and corresponding eigenvectors <span
+class="math inline">\(\mathbf{v}_1, \mathbf{v}_2, \ldots,
+\mathbf{v}_n\)</span>.</p>
+<p>3. **Projection**: Project the data onto the principal components in
+<span class="math inline">\(\mathcal{H}\)</span> by computing the
+projections <span class="math inline">\(\mathbf{z}_i = \lambda_k^{-1/2}
+\mathbf{v}_k^T \mathbf{K}_i\)</span> for each data point <span
+class="math inline">\(\mathbf{x}_i\)</span>, where <span
+class="math inline">\(\mathbf{K}_i\)</span> is the <span
+class="math inline">\(i\)</span>-th column of <span
+class="math inline">\(\mathbf{K}\)</span>.</p>
+<h1 id="theorems-and-proofs">Theorems and Proofs</h1>
+<h2
+id="theorem-kernelized-pca-as-a-linear-pca-in-feature-space">Theorem:
+Kernelized PCA as a Linear PCA in Feature Space</h2>
+<p>The KPCA algorithm is equivalent to performing linear PCA in the
+feature space <span class="math inline">\(\mathcal{H}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Let <span
+class="math inline">\(\mathbf{\Sigma}_{\Phi(\mathbf{X})}\)</span> be the
+covariance matrix of the data in the feature space <span
+class="math inline">\(\mathcal{H}\)</span>. The principal components are
+given by the eigenvectors of <span
+class="math inline">\(\mathbf{\Sigma}_{\Phi(\mathbf{X})}\)</span>.</p>
+<p>The covariance matrix in <span
+class="math inline">\(\mathcal{H}\)</span> can be expressed as:</p>
+<p><span class="math display">\[\mathbf{\Sigma}_{\Phi(\mathbf{X})} =
+\frac{1}{n} \sum_{i=1}^n (\Phi(\mathbf{x}_i) -
+\bar{\Phi})(\Phi(\mathbf{x}_i) - \bar{\Phi})^T\]</span></p>
+<p>where <span class="math inline">\(\bar{\Phi} = \frac{1}{n}
+\sum_{i=1}^n \Phi(\mathbf{x}_i)\)</span>.</p>
+<p>The centered kernel matrix <span
+class="math inline">\(\mathbf{K}\)</span> can be written as:</p>
+<p><span class="math display">\[\mathbf{K} = \Phi(\mathbf{X})^T
+\Phi(\mathbf{X}) - \frac{1}{n} \mathbf{1} \mathbf{1}^T
+\Phi(\mathbf{X})^T \Phi(\mathbf{X}) - \frac{1}{n} \Phi(\mathbf{X})^T
+\Phi(\mathbf{X}) \mathbf{1} \mathbf{1}^T + \frac{1}{n^2} \mathbf{1}
+\mathbf{1}^T \Phi(\mathbf{X})^T \Phi(\mathbf{X}) \mathbf{1}
+\mathbf{1}^T\]</span></p>
+<p>This can be simplified to:</p>
+<p><span class="math display">\[\mathbf{K} = \Phi(\mathbf{X})^T \left(
+\mathbf{I} - \frac{1}{n} \mathbf{1} \mathbf{1}^T \right) \left(
+\mathbf{I} - \frac{1}{n} \mathbf{1} \mathbf{1}^T \right)
+\Phi(\mathbf{X})\]</span></p>
+<p>The eigenvectors of <span class="math inline">\(\mathbf{K}\)</span>
+correspond to the principal components in <span
+class="math inline">\(\mathcal{H}\)</span>, as they are the solutions to
+the eigenvalue problem:</p>
+<p><span class="math display">\[\mathbf{K} \mathbf{v} = \lambda
+\mathbf{v}\]</span></p>
+<p>This is equivalent to solving the eigenvalue problem in <span
+class="math inline">\(\mathcal{H}\)</span>:</p>
+<p><span class="math display">\[\Phi(\mathbf{X})^T \left( \mathbf{I} -
+\frac{1}{n} \mathbf{1} \mathbf{1}^T \right) \left( \mathbf{I} -
+\frac{1}{n} \mathbf{1} \mathbf{1}^T \right) \Phi(\mathbf{X}) \mathbf{v}
+= \lambda \mathbf{v}\]</span></p>
+<p>Thus, KPCA is equivalent to performing linear PCA in the feature
+space <span class="math inline">\(\mathcal{H}\)</span>. ◻</p>
+</div>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<h2 id="property-i-dimensionality-reduction">Property (i):
+Dimensionality Reduction</h2>
+<p>KPCA allows for dimensionality reduction by selecting the top <span
+class="math inline">\(k\)</span> principal components with the largest
+eigenvalues. This reduces the complexity of the data while preserving
+its essential structure.</p>
+<h2 id="property-ii-nonlinear-feature-extraction">Property (ii):
+Nonlinear Feature Extraction</h2>
+<p>By using a nonlinear kernel function, KPCA can extract nonlinear
+features from the data. This is particularly useful when the data lies
+on a nonlinear manifold.</p>
+<h2 id="property-iii-computational-efficiency">Property (iii):
+Computational Efficiency</h2>
+<p>The computational complexity of KPCA is dominated by the eigenvalue
+decomposition of the kernel matrix, which has a complexity of <span
+class="math inline">\(O(n^3)\)</span>. For large datasets, this can be
+computationally expensive. However, various approximation methods exist
+to mitigate this issue.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Kernelized PCA represents a powerful extension of traditional PCA,
+enabling the analysis of complex, nonlinear datasets. Its ability to
+implicitly map data into a higher-dimensional feature space through the
+use of kernel functions has made it an indispensable tool in modern data
+analysis. The theoretical foundations and practical applications of KPCA
+continue to be areas of active research, promising further advancements
+in the field of dimensionality reduction.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

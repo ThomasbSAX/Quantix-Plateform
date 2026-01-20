@@ -1,0 +1,433 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de calcul quantique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de calcul quantique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’ère quantique a ouvert des perspectives révolutionnaires dans le
+domaine du calcul. À l’aube de ce siècle, les ordinateurs quantiques
+promettent des performances inégalées pour résoudre certains problèmes.
+Ces machines exploitent les principes fondamentaux de la mécanique
+quantique, tels que l’intrication et la superposition d’états. L’étude
+de la complexité des problèmes quantiques est donc devenue un champ de
+recherche essentiel, tant pour comprendre les limites théoriques que
+pour exploiter pleinement le potentiel des ordinateurs quantiques.</p>
+<p>L’émergence de cette notion est motivée par la nécessité de classer
+les problèmes en fonction de leur difficulté sur des machines
+quantiques. Contrairement aux modèles classiques, où la complexité est
+souvent évaluée en termes de temps d’exécution ou d’espace mémoire, les
+problèmes quantiques nécessitent une approche différente. En effet, la
+superposition des états permet de traiter plusieurs configurations
+simultanément, ce qui peut réduire drastiquement le temps de calcul pour
+certains problèmes.</p>
+<p>Dans ce cadre, la notion de complexité quantique devient
+indispensable. Elle permet non seulement d’identifier les problèmes pour
+lesquels les ordinateurs quantiques offrent un avantage significatif,
+mais aussi de définir des limites théoriques. Par exemple, le célèbre
+algorithme de Shor pour la factorisation des entiers montre que certains
+problèmes, considérés comme difficiles en calcul classique, peuvent être
+résolus efficacement sur une machine quantique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour aborder la complexité des problèmes de calcul quantique, il est
+essentiel de définir plusieurs concepts clés. Commençons par la notion
+de problème décisionnel quantique.</p>
+<p>Un problème décisionnel quantique est un problème pour lequel une
+machine quantique peut fournir une réponse binaire, oui ou non, en
+fonction d’une entrée donnée. Par exemple, considérons le problème
+suivant : étant donné un nombre entier <span
+class="math inline">\(n\)</span>, déterminer si <span
+class="math inline">\(n\)</span> est premier.</p>
+<p>Formellement, nous pouvons définir un problème décisionnel quantique
+comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(L \subseteq \{0,1\}^*\)</span> un
+langage. On dit que <span class="math inline">\(L\)</span> est dans la
+classe de complexité <span class="math inline">\(BQP\)</span>
+(Bounded-error Quantum Polynomial time) s’il existe une machine
+quantique <span class="math inline">\(M\)</span> telle que pour tout
+<span class="math inline">\(x \in \{0,1\}^*\)</span>, <span
+class="math display">\[|\Pr[M(x) = 1] - \Pr[M(x) = 0]| \geq
+\frac{1}{3},\]</span> où <span class="math inline">\(M(x) = 1\)</span>
+signifie que <span class="math inline">\(x \in L\)</span> et <span
+class="math inline">\(M(x) = 0\)</span> signifie que <span
+class="math inline">\(x \notin L\)</span>. De plus, le temps d’exécution
+de <span class="math inline">\(M\)</span> est polynomial en la taille de
+<span class="math inline">\(x\)</span>.</p>
+</div>
+<p>Une autre notion importante est celle de problème d’optimisation
+quantique. Un problème d’optimisation quantique consiste à trouver le
+minimum ou le maximum d’une fonction donnée, en utilisant les ressources
+d’un ordinateur quantique. Par exemple, le problème du voyageur de
+commerce peut être formulé comme un problème d’optimisation
+quantique.</p>
+<p>Formellement, nous pouvons définir un problème d’optimisation
+quantique comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f : \{0,1\}^n \rightarrow
+\mathbb{R}\)</span> une fonction. On dit que <span
+class="math inline">\(f\)</span> est dans la classe de complexité <span
+class="math inline">\(QMA\)</span> (Quantum Merlin-Arthur) s’il existe
+une machine quantique <span class="math inline">\(M\)</span> telle que
+pour tout <span class="math inline">\(x \in \{0,1\}^n\)</span>, <span
+class="math display">\[\exists y \in \{0,1\}^{poly(n)} \text{ tel que }
+M(x,y) = 1,\]</span> où <span class="math inline">\(y\)</span> est un
+certificat quantique et <span class="math inline">\(M(x,y) = 1\)</span>
+signifie que <span class="math inline">\(y\)</span> est un certificat
+valide pour <span class="math inline">\(x\)</span>. De plus, le temps
+d’exécution de <span class="math inline">\(M\)</span> est polynomial en
+la taille de <span class="math inline">\(x\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’un des théorèmes les plus célèbres en complexité quantique est le
+théorème de Bernstein-Vazirani. Ce théorème montre que les ordinateurs
+quantiques peuvent résoudre certains problèmes de recherche
+d’information avec une efficacité exponentielle par rapport aux
+algorithmes classiques.</p>
+<p>Commençons par expliquer pédagogiquement ce que nous cherchons à
+obtenir. Supposons que nous ayons une fonction <span
+class="math inline">\(f : \{0,1\}^n \rightarrow \{0,1\}\)</span> telle
+que <span class="math inline">\(f(x) = x \cdot s\)</span>, où <span
+class="math inline">\(s \in \{0,1\}^n\)</span> est un vecteur secret.
+Notre objectif est de déterminer <span class="math inline">\(s\)</span>
+en utilisant le moins d’évaluations possibles de <span
+class="math inline">\(f\)</span>.</p>
+<p>Formellement, le théorème de Bernstein-Vazirani peut être énoncé
+comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f : \{0,1\}^n \rightarrow
+\{0,1\}\)</span> une fonction telle que <span class="math inline">\(f(x)
+= x \cdot s\)</span>, où <span class="math inline">\(s \in
+\{0,1\}^n\)</span> est un vecteur secret. Alors, il existe un algorithme
+quantique qui détermine <span class="math inline">\(s\)</span> en
+utilisant une seule évaluation de <span
+class="math inline">\(f\)</span>.</p>
+</div>
+<p>La preuve de ce théorème repose sur l’utilisation d’un oracle
+quantique et des propriétés de la transformée de Fourier quantique. Nous
+allons maintenant développer cette preuve étape par étape.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Bernstein-Vazirani, nous allons utiliser
+un algorithme quantique qui exploite les propriétés de la superposition
+et de l’interférence. L’algorithme peut être décrit comme suit :</p>
+<p>1. Initialisation : Préparer l’état initial <span
+class="math inline">\(|0\rangle^{\otimes n}\)</span>.</p>
+<p>2. Application de la transformée de Hadamard : Appliquer la porte de
+Hadamard <span class="math inline">\(H^{\otimes n}\)</span> à l’état
+initial, ce qui donne l’état superposé <span
+class="math inline">\(\frac{1}{\sqrt{2^n}} \sum_{x \in \{0,1\}^n}
+|x\rangle\)</span>.</p>
+<p>3. Évaluation de la fonction <span class="math inline">\(f\)</span> :
+Utiliser un oracle quantique pour évaluer <span
+class="math inline">\(f\)</span> sur chaque état de la superposition.
+Cela donne l’état <span class="math inline">\(\frac{1}{\sqrt{2^n}}
+\sum_{x \in \{0,1\}^n} (-1)^{f(x)} |x\rangle\)</span>.</p>
+<p>4. Application de la transformée de Hadamard : Appliquer à nouveau la
+porte de Hadamard <span class="math inline">\(H^{\otimes n}\)</span> à
+l’état résultant. Cela donne l’état <span
+class="math inline">\(|s\rangle\)</span>.</p>
+<p>5. Mesure : Mesurer l’état final pour obtenir le vecteur secret <span
+class="math inline">\(s\)</span>.</p>
+<p>Nous allons maintenant justifier chaque étape de cette preuve.</p>
+<div class="proof">
+<p><em>Proof.</em> 1. Initialisation : L’état initial <span
+class="math inline">\(|0\rangle^{\otimes n}\)</span> est un état de base
+du registre quantique.</p>
+<p>2. Application de la transformée de Hadamard : La porte de Hadamard
+<span class="math inline">\(H\)</span> est définie par <span
+class="math display">\[H |0\rangle = \frac{1}{\sqrt{2}} (|0\rangle +
+|1\rangle) \quad \text{et} \quad H |1\rangle = \frac{1}{\sqrt{2}}
+(|0\rangle - |1\rangle).\]</span> En appliquant <span
+class="math inline">\(H^{\otimes n}\)</span> à l’état initial, nous
+obtenons <span class="math display">\[H^{\otimes n} |0\rangle^{\otimes
+n} = \frac{1}{\sqrt{2^n}} \sum_{x \in \{0,1\}^n} |x\rangle.\]</span></p>
+<p>3. Évaluation de la fonction <span class="math inline">\(f\)</span> :
+L’oracle quantique est une opération unitaire qui agit sur le registre
+quantique en fonction de la valeur de <span
+class="math inline">\(f\)</span>. Plus précisément, l’oracle est défini
+par <span class="math display">\[U_f |x\rangle |y\rangle = |x\rangle |y
+\oplus f(x)\rangle,\]</span> où <span class="math inline">\(y\)</span>
+est un qubit auxiliaire. En utilisant l’oracle, nous obtenons <span
+class="math display">\[\frac{1}{\sqrt{2^n}} \sum_{x \in \{0,1\}^n}
+|x\rangle |y\rangle \mapsto \frac{1}{\sqrt{2^n}} \sum_{x \in \{0,1\}^n}
+(-1)^{f(x)} |x\rangle |y\rangle.\]</span></p>
+<p>4. Application de la transformée de Hadamard : En appliquant à
+nouveau <span class="math inline">\(H^{\otimes n}\)</span> à l’état
+résultant, nous obtenons <span class="math display">\[H^{\otimes n}
+\left( \frac{1}{\sqrt{2^n}} \sum_{x \in \{0,1\}^n} (-1)^{f(x)} |x\rangle
+\right) = |s\rangle.\]</span> Cela découle du fait que <span
+class="math inline">\(f(x) = x \cdot s\)</span>, et donc <span
+class="math display">\[(-1)^{f(x)} = (-1)^{x \cdot s} = \prod_{i=1}^n
+(-1)^{s_i x_i}.\]</span></p>
+<p>5. Mesure : En mesurant l’état final <span
+class="math inline">\(|s\rangle\)</span>, nous obtenons le vecteur
+secret <span class="math inline">\(s\)</span> avec une probabilité de
+1. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous allons maintenant énoncer quelques propriétés et corollaires
+importants en complexité quantique.</p>
+<div class="proposition">
+<p>La classe de complexité <span class="math inline">\(BQP\)</span> est
+contenue dans la classe de complexité <span
+class="math inline">\(PP\)</span> (Probabilistic Polynomial time).</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cela découle du fait que les machines quantiques
+peuvent être simulées par des algorithmes probabilistes classiques, avec
+une erreur bornée. Plus précisément, pour toute machine quantique <span
+class="math inline">\(M\)</span> dans <span
+class="math inline">\(BQP\)</span>, il existe un algorithme probabiliste
+classique <span class="math inline">\(A\)</span> tel que pour tout <span
+class="math inline">\(x \in \{0,1\}^*\)</span>, <span
+class="math display">\[|\Pr[A(x) = 1] - \Pr[M(x) = 1]| \leq
+\frac{1}{3}.\]</span> De plus, le temps d’exécution de <span
+class="math inline">\(A\)</span> est polynomial en la taille de <span
+class="math inline">\(x\)</span>. ◻</p>
+</div>
+<div class="proposition">
+<p>La classe de complexité <span class="math inline">\(QMA\)</span> est
+contenue dans la classe de complexité <span
+class="math inline">\(NP\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cela découle du fait que les certificats quantiques
+peuvent être simulés par des preuves classiques. Plus précisément, pour
+toute machine quantique <span class="math inline">\(M\)</span> dans
+<span class="math inline">\(QMA\)</span>, il existe un algorithme
+classique <span class="math inline">\(A\)</span> tel que pour tout <span
+class="math inline">\(x \in \{0,1\}^n\)</span>, <span
+class="math display">\[\exists y \in \{0,1\}^{poly(n)} \text{ tel que }
+A(x,y) = 1,\]</span> où <span class="math inline">\(y\)</span> est un
+certificat classique et <span class="math inline">\(A(x,y) = 1\)</span>
+signifie que <span class="math inline">\(y\)</span> est un certificat
+valide pour <span class="math inline">\(x\)</span>. De plus, le temps
+d’exécution de <span class="math inline">\(A\)</span> est polynomial en
+la taille de <span class="math inline">\(x\)</span>. ◻</p>
+</div>
+<div class="proposition">
+<p>La classe de complexité <span class="math inline">\(BQP\)</span> est
+fermée sous complémentation.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cela découle du fait que les machines quantiques
+peuvent inverser leur réponse en utilisant une opération unitaire
+simple. Plus précisément, pour toute machine quantique <span
+class="math inline">\(M\)</span> dans <span
+class="math inline">\(BQP\)</span>, il existe une machine quantique
+<span class="math inline">\(M&#39;\)</span> telle que pour tout <span
+class="math inline">\(x \in \{0,1\}^*\)</span>, <span
+class="math display">\[|\Pr[M&#39;(x) = 1] - \Pr[M(x) = 0]| \geq
+\frac{1}{3}.\]</span> De plus, le temps d’exécution de <span
+class="math inline">\(M&#39;\)</span> est polynomial en la taille de
+<span class="math inline">\(x\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’étude de la complexité des problèmes quantiques est un domaine de
+recherche fascinant et en pleine expansion. Les résultats présentés dans
+cet article montrent que les ordinateurs quantiques offrent des
+avantages significatifs pour résoudre certains problèmes. Cependant, de
+nombreuses questions restent ouvertes, notamment concernant les
+relations entre les différentes classes de complexité quantique et
+classique. Les recherches futures dans ce domaine promettent de révéler
+encore plus des mystères du calcul quantique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

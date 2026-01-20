@@ -1,0 +1,325 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Conjugaison Wishart-Multinormale : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Conjugaison Wishart-Multinormale : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La conjugaison Wishart-Multinormale émerge comme un concept
+fondamental dans le domaine de l’analyse statistique bayésienne.
+Historiquement, cette notion trouve ses racines dans les travaux
+pionniers sur les distributions de Wishart et multinormales, qui ont été
+développées pour modéliser des phénomènes complexes dans des espaces
+vectoriels de grande dimension. La conjugaison entre ces deux
+distributions est indispensable pour comprendre les propriétés
+asymptotiques et les comportements limites des modèles bayésiens,
+notamment dans le cadre de l’inférence statistique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour aborder la conjugaison Wishart-Multinormale, il est essentiel de
+comprendre les distributions sous-jacentes. Considérons un vecteur
+aléatoire <span class="math inline">\(\mathbf{X} \in
+\mathbb{R}^n\)</span> suivant une distribution multinomiale. Nous
+cherchons à modéliser la covariance de ce vecteur par une matrice <span
+class="math inline">\(\Sigma\)</span>. La distribution Wishart
+intervient alors pour capturer l’incertitude sur cette matrice de
+covariance.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathbf{X} = (X_1, X_2, \ldots,
+X_k)^T\)</span> un vecteur aléatoire de dimension <span
+class="math inline">\(k\)</span>. On dit que <span
+class="math inline">\(\mathbf{X}\)</span> suit une distribution
+multinomiale de paramètres <span class="math inline">\(n\)</span> et
+<span class="math inline">\(\mathbf{p} = (p_1, p_2, \ldots,
+p_k)^T\)</span> si pour tout <span class="math inline">\(x = (x_1, x_2,
+\ldots, x_k)^T\)</span> tel que <span class="math inline">\(\sum_{i=1}^k
+x_i = n\)</span>, on a : <span class="math display">\[P(\mathbf{X} =
+\mathbf{x}) = \frac{n!}{x_1! x_2! \cdots x_k!} p_1^{x_1} p_2^{x_2}
+\cdots p_k^{x_k}\]</span></p>
+</div>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathbf{X}_1, \mathbf{X}_2, \ldots,
+\mathbf{X}_n\)</span> des vecteurs aléatoires indépendants et
+identiquement distribués (i.i.d.) suivant une distribution normale
+multivariée <span class="math inline">\(\mathcal{N}(\mathbf{0},
+\Sigma)\)</span>. La matrice <span class="math inline">\(S =
+\sum_{i=1}^n \mathbf{X}_i \mathbf{X}_i^T\)</span> suit une distribution
+Wishart de paramètres <span class="math inline">\(n\)</span> et <span
+class="math inline">\(\Sigma\)</span>, notée <span
+class="math inline">\(W_n(\Sigma)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème central dans l’étude de la conjugaison
+Wishart-Multinormale est le suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{X}\)</span> un vecteur
+aléatoire suivant une distribution multinomiale de paramètres <span
+class="math inline">\(n\)</span> et <span
+class="math inline">\(\mathbf{p}\)</span>, et soit <span
+class="math inline">\(\Sigma\)</span> une matrice de covariance
+aléatoire suivant une distribution Wishart <span
+class="math inline">\(W_n(\Psi)\)</span>. Alors, la distribution
+conditionnelle de <span class="math inline">\(\mathbf{X}\)</span>
+sachant <span class="math inline">\(\Sigma\)</span> est une distribution
+multinomiale avec des paramètres dépendant de <span
+class="math inline">\(\Sigma\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer ce théorème, nous devons établir une relation entre
+les distributions multinomiale et Wishart. Considérons d’abord la
+distribution conditionnelle de <span
+class="math inline">\(\mathbf{X}\)</span> sachant <span
+class="math inline">\(\Sigma\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\mathbf{X}\)</span>
+un vecteur aléatoire suivant une distribution multinomiale de paramètres
+<span class="math inline">\(n\)</span> et <span
+class="math inline">\(\mathbf{p}\)</span>. La matrice de covariance
+<span class="math inline">\(\Sigma\)</span> suit une distribution
+Wishart <span class="math inline">\(W_n(\Psi)\)</span>. Nous voulons
+montrer que la distribution conditionnelle de <span
+class="math inline">\(\mathbf{X}\)</span> sachant <span
+class="math inline">\(\Sigma\)</span> est une distribution multinomiale
+avec des paramètres dépendant de <span
+class="math inline">\(\Sigma\)</span>.</p>
+<p>Pour ce faire, nous utilisons la propriété de conjugaison entre les
+distributions multinomiale et Wishart. La distribution a priori de <span
+class="math inline">\(\Sigma\)</span> est une distribution
+inverse-Wishart, qui est la conjuguée de la distribution multinomiale.
+Ainsi, la distribution a posteriori de <span
+class="math inline">\(\Sigma\)</span> après avoir observé <span
+class="math inline">\(\mathbf{X}\)</span> est également une distribution
+inverse-Wishart, mais avec des paramètres mis à jour.</p>
+<p>En utilisant les propriétés de la distribution multinomiale et de la
+distribution Wishart, nous pouvons écrire la distribution conditionnelle
+de <span class="math inline">\(\mathbf{X}\)</span> sachant <span
+class="math inline">\(\Sigma\)</span> comme une distribution
+multinomiale avec des paramètres dépendant de <span
+class="math inline">\(\Sigma\)</span>. Cette relation est établie par
+l’intégration sur la distribution a priori de <span
+class="math inline">\(\Sigma\)</span> et l’application des propriétés de
+conjugaison. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ici quelques propriétés importantes de la conjugaison
+Wishart-Multinormale :</p>
+<ol>
+<li><p>La distribution a posteriori de <span
+class="math inline">\(\Sigma\)</span> est une distribution
+inverse-Wishart avec des paramètres mis à jour en fonction de <span
+class="math inline">\(\mathbf{X}\)</span>.</p></li>
+<li><p>La distribution conditionnelle de <span
+class="math inline">\(\mathbf{X}\)</span> sachant <span
+class="math inline">\(\Sigma\)</span> est une distribution multinomiale
+avec des paramètres dépendant de <span
+class="math inline">\(\Sigma\)</span>.</p></li>
+<li><p>La conjugaison Wishart-Multinormale permet de simplifier les
+calculs d’inférence bayésienne dans les modèles à grande
+dimension.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La conjugaison Wishart-Multinormale est un concept puissant et
+élégant qui trouve des applications dans de nombreux domaines de
+l’analyse statistique bayésienne. En comprenant les propriétés et les
+théorèmes associés à cette conjugaison, nous pouvons développer des
+modèles plus robustes et précis pour l’inférence statistique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

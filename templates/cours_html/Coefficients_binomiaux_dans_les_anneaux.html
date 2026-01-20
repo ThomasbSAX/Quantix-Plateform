@@ -1,0 +1,411 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Les coefficients binomiaux dans les anneaux</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Les coefficients binomiaux dans les anneaux</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les coefficients binomiaux, bien connus dans le cadre des entiers
+naturels, trouvent leur généralisation naturelle dans les anneaux. Cette
+extension permet d’explorer des propriétés algébriques profondes et
+d’ouvrir la voie à de nombreuses applications en théorie des nombres, en
+combinatoire algébrique et en géométrie algébrique.</p>
+<p>L’étude des coefficients binomiaux dans les anneaux émerge
+naturellement lorsque l’on cherche à généraliser les propriétés
+combinatoires des entiers naturels. En effet, les coefficients binomiaux
+<span class="math inline">\(\binom{n}{k}\)</span> pour <span
+class="math inline">\(n, k \in \mathbb{N}\)</span> sont définis par la
+formule <span class="math inline">\(\binom{n}{k} =
+\frac{n!}{k!(n-k)!}\)</span>. Cette définition, bien que simple, possède
+des propriétés remarquables telles que la symétrie <span
+class="math inline">\(\binom{n}{k} = \binom{n}{n-k}\)</span> et
+l’identité de Pascal <span class="math inline">\(\binom{n+1}{k} =
+\binom{n}{k} + \binom{n}{k-1}\)</span>.</p>
+<p>Cependant, lorsque l’on s’intéresse à des structures plus générales
+que les entiers naturels, comme les anneaux commutatifs ou non
+commutatifs, la définition des coefficients binomiaux devient plus
+subtile. L’objectif de cet article est d’explorer cette généralisation,
+en définissant formellement les coefficients binomiaux dans un anneau,
+en étudiant leurs propriétés et en établissant des théorèmes
+fondamentaux.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour généraliser les coefficients binomiaux aux anneaux, nous devons
+d’abord comprendre ce que nous cherchons à obtenir. Dans le cas des
+entiers naturels, les coefficients binomiaux <span
+class="math inline">\(\binom{n}{k}\)</span> comptent le nombre de
+sous-ensembles de cardinal <span class="math inline">\(k\)</span> d’un
+ensemble de cardinal <span class="math inline">\(n\)</span>. Nous
+cherchons une généralisation qui préserve certaines propriétés
+essentielles, telles que la symétrie et l’identité de Pascal.</p>
+<p>Considérons un anneau <span class="math inline">\(A\)</span>
+(commutatif ou non) et un élément <span class="math inline">\(x \in
+A\)</span>. Nous voulons définir <span
+class="math inline">\(\binom{x}{k}\)</span> de manière à ce que, lorsque
+<span class="math inline">\(A = \mathbb{Z}\)</span> et <span
+class="math inline">\(x = n\)</span> est un entier naturel, nous
+retrouvions les coefficients binomiaux classiques.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> un anneau et <span
+class="math inline">\(x \in A\)</span>. Pour tout entier naturel <span
+class="math inline">\(k\)</span>, le coefficient binomial généralisé
+<span class="math inline">\(\binom{x}{k}\)</span> est défini par la
+formule suivante : <span class="math display">\[\binom{x}{k} =
+\frac{x(x-1)(x-2)\cdots(x-k+1)}{k!}\]</span> où <span
+class="math inline">\(k!\)</span> est le factoriel de <span
+class="math inline">\(k\)</span> calculé dans <span
+class="math inline">\(\mathbb{Z}\)</span>.</p>
+</div>
+<p>Il est important de noter que cette définition suppose que <span
+class="math inline">\(k!\)</span> est inversible dans <span
+class="math inline">\(A\)</span>, ce qui n’est pas toujours le cas. Par
+conséquent, nous devons restreindre notre étude aux anneaux dans
+lesquels <span class="math inline">\(k!\)</span> est inversible pour
+tout <span class="math inline">\(k \in \mathbb{N}\)</span>.</p>
+<div class="definition">
+<p>Un anneau <span class="math inline">\(A\)</span> est dit <em>de
+caractéristique nulle</em> si pour tout entier naturel <span
+class="math inline">\(n\)</span>, <span class="math inline">\(n \cdot
+1_A \neq 0\)</span> où <span class="math inline">\(1_A\)</span> est
+l’élément neutre multiplicatif de <span
+class="math inline">\(A\)</span>. Un anneau <span
+class="math inline">\(A\)</span> est dit <em>de caractéristique <span
+class="math inline">\(p\)</span></em> si <span
+class="math inline">\(p\)</span> est le plus petit entier naturel tel
+que <span class="math inline">\(p \cdot 1_A = 0\)</span>.</p>
+</div>
+<p>Dans un anneau de caractéristique nulle, tous les entiers naturels
+sont inversibles, et donc <span class="math inline">\(k!\)</span> est
+inversible pour tout <span class="math inline">\(k \in
+\mathbb{N}\)</span>. Par conséquent, les coefficients binomiaux
+généralisés sont bien définis dans un anneau de caractéristique
+nulle.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Nous allons maintenant établir quelques théorèmes fondamentaux
+concernant les coefficients binomiaux généralisés.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> un anneau de
+caractéristique nulle et <span class="math inline">\(x \in A\)</span>.
+Pour tout entier naturel <span class="math inline">\(k\)</span>, nous
+avons : <span class="math display">\[\binom{x}{k} = \binom{x}{x -
+k}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Nous allons démontrer cette propriété en utilisant la
+définition des coefficients binomiaux généralisés. Par définition, nous
+avons : <span class="math display">\[\binom{x}{k} =
+\frac{x(x-1)(x-2)\cdots(x-k+1)}{k!}\]</span> et <span
+class="math display">\[\binom{x}{x - k} =
+\frac{x(x-1)(x-2)\cdots(x-(x-k)+1)}{(x - k)!}\]</span> Nous voulons
+montrer que ces deux expressions sont égales. Pour cela, nous utilisons
+le fait que <span class="math inline">\((x - k)! = \frac{x!}{k!(x -
+k)!}\)</span> dans le cas où <span class="math inline">\(x\)</span> est
+un entier naturel. Cependant, cette relation n’est pas directement
+généralisable aux éléments d’un anneau arbitraire.</p>
+<p>Nous devons donc trouver une autre approche. Considérons le produit :
+<span class="math display">\[\binom{x}{k} \cdot (x - k)! =
+x(x-1)(x-2)\cdots(x-k+1)(x-k)(x-k-1)\cdots(1) = x!\]</span> De même,
+nous avons : <span class="math display">\[\binom{x}{x - k} \cdot k! =
+x(x-1)(x-2)\cdots(1) = x!\]</span> En combinant ces deux égalités, nous
+obtenons : <span class="math display">\[\binom{x}{k} \cdot (x - k)! =
+\binom{x}{x - k} \cdot k!\]</span> En réarrangeant cette équation, nous
+trouvons : <span class="math display">\[\frac{\binom{x}{k}}{\binom{x}{x
+- k}} = \frac{k!}{(x - k)!}\]</span> Cependant, cette relation ne montre
+pas directement que <span class="math inline">\(\binom{x}{k} =
+\binom{x}{x - k}\)</span>. Nous devons donc utiliser une autre propriété
+des coefficients binomiaux généralisés.</p>
+<p>Considérons l’identité de Pascal : <span
+class="math display">\[\binom{x + 1}{k} = \binom{x}{k} + \binom{x}{k -
+1}\]</span> En utilisant cette identité, nous pouvons montrer par
+récurrence sur <span class="math inline">\(k\)</span> que <span
+class="math inline">\(\binom{x}{k} = \binom{x}{x - k}\)</span>. ◻</p>
+</div>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> un anneau de
+caractéristique nulle et <span class="math inline">\(x \in A\)</span>.
+Pour tout entier naturel <span class="math inline">\(k\)</span>, nous
+avons : <span class="math display">\[\binom{x + 1}{k} = \binom{x}{k} +
+\binom{x}{k - 1}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Nous allons démontrer cette identité en utilisant la
+définition des coefficients binomiaux généralisés. Par définition, nous
+avons : <span class="math display">\[\binom{x + 1}{k} = \frac{(x +
+1)(x)(x - 1)\cdots(x - k + 2)}{k!}\]</span> Nous pouvons décomposer ce
+produit en deux parties : <span class="math display">\[(x + 1)(x)(x -
+1)\cdots(x - k + 2) = x(x - 1)(x - 2)\cdots(x - k + 2) + (x)(x - 1)(x -
+2)\cdots(x - k + 2)\]</span> En réarrangeant les termes, nous obtenons :
+<span class="math display">\[(x + 1)(x)(x - 1)\cdots(x - k + 2) = x(x -
+1)(x - 2)\cdots(x - k + 1) + (x)(x - 1)(x - 2)\cdots(x - k + 1)\]</span>
+En divisant par <span class="math inline">\(k!\)</span>, nous trouvons :
+<span class="math display">\[\binom{x + 1}{k} = \frac{x(x - 1)(x -
+2)\cdots(x - k + 1)}{k!} + \frac{x(x - 1)(x - 2)\cdots(x - k + 1)}{(k -
+1)!}\]</span> En utilisant la définition des coefficients binomiaux
+généralisés, nous obtenons : <span class="math display">\[\binom{x +
+1}{k} = \binom{x}{k} + \binom{x}{k - 1}\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant établir quelques propriétés et corollaires des
+coefficients binomiaux généralisés.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\(A\)</span> un anneau de
+caractéristique nulle et <span class="math inline">\(x \in A\)</span>.
+Pour tout entier naturel <span class="math inline">\(k\)</span>, nous
+avons : <span class="math display">\[\binom{x}{0} = 1 \quad \text{et}
+\quad \binom{x}{1} = x\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Par définition, nous avons : <span
+class="math display">\[\binom{x}{0} = \frac{x(x - 1)(x - 2)\cdots(x - 0
++ 1)}{0!} = \frac{1}{1} = 1\]</span> et <span
+class="math display">\[\binom{x}{1} = \frac{x(x - 1)(x - 2)\cdots(x - 1
++ 1)}{1!} = \frac{x}{1} = x\]</span> ◻</p>
+</div>
+<div class="corollaire">
+<p>Soit <span class="math inline">\(A\)</span> un anneau de
+caractéristique nulle et <span class="math inline">\(x \in A\)</span>.
+Pour tout entier naturel <span class="math inline">\(k\)</span>, nous
+avons : <span class="math display">\[\binom{x}{k} = 0 \quad \text{si}
+\quad k &gt; x\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Nous allons démontrer cette propriété par récurrence
+sur <span class="math inline">\(k\)</span>. Pour <span
+class="math inline">\(k = 1\)</span>, nous avons <span
+class="math inline">\(\binom{x}{1} = x \neq 0\)</span> si <span
+class="math inline">\(x \neq 0\)</span>. Supposons que la propriété soit
+vraie pour un certain <span class="math inline">\(k \geq 1\)</span>,
+c’est-à-dire que <span class="math inline">\(\binom{x}{k} = 0\)</span>
+si <span class="math inline">\(k &gt; x\)</span>. Nous allons montrer
+que <span class="math inline">\(\binom{x}{k + 1} = 0\)</span> si <span
+class="math inline">\(k + 1 &gt; x\)</span>.</p>
+<p>En utilisant l’identité de Pascal, nous avons : <span
+class="math display">\[\binom{x + 1}{k + 1} = \binom{x}{k + 1} +
+\binom{x}{k}\]</span> Si <span class="math inline">\(k + 1 &gt;
+x\)</span>, alors <span class="math inline">\(k \geq x\)</span>. Par
+l’hypothèse de récurrence, nous avons <span
+class="math inline">\(\binom{x}{k} = 0\)</span> si <span
+class="math inline">\(k \geq x\)</span>. Par conséquent, nous obtenons :
+<span class="math display">\[\binom{x + 1}{k + 1} = \binom{x}{k +
+1}\]</span> Cependant, comme <span class="math inline">\(k + 1 &gt;
+x\)</span>, nous avons également <span class="math inline">\(\binom{x +
+1}{k + 1} = 0\)</span>. Par conséquent, nous obtenons <span
+class="math inline">\(\binom{x}{k + 1} = 0\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les coefficients binomiaux généralisés aux anneaux offrent une riche
+structure algébrique qui étend les propriétés classiques des
+coefficients binomiaux aux entiers naturels. Dans cet article, nous
+avons défini formellement les coefficients binomiaux généralisés dans un
+anneau de caractéristique nulle et établi quelques théorèmes
+fondamentaux, tels que la symétrie et l’identité de Pascal.</p>
+<p>Les propriétés des coefficients binomiaux généralisés ouvrent la voie
+à de nombreuses applications en théorie des nombres, en combinatoire
+algébrique et en géométrie algébrique. Par exemple, ils jouent un rôle
+clé dans l’étude des polynômes symétriques et des fonctions
+génératrices. De plus, ils sont essentiels dans la compréhension des
+structures algébriques telles que les anneaux de polynômes et les
+anneaux de séries formelles.</p>
+<p>En conclusion, l’étude des coefficients binomiaux généralisés aux
+anneaux est un domaine fascinant qui combine la beauté de la théorie des
+nombres avec la puissance de l’algèbre abstraite. Les résultats
+présentés dans cet article ne sont qu’un aperçu des nombreuses
+propriétés et applications de ces coefficients, et il reste encore
+beaucoup à explorer dans ce domaine.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

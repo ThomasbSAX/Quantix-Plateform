@@ -1,0 +1,371 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Stabilité des systèmes à commande par apprentissage</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Stabilité des systèmes à commande par
+apprentissage</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les systèmes à commande par apprentissage (ou <em>learning-based
+control systems</em>) représentent une avancée majeure dans le domaine
+de l’automatisation et du contrôle des systèmes dynamiques. L’idée
+centrale est d’intégrer des techniques d’apprentissage automatique dans
+la boucle de commande pour permettre au système de s’adapter en temps
+réel à des environnements complexes et changeants. Cette approche émerge
+naturellement face aux limites des méthodes de commande classiques, qui
+supposent souvent une connaissance parfaite du modèle du système à
+contrôler.</p>
+<p>L’apprentissage automatique offre des outils puissants pour modéliser
+des systèmes non linéaires et complexes, souvent difficiles à capturer
+avec des modèles analytiques traditionnels. Cependant, l’intégration de
+ces techniques dans une boucle de commande soulève des questions
+fondamentales sur la stabilité du système global. En effet, les méthodes
+d’apprentissage peuvent introduire des dynamiques imprévisibles qui
+doivent être rigoureusement analysées pour garantir la stabilité du
+système.</p>
+<p>Dans cet article, nous explorons les concepts de base de la stabilité
+des systèmes à commande par apprentissage. Nous commençons par définir
+formellement ce que nous entendons par stabilité dans ce contexte, puis
+nous examinons les théorèmes clés qui permettent de garantir cette
+propriété. Enfin, nous discutons des implications pratiques et des défis
+ouverts dans ce domaine de recherche en pleine expansion.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour aborder la question de la stabilité des systèmes à commande par
+apprentissage, il est essentiel de définir clairement les concepts
+fondamentaux.</p>
+<h2 class="unnumbered" id="stabilité-dun-système-dynamique">Stabilité
+d’un système dynamique</h2>
+<p>Considérons un système dynamique décrit par l’équation différentielle
+: <span class="math display">\[\dot{x}(t) = f(x(t), u(t))\]</span> où
+<span class="math inline">\(x(t) \in \mathbb{R}^n\)</span> est l’état du
+système, <span class="math inline">\(u(t) \in \mathbb{R}^m\)</span> est
+la commande appliquée, et <span class="math inline">\(f : \mathbb{R}^n
+\times \mathbb{R}^m \rightarrow \mathbb{R}^n\)</span> est une fonction
+continue.</p>
+<p>Nous cherchons à garantir que le système reste dans un état stable,
+c’est-à-dire qu’il ne diverge pas vers l’infini. Formellement, nous
+disons qu’un point d’équilibre <span class="math inline">\(x^*\)</span>
+est stable si pour tout <span class="math inline">\(\epsilon &gt;
+0\)</span>, il existe un <span class="math inline">\(\delta &gt;
+0\)</span> tel que : <span class="math display">\[\|x(0) - x^*\| &lt;
+\delta \implies \|x(t) - x^*\| &lt; \epsilon \quad \forall t \geq
+0\]</span></p>
+<h2 class="unnumbered" id="stabilité-asymptotique">Stabilité
+asymptotique</h2>
+<p>Un point d’équilibre <span class="math inline">\(x^*\)</span> est dit
+asymptotiquement stable si : <span class="math display">\[\lim_{t \to
+\infty} \|x(t) - x^*\| = 0\]</span></p>
+<h2 class="unnumbered" id="stabilité-exponentielle">Stabilité
+exponentielle</h2>
+<p>Un point d’équilibre <span class="math inline">\(x^*\)</span> est dit
+exponentiellement stable s’il existe des constantes <span
+class="math inline">\(c &gt; 0\)</span> et <span
+class="math inline">\(\lambda &gt; 0\)</span> telles que : <span
+class="math display">\[\|x(t) - x^*\| \leq c e^{-\lambda t} \|x(0) -
+x^*\| \quad \forall t \geq 0\]</span></p>
+<h1 class="unnumbered" id="théorèmes-de-stabilité">Théorèmes de
+stabilité</h1>
+<p>Pour garantir la stabilité des systèmes à commande par apprentissage,
+plusieurs théorèmes clés peuvent être utilisés. Nous en présentons
+quelques-uns ici.</p>
+<h2 class="unnumbered" id="théorème-de-lyapunov">Théorème de
+Lyapunov</h2>
+<p>Le théorème de Lyapunov est un outil fondamental pour l’analyse de la
+stabilité des systèmes dynamiques. Il s’énonce comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(V : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction continument différentiable, appelée
+fonction de Lyapunov. Si :</p>
+<ul>
+<li><p><span class="math inline">\(V(x) &gt; 0\)</span> pour tout <span
+class="math inline">\(x \neq 0\)</span>,</p></li>
+<li><p><span class="math inline">\(V(x) = 0\)</span> seulement pour
+<span class="math inline">\(x = 0\)</span>,</p></li>
+<li><p><span class="math inline">\(\dot{V}(x) = \frac{d}{dt} V(x(t))
+\leq 0\)</span> pour tout <span
+class="math inline">\(x\)</span>,</p></li>
+</ul>
+<p>alors le point d’équilibre <span class="math inline">\(x = 0\)</span>
+est stable. De plus, si <span class="math inline">\(\dot{V}(x) &lt;
+0\)</span> pour tout <span class="math inline">\(x \neq 0\)</span>,
+alors le point d’équilibre est asymptotiquement stable.</p>
+</div>
+<h2 class="unnumbered" id="théorème-de-lasalle">Théorème de LaSalle</h2>
+<p>Le théorème de LaSalle est une extension du théorème de Lyapunov qui
+permet d’analyser la stabilité des systèmes dynamiques en utilisant une
+fonction de Lyapunov.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(V : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction de Lyapunov continument différentiable.
+Si :</p>
+<ul>
+<li><p><span class="math inline">\(V(x) &gt; 0\)</span> pour tout <span
+class="math inline">\(x \neq 0\)</span>,</p></li>
+<li><p><span class="math inline">\(V(x) = 0\)</span> seulement pour
+<span class="math inline">\(x = 0\)</span>,</p></li>
+<li><p><span class="math inline">\(\dot{V}(x) \leq 0\)</span> pour tout
+<span class="math inline">\(x\)</span>,</p></li>
+</ul>
+<p>et si l’ensemble des points où <span class="math inline">\(\dot{V}(x)
+= 0\)</span> est invariant, alors le point d’équilibre <span
+class="math inline">\(x = 0\)</span> est asymptotiquement stable.</p>
+</div>
+<h1 class="unnumbered" id="preuves-de-stabilité">Preuves de
+stabilité</h1>
+<p>Pour démontrer la stabilité d’un système à commande par
+apprentissage, nous devons utiliser les théorèmes présentés ci-dessus.
+Nous illustrons cela avec un exemple simple.</p>
+<h2 class="unnumbered" id="exemple-de-preuve">Exemple de preuve</h2>
+<p>Considérons un système dynamique décrit par : <span
+class="math display">\[\dot{x}(t) = -x(t) + u(t)\]</span> où <span
+class="math inline">\(u(t)\)</span> est une commande générée par un
+algorithme d’apprentissage automatique.</p>
+<p>Supposons que l’algorithme d’apprentissage génère une commande de la
+forme : <span class="math display">\[u(t) = -k x(t)\]</span> où <span
+class="math inline">\(k &gt; 0\)</span> est un paramètre
+d’apprentissage.</p>
+<p>Le système dynamique devient alors : <span
+class="math display">\[\dot{x}(t) = -(1 + k) x(t)\]</span></p>
+<p>Nous choisissons une fonction de Lyapunov <span
+class="math inline">\(V(x) = \frac{1}{2} x^2\)</span>. Calculons sa
+dérivée temporelle : <span class="math display">\[\dot{V}(x) = x \dot{x}
+= x (-(1 + k) x) = -(1 + k) x^2\]</span></p>
+<p>Puisque <span class="math inline">\(\dot{V}(x) &lt; 0\)</span> pour
+tout <span class="math inline">\(x \neq 0\)</span>, le point d’équilibre
+<span class="math inline">\(x = 0\)</span> est asymptotiquement
+stable.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+corollaires</h1>
+<p>Nous présentons ici quelques propriétés et corollaires importants
+pour la stabilité des systèmes à commande par apprentissage.</p>
+<h2 class="unnumbered" id="propriété-de-robustesse">Propriété de
+robustesse</h2>
+<p>La stabilité d’un système à commande par apprentissage doit être
+robuste face aux perturbations et aux erreurs de modélisation.
+Formellement, nous disons qu’un système est robustement stable si :
+<span class="math display">\[\forall \epsilon &gt; 0, \exists \delta
+&gt; 0 \text{ tel que } \|x(0) - x^*\| &lt; \delta \implies \|x(t) -
+x^*\| &lt; \epsilon \quad \forall t \geq 0\]</span> même en présence de
+perturbations bornées.</p>
+<h2 class="unnumbered" id="corollaire-de-stabilité-globale">Corollaire
+de stabilité globale</h2>
+<p>Un corollaire important du théorème de Lyapunov est la notion de
+stabilité globale. Un système est globalement stable si le point
+d’équilibre <span class="math inline">\(x = 0\)</span> est
+asymptotiquement stable pour tout état initial <span
+class="math inline">\(x(0)\)</span>.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les systèmes à commande par apprentissage représentent une avancée
+majeure dans le domaine du contrôle des systèmes dynamiques. Cependant,
+leur stabilité doit être rigoureusement analysée pour garantir un
+fonctionnement fiable et sûr. Dans cet article, nous avons présenté les
+concepts fondamentaux de la stabilité des systèmes à commande par
+apprentissage, en utilisant des outils mathématiques tels que les
+fonctions de Lyapunov et les théorèmes de stabilité. Nous avons
+également illustré ces concepts avec un exemple simple.</p>
+<p>Les défis ouverts dans ce domaine sont nombreux, notamment en ce qui
+concerne la robustesse des systèmes face aux perturbations et
+l’adaptation en temps réel aux changements d’environnement. Les
+recherches futures devront se concentrer sur le développement de
+nouvelles méthodes pour garantir la stabilité des systèmes à commande
+par apprentissage dans des contextes toujours plus complexes et
+dynamiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,373 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de métaheuristiques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de métaheuristiques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les métaheuristiques représentent une classe d’algorithmes inspirés
+par des processus naturels ou biologiques, conçus pour résoudre des
+problèmes d’optimisation complexes. Leur émergence historique remonte
+aux années 1970 avec les premiers travaux sur les algorithmes
+génétiques, suivis par les recuits simulés et les essaims de particules.
+Ces méthodes ont été développées pour répondre à des défis où les
+approches classiques, comme la programmation linéaire ou dynamique,
+échouent en raison de leur complexité computationnelle
+exponentielle.</p>
+<p>L’intérêt pour les métaheuristiques réside dans leur capacité à
+explorer efficacement des espaces de solutions vastes et non convexes,
+souvent rencontrés dans des domaines tels que la logistique,
+l’ingénierie, et les sciences des données. Elles offrent une alternative
+pragmatique aux méthodes exactes, en sacrifiant parfois la garantie de
+l’optimalité au profit d’une solution suffisamment bonne trouvée
+rapidement.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la complexité des problèmes de métaheuristiques, il
+est essentiel de définir plusieurs concepts clés.</p>
+<h2 id="problème-doptimisation">Problème d’optimisation</h2>
+<p>Considérons un problème d’optimisation générale. On cherche à
+minimiser une fonction <span class="math inline">\(f: \mathcal{S}
+\rightarrow \mathbb{R}\)</span>, où <span
+class="math inline">\(\mathcal{S}\)</span> est un ensemble de solutions
+admissibles. Pédagogiquement, imaginons que <span
+class="math inline">\(f\)</span> représente un coût à minimiser, et
+<span class="math inline">\(\mathcal{S}\)</span> l’ensemble des
+configurations possibles d’un système.</p>
+<p>Formellement, un problème d’optimisation est défini par : <span
+class="math display">\[\min_{x \in \mathcal{S}} f(x)\]</span> où <span
+class="math inline">\(\mathcal{S} \subseteq \mathbb{R}^n\)</span> est
+l’espace de recherche, et <span class="math inline">\(f: \mathcal{S}
+\rightarrow \mathbb{R}\)</span> est la fonction objectif.</p>
+<h2 id="métaheuristique">Métaheuristique</h2>
+<p>Une métaheuristique est un algorithme qui guide d’autres heuristiques
+pour explorer l’espace de recherche de manière intelligente. Elle vise à
+éviter les pièges locaux et à converger vers une solution globale ou
+quasi-globale.</p>
+<p>Formellement, une métaheuristique <span
+class="math inline">\(\mathcal{A}\)</span> est une fonction qui prend en
+entrée un problème d’optimisation <span class="math inline">\(P =
+(\mathcal{S}, f)\)</span> et retourne une solution <span
+class="math inline">\(x^* \in \mathcal{S}\)</span>: <span
+class="math display">\[\mathcal{A}: (\mathcal{S}, f) \mapsto
+x^*\]</span> où <span class="math inline">\(x^*\)</span> est une
+approximation de la solution optimale.</p>
+<h2 id="complexité-computationnelle">Complexité computationnelle</h2>
+<p>La complexité d’un algorithme mesure le nombre d’opérations
+nécessaires pour résoudre un problème en fonction de la taille de
+l’entrée. Pour les métaheuristiques, cette complexité est souvent
+analysée en termes du nombre d’évaluations de la fonction objectif.</p>
+<p>Formellement, soit <span class="math inline">\(n\)</span> la taille
+de l’entrée. La complexité d’une métaheuristique <span
+class="math inline">\(\mathcal{A}\)</span> est définie par : <span
+class="math display">\[T_{\mathcal{A}}(n) = \text{Nombre
+d&#39;évaluations de } f \text{ nécessaires par } \mathcal{A} \text{
+pour résoudre } P\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-convergence-des-métaheuristiques">Théorème de
+convergence des métaheuristiques</h2>
+<p>Un théorème fondamental en théorie des métaheuristiques est celui de
+la convergence. Il stipule que, sous certaines conditions, une
+métaheuristique convergera vers une solution optimale avec une
+probabilité de 1.</p>
+<h2 id="énoncé-du-théorème">Énoncé du théorème</h2>
+<p>Soit <span class="math inline">\(\mathcal{A}\)</span> une
+métaheuristique appliquée à un problème d’optimisation <span
+class="math inline">\(P = (\mathcal{S}, f)\)</span>. Supposons que :</p>
+<ul>
+<li><p><span class="math inline">\(\mathcal{A}\)</span> explore l’espace
+de recherche <span class="math inline">\(\mathcal{S}\)</span> de manière
+ergodique.</p></li>
+<li><p>La probabilité de transition entre deux solutions <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> est non nulle pour tout <span
+class="math inline">\(x, y \in \mathcal{S}\)</span>.</p></li>
+</ul>
+<p>Alors, la probabilité que <span
+class="math inline">\(\mathcal{A}\)</span> trouve une solution optimale
+<span class="math inline">\(x^*\)</span> tend vers 1 lorsque le nombre
+d’itérations tend vers l’infini : <span class="math display">\[\lim_{k
+\rightarrow \infty} P(\mathcal{A}_k = x^*) = 1\]</span> où <span
+class="math inline">\(\mathcal{A}_k\)</span> désigne la solution
+retournée par <span class="math inline">\(\mathcal{A}\)</span> après
+<span class="math inline">\(k\)</span> itérations.</p>
+<h2 id="démonstration">Démonstration</h2>
+<p>La démonstration repose sur le théorème ergodique de Markov.
+Considérons la chaîne de Markov <span class="math inline">\((X_k)_{k
+\geq 0}\)</span> définie par les transitions de <span
+class="math inline">\(\mathcal{A}\)</span>. Par hypothèse, cette chaîne
+est irréductible et apériodique. D’après le théorème ergodique, la
+distribution stationnaire <span class="math inline">\(\pi\)</span>
+existe et est unique.</p>
+<p>La probabilité que <span class="math inline">\(X_k = x^*\)</span>
+tend vers <span class="math inline">\(\pi(x^*)\)</span> lorsque <span
+class="math inline">\(k \rightarrow \infty\)</span>. Puisque <span
+class="math inline">\(x^*\)</span> est un état absorbant, <span
+class="math inline">\(\pi(x^*) = 1\)</span>. Donc : <span
+class="math display">\[\lim_{k \rightarrow \infty} P(X_k = x^*) =
+1\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-convergence">Preuve du théorème de
+convergence</h2>
+<p>Pour prouver le théorème de convergence, nous devons montrer que la
+chaîne de Markov associée à la métaheuristique est ergodique. Cela
+implique deux propriétés :</p>
+<ul>
+<li><p>Irréductibilité : Pour tout <span class="math inline">\(x, y \in
+\mathcal{S}\)</span>, il existe un entier <span
+class="math inline">\(k\)</span> tel que la probabilité de transition de
+<span class="math inline">\(x\)</span> à <span
+class="math inline">\(y\)</span> en <span
+class="math inline">\(k\)</span> étapes est non nulle.</p></li>
+<li><p>Apériodicité : Pour tout <span class="math inline">\(x \in
+\mathcal{S}\)</span>, il existe un entier <span
+class="math inline">\(k\)</span> tel que la probabilité de transition de
+<span class="math inline">\(x\)</span> à lui-même en <span
+class="math inline">\(k\)</span> étapes est nulle.</p></li>
+</ul>
+<p>Supposons que <span class="math inline">\(\mathcal{A}\)</span>
+explore <span class="math inline">\(\mathcal{S}\)</span> de manière
+ergodique. Alors, pour tout <span class="math inline">\(x, y \in
+\mathcal{S}\)</span>, il existe une suite d’états intermédiaires qui
+permet de passer de <span class="math inline">\(x\)</span> à <span
+class="math inline">\(y\)</span>. Cela implique l’irréductibilité.</p>
+<p>De plus, si <span class="math inline">\(\mathcal{A}\)</span> ne peut
+pas rester indéfiniment dans un état donné (par exemple, en raison d’une
+mutation aléatoire), alors la chaîne est apériodique. Ainsi, les
+conditions du théorème ergodique sont satisfaites.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-convergence-en-temps-fini">Propriété de convergence
+en temps fini</h2>
+<p>Soit <span class="math inline">\(\mathcal{A}\)</span> une
+métaheuristique appliquée à un problème d’optimisation <span
+class="math inline">\(P = (\mathcal{S}, f)\)</span>. Si <span
+class="math inline">\(\mathcal{A}\)</span> est ergodique, alors pour
+tout <span class="math inline">\(\epsilon &gt; 0\)</span>, il existe un
+entier <span class="math inline">\(k\)</span> tel que : <span
+class="math display">\[P(\mathcal{A}_k = x^*) &gt; 1 -
+\epsilon\]</span></p>
+<h2 id="preuve">Preuve</h2>
+<p>Cette propriété découle directement du théorème de convergence.
+Puisque <span class="math inline">\(\lim_{k \rightarrow \infty}
+P(\mathcal{A}_k = x^*) = 1\)</span>, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe un entier
+<span class="math inline">\(k\)</span> tel que <span
+class="math inline">\(P(\mathcal{A}_k = x^*) &gt; 1 -
+\epsilon\)</span>.</p>
+<h2 id="propriété-de-complexité">Propriété de complexité</h2>
+<p>Soit <span class="math inline">\(\mathcal{A}\)</span> une
+métaheuristique appliquée à un problème d’optimisation <span
+class="math inline">\(P = (\mathcal{S}, f)\)</span>. Si <span
+class="math inline">\(\mathcal{A}\)</span> est ergodique, alors la
+complexité <span class="math inline">\(T_{\mathcal{A}}(n)\)</span> est
+finie pour tout <span class="math inline">\(n\)</span>.</p>
+<h2 id="preuve-1">Preuve</h2>
+<p>Puisque <span class="math inline">\(\mathcal{A}\)</span> converge
+vers une solution optimale en un nombre fini d’itérations avec une
+probabilité arbitrairement proche de 1, la complexité <span
+class="math inline">\(T_{\mathcal{A}}(n)\)</span> est finie pour tout
+<span class="math inline">\(n\)</span>.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les métaheuristiques offrent une approche puissante et flexible pour
+résoudre des problèmes d’optimisation complexes. Leur complexité
+computationnelle peut être analysée rigoureusement en utilisant des
+outils de la théorie des probabilités et des chaînes de Markov. Les
+théorèmes de convergence et les propriétés associées fournissent une
+base solide pour comprendre et améliorer ces algorithmes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

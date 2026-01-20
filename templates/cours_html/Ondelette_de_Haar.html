@@ -1,0 +1,340 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Ondelettes de Haar : Une Introduction Mathématique et Historique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Ondelettes de Haar : Une Introduction Mathématique et
+Historique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse par ondelettes est une méthode puissante pour représenter
+des fonctions ou des signaux en termes de fonctions élémentaires
+appelées ondelettes. Parmi celles-ci, les ondelettes de Haar occupent
+une place particulière en raison de leur simplicité et de leurs
+propriétés remarquables. Introduites par le mathématicien hongrois
+Alfréd Haar en 1909, ces ondelettes sont les premières à avoir été
+utilisées dans le cadre de l’analyse multirésolution.</p>
+<p>L’objectif principal des ondelettes de Haar est de fournir une
+représentation discrète et locale d’une fonction, permettant ainsi une
+analyse fine des variations locales du signal. Elles sont
+particulièrement adaptées pour les applications où la localité et
+l’efficacité de calcul sont cruciales, comme le traitement du signal ou
+la compression d’images.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir les ondelettes de Haar, commençons par comprendre ce que
+nous cherchons à obtenir. Nous voulons une famille de fonctions qui
+permettent de représenter toute fonction intégrable en termes de
+fonctions élémentaires, locales et orthogonales. Ces fonctions doivent
+être capables de capturer les variations fines d’un signal.</p>
+<p>Formellement, une ondelette de Haar est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\psi(x)\)</span> la fonction mère de
+Haar, définie par : <span class="math display">\[\psi(x) =
+\begin{cases}
+1 &amp; \text{si } 0 \leq x &lt; \frac{1}{2} \\
+-1 &amp; \text{si } \frac{1}{2} \leq x &lt; 1 \\
+0 &amp; \text{sinon}
+\end{cases}\]</span></p>
+</div>
+<p>Cette fonction est ensuite translatée et dilatée pour former une
+famille d’ondelettes : <span class="math display">\[\psi_{j,k}(x) =
+2^{j/2} \psi(2^j x - k), \quad j, k \in \mathbb{Z}\]</span> où <span
+class="math inline">\(j\)</span> est l’indice de dilatation et <span
+class="math inline">\(k\)</span> est l’indice de translation.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant les ondelettes de Haar est
+le théorème d’analyse multirésolution, qui stipule que toute fonction
+intégrable peut être représentée comme une somme infinie de projections
+sur des espaces engendrés par les ondelettes de Haar.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(V_j\)</span> l’espace engendré par
+les fonctions de la forme : <span class="math display">\[\phi_{j,k}(x) =
+2^{j/2} \phi(2^j x - k), \quad j, k \in \mathbb{Z}\]</span> où <span
+class="math inline">\(\phi(x)\)</span> est la fonction échelle de Haar
+définie par : <span class="math display">\[\phi(x) =
+\begin{cases}
+1 &amp; \text{si } 0 \leq x &lt; 1 \\
+0 &amp; \text{sinon}
+\end{cases}\]</span> Alors, pour toute fonction <span
+class="math inline">\(f \in L^2(\mathbb{R})\)</span>, il existe une
+suite de coefficients <span class="math inline">\(c_j(k)\)</span> telle
+que : <span class="math display">\[f(x) = \sum_{k \in \mathbb{Z}} c_j(k)
+\phi_{j,k}(x)\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve du théorème d’analyse multirésolution repose sur plusieurs
+étapes clés. Tout d’abord, on montre que les espaces <span
+class="math inline">\(V_j\)</span> forment une suite décroissante
+d’espaces de Hilbert. Ensuite, on utilise la propriété d’orthogonalité
+des ondelettes de Haar pour décomposer la fonction <span
+class="math inline">\(f\)</span> en une somme infinie de projections sur
+ces espaces.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver le théorème d’analyse multirésolution,
+commençons par montrer que les espaces <span
+class="math inline">\(V_j\)</span> forment une suite décroissante. Pour
+cela, nous devons vérifier que pour tout <span
+class="math inline">\(j\)</span>, <span class="math inline">\(V_{j+1}
+\subset V_j\)</span>.</p>
+<p>Considérons une fonction <span class="math inline">\(f \in
+V_{j+1}\)</span>. Par définition, il existe des coefficients <span
+class="math inline">\(c_{j+1}(k)\)</span> tels que : <span
+class="math display">\[f(x) = \sum_{k \in \mathbb{Z}} c_{j+1}(k)
+\phi_{j+1,k}(x)\]</span> Nous voulons montrer que <span
+class="math inline">\(f\)</span> peut également être exprimée en termes
+des fonctions <span class="math inline">\(\phi_{j,k}\)</span>. Pour
+cela, nous utilisons la relation de récurrence suivante : <span
+class="math display">\[\phi_{j,k}(x) = \phi_{j+1,2k}(x) +
+\phi_{j+1,2k+1}(x)\]</span> Cette relation montre que chaque fonction
+<span class="math inline">\(\phi_{j,k}\)</span> peut être exprimée comme
+une combinaison linéaire de deux fonctions <span
+class="math inline">\(\phi_{j+1,k&#39;}\)</span>. Par conséquent,
+l’espace <span class="math inline">\(V_j\)</span> est engendré par les
+fonctions <span class="math inline">\(\phi_{j+1,k&#39;}\)</span>, ce qui
+prouve que <span class="math inline">\(V_{j+1} \subset V_j\)</span>.</p>
+<p>Ensuite, nous utilisons la propriété d’orthogonalité des ondelettes
+de Haar pour décomposer la fonction <span
+class="math inline">\(f\)</span> en une somme infinie de projections sur
+les espaces <span class="math inline">\(V_j\)</span>. Pour cela, nous
+introduisons les coefficients de détail <span
+class="math inline">\(d_j(k)\)</span>, définis par : <span
+class="math display">\[d_j(k) = \langle f, \psi_{j,k} \rangle\]</span>
+où <span class="math inline">\(\psi_{j,k}\)</span> est l’ondelette de
+Haar définie précédemment. Les coefficients <span
+class="math inline">\(c_j(k)\)</span> sont alors mis à jour en utilisant
+la relation : <span class="math display">\[c_j(k) = c_{j+1}(2k) +
+c_{j+1}(2k+1)\]</span> Cette relation permet de reconstruire la fonction
+<span class="math inline">\(f\)</span> à chaque niveau de résolution
+<span class="math inline">\(j\)</span>.</p>
+<p>Enfin, nous utilisons le théorème de Parseval pour montrer que la
+somme des carrés des coefficients <span
+class="math inline">\(c_j(k)\)</span> et <span
+class="math inline">\(d_j(k)\)</span> est finie, ce qui garantit la
+convergence de la série. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les ondelettes de Haar possèdent plusieurs propriétés intéressantes,
+que nous listons ci-dessous :</p>
+<ul>
+<li><p><strong>Orthogonalité</strong> : Les ondelettes de Haar sont
+orthogonales entre elles, ce qui signifie que : <span
+class="math display">\[\langle \psi_{j,k}, \psi_{j&#39;,k&#39;} \rangle
+= \delta_{j,j&#39;} \delta_{k,k&#39;}\]</span> où <span
+class="math inline">\(\delta\)</span> est le symbole de
+Kronecker.</p></li>
+<li><p><strong>Localité</strong> : Les ondelettes de Haar sont
+localisées à la fois en temps et en fréquence. Cela signifie qu’elles
+capturent les variations locales d’un signal tout en permettant une
+analyse fine des composantes fréquentielles.</p></li>
+<li><p><strong>Efficacité de calcul</strong> : Les ondelettes de Haar
+sont particulièrement efficaces pour le calcul des coefficients
+d’ondelette, ce qui les rend adaptées aux applications où la rapidité de
+calcul est cruciale.</p></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les ondelettes de Haar constituent un outil puissant pour l’analyse
+et la représentation des signaux. Leur simplicité, leur localité et leur
+efficacité de calcul en font un choix privilégié pour de nombreuses
+applications en traitement du signal et en compression d’images. Bien
+que leur utilisation soit limitée par la nature discontinue de la
+fonction mère, elles restent un point de départ essentiel pour l’étude
+des ondelettes plus générales.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

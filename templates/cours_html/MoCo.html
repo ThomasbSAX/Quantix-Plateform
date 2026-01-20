@@ -1,0 +1,309 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Mouvement du Centre de Masse (MoCo)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Mouvement du Centre de Masse (MoCo)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le concept de mouvement du centre de masse (MoCo) émerge
+naturellement dans l’étude des systèmes mécaniques, qu’ils soient
+discrets ou continus. Historiquement, cette notion a été formalisée pour
+simplifier l’analyse des mouvements complexes en physique classique. Le
+MoCo permet de réduire un système de particules à une seule particule
+fictive, le centre de masse, dont la dynamique est souvent plus simple à
+étudier.</p>
+<p>Le MoCo est indispensable dans divers domaines de la physique,
+notamment en mécanique céleste pour étudier les mouvements des planètes
+et des satellites, ou encore en dynamique des fluides pour analyser le
+comportement global d’un système fluide. Il permet de séparer les
+mouvements internes des mouvements globaux, facilitant ainsi l’analyse
+et la résolution des problèmes mécaniques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir le centre de masse, considérons un système de <span
+class="math inline">\(N\)</span> particules. On cherche à représenter ce
+système par une seule particule fictive qui capture l’essentiel de son
+comportement dynamique.</p>
+<div class="definition">
+<p>Soit un système de <span class="math inline">\(N\)</span> particules
+de masses <span class="math inline">\(m_i\)</span> et positions <span
+class="math inline">\(\mathbf{r}_i\)</span>, où <span
+class="math inline">\(i = 1, \ldots, N\)</span>. Le centre de masse
+<span class="math inline">\(\mathbf{R}\)</span> est défini comme la
+moyenne pondérée des positions des particules, pondérées par leurs
+masses respectives.</p>
+<p>Formellement, le centre de masse est donné par : <span
+class="math display">\[\mathbf{R} = \frac{1}{M} \sum_{i=1}^{N} m_i
+\mathbf{r}_i\]</span> où <span class="math inline">\(M = \sum_{i=1}^{N}
+m_i\)</span> est la masse totale du système.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux liés au MoCo est le théorème de la
+conservation du moment cinétique. Ce théorème stipule que, en l’absence
+de forces extérieures, le moment cinétique total d’un système est
+conservé.</p>
+<div class="theorem">
+<p>Soit un système de particules soumis uniquement à des forces
+internes. Le moment cinétique total <span
+class="math inline">\(\mathbf{L}\)</span> par rapport à un point fixe
+est conservé.</p>
+<p>Formellement, on a : <span
+class="math display">\[\frac{d\mathbf{L}}{dt} = 0 \quad \text{où} \quad
+\mathbf{L} = \sum_{i=1}^{N} \mathbf{r}_i \times m_i
+\mathbf{v}_i\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de la conservation du moment cinétique,
+nous commençons par exprimer la dérivée temporelle du moment cinétique
+total.</p>
+<p><span class="math display">\[\frac{d\mathbf{L}}{dt} = \sum_{i=1}^{N}
+\frac{d}{dt} (\mathbf{r}_i \times m_i \mathbf{v}_i)\]</span></p>
+<p>En utilisant la règle de dérivation du produit vectoriel, nous
+obtenons :</p>
+<p><span class="math display">\[\frac{d\mathbf{L}}{dt} = \sum_{i=1}^{N}
+\left( \mathbf{v}_i \times m_i \mathbf{v}_i + \mathbf{r}_i \times m_i
+\mathbf{a}_i \right)\]</span></p>
+<p>Le premier terme de la somme est nul car le produit vectoriel d’un
+vecteur par lui-même est toujours nul. Le deuxième terme peut être
+réécrit en utilisant la deuxième loi de Newton :</p>
+<p><span class="math display">\[m_i \mathbf{a}_i =
+\mathbf{F}_i^{\text{ext}} + \sum_{j \neq i} \mathbf{F}_{ij}\]</span></p>
+<p>où <span class="math inline">\(\mathbf{F}_i^{\text{ext}}\)</span> est
+la force extérieure agissant sur la particule <span
+class="math inline">\(i\)</span>, et <span
+class="math inline">\(\mathbf{F}_{ij}\)</span> est la force exercée par
+la particule <span class="math inline">\(j\)</span> sur la particule
+<span class="math inline">\(i\)</span>.</p>
+<p>En supposant qu’il n’y a pas de forces extérieures, nous avons :</p>
+<p><span class="math display">\[\frac{d\mathbf{L}}{dt} = \sum_{i=1}^{N}
+\mathbf{r}_i \times \left( \sum_{j \neq i} \mathbf{F}_{ij}
+\right)\]</span></p>
+<p>En utilisant la troisième loi de Newton, <span
+class="math inline">\(\mathbf{F}_{ij} = -\mathbf{F}_{ji}\)</span>, nous
+pouvons montrer que chaque paire de forces internes se compense, ce qui
+conduit à :</p>
+<p><span class="math display">\[\frac{d\mathbf{L}}{dt} = 0\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes du MoCo.</p>
+<ol>
+<li><p><strong>Conservation de l’Énergie</strong> : Le MoCo permet
+également de simplifier l’analyse de la conservation de l’énergie.
+L’énergie cinétique totale d’un système peut être décomposée en une
+partie associée au mouvement du centre de masse et une partie associée
+aux mouvements relatifs.</p></li>
+<li><p><strong>Mouvement du Centre de Masse</strong> : Le mouvement du
+centre de masse d’un système isolé est rectiligne et uniforme. Cela
+découle directement de la conservation du moment linéaire
+total.</p></li>
+<li><p><strong>Réduction de Dimension</strong> : Le MoCo permet de
+réduire la dimension du problème mécanique. Par exemple, pour un système
+de <span class="math inline">\(N\)</span> particules en trois
+dimensions, le MoCo réduit le problème à un seul point en trois
+dimensions.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le mouvement du centre de masse est un concept fondamental en
+mécanique classique, offrant une simplification puissante pour l’analyse
+des systèmes complexes. En réduisant un système de particules à une
+seule particule fictive, le MoCo permet de séparer les mouvements
+internes des mouvements globaux, facilitant ainsi l’étude et la
+résolution des problèmes mécaniques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

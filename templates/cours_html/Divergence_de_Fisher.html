@@ -1,0 +1,330 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Fisher : Une Mesure Fondamentale en Statistique et Théorie de l’Information</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Fisher : Une Mesure Fondamentale en
+Statistique et Théorie de l’Information</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La divergence de Fisher, également connue sous le nom d’information
+de Fisher, est une notion centrale en statistique mathématique et en
+théorie de l’information. Elle trouve ses racines dans les travaux de
+Ronald Aylmer Fisher, un statisticien britannique du début du XXe
+siècle. La divergence de Fisher émerge comme une mesure de la quantité
+d’information contenue dans un modèle statistique par rapport à un
+paramètre inconnu. Elle est indispensable dans divers domaines,
+notamment l’estimation de paramètres, la théorie des tests statistiques,
+et même en apprentissage automatique.</p>
+<p>L’importance de la divergence de Fisher réside dans sa capacité à
+quantifier l’information contenue dans des observations par rapport à un
+paramètre. Elle permet de comparer différentes estimations et de choisir
+celles qui sont les plus informatives. De plus, elle joue un rôle
+crucial dans la dérivation de limites inférieures sur l’erreur
+d’estimation, comme le montre la célèbre inégalité de Cramér-Rao.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la divergence de Fisher, commençons par considérer un
+modèle statistique paramétrique. Supposons que nous avons une famille de
+densités de probabilité <span class="math inline">\(\{ p(x|\theta)
+\}_{\theta \in \Theta}\)</span>, où <span
+class="math inline">\(x\)</span> représente les observations et <span
+class="math inline">\(\theta\)</span> le paramètre inconnu que nous
+cherchons à estimer.</p>
+<p>Nous voulons mesurer la quantité d’information contenue dans une
+observation <span class="math inline">\(x\)</span> par rapport au
+paramètre <span class="math inline">\(\theta\)</span>. Intuitivement,
+cette information devrait être liée à la sensibilité de la densité de
+probabilité <span class="math inline">\(p(x|\theta)\)</span> par rapport
+aux variations du paramètre <span
+class="math inline">\(\theta\)</span>.</p>
+<p>La divergence de Fisher est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(p(x|\theta)\)</span> une densité de
+probabilité paramétrée par <span class="math inline">\(\theta\)</span>.
+La divergence de Fisher est définie comme : <span
+class="math display">\[I(\theta) = \mathbb{E}_{\theta} \left[ \left(
+\frac{\partial}{\partial \theta} \log p(X|\theta) \right)^2
+\right],\]</span> où <span
+class="math inline">\(\mathbb{E}_{\theta}\)</span> désigne l’espérance
+mathématique par rapport à la distribution <span
+class="math inline">\(p(x|\theta)\)</span>.</p>
+</div>
+<p>Une autre formulation équivalente de la divergence de Fisher est
+donnée par :</p>
+<p><span class="math display">\[I(\theta) = - \mathbb{E}_{\theta} \left[
+\frac{\partial^2}{\partial \theta^2} \log p(X|\theta)
+\right].\]</span></p>
+<p>Cette formulation montre que la divergence de Fisher est liée à la
+courbure de la fonction de log-vraisemblance.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’un des théorèmes les plus importants liés à la divergence de Fisher
+est l’inégalité de Cramér-Rao. Ce théorème établit une limite inférieure
+sur la variance d’un estimateur non biaisé.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(T(X)\)</span> un estimateur non
+biaisé de <span class="math inline">\(\theta\)</span>, c’est-à-dire que
+<span class="math inline">\(\mathbb{E}_{\theta}[T(X)] = \theta\)</span>.
+Alors, la variance de <span class="math inline">\(T(X)\)</span> est
+bornée inférieurement par l’inverse de la divergence de Fisher : <span
+class="math display">\[\text{Var}_{\theta}(T(X)) \geq
+\frac{1}{I(\theta)}.\]</span></p>
+</div>
+<p>La démonstration de ce théorème repose sur des techniques d’analyse
+fonctionnelle et utilise la divergence de Fisher comme mesure
+centrale.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver l’inégalité de Cramér-Rao, commençons par considérer la
+fonction de score <span class="math inline">\(S(X|\theta) =
+\frac{\partial}{\partial \theta} \log p(X|\theta)\)</span>. Nous savons
+que <span class="math inline">\(\mathbb{E}_{\theta}[S(X|\theta)] =
+0\)</span> pour tout <span class="math inline">\(\theta\)</span>.</p>
+<p>Considérons maintenant un estimateur non biaisé <span
+class="math inline">\(T(X)\)</span>. Nous pouvons écrire la covariance
+entre <span class="math inline">\(S(X|\theta)\)</span> et <span
+class="math inline">\(T(X)\)</span> comme suit :</p>
+<p><span class="math display">\[\text{Cov}_{\theta}(S(X|\theta), T(X)) =
+\mathbb{E}_{\theta}[S(X|\theta)T(X)] -
+\mathbb{E}_{\theta}[S(X|\theta)]\mathbb{E}_{\theta}[T(X)] =
+\mathbb{E}_{\theta}[S(X|\theta)T(X)].\]</span></p>
+<p>D’autre part, nous avons :</p>
+<p><span class="math display">\[\mathbb{E}_{\theta}[S(X|\theta)T(X)] =
+\mathbb{E}_{\theta} \left[ T(X) \frac{\partial}{\partial \theta} \log
+p(X|\theta) \right] = \mathbb{E}_{\theta} \left[ T(X)
+\frac{\partial}{\partial \theta} p(X|\theta) \right].\]</span></p>
+<p>En utilisant l’intégration par parties, nous obtenons :</p>
+<p><span class="math display">\[\mathbb{E}_{\theta} \left[ T(X)
+\frac{\partial}{\partial \theta} p(X|\theta) \right] = -
+\mathbb{E}_{\theta} \left[ \frac{\partial}{\partial \theta} T(X)
+p(X|\theta) \right] = - \frac{\partial}{\partial \theta}
+\mathbb{E}_{\theta}[T(X)] = -1,\]</span></p>
+<p>puisque <span class="math inline">\(T(X)\)</span> est un estimateur
+non biaisé. Par conséquent, nous avons :</p>
+<p><span class="math display">\[\text{Cov}_{\theta}(S(X|\theta), T(X)) =
+-1.\]</span></p>
+<p>En utilisant l’inégalité de Cauchy-Schwarz, nous avons :</p>
+<p><span class="math display">\[\text{Cov}_{\theta}(S(X|\theta), T(X))^2
+\leq \text{Var}_{\theta}(S(X|\theta))
+\text{Var}_{\theta}(T(X)).\]</span></p>
+<p>Mais <span class="math inline">\(\text{Var}_{\theta}(S(X|\theta)) =
+I(\theta)\)</span>, donc :</p>
+<p><span class="math display">\[1 \leq I(\theta)
+\text{Var}_{\theta}(T(X)),\]</span></p>
+<p>ce qui implique :</p>
+<p><span class="math display">\[\text{Var}_{\theta}(T(X)) \geq
+\frac{1}{I(\theta)}.\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La divergence de Fisher possède plusieurs propriétés intéressantes
+:</p>
+<ol>
+<li><p>La divergence de Fisher est toujours non négative, c’est-à-dire
+<span class="math inline">\(I(\theta) \geq 0\)</span>.</p></li>
+<li><p>La divergence de Fisher est invariante sous les transformations
+bijectives du paramètre <span
+class="math inline">\(\theta\)</span>.</p></li>
+<li><p>La divergence de Fisher est additive pour les modèles
+indépendants. Si <span class="math inline">\(X_1\)</span> et <span
+class="math inline">\(X_2\)</span> sont indépendants, alors : <span
+class="math display">\[I(\theta; (X_1, X_2)) = I(\theta; X_1) +
+I(\theta; X_2).\]</span></p></li>
+</ol>
+<p>Ces propriétés font de la divergence de Fisher un outil puissant pour
+l’analyse des modèles statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

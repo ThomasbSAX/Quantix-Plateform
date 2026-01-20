@@ -1,0 +1,387 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de couverture</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title"><strong>Complexité des problèmes de
+couverture</strong></h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les problèmes de couverture constituent une classe fondamentale en
+optimisation combinatoire, émergée dans les années 1960 avec les travaux
+pionniers de Kővári-Sós-Turán et de Erdős. Ces problèmes trouvent leur
+origine dans des questions centrales en théorie des graphes, en
+algorithmique et en informatique théorique. Leur importance réside dans
+leur capacité à modéliser des situations variées, allant de la
+conception de circuits électroniques à l’allocation de ressources dans
+les réseaux. La notion de couverture émerge naturellement lorsque l’on
+cherche à sélectionner un ensemble minimal d’éléments satisfaisant
+certaines contraintes, ce qui en fait un outil indispensable dans de
+nombreux domaines appliqués.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de complexité des problèmes de couverture,
+commençons par comprendre ce que l’on cherche à modéliser. Supposons que
+nous ayons un ensemble de contraintes, et que chaque contrainte doive
+être satisfaite par au moins un élément d’un ensemble donné. Notre
+objectif est de trouver le plus petit sous-ensemble qui satisfait toutes
+les contraintes.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{U} = \{u_1,
+u_2, \ldots, u_n\}\)</span> un ensemble fini et <span
+class="math inline">\(\mathcal{S} = \{S_1, S_2, \ldots, S_m\}\)</span>
+une famille de sous-ensembles de <span
+class="math inline">\(\mathcal{U}\)</span>. Un problème de couverture
+consiste à trouver un sous-ensemble <span class="math inline">\(C
+\subseteq \mathcal{U}\)</span> tel que pour tout <span
+class="math inline">\(S_i \in \mathcal{S}\)</span>, on a <span
+class="math inline">\(C \cap S_i \neq \emptyset\)</span>. Le problème de
+couverture minimal est alors défini comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{U} = \{u_1, u_2, \ldots,
+u_n\}\)</span> et <span class="math inline">\(\mathcal{S} = \{S_1, S_2,
+\ldots, S_m\}\)</span> une famille de sous-ensembles de <span
+class="math inline">\(\mathcal{U}\)</span>. Trouver un sous-ensemble
+<span class="math inline">\(C \subseteq \mathcal{U}\)</span> tel que :
+<span class="math display">\[\forall S_i \in \mathcal{S}, \exists u_j
+\in C \text{ tel que } u_j \in S_i\]</span> et <span
+class="math inline">\(|C|\)</span> est minimisé.</p>
+</div>
+<p>Une autre formulation équivalente utilise la notion de matrice
+binaire. Considérons une matrice <span class="math inline">\(A\)</span>
+de taille <span class="math inline">\(m \times n\)</span> où chaque
+ligne représente un sous-ensemble <span
+class="math inline">\(S_i\)</span> et chaque colonne représente un
+élément <span class="math inline">\(u_j\)</span>. Le problème de
+couverture minimal peut alors être formulé comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice binaire de
+taille <span class="math inline">\(m \times n\)</span>. Trouver un
+sous-ensemble minimal d’indices de colonnes <span
+class="math inline">\(C\)</span> tel que pour chaque ligne <span
+class="math inline">\(i\)</span>, il existe un indice <span
+class="math inline">\(j \in C\)</span> avec <span
+class="math inline">\(A_{ij} = 1\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié aux problèmes de couverture est le
+théorème de Kővári-Sós-Turán, qui donne une borne supérieure sur la
+taille d’un graphe bipartite sans sous-graphe complet <span
+class="math inline">\(K_{s,t}\)</span>. Ce théorème est crucial pour
+comprendre la complexité des problèmes de couverture.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(G\)</span> un graphe bipartite avec
+des parties <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Pour tout <span
+class="math inline">\(s, t \geq 2\)</span>, il existe une constante
+<span class="math inline">\(c = c(s,t) &gt; 0\)</span> telle que si
+<span class="math inline">\(G\)</span> ne contient pas de sous-graphe
+complet <span class="math inline">\(K_{s,t}\)</span>, alors : <span
+class="math display">\[|E(G)| \leq c \cdot n^{2 - 1/s}\]</span> où <span
+class="math inline">\(n = |X| + |Y|\)</span>.</p>
+</div>
+<p>Une autre formulation importante est le théorème de Erdős, qui donne
+une borne inférieure sur la taille d’une couverture.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{S} = \{S_1, S_2, \ldots,
+S_m\}\)</span> une famille de sous-ensembles d’un ensemble <span
+class="math inline">\(\mathcal{U} = \{u_1, u_2, \ldots, u_n\}\)</span>.
+Alors, il existe une couverture <span class="math inline">\(C\)</span>
+telle que : <span class="math display">\[|C| \leq \sum_{i=1}^m
+\frac{1}{|S_i|}\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Erdős, nous utilisons une approche
+probabiliste. Considérons un ensemble <span
+class="math inline">\(\mathcal{U} = \{u_1, u_2, \ldots, u_n\}\)</span>
+et une famille de sous-ensembles <span class="math inline">\(\mathcal{S}
+= \{S_1, S_2, \ldots, S_m\}\)</span>. Nous voulons montrer qu’il existe
+une couverture <span class="math inline">\(C\)</span> telle que <span
+class="math inline">\(|C| \leq \sum_{i=1}^m
+\frac{1}{|S_i|}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons une variable aléatoire <span
+class="math inline">\(X\)</span> qui représente la taille d’une
+couverture aléatoire. Nous définissons <span class="math inline">\(X =
+\sum_{j=1}^n X_j\)</span>, où <span class="math inline">\(X_j\)</span>
+est une variable indicatrice qui vaut 1 si <span
+class="math inline">\(u_j \in C\)</span>. La probabilité que <span
+class="math inline">\(X_j = 1\)</span> est donnée par : <span
+class="math display">\[P(X_j = 1) = 1 - \prod_{S_i \ni u_j} \left(1 -
+\frac{1}{|S_i|}\right)\]</span> En utilisant l’inégalité de Markov, nous
+avons : <span class="math display">\[E[X] = \sum_{j=1}^n P(X_j = 1) \leq
+\sum_{i=1}^m \frac{1}{|S_i|}\]</span> Par conséquent, il existe une
+couverture <span class="math inline">\(C\)</span> telle que <span
+class="math inline">\(|C| \leq E[X]\)</span>, ce qui achève la
+preuve. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ici quelques propriétés et corollaires importants liés
+aux problèmes de couverture.</p>
+<ol>
+<li><p><strong>Propriété de Sous-modularité</strong> : La fonction de
+couverture est sous-modulaire, c’est-à-dire que pour tout <span
+class="math inline">\(A \subseteq B \subseteq \mathcal{U}\)</span> et
+<span class="math inline">\(x \in \mathcal{U} \setminus B\)</span>, on a
+: <span class="math display">\[f(A \cup \{x\}) - f(A) \geq f(B \cup
+\{x\}) - f(B)\]</span> où <span class="math inline">\(f(S)\)</span>
+représente le nombre de sous-ensembles de <span
+class="math inline">\(\mathcal{S}\)</span> couverts par <span
+class="math inline">\(S\)</span>.</p></li>
+<li><p><strong>Corollaire de l’Approximation</strong> : Le problème de
+couverture minimal peut être approximé dans un facteur <span
+class="math inline">\(\ln(n)\)</span>, où <span
+class="math inline">\(n\)</span> est la taille de l’ensemble <span
+class="math inline">\(\mathcal{U}\)</span>.</p></li>
+<li><p><strong>Propriété de NP-Difficulté</strong> : Le problème de
+couverture minimal est NP-difficile, même pour des instances restreintes
+où chaque sous-ensemble <span class="math inline">\(S_i\)</span> a une
+taille fixe.</p></li>
+</ol>
+<p>Pour prouver la propriété de sous-modularité, nous utilisons le fait
+que l’ajout d’un élément <span class="math inline">\(x\)</span> à un
+ensemble <span class="math inline">\(A\)</span> couvre au plus autant de
+sous-ensembles que l’ajout de <span class="math inline">\(x\)</span> à
+un ensemble plus grand <span class="math inline">\(B\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux ensembles <span
+class="math inline">\(A \subseteq B \subseteq \mathcal{U}\)</span> et un
+élément <span class="math inline">\(x \in \mathcal{U} \setminus
+B\)</span>. Nous voulons montrer que : <span class="math display">\[f(A
+\cup \{x\}) - f(A) \geq f(B \cup \{x\}) - f(B)\]</span> Cela découle du
+fait que les sous-ensembles couverts par <span
+class="math inline">\(x\)</span> dans <span class="math inline">\(A \cup
+\{x\}\)</span> sont un sous-ensemble des sous-ensembles couverts par
+<span class="math inline">\(x\)</span> dans <span
+class="math inline">\(B \cup \{x\}\)</span>. ◻</p>
+</div>
+<p>Pour prouver le corollaire de l’approximation, nous utilisons un
+algorithme glouton qui sélectionne à chaque étape l’élément couvrant le
+plus de sous-ensembles non couverts.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(C\)</span>
+l’ensemble construit par l’algorithme glouton et <span
+class="math inline">\(OPT\)</span> une solution optimale. Nous voulons
+montrer que : <span class="math display">\[|C| \leq \ln(n) \cdot
+|OPT|\]</span> Cela découle du fait que chaque élément ajouté par
+l’algorithme glouton couvre au moins <span
+class="math inline">\(\frac{1}{|OPT|}\)</span> des sous-ensembles non
+couverts. ◻</p>
+</div>
+<p>Pour prouver la propriété de NP-difficulté, nous utilisons une
+réduction depuis le problème du sommet dominant.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(G\)</span> un graphe
+et <span class="math inline">\(k\)</span> un entier. Nous construisons
+une instance du problème de couverture minimal où chaque sommet
+représente un sous-ensemble des voisins du sommet correspondant. Nous
+voulons montrer que <span class="math inline">\(G\)</span> a un ensemble
+dominant de taille au plus <span class="math inline">\(k\)</span> si et
+seulement si l’instance du problème de couverture minimal a une solution
+de taille au plus <span class="math inline">\(k\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les problèmes de couverture constituent une classe fondamentale en
+optimisation combinatoire, avec des applications variées dans de
+nombreux domaines. Leur complexité a été étudiée en profondeur, et
+plusieurs théorèmes importants ont été établis pour comprendre leurs
+propriétés. Les preuves détaillées de ces théorèmes et corollaires
+montrent la richesse et la profondeur de cette théorie, qui continue
+d’être un sujet actif de recherche.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

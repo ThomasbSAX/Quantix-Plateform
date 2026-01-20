@@ -1,0 +1,378 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Matthews Correlation Coefficient (MCC) : Une mesure robuste de la qualité des classifications binaires</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Matthews Correlation Coefficient (MCC) : Une mesure
+robuste de la qualité des classifications binaires</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’évaluation des modèles de classification binaire est une tâche
+cruciale en apprentissage automatique. Parmi les nombreuses métriques
+disponibles, le Matthews Correlation Coefficient (MCC) se distingue par
+sa robustesse et son équilibre face aux déséquilibres de classe.
+Introduit par Brian W. Matthews en 1975, le MCC est une mesure de
+corrélation qui prend en compte les vrais positifs (VP), les faux
+positifs (FP), les vrais négatifs (VN) et les faux négatifs (FN).
+Contrairement à d’autres métriques comme l’exactitude ou le rappel, le
+MCC reste fiable même lorsque les classes sont déséquilibrées.</p>
+<p>Le MCC est particulièrement utile dans des contextes où les erreurs
+de classification peuvent avoir des conséquences graves, comme la
+détection de maladies ou la sécurité informatique. Sa capacité à fournir
+une évaluation globale du modèle en tenant compte de toutes les
+catégories de prédictions en fait un outil précieux pour les chercheurs
+et les praticiens.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre le MCC, commençons par définir les termes de base
+nécessaires.</p>
+<h2 class="unnumbered" id="confusion-matrix">Confusion Matrix</h2>
+<p>Considérons un problème de classification binaire où nous avons deux
+classes : positive (P) et négative (N). Après avoir appliqué un modèle
+de classification à un ensemble de données, nous pouvons construire une
+matrice de confusion qui résume les résultats des prédictions.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(Y\)</span> le vecteur des étiquettes
+réelles et <span class="math inline">\(\hat{Y}\)</span> le vecteur des
+prédictions. La matrice de confusion est définie comme suit :</p>
+<p><span class="math display">\[\begin{array}{cc|c|c|}
+&amp; &amp; \text{Prédit Positif} &amp; \text{Prédit Négatif} \\
+\hline
+\text{Vrai Positif} &amp; \text{Vrai Négatif} &amp; VP = \sum_{i=1}^{n}
+\mathbb{1}(Y_i = 1 \land \hat{Y}_i = 1) &amp; FN = \sum_{i=1}^{n}
+\mathbb{1}(Y_i = 1 \land \hat{Y}_i = 0) \\
+\hline
+\text{Faux Positif} &amp; \text{Faux Négatif} &amp; FP = \sum_{i=1}^{n}
+\mathbb{1}(Y_i = 0 \land \hat{Y}_i = 1) &amp; VN = \sum_{i=1}^{n}
+\mathbb{1}(Y_i = 0 \land \hat{Y}_i = 0) \\
+\hline
+\end{array}\]</span></p>
+<p>où <span class="math inline">\(\mathbb{1}\)</span> est la fonction
+indicatrice et <span class="math inline">\(n\)</span> est le nombre
+total d’échantillons.</p>
+</div>
+<h2 class="unnumbered"
+id="matthews-correlation-coefficient-mcc">Matthews Correlation
+Coefficient (MCC)</h2>
+<p>Le MCC est une mesure de corrélation qui prend en compte toutes les
+catégories de la matrice de confusion. Il est défini comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(VP\)</span>, <span
+class="math inline">\(VN\)</span>, <span
+class="math inline">\(FP\)</span> et <span
+class="math inline">\(FN\)</span> les éléments de la matrice de
+confusion. Le MCC est défini par :</p>
+<p><span class="math display">\[MCC = \frac{VP \times VN - FP \times
+FN}{\sqrt{(VP + FP)(VP + FN)(VN + FP)(VN + FN)}}\]</span></p>
+<p>De manière équivalente, en utilisant les quantificateurs :</p>
+<p><span class="math display">\[MCC = \frac{\sum_{i=1}^{n}
+\mathbb{1}(Y_i = 1 \land \hat{Y}_i = 1) \times \sum_{i=1}^{n}
+\mathbb{1}(Y_i = 0 \land \hat{Y}_i = 0) - \sum_{i=1}^{n} \mathbb{1}(Y_i
+= 0 \land \hat{Y}_i = 1) \times \sum_{i=1}^{n} \mathbb{1}(Y_i = 1 \land
+\hat{Y}_i = 0)}{\sqrt{\left(\sum_{i=1}^{n} \mathbb{1}(Y_i = 1 \land
+\hat{Y}_i = 1) + \sum_{i=1}^{n} \mathbb{1}(Y_i = 0 \land \hat{Y}_i =
+1)\right) \left(\sum_{i=1}^{n} \mathbb{1}(Y_i = 1 \land \hat{Y}_i = 1) +
+\sum_{i=1}^{n} \mathbb{1}(Y_i = 1 \land \hat{Y}_i = 0)\right)
+\left(\sum_{i=1}^{n} \mathbb{1}(Y_i = 0 \land \hat{Y}_i = 0) +
+\sum_{i=1}^{n} \mathbb{1}(Y_i = 0 \land \hat{Y}_i = 1)\right)
+\left(\sum_{i=1}^{n} \mathbb{1}(Y_i = 0 \land \hat{Y}_i = 0) +
+\sum_{i=1}^{n} \mathbb{1}(Y_i = 1 \land \hat{Y}_i =
+0)\right)}}\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes-et-propriétés">Théorèmes et
+Propriétés</h1>
+<p>Le MCC possède plusieurs propriétés intéressantes qui le rendent
+particulièrement utile pour l’évaluation des modèles de
+classification.</p>
+<h2 class="unnumbered" id="théorème-1-valeurs-du-mcc">Théorème 1:
+Valeurs du MCC</h2>
+<p>Le MCC prend des valeurs dans l’intervalle <span
+class="math inline">\([-1, 1]\)</span>, où :</p>
+<ul>
+<li><p><span class="math inline">\(MCC = 1\)</span> indique une
+prédiction parfaite.</p></li>
+<li><p><span class="math inline">\(MCC = 0\)</span> indique une
+prédiction aléatoire.</p></li>
+<li><p><span class="math inline">\(MCC = -1\)</span> indique une
+prédiction parfaitement inverse.</p></li>
+</ul>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer cela, considérons les valeurs extrêmes
+possibles de la matrice de confusion.</p>
+<p>1. **Prédiction Parfaite (MCC = 1)** : <span
+class="math display">\[VP = n_1, \quad VN = n_0, \quad FP = 0, \quad FN
+= 0\]</span> où <span class="math inline">\(n_1\)</span> est le nombre
+d’échantillons positifs et <span class="math inline">\(n_0\)</span> est
+le nombre d’échantillons négatifs.</p>
+<p>Alors, <span class="math display">\[MCC = \frac{n_1 n_0 - 0 \times
+0}{\sqrt{n_1 n_0 n_1 n_0}} = \frac{n_1 n_0}{n_1 n_0} = 1\]</span></p>
+<p>2. **Prédiction Aléatoire (MCC = 0)** : <span
+class="math display">\[VP = \frac{n_1}{2}, \quad VN = \frac{n_0}{2},
+\quad FP = \frac{n_1}{2}, \quad FN = \frac{n_0}{2}\]</span></p>
+<p>Alors, <span class="math display">\[MCC = \frac{\frac{n_1}{2}
+\frac{n_0}{2} - \frac{n_1}{2} \frac{n_0}{2}}{\sqrt{\left(\frac{n_1}{2} +
+\frac{n_1}{2}\right)\left(\frac{n_1}{2} +
+\frac{n_0}{2}\right)\left(\frac{n_0}{2} +
+\frac{n_1}{2}\right)\left(\frac{n_0}{2} + \frac{n_0}{2}\right)}} =
+0\]</span></p>
+<p>3. **Prédiction Parfaitement Inverse (MCC = -1)** : <span
+class="math display">\[VP = 0, \quad VN = 0, \quad FP = n_1, \quad FN =
+n_0\]</span></p>
+<p>Alors, <span class="math display">\[MCC = \frac{0 - n_1
+n_0}{\sqrt{n_1 (n_1 + n_0) n_0 (n_1 + n_0)}} = \frac{-n_1 n_0}{n_1 n_0}
+= -1\]</span> ◻</p>
+</div>
+<h2 class="unnumbered"
+id="théorème-2-robustesse-aux-déséquilibres-de-classe">Théorème 2:
+Robustesse aux Déséquilibres de Classe</h2>
+<p>Le MCC est robuste aux déséquilibres de classe, contrairement à
+d’autres métriques comme l’exactitude.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un déséquilibre de classe où <span
+class="math inline">\(n_1 \ll n_0\)</span>. L’exactitude peut être
+élevée simplement en prédisant toujours la classe négative, mais le MCC
+restera faible car il prend en compte les FP et FN.</p>
+<p>Par exemple, <span class="math display">\[VP = 0, \quad VN = n_0,
+\quad FP = n_1, \quad FN = 0\]</span></p>
+<p>Alors, <span class="math display">\[MCC = \frac{0 - n_1
+n_0}{\sqrt{n_1 (n_1 + n_0) n_0 (n_1 + n_0)}} \approx -1\]</span></p>
+<p>Ainsi, le MCC reflète la véritable performance du modèle dans des
+scénarios déséquilibrés. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le MCC possède plusieurs propriétés qui en font une métrique
+précieuse pour l’évaluation des modèles de classification.</p>
+<h2 class="unnumbered" id="propriété-1-symétrie">Propriété 1:
+Symétrie</h2>
+<p>Le MCC est symétrique par rapport aux classes positive et négative.
+Cela signifie que l’échange des étiquettes positives et négatives ne
+change pas la valeur du MCC.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(Y&#39; = 1 -
+Y\)</span> et <span class="math inline">\(\hat{Y}&#39; = 1 -
+\hat{Y}\)</span>. Alors,</p>
+<p><span class="math display">\[VP&#39; = FN, \quad VN&#39; = FP, \quad
+FP&#39; = VN, \quad FN&#39; = VP\]</span></p>
+<p>Ainsi, <span class="math display">\[MCC&#39; = \frac{FN \times FP -
+VN \times VP}{\sqrt{(FN + FP)(FN + VN)(FP + FP)(FP + VN)}} = \frac{VP
+\times VN - FP \times FN}{\sqrt{(VP + FP)(VP + FN)(VN + FP)(VN + FN)}} =
+MCC\]</span> ◻</p>
+</div>
+<h2 class="unnumbered"
+id="propriété-2-invariance-par-transformation-linéaire">Propriété 2:
+Invariance par Transformation Linéaire</h2>
+<p>Le MCC est invariant par transformation linéaire des scores de
+prédiction. Cela signifie que l’application d’une fonction affine aux
+scores de prédiction ne change pas la valeur du MCC.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\hat{Y}&#39; = a
+\hat{Y} + b\)</span> où <span class="math inline">\(a &gt; 0\)</span>.
+Les prédictions binaires restent inchangées, donc la matrice de
+confusion reste identique. Par conséquent, le MCC reste le même. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Matthews Correlation Coefficient est une métrique robuste et
+équilibrée pour l’évaluation des modèles de classification binaire. Sa
+capacité à prendre en compte toutes les catégories de la matrice de
+confusion et sa robustesse face aux déséquilibres de classe en font un
+outil précieux pour les chercheurs et les praticiens. En comprenant ses
+propriétés et ses théorèmes, nous pouvons mieux évaluer la performance
+de nos modèles et prendre des décisions éclairées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

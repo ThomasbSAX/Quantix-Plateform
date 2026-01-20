@@ -1,0 +1,413 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Théorème d’Arzelà-Ascoli : Un pont entre l’analyse et la topologie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Théorème d’Arzelà-Ascoli : Un pont entre l’analyse et
+la topologie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le théorème d’Arzelà-Ascoli est un résultat fondamental en analyse
+mathématique, reliant les concepts de compacité et d’équicontinuité. Ce
+théorème émerge dans le cadre de l’étude des familles de fonctions
+continues définies sur un espace compact, et il est indispensable pour
+comprendre le comportement asymptotique de ces familles. Historiquement,
+ce théorème a été développé par les mathématiciens italiens Cesare
+Arzelà et Giulio Ascoli à la fin du XIXe siècle, marquant une avancée
+significative dans la théorie des fonctions.</p>
+<p>Le théorème d’Arzelà-Ascoli est crucial car il fournit une condition
+nécessaire et suffisante pour qu’une famille de fonctions continues
+admette une sous-suite convergente uniformément. Cela permet de
+généraliser des concepts comme la compacité dans des espaces de
+fonctions, ouvrant ainsi la voie à des applications en analyse
+fonctionnelle et en théorie du potentiel.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’énoncer le théorème, il est essentiel de définir les concepts
+clés qui y sont associés.</p>
+<h2 id="équicontinuité">Équicontinuité</h2>
+<p>Considérons une famille de fonctions <span
+class="math inline">\(\mathcal{F} = \{f_\alpha\}_{\alpha \in A}\)</span>
+définies sur un espace métrique <span class="math inline">\(X\)</span> à
+valeurs dans un espace métrique <span class="math inline">\(Y\)</span>.
+On cherche une propriété qui garantit que les fonctions de cette famille
+ne varient pas trop rapidement. Cette idée conduit naturellement à la
+notion d’équicontinuité.</p>
+<div class="definition">
+<p>Une famille de fonctions <span
+class="math inline">\(\mathcal{F}\)</span> est dite équicontinue si pour
+tout <span class="math inline">\(x \in X\)</span> et pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe un <span
+class="math inline">\(\delta &gt; 0\)</span> tel que pour toute fonction
+<span class="math inline">\(f \in \mathcal{F}\)</span>, on a : <span
+class="math display">\[\forall y \in X, \, d_X(x, y) &lt; \delta
+\implies d_Y(f(x), f(y)) &lt; \epsilon\]</span> En d’autres termes,
+<span class="math inline">\(\mathcal{F}\)</span> est équicontinue si
+pour tout <span class="math inline">\(x \in X\)</span>, la famille des
+fonctions restreintes à un voisinage de <span
+class="math inline">\(x\)</span> est uniformément continue.</p>
+</div>
+<h2 id="famille-uniformément-bornée">Famille uniformément bornée</h2>
+<p>Une autre propriété importante est celle de la borne uniforme.
+Intuitivement, une famille de fonctions est uniformément bornée si
+toutes les fonctions de la famille ne dépassent pas une certaine limite
+commune.</p>
+<div class="definition">
+<p>Une famille de fonctions <span
+class="math inline">\(\mathcal{F}\)</span> est dite uniformément bornée
+si il existe un <span class="math inline">\(M &gt; 0\)</span> tel que
+pour toute fonction <span class="math inline">\(f \in
+\mathcal{F}\)</span>, on a : <span class="math display">\[\forall x \in
+X, \, d_Y(f(x), y_0) \leq M\]</span> où <span
+class="math inline">\(y_0\)</span> est un point fixe dans <span
+class="math inline">\(Y\)</span>.</p>
+</div>
+<h1 id="théorème-darzelà-ascoli">Théorème d’Arzelà-Ascoli</h1>
+<p>Nous sommes maintenant prêts à énoncer le théorème d’Arzelà-Ascoli.
+Ce théorème fournit une condition nécessaire et suffisante pour qu’une
+famille de fonctions continues admette une sous-suite convergente
+uniformément.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> un espace métrique
+compact et <span class="math inline">\(Y\)</span> un espace métrique
+complet. Considérons une famille de fonctions continues <span
+class="math inline">\(\mathcal{F} = \{f_\alpha\}_{\alpha \in A} : X \to
+Y\)</span>. Alors, les assertions suivantes sont équivalentes :</p>
+<ol>
+<li><p>La famille <span class="math inline">\(\mathcal{F}\)</span> est
+équicontinue et uniformément bornée.</p></li>
+<li><p>Toute suite <span class="math inline">\((f_n)_{n \in
+\mathbb{N}}\)</span> dans <span
+class="math inline">\(\mathcal{F}\)</span> admet une sous-suite qui
+converge uniformément vers une fonction continue <span
+class="math inline">\(f : X \to Y\)</span>.</p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>La preuve du théorème d’Arzelà-Ascoli est un chef-d’œuvre de
+l’analyse mathématique, combinant des techniques de topologie et
+d’analyse fonctionnelle. Nous allons détailler chaque étape de la
+démonstration.</p>
+<h2 id="preuve-de-i-implies-ii">Preuve de (i) <span
+class="math inline">\(\implies\)</span> (ii)</h2>
+<p>Supposons que <span class="math inline">\(\mathcal{F}\)</span> soit
+équicontinue et uniformément bornée. Nous devons montrer qu’il existe
+une sous-suite convergente uniformément.</p>
+<p>1. **Construction de la suite extraite** : Soit <span
+class="math inline">\((f_n)_{n \in \mathbb{N}}\)</span> une suite dans
+<span class="math inline">\(\mathcal{F}\)</span>. Pour chaque <span
+class="math inline">\(x \in X\)</span>, la suite <span
+class="math inline">\((f_n(x))_{n \in \mathbb{N}}\)</span> est bornée
+dans <span class="math inline">\(Y\)</span>. Puisque <span
+class="math inline">\(Y\)</span> est complet, on peut extraire une
+sous-suite <span class="math inline">\((f_{n_k}(x))_{k \in
+\mathbb{N}}\)</span> qui converge vers un point <span
+class="math inline">\(f(x) \in Y\)</span>.</p>
+<p>2. **Continuité de la fonction limite** : Nous devons montrer que
+<span class="math inline">\(f : X \to Y\)</span> est continue. Soit
+<span class="math inline">\(x_0 \in X\)</span> et <span
+class="math inline">\(\epsilon &gt; 0\)</span>. Puisque <span
+class="math inline">\(\mathcal{F}\)</span> est équicontinue, il existe
+un <span class="math inline">\(\delta &gt; 0\)</span> tel que pour tout
+<span class="math inline">\(y \in X\)</span> avec <span
+class="math inline">\(d_X(x_0, y) &lt; \delta\)</span>, on a : <span
+class="math display">\[d_Y(f_n(x_0), f_n(y)) &lt; \epsilon/3 \quad
+\forall n \in \mathbb{N}\]</span> De plus, comme <span
+class="math inline">\(f_{n_k}(x_0) \to f(x_0)\)</span>, il existe un
+<span class="math inline">\(K \in \mathbb{N}\)</span> tel que pour tout
+<span class="math inline">\(k \geq K\)</span>, on a : <span
+class="math display">\[d_Y(f_{n_k}(x_0), f(x_0)) &lt;
+\epsilon/3\]</span> et <span class="math display">\[d_Y(f_{n_k}(y),
+f(y)) &lt; \epsilon/3\]</span> Par l’inégalité triangulaire, pour tout
+<span class="math inline">\(k \geq K\)</span>, on a : <span
+class="math display">\[d_Y(f(x_0), f(y)) \leq d_Y(f(x_0), f_{n_k}(x_0))
++ d_Y(f_{n_k}(x_0), f_{n_k}(y)) + d_Y(f_{n_k}(y), f(y)) &lt;
+\epsilon\]</span> Cela montre que <span class="math inline">\(f\)</span>
+est continue en <span class="math inline">\(x_0\)</span>.</p>
+<p>3. **Convergence uniforme** : Pour montrer que la convergence est
+uniforme, nous utilisons l’équicontinuité. Soit <span
+class="math inline">\(\epsilon &gt; 0\)</span>. Puisque <span
+class="math inline">\(X\)</span> est compact, il existe un recouvrement
+fini <span class="math inline">\(\{U_i\}_{i=1}^m\)</span> de <span
+class="math inline">\(X\)</span> tel que pour chaque <span
+class="math inline">\(i\)</span>, il existe un point <span
+class="math inline">\(x_i \in U_i\)</span> avec : <span
+class="math display">\[d_Y(f_n(x), f(x)) &lt; \epsilon/2 \quad \forall x
+\in U_i, \, n \geq N_i\]</span> En utilisant la diagonalisation, on peut
+trouver un <span class="math inline">\(N\)</span> tel que pour tout
+<span class="math inline">\(n \geq N\)</span>, on a : <span
+class="math display">\[d_Y(f_n(x), f(x)) &lt; \epsilon/2 \quad \forall x
+\in X\]</span> Cela montre que <span class="math inline">\(f_n \to
+f\)</span> uniformément.</p>
+<h2 id="preuve-de-ii-implies-i">Preuve de (ii) <span
+class="math inline">\(\implies\)</span> (i)</h2>
+<p>Supposons que toute suite dans <span
+class="math inline">\(\mathcal{F}\)</span> admet une sous-suite
+convergente uniformément. Nous devons montrer que <span
+class="math inline">\(\mathcal{F}\)</span> est équicontinue et
+uniformément bornée.</p>
+<p>1. **Uniforme bornitude** : Supposons par l’absurde que <span
+class="math inline">\(\mathcal{F}\)</span> n’est pas uniformément
+bornée. Alors, pour tout <span class="math inline">\(n \in
+\mathbb{N}\)</span>, il existe une fonction <span
+class="math inline">\(f_n \in \mathcal{F}\)</span> et un point <span
+class="math inline">\(x_n \in X\)</span> tels que : <span
+class="math display">\[d_Y(f_n(x_n), y_0) &gt; n\]</span> En utilisant
+le théorème de Bolzano-Weierstrass, on peut extraire une sous-suite
+<span class="math inline">\((f_{n_k})_{k \in \mathbb{N}}\)</span> qui
+converge uniformément vers une fonction <span
+class="math inline">\(f\)</span>. Cependant, cela contredit le fait que
+<span class="math inline">\(d_Y(f_{n_k}(x_{n_k}), y_0) &gt;
+n_k\)</span>, car <span class="math inline">\(f\)</span> serait
+bornée.</p>
+<p>2. **Équicontinuité** : Supposons par l’absurde que <span
+class="math inline">\(\mathcal{F}\)</span> n’est pas équicontinue.
+Alors, il existe un <span class="math inline">\(x_0 \in X\)</span> et un
+<span class="math inline">\(\epsilon &gt; 0\)</span> tels que pour tout
+<span class="math inline">\(n \in \mathbb{N}\)</span>, il existe une
+fonction <span class="math inline">\(f_n \in \mathcal{F}\)</span> et un
+point <span class="math inline">\(x_n \in X\)</span> avec : <span
+class="math display">\[d_X(x_0, x_n) &lt; 1/n \quad \text{et} \quad
+d_Y(f_n(x_0), f_n(x_n)) \geq \epsilon\]</span> En utilisant le théorème
+de Bolzano-Weierstrass, on peut extraire une sous-suite <span
+class="math inline">\((f_{n_k})_{k \in \mathbb{N}}\)</span> qui converge
+uniformément vers une fonction <span class="math inline">\(f\)</span>.
+Cependant, cela contredit le fait que <span
+class="math inline">\(d_Y(f_{n_k}(x_0), f_{n_k}(x_{n_k})) \geq
+\epsilon\)</span>, car <span class="math inline">\(f\)</span> serait
+continue.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le théorème d’Arzelà-Ascoli a de nombreuses conséquences importantes
+en analyse mathématique. Nous en listons quelques-unes ci-dessous.</p>
+<div class="corollaire">
+<p>Soit <span class="math inline">\(X\)</span> un espace métrique
+compact et <span class="math inline">\(Y\)</span> un espace métrique
+complet. L’espace des fonctions continues bornées <span
+class="math inline">\(C_b(X, Y)\)</span> muni de la topologie de la
+convergence uniforme est un espace compact si et seulement si <span
+class="math inline">\(Y\)</span> est compact.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ce corollaire découle directement du
+théorème d’Arzelà-Ascoli en considérant des familles de fonctions qui
+sont à la fois équicontinues et uniformément bornées. ◻</p>
+</div>
+<div class="corollaire">
+<p>Soit <span class="math inline">\(X\)</span> un espace métrique
+compact et <span class="math inline">\(Y\)</span> un espace métrique
+complet. Une famille de fonctions continues <span
+class="math inline">\(\mathcal{F} : X \to Y\)</span> est relativement
+compacte dans l’espace des fonctions continues <span
+class="math inline">\(C(X, Y)\)</span> muni de la topologie de la
+convergence uniforme si et seulement si <span
+class="math inline">\(\mathcal{F}\)</span> est équicontinue et
+bornée.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ce corollaire suit également du théorème
+d’Arzelà-Ascoli en utilisant des arguments standard de topologie. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le théorème d’Arzelà-Ascoli est un résultat profond et puissant qui
+lie les concepts d’équicontinuité, de borne uniforme et de compacité. Il
+a des applications vastes et variées en analyse mathématique, en théorie
+du potentiel et dans de nombreux autres domaines des mathématiques. En
+comprenant ce théorème, on acquiert une compréhension plus profonde de
+la structure des espaces de fonctions et de leur comportement
+asymptotique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

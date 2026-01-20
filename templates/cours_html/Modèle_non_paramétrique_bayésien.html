@@ -1,0 +1,343 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Modèle non paramétrique bayésien</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Modèle non paramétrique bayésien</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse statistique moderne est souvent confrontée à des problèmes
+où les hypothèses paramétriques traditionnelles sont trop restrictives.
+Les modèles non paramétriques bayésiens offrent une alternative
+puissante, permettant de capturer des structures complexes sans imposer
+de forme spécifique à priori. Ces modèles émergent naturellement dans le
+cadre de l’inférence bayésienne, où l’on cherche à intégrer des
+informations a priori tout en laissant les données parler.</p>
+<p>L’origine de ces modèles remonte aux travaux pionniers de Thomas
+Bayes, mais leur développement moderne est étroitement lié à l’émergence
+des méthodes numériques puissantes pour traiter des problèmes de grande
+dimension. Les modèles non paramétriques bayésiens sont indispensables
+dans des domaines tels que la bioinformatique, l’apprentissage
+automatique et les sciences sociales, où la flexibilité des modèles est
+cruciale pour capturer des phénomènes complexes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les modèles non paramétriques bayésiens, commençons
+par identifier ce que nous cherchons à modéliser. Supposons que nous
+ayons un ensemble de données <span class="math inline">\(\mathbf{X} =
+\{X_1, X_2, \ldots, X_n\}\)</span> et que nous voulions inférer une
+distribution de probabilité sous-jacente <span
+class="math inline">\(P\)</span>. En statistique paramétrique, nous
+imposerions une forme spécifique à <span
+class="math inline">\(P\)</span> via un nombre fini de paramètres. En
+revanche, en statistique non paramétrique, nous cherchons à estimer
+<span class="math inline">\(P\)</span> sans imposer de forme
+spécifique.</p>
+<div class="definition">
+<p>Un modèle non paramétrique bayésien est un modèle où la distribution
+de probabilité <span class="math inline">\(P\)</span> est considérée
+comme une variable aléatoire et est modélisée par un processus
+stochastique. Formellement, on peut écrire : <span
+class="math display">\[P \sim G\]</span> où <span
+class="math inline">\(G\)</span> est un processus de probabilité. En
+d’autres termes, pour tout ensemble mesurable <span
+class="math inline">\(A\)</span>, on a : <span
+class="math display">\[P(A) \sim G(A)\]</span></p>
+</div>
+<p>Une formulation équivalente est donnée par le théorème de
+représentation intégrale de Loève, qui stipule que toute distribution de
+probabilité <span class="math inline">\(P\)</span> peut être représentée
+comme une moyenne pondérée d’un ensemble de distributions paramétriques
+<span class="math inline">\(\{P_\theta\}_{\theta \in \Theta}\)</span> :
+<span class="math display">\[P = \int_{\Theta} P_\theta \,
+dG(\theta)\]</span> où <span class="math inline">\(G\)</span> est une
+mesure de probabilité sur l’espace des paramètres <span
+class="math inline">\(\Theta\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental dans le cadre des modèles non paramétriques
+bayésiens est le théorème de représentation intégrale de Loève, que nous
+avons mentionné précédemment. Ce théorème est crucial car il permet de
+représenter toute distribution de probabilité comme une moyenne pondérée
+d’un ensemble de distributions paramétriques.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{P}\)</span> un espace
+convexe de distributions de probabilité. Alors, pour toute distribution
+<span class="math inline">\(P \in \mathcal{P}\)</span>, il existe une
+mesure de probabilité <span class="math inline">\(G\)</span> sur un
+espace compact <span class="math inline">\(\Theta\)</span> et une
+famille de distributions paramétriques <span
+class="math inline">\(\{P_\theta\}_{\theta \in \Theta}\)</span> telle
+que : <span class="math display">\[P = \int_{\Theta} P_\theta \,
+dG(\theta)\]</span></p>
+</div>
+<p>La preuve de ce théorème repose sur des concepts avancés d’analyse
+fonctionnelle et de théorie de la mesure. Elle montre que toute
+distribution peut être représentée comme une moyenne pondérée d’un
+ensemble de distributions paramétriques, ce qui est essentiel pour
+comprendre les modèles non paramétriques bayésiens.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer l’application du théorème de représentation intégrale
+de Loève, considérons un exemple simple. Supposons que nous ayons une
+distribution <span class="math inline">\(P\)</span> sur l’espace des
+réels <span class="math inline">\(\mathbb{R}\)</span>. Nous voulons
+représenter <span class="math inline">\(P\)</span> comme une moyenne
+pondérée d’un ensemble de distributions normales.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(P\)</span> une
+distribution de probabilité sur <span
+class="math inline">\(\mathbb{R}\)</span>. Par le théorème de
+représentation intégrale de Loève, il existe une mesure de probabilité
+<span class="math inline">\(G\)</span> sur un espace compact <span
+class="math inline">\(\Theta \subset \mathbb{R}^2\)</span> et une
+famille de distributions normales <span class="math inline">\(\{N(\mu,
+\sigma^2)\}_{(\mu, \sigma^2) \in \Theta}\)</span> telle que : <span
+class="math display">\[P = \int_{\Theta} N(\mu, \sigma^2) \, dG(\mu,
+\sigma^2)\]</span> Cela signifie que pour tout ensemble mesurable <span
+class="math inline">\(A \subset \mathbb{R}\)</span>, on a : <span
+class="math display">\[P(A) = \int_{\Theta} N(\mu, \sigma^2)(A) \,
+dG(\mu, \sigma^2)\]</span> où <span class="math inline">\(N(\mu,
+\sigma^2)(A)\)</span> est la probabilité que la distribution normale
+<span class="math inline">\(N(\mu, \sigma^2)\)</span> attribue à
+l’ensemble <span class="math inline">\(A\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les modèles non paramétriques bayésiens possèdent plusieurs
+propriétés intéressantes qui les rendent puissants pour l’inférence
+statistique. Voici quelques-unes de ces propriétés :</p>
+<ol>
+<li><p>Flexibilité : Les modèles non paramétriques bayésiens peuvent
+capturer des structures complexes sans imposer de forme spécifique à
+priori. Cela les rend particulièrement utiles pour modéliser des
+phénomènes complexes.</p></li>
+<li><p>Robustesse : Ces modèles sont robustes aux hypothèses
+restrictives souvent imposées par les modèles paramétriques. Ils
+permettent de mieux capturer la variabilité des données.</p></li>
+<li><p>Intégration de l’information a priori : Les modèles non
+paramétriques bayésiens permettent d’intégrer des informations a priori
+de manière flexible, ce qui est crucial pour l’inférence
+bayésienne.</p></li>
+</ol>
+<p>Pour illustrer la flexibilité des modèles non paramétriques
+bayésiens, considérons un exemple où nous voulons estimer une
+distribution de probabilité à partir d’un échantillon de données.
+Supposons que nous ayons un échantillon <span
+class="math inline">\(\mathbf{X} = \{X_1, X_2, \ldots, X_n\}\)</span> et
+que nous voulions estimer la distribution sous-jacente <span
+class="math inline">\(P\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Par le théorème de représentation intégrale de Loève,
+nous savons que <span class="math inline">\(P\)</span> peut être
+représentée comme une moyenne pondérée d’un ensemble de distributions
+paramétriques. En utilisant un processus de Dirichlet comme priori pour
+<span class="math inline">\(G\)</span>, nous pouvons inférer la
+distribution <span class="math inline">\(P\)</span> à partir des
+données. Le processus de Dirichlet est un choix populaire pour les
+modèles non paramétriques bayésiens car il permet une inférence flexible
+et robuste. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les modèles non paramétriques bayésiens offrent une alternative
+puissante aux modèles paramétriques traditionnels. Ils permettent de
+capturer des structures complexes sans imposer de forme spécifique à
+priori, ce qui les rend particulièrement utiles pour l’inférence
+statistique dans des domaines tels que la bioinformatique,
+l’apprentissage automatique et les sciences sociales. Les théorèmes
+fondamentaux tels que le théorème de représentation intégrale de Loève
+fournissent une base solide pour comprendre et appliquer ces
+modèles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

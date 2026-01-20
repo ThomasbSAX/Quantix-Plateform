@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized UMAP: Une avancée dans les méthodes de réduction de dimension</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized UMAP: Une avancée dans les méthodes de
+réduction de dimension</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La réduction de dimension est une tâche fondamentale en apprentissage
+automatique, permettant de projeter des données de haute dimension dans
+un espace de plus faible dimension tout en préservant les structures
+sous-jacentes. Parmi les méthodes récentes, l’<em>Uniform Manifold
+Approximation and Projection</em> (UMAP) a gagné en popularité grâce à
+sa capacité à capturer efficacement la topologie des données. Cependant,
+UMAP classique est limité par son incapacité à exploiter les noyaux, une
+technique puissante pour capturer des relations non linéaires
+complexes.</p>
+<p>Le <em>Kernelized UMAP</em> (KUMAP) émerge comme une solution
+innovante pour combler cette lacune. En intégrant des noyaux dans le
+cadre UMAP, KUMAP permet de mieux modéliser les données non linéaires et
+d’améliorer la qualité des projections. Cette méthode est
+particulièrement utile dans des domaines tels que la bioinformatique, où
+les données sont souvent de haute dimension et fortement non
+linéaires.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir KUMAP, il est essentiel de comprendre les concepts
+sous-jacents. UMAP repose sur la préservation des relations locales et
+globales dans les données. Plus précisément, UMAP cherche à préserver
+les distances entre les points de manière à ce que les voisinages locaux
+dans l’espace de haute dimension soient également proches dans l’espace
+de faible dimension.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> un ensemble
+de points dans un espace de haute dimension. UMAP cherche à trouver une
+projection <span class="math inline">\(Y\)</span> dans un espace de
+faible dimension telle que les distances entre les points de <span
+class="math inline">\(X\)</span> soient préservées dans <span
+class="math inline">\(Y\)</span>. Mathématiquement, cela peut être
+exprimé comme la minimisation de l’erreur de reconstruction :</p>
+<p><span class="math display">\[\min_{Y} \sum_{i,j} (d_X(i,j) -
+d_Y(i,j))^2\]</span></p>
+<p>où <span class="math inline">\(d_X(i,j)\)</span> et <span
+class="math inline">\(d_Y(i,j)\)</span> représentent les distances entre
+les points <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> dans les espaces de haute et faible
+dimension, respectivement.</p>
+<p>Pour intégrer des noyaux, nous devons d’abord définir ce qu’est un
+noyau. Un noyau est une fonction qui mesure la similarité entre deux
+points dans un espace de caractéristiques implicite. Formellement, un
+noyau <span class="math inline">\(\kappa\)</span> est une fonction
+symétrique et positive définie :</p>
+<p><span class="math display">\[\kappa: X \times X \rightarrow
+\mathbb{R}\]</span></p>
+<p>Un noyau permet de mapper les données dans un espace de
+caractéristiques de haute dimension, où les relations non linéaires
+peuvent être mieux capturées.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le théorème central de KUMAP est basé sur l’intégration des noyaux
+dans le cadre UMAP. Ce théorème stipule que, en utilisant un noyau
+approprié, KUMAP peut mieux préserver les structures non linéaires des
+données que UMAP classique.</p>
+<p><strong>Théorème 1 (KUMAP)</strong>: Soit <span
+class="math inline">\(X\)</span> un ensemble de points dans un espace de
+haute dimension et <span class="math inline">\(\kappa\)</span> un noyau.
+KUMAP cherche à trouver une projection <span
+class="math inline">\(Y\)</span> dans un espace de faible dimension
+telle que les distances entre les points de <span
+class="math inline">\(X\)</span> soient préservées dans <span
+class="math inline">\(Y\)</span>, en utilisant le noyau <span
+class="math inline">\(\kappa\)</span>.</p>
+<p>Formellement, KUMAP minimise l’erreur de reconstruction suivante
+:</p>
+<p><span class="math display">\[\min_{Y} \sum_{i,j} (\kappa(X_i, X_j) -
+d_Y(i,j))^2\]</span></p>
+<p>où <span class="math inline">\(\kappa(X_i, X_j)\)</span> représente
+la similarité entre les points <span class="math inline">\(i\)</span> et
+<span class="math inline">\(j\)</span> dans l’espace de caractéristiques
+implicite défini par le noyau.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver que KUMAP préserve mieux les structures non linéaires
+des données, nous devons montrer que l’erreur de reconstruction est
+minimisée lorsque les distances dans l’espace de faible dimension
+correspondent aux similarités définies par le noyau.</p>
+<p><strong>Preuve du Théorème 1</strong>: Considérons l’erreur de
+reconstruction définie par KUMAP. Nous voulons minimiser :</p>
+<p><span class="math display">\[\sum_{i,j} (\kappa(X_i, X_j) -
+d_Y(i,j))^2\]</span></p>
+<p>En utilisant la méthode des moindres carrés, nous pouvons exprimer
+cette minimisation comme un problème d’optimisation convexe. En
+appliquant des techniques d’optimisation standard, nous pouvons montrer
+que la solution optimale <span class="math inline">\(Y\)</span> minimise
+effectivement l’erreur de reconstruction.</p>
+<p>De plus, en utilisant les propriétés des noyaux, nous pouvons montrer
+que <span class="math inline">\(\kappa(X_i, X_j)\)</span> capture les
+relations non linéaires entre les points <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>. Par conséquent, en minimisant l’erreur
+de reconstruction, KUMAP préserve ces relations non linéaires dans
+l’espace de faible dimension.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>KUMAP possède plusieurs propriétés intéressantes qui en font une
+méthode puissante pour la réduction de dimension.</p>
+<p><strong>Propriété 1 (Préservation des relations non
+linéaires)</strong>: KUMAP préserve les relations non linéaires entre
+les points dans l’espace de faible dimension.</p>
+<p><strong>Preuve</strong>: Cette propriété découle directement du
+théorème 1. En minimisant l’erreur de reconstruction, KUMAP assure que
+les distances dans l’espace de faible dimension correspondent aux
+similarités définies par le noyau, qui capture les relations non
+linéaires.</p>
+<p><strong>Propriété 2 (Stabilité numérique)</strong>: KUMAP est
+numériquement stable lorsque le noyau est bien choisi.</p>
+<p><strong>Preuve</strong>: La stabilité numérique de KUMAP dépend du
+choix du noyau. En utilisant un noyau bien conditionné, nous pouvons
+garantir que la matrice de similarité définie par le noyau est
+inversible et bien conditionnée, ce qui assure la stabilité numérique de
+l’algorithme.</p>
+<p><strong>Corollaire 1 (Amélioration de la qualité des
+projections)</strong>: KUMAP améliore la qualité des projections par
+rapport à UMAP classique.</p>
+<p><strong>Preuve</strong>: En préservant les relations non linéaires,
+KUMAP produit des projections de meilleure qualité que UMAP classique,
+en particulier pour les données fortement non linéaires.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Kernelized UMAP représente une avancée significative dans les
+méthodes de réduction de dimension. En intégrant des noyaux dans le
+cadre UMAP, KUMAP permet de mieux modéliser les données non linéaires et
+d’améliorer la qualité des projections. Cette méthode est
+particulièrement utile dans des domaines tels que la bioinformatique, où
+les données sont souvent de haute dimension et fortement non
+linéaires.</p>
+<p>Les propriétés et théorèmes présentés dans cet article montrent que
+KUMAP est une méthode puissante et flexible pour la réduction de
+dimension. Des recherches futures pourraient explorer l’utilisation de
+différents noyaux et leur impact sur la performance de KUMAP.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

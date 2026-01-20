@@ -1,0 +1,385 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Gower pour variables mixtes asymétriques standardisées</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Gower pour variables mixtes asymétriques
+standardisées</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des données est souvent confrontée à la nécessité de
+mesurer les distances entre individus décrits par des variables mixtes,
+c’est-à-dire à la fois quantitatives et qualitatives. La distance de
+Gower, introduite par G. M. S. Gower en 1971, offre une solution
+élégante à ce problème complexe. Cette distance est particulièrement
+utile lorsque les variables sont asymétriques et nécessitent une
+standardisation préalable.</p>
+<p>L’émergence de la distance de Gower est motivée par le besoin de
+traiter des données hétérogènes tout en préservant les propriétés
+métriques essentielles. Elle est indispensable dans des domaines tels
+que la biologie, la psychologie et les sciences sociales, où les données
+sont souvent mixtes et asymétriques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de Gower, il est essentiel de définir
+d’abord ce que nous cherchons à mesurer. Nous voulons une distance qui
+prenne en compte la nature mixte des variables, tout en standardisant
+les variables quantitatives pour tenir compte de leur asymétrie.</p>
+<p>Considérons un ensemble de <span class="math inline">\(n\)</span>
+individus décrits par <span class="math inline">\(p\)</span> variables,
+où certaines variables sont quantitatives et d’autres qualitatives. Nous
+cherchons une fonction <span class="math inline">\(d\)</span> qui, pour
+deux individus <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, mesure leur dissimilarité.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux individus décrits par <span
+class="math inline">\(p\)</span> variables mixtes. La distance de Gower
+entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> est définie comme : <span
+class="math display">\[d(X, Y) = \frac{\sum_{k=1}^{p} d_k(x_{ik},
+y_{ik}) \cdot r_k}{\sum_{k=1}^{p} r_k}\]</span> où <span
+class="math inline">\(d_k\)</span> est la distance pour la <span
+class="math inline">\(k\)</span>-ème variable, et <span
+class="math inline">\(r_k\)</span> est un indicateur binaire qui vaut 1
+si la <span class="math inline">\(k\)</span>-ème variable est prise en
+compte et 0 sinon.</p>
+</div>
+<p>Pour les variables quantitatives standardisées, la distance <span
+class="math inline">\(d_k\)</span> est définie par : <span
+class="math display">\[d_k(x_{ik}, y_{ik}) = |x_{ik} - y_{ik}| /
+\text{range}_k\]</span> où <span
+class="math inline">\(\text{range}_k\)</span> est l’étendue de la <span
+class="math inline">\(k\)</span>-ème variable.</p>
+<p>Pour les variables qualitatives, la distance <span
+class="math inline">\(d_k\)</span> est définie par : <span
+class="math display">\[d_k(x_{ik}, y_{ik}) = \begin{cases}
+0 &amp; \text{si } x_{ik} = y_{ik} \\
+1 &amp; \text{sinon}
+\end{cases}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la distance de Gower est celui de sa
+métrique. Nous voulons montrer que la distance de Gower satisfait les
+propriétés d’une distance métrique.</p>
+<div class="theorem">
+<p>La distance de Gower <span class="math inline">\(d\)</span> satisfait
+les propriétés suivantes :</p>
+<ol>
+<li><p>(Non-négativité) <span class="math inline">\(d(X, Y) \geq
+0\)</span></p></li>
+<li><p>(Identité des indiscernables) <span class="math inline">\(d(X, Y)
+= 0\)</span> si et seulement si <span class="math inline">\(X =
+Y\)</span></p></li>
+<li><p>(Symétrie) <span class="math inline">\(d(X, Y) = d(Y,
+X)\)</span></p></li>
+<li><p>(Inégalité triangulaire) <span class="math inline">\(d(X, Z) \leq
+d(X, Y) + d(Y, Z)\)</span></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>La non-négativité découle directement de la définition, car les
+distances <span class="math inline">\(d_k\)</span> sont non négatives et
+les poids <span class="math inline">\(r_k\)</span> sont
+positifs.</p></li>
+<li><p>L’identité des indiscernables est satisfaite car si <span
+class="math inline">\(X = Y\)</span>, alors <span
+class="math inline">\(d_k(x_{ik}, y_{ik}) = 0\)</span> pour toutes les
+variables <span class="math inline">\(k\)</span>, ce qui implique <span
+class="math inline">\(d(X, Y) = 0\)</span>. Réciproquement, si <span
+class="math inline">\(d(X, Y) = 0\)</span>, alors toutes les distances
+<span class="math inline">\(d_k(x_{ik}, y_{ik})\)</span> doivent être
+nulles, ce qui implique <span class="math inline">\(X =
+Y\)</span>.</p></li>
+<li><p>La symétrie est évidente car <span
+class="math inline">\(d_k(x_{ik}, y_{ik}) = d_k(y_{ik}, x_{ik})\)</span>
+et <span class="math inline">\(r_k\)</span> est symétrique.</p></li>
+<li><p>Pour l’inégalité triangulaire, nous utilisons le fait que chaque
+distance <span class="math inline">\(d_k\)</span> satisfait l’inégalité
+triangulaire. En combinant ces inégalités et en utilisant la linéarité
+de la somme, nous obtenons l’inégalité triangulaire pour <span
+class="math inline">\(d\)</span>.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer les propriétés de la distance de Gower, nous devons
+justifier chaque étape en détail.</p>
+<div class="proof">
+<p><em>Preuve des propriétés de la distance de Gower.</em> Considérons
+deux individus <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+<ol>
+<li><p>Pour la non-négativité, nous avons : <span
+class="math display">\[d(X, Y) = \frac{\sum_{k=1}^{p} d_k(x_{ik},
+y_{ik}) \cdot r_k}{\sum_{k=1}^{p} r_k} \geq 0\]</span> car <span
+class="math inline">\(d_k(x_{ik}, y_{ik}) \geq 0\)</span> et <span
+class="math inline">\(r_k \geq 0\)</span>.</p></li>
+<li><p>Pour l’identité des indiscernables, si <span
+class="math inline">\(X = Y\)</span>, alors <span
+class="math inline">\(d_k(x_{ik}, y_{ik}) = 0\)</span> pour toutes les
+variables <span class="math inline">\(k\)</span>, donc : <span
+class="math display">\[d(X, Y) = 0\]</span> Réciproquement, si <span
+class="math inline">\(d(X, Y) = 0\)</span>, alors toutes les distances
+<span class="math inline">\(d_k(x_{ik}, y_{ik})\)</span> doivent être
+nulles, ce qui implique <span class="math inline">\(X =
+Y\)</span>.</p></li>
+<li><p>Pour la symétrie, nous avons : <span class="math display">\[d(X,
+Y) = \frac{\sum_{k=1}^{p} d_k(x_{ik}, y_{ik}) \cdot r_k}{\sum_{k=1}^{p}
+r_k} = \frac{\sum_{k=1}^{p} d_k(y_{ik}, x_{ik}) \cdot
+r_k}{\sum_{k=1}^{p} r_k} = d(Y, X)\]</span></p></li>
+<li><p>Pour l’inégalité triangulaire, considérons un troisième individu
+<span class="math inline">\(Z\)</span>. Nous devons montrer que : <span
+class="math display">\[d(X, Z) \leq d(X, Y) + d(Y, Z)\]</span> En
+utilisant la définition de <span class="math inline">\(d\)</span>, nous
+avons : <span class="math display">\[d(X, Z) = \frac{\sum_{k=1}^{p}
+d_k(x_{ik}, z_{ik}) \cdot r_k}{\sum_{k=1}^{p} r_k}\]</span> <span
+class="math display">\[d(X, Y) + d(Y, Z) = \frac{\sum_{k=1}^{p}
+(d_k(x_{ik}, y_{ik}) + d_k(y_{ik}, z_{ik})) \cdot r_k}{\sum_{k=1}^{p}
+r_k}\]</span> En utilisant l’inégalité triangulaire pour chaque distance
+<span class="math inline">\(d_k\)</span>, nous obtenons : <span
+class="math display">\[d_k(x_{ik}, z_{ik}) \leq d_k(x_{ik}, y_{ik}) +
+d_k(y_{ik}, z_{ik})\]</span> En sommant sur toutes les variables <span
+class="math inline">\(k\)</span> et en divisant par la somme des poids
+<span class="math inline">\(r_k\)</span>, nous obtenons l’inégalité
+triangulaire pour <span class="math inline">\(d\)</span>.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés et corollaires importants
+de la distance de Gower.</p>
+<div class="proposition">
+<p>La distance de Gower est invariante par translation et par échelle
+des variables quantitatives.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour la translation, supposons que nous ajoutons une
+constante <span class="math inline">\(c_k\)</span> à chaque variable
+quantitative. La distance <span class="math inline">\(d_k\)</span>
+devient : <span class="math display">\[d_k(x_{ik} + c_k, y_{ik} + c_k) =
+|(x_{ik} + c_k) - (y_{ik} + c_k)| / \text{range}_k = |x_{ik} - y_{ik}| /
+\text{range}_k\]</span> donc la distance de Gower reste inchangée.</p>
+<p>Pour l’échelle, supposons que nous multiplions chaque variable
+quantitative par une constante positive <span
+class="math inline">\(a_k\)</span>. La distance <span
+class="math inline">\(d_k\)</span> devient : <span
+class="math display">\[d_k(a_k x_{ik}, a_k y_{ik}) = |a_k x_{ik} - a_k
+y_{ik}| / (a_k \text{range}_k) = |x_{ik} - y_{ik}| /
+\text{range}_k\]</span> donc la distance de Gower reste inchangée. ◻</p>
+</div>
+<div class="corollaire">
+<p>La distance de Gower peut être utilisée pour effectuer une analyse en
+composantes principales sur des données mixtes.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> L’analyse en composantes principales repose sur la
+définition d’une matrice de distances entre individus. En utilisant la
+distance de Gower, nous pouvons construire une telle matrice pour des
+données mixtes et appliquer l’analyse en composantes principales. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Gower offre une méthode puissante et flexible pour
+mesurer les distances entre individus décrits par des variables mixtes
+asymétriques standardisées. Ses propriétés métriques et son invariance
+par translation et échelle en font un outil précieux pour l’analyse des
+données hétérogènes. En comprenant ses définitions, théorèmes et
+propriétés, nous pouvons mieux apprécier son utilité dans divers
+domaines de la recherche.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

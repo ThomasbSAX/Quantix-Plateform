@@ -1,0 +1,303 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode d’interpolation complexe</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode d’interpolation complexe</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’interpolation est une technique fondamentale en analyse numérique,
+permettant de reconstruire une fonction à partir d’un ensemble discret
+de points. L’interpolation complexe, en particulier, étend cette notion
+au cadre des fonctions analytiques complexes. Cette méthode est
+indispensable dans de nombreux domaines, tels que le traitement du
+signal, la modélisation physique et l’analyse numérique, où la précision
+et la fidélité des reconstructions sont cruciales.</p>
+<p>L’émergence de l’interpolation complexe est motivée par le besoin de
+traiter des fonctions qui ne sont pas nécessairement réelles ou définies
+sur des intervalles finis. Les fonctions analytiques complexes, grâce à
+leurs propriétés remarquables, permettent des reconstructions plus
+précises et des extrapolations fiables. Cette méthode est donc
+indispensable dans les cadres où la continuité et la différentiabilité
+sont des exigences fondamentales.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’interpolation complexe, il est essentiel de définir
+quelques concepts clés. Supposons que nous ayons un ensemble de points
+complexes <span class="math inline">\(z_0, z_1, \ldots, z_n\)</span> et
+leurs images correspondantes <span class="math inline">\(w_0, w_1,
+\ldots, w_n\)</span>. Nous cherchons une fonction <span
+class="math inline">\(f\)</span> analytique qui satisfait <span
+class="math inline">\(f(z_k) = w_k\)</span> pour tout <span
+class="math inline">\(k\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(z_0, z_1, \ldots, z_n\)</span> des
+points distincts dans le plan complexe et <span
+class="math inline">\(w_0, w_1, \ldots, w_n\)</span> des nombres
+complexes. Une fonction <span class="math inline">\(f\)</span> est dite
+interpolante si elle satisfait : <span class="math display">\[f(z_k) =
+w_k \quad \text{pour tout} \quad k = 0, 1, \ldots, n.\]</span> De
+manière formelle, nous cherchons une fonction <span
+class="math inline">\(f\)</span> analytique telle que : <span
+class="math display">\[\exists f : \mathbb{C} \rightarrow \mathbb{C},
+\quad \text{analytique}, \quad \forall k \in \{0, 1, \ldots, n\}, \quad
+f(z_k) = w_k.\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux dans l’interpolation complexe est le
+théorème de Runge, qui garantit l’existence d’une fonction polynomiale
+interpolante pour tout ensemble de points dans le plan complexe.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(z_0, z_1, \ldots, z_n\)</span> des
+points distincts dans le plan complexe et <span
+class="math inline">\(w_0, w_1, \ldots, w_n\)</span> des nombres
+complexes. Il existe une fonction polynomiale <span
+class="math inline">\(P\)</span> telle que : <span
+class="math display">\[P(z_k) = w_k \quad \text{pour tout} \quad k = 0,
+1, \ldots, n.\]</span> De manière formelle, pour tout ensemble de points
+<span class="math inline">\(\{z_k\}_{k=0}^n\)</span> et de valeurs <span
+class="math inline">\(\{w_k\}_{k=0}^n\)</span>, il existe un polynôme
+<span class="math inline">\(P\)</span> vérifiant : <span
+class="math display">\[\exists P \in \mathbb{C}[z], \quad \forall k \in
+\{0, 1, \ldots, n\}, \quad P(z_k) = w_k.\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>La preuve du théorème de Runge repose sur l’utilisation des polynômes
+de Lagrange. Considérons les polynômes de base de Lagrange <span
+class="math inline">\(L_k\)</span> définis par : <span
+class="math display">\[L_k(z) = \prod_{\substack{m=0 \\ m \neq k}}^n
+\frac{z - z_m}{z_k - z_m}.\]</span> Ces polynômes satisfont la propriété
+<span class="math inline">\(L_k(z_m) = \delta_{km}\)</span>, où <span
+class="math inline">\(\delta_{km}\)</span> est le symbole de
+Kronecker.</p>
+<p>La fonction interpolante <span class="math inline">\(P\)</span> peut
+alors être construite comme une combinaison linéaire des polynômes de
+Lagrange : <span class="math display">\[P(z) = \sum_{k=0}^n w_k
+L_k(z).\]</span> Il est facile de vérifier que <span
+class="math inline">\(P\)</span> satisfait les conditions
+d’interpolation : <span class="math display">\[P(z_k) = \sum_{m=0}^n w_m
+L_m(z_k) = w_k.\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’interpolation complexe possède plusieurs propriétés intéressantes,
+que nous énumérons ci-dessous :</p>
+<ol>
+<li><p><strong>Unicité</strong> : L’interpolant polynomiale est unique.
+En effet, si <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> sont deux polynômes interpolants, alors
+<span class="math inline">\(P - Q\)</span> est un polynôme de degré au
+plus <span class="math inline">\(n\)</span> qui s’annule en <span
+class="math inline">\(n+1\)</span> points distincts. Par conséquent,
+<span class="math inline">\(P - Q = 0\)</span>.</p></li>
+<li><p><strong>Stabilité</strong> : L’interpolation polynomiale est
+stable sous certaines conditions. Si les points <span
+class="math inline">\(z_k\)</span> sont bien conditionnés, c’est-à-dire
+que la matrice de Vandermonde est inversible, alors l’interpolant est
+unique et stable numériquement.</p></li>
+<li><p><strong>Extrapolation</strong> : L’interpolation complexe permet
+non seulement l’interpolation mais aussi l’extrapolation. Cependant,
+l’extrapolation peut être instable et doit être utilisée avec
+prudence.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’interpolation complexe est une méthode puissante pour reconstruire
+des fonctions analytiques à partir de points discrets. Grâce au théorème
+de Runge, nous savons qu’une telle reconstruction est toujours possible
+dans le cadre polynomial. Cependant, il est crucial de comprendre les
+propriétés et les limites de cette méthode pour l’utiliser efficacement
+dans des applications pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

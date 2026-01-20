@@ -1,0 +1,379 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Décomposition en valeurs propres pour l’Analyse en Composantes Principales (PCA)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Décomposition en valeurs propres pour l’Analyse en
+Composantes Principales (PCA)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’Analyse en Composantes Principales (PCA) est une technique
+statistique multidimensionnelle qui permet de réduire la dimension d’un
+ensemble de données tout en préservant au maximum l’information contenue
+dans les données originales. La PCA repose sur la décomposition en
+valeurs propres d’une matrice de covariance ou de corrélation, ce qui
+permet de projeter les données dans un espace de dimension
+inférieure.</p>
+<p>La PCA trouve ses origines dans les travaux de Karl Pearson en 1901
+et a été formalisée par Harold Hotelling dans les années 1930. Elle est
+aujourd’hui largement utilisée dans divers domaines tels que la
+bioinformatique, l’imagerie médicale, la finance et l’apprentissage
+automatique.</p>
+<h1 id="définitions">Définitions</h1>
+<h2 id="matrice-de-covariance">Matrice de covariance</h2>
+<p>Considérons un ensemble de données <span
+class="math inline">\(\mathbf{X} = [\mathbf{x}_1, \mathbf{x}_2, \dots,
+\mathbf{x}_n] \in \mathbb{R}^{p \times n}\)</span>, où chaque colonne
+<span class="math inline">\(\mathbf{x}_i\)</span> représente un
+échantillon de dimension <span class="math inline">\(p\)</span>. La
+matrice de covariance <span class="math inline">\(\mathbf{S} \in
+\mathbb{R}^{p \times p}\)</span> est définie comme :</p>
+<p><span class="math display">\[\mathbf{S} = \frac{1}{n-1} \sum_{i=1}^n
+(\mathbf{x}_i - \bar{\mathbf{x}})(\mathbf{x}_i -
+\bar{\mathbf{x}})^T\]</span></p>
+<p>où <span class="math inline">\(\bar{\mathbf{x}}\)</span> est le
+vecteur moyen des échantillons.</p>
+<h2 id="décomposition-en-valeurs-propres">Décomposition en valeurs
+propres</h2>
+<p>La décomposition en valeurs propres de la matrice de covariance <span
+class="math inline">\(\mathbf{S}\)</span> est donnée par :</p>
+<p><span class="math display">\[\mathbf{S} = \mathbf{V} \mathbf{\Lambda}
+\mathbf{V}^T\]</span></p>
+<p>où <span class="math inline">\(\mathbf{V} = [\mathbf{v}_1,
+\mathbf{v}_2, \dots, \mathbf{v}_p] \in \mathbb{R}^{p \times p}\)</span>
+est la matrice des vecteurs propres normalisés de <span
+class="math inline">\(\mathbf{S}\)</span>, et <span
+class="math inline">\(\mathbf{\Lambda} = \text{diag}(\lambda_1,
+\lambda_2, \dots, \lambda_p) \in \mathbb{R}^{p \times p}\)</span> est la
+matrice diagonale des valeurs propres de <span
+class="math inline">\(\mathbf{S}\)</span>, ordonnées de manière
+décroissante, i.e., <span class="math inline">\(\lambda_1 \geq \lambda_2
+\geq \dots \geq \lambda_p \geq 0\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-spectral">Théorème spectral</h2>
+<p>Le théorème spectral stipule que toute matrice symétrique réelle
+<span class="math inline">\(\mathbf{S}\)</span> peut être diagonalisée
+par une matrice orthogonale. En d’autres termes, il existe une matrice
+<span class="math inline">\(\mathbf{V}\)</span> telle que :</p>
+<p><span class="math display">\[\mathbf{S} = \mathbf{V} \mathbf{\Lambda}
+\mathbf{V}^T\]</span></p>
+<p>où <span class="math inline">\(\mathbf{V}\)</span> est une matrice
+orthogonale, i.e., <span class="math inline">\(\mathbf{V}^T \mathbf{V} =
+\mathbf{I}\)</span>, et <span
+class="math inline">\(\mathbf{\Lambda}\)</span> est une matrice
+diagonale contenant les valeurs propres de <span
+class="math inline">\(\mathbf{S}\)</span>.</p>
+<h2 id="théorème-de-réduction-de-dimension">Théorème de réduction de
+dimension</h2>
+<p>Le théorème de réduction de dimension stipule que, pour un entier
+<span class="math inline">\(k \leq p\)</span>, la projection des données
+<span class="math inline">\(\mathbf{X}\)</span> sur les <span
+class="math inline">\(k\)</span> premiers vecteurs propres de <span
+class="math inline">\(\mathbf{S}\)</span> minimise l’erreur quadratique
+moyenne entre les données originales et les données projetées. En
+d’autres termes, la matrice de projection <span
+class="math inline">\(\mathbf{P}_k = \mathbf{V}_k
+\mathbf{V}_k^T\)</span>, où <span
+class="math inline">\(\mathbf{V}_k\)</span> est la matrice des <span
+class="math inline">\(k\)</span> premiers vecteurs propres de <span
+class="math inline">\(\mathbf{S}\)</span>, minimise :</p>
+<p><span class="math display">\[\min_{\mathbf{P} \in \mathbb{R}^{p
+\times p}, \mathbf{P}^T \mathbf{P} = \mathbf{I}_k} \|\mathbf{X} -
+\mathbf{P} \mathbf{X}\|_F^2\]</span></p>
+<p>où <span class="math inline">\(\|\cdot\|_F\)</span> désigne la norme
+de Frobenius.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-spectral">Preuve du théorème spectral</h2>
+<p>La preuve du théorème spectral repose sur le fait que toute matrice
+symétrique réelle possède des valeurs propres réelles et une base de
+vecteurs propres orthogonaux. En effet, soit <span
+class="math inline">\(\mathbf{S}\)</span> une matrice symétrique réelle.
+Alors, il existe un polynôme caractéristique <span
+class="math inline">\(p(\lambda) = \det(\mathbf{S} - \lambda
+\mathbf{I})\)</span> dont les racines sont les valeurs propres de <span
+class="math inline">\(\mathbf{S}\)</span>. De plus, pour chaque valeur
+propre <span class="math inline">\(\lambda_i\)</span>, il existe un
+vecteur propre non nul <span class="math inline">\(\mathbf{v}_i\)</span>
+tel que :</p>
+<p><span class="math display">\[\mathbf{S} \mathbf{v}_i = \lambda_i
+\mathbf{v}_i\]</span></p>
+<p>Les vecteurs propres <span
+class="math inline">\(\mathbf{v}_i\)</span> peuvent être normalisés et
+orthonormalisés à l’aide du procédé de Gram-Schmidt, ce qui donne la
+matrice <span class="math inline">\(\mathbf{V}\)</span>. Enfin, il est
+facile de vérifier que :</p>
+<p><span class="math display">\[\mathbf{S} = \mathbf{V} \mathbf{\Lambda}
+\mathbf{V}^T\]</span></p>
+<h2 id="preuve-du-théorème-de-réduction-de-dimension">Preuve du théorème
+de réduction de dimension</h2>
+<p>La preuve du théorème de réduction de dimension repose sur le fait
+que la projection des données <span
+class="math inline">\(\mathbf{X}\)</span> sur les <span
+class="math inline">\(k\)</span> premiers vecteurs propres de <span
+class="math inline">\(\mathbf{S}\)</span> minimise l’erreur quadratique
+moyenne. En effet, soit <span
+class="math inline">\(\mathbf{P}_k\)</span> la matrice de projection sur
+les <span class="math inline">\(k\)</span> premiers vecteurs propres de
+<span class="math inline">\(\mathbf{S}\)</span>. Alors, l’erreur
+quadratique moyenne entre les données originales et les données
+projetées est donnée par :</p>
+<p><span class="math display">\[\|\mathbf{X} - \mathbf{P}_k
+\mathbf{X}\|_F^2 = \text{tr}(\mathbf{X}^T (\mathbf{I} - \mathbf{P}_k)
+\mathbf{X}) = \text{tr}(\mathbf{S} (\mathbf{I} -
+\mathbf{P}_k))\]</span></p>
+<p>où <span class="math inline">\(\text{tr}(\cdot)\)</span> désigne la
+trace d’une matrice. En utilisant le théorème spectral, on peut montrer
+que :</p>
+<p><span class="math display">\[\text{tr}(\mathbf{S} (\mathbf{I} -
+\mathbf{P}_k)) = \sum_{i=k+1}^p \lambda_i\]</span></p>
+<p>Enfin, il est facile de vérifier que cette quantité est minimisée
+lorsque <span class="math inline">\(\mathbf{P}_k\)</span> est la matrice
+de projection sur les <span class="math inline">\(k\)</span> premiers
+vecteurs propres de <span class="math inline">\(\mathbf{S}\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et corollaires</h1>
+<h2 id="propriétés-des-valeurs-propres-et-vecteurs-propres">Propriétés
+des valeurs propres et vecteurs propres</h2>
+<ol>
+<li><p>Les valeurs propres de la matrice de covariance <span
+class="math inline">\(\mathbf{S}\)</span> sont toutes réelles et non
+négatives, i.e., <span class="math inline">\(\lambda_i \geq 0\)</span>
+pour tout <span class="math inline">\(i = 1, \dots, p\)</span>.</p></li>
+<li><p>Les vecteurs propres de <span
+class="math inline">\(\mathbf{S}\)</span> associés à des valeurs propres
+distinctes sont linéairement indépendants.</p></li>
+<li><p>La somme des valeurs propres de <span
+class="math inline">\(\mathbf{S}\)</span> est égale à la trace de <span
+class="math inline">\(\mathbf{S}\)</span>, i.e., <span
+class="math inline">\(\sum_{i=1}^p \lambda_i =
+\text{tr}(\mathbf{S})\)</span>.</p></li>
+<li><p>Le déterminant de <span class="math inline">\(\mathbf{S}\)</span>
+est égal au produit des valeurs propres de <span
+class="math inline">\(\mathbf{S}\)</span>, i.e., <span
+class="math inline">\(\det(\mathbf{S}) = \prod_{i=1}^p
+\lambda_i\)</span>.</p></li>
+</ol>
+<h2 id="corollaires-de-la-pca">Corollaires de la PCA</h2>
+<ol>
+<li><p>La variance totale des données <span
+class="math inline">\(\mathbf{X}\)</span> est égale à la somme des
+valeurs propres de <span class="math inline">\(\mathbf{S}\)</span>,
+i.e., <span class="math inline">\(\text{Var}(\mathbf{X}) = \sum_{i=1}^p
+\lambda_i\)</span>.</p></li>
+<li><p>La proportion de variance expliquée par les <span
+class="math inline">\(k\)</span> premières composantes principales est
+donnée par :</p>
+<p><span class="math display">\[\text{Proportion de variance expliquée}
+= \frac{\sum_{i=1}^k \lambda_i}{\sum_{i=1}^p
+\lambda_i}\]</span></p></li>
+<li><p>La projection des données <span
+class="math inline">\(\mathbf{X}\)</span> sur les <span
+class="math inline">\(k\)</span> premières composantes principales
+minimise l’erreur quadratique moyenne entre les données originales et
+les données projetées.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La décomposition en valeurs propres pour la PCA est une technique
+puissante et polyvalente pour la réduction de dimension et l’analyse
+exploratoire des données. Elle repose sur des concepts mathématiques
+solides tels que la décomposition spectrale et les propriétés des
+matrices symétriques. Les théorèmes et preuves présentés dans cet
+article montrent que la PCA est une méthode optimale pour la réduction
+de dimension, et les propriétés et corollaires discutés illustrent son
+utilité pratique dans divers domaines d’application.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

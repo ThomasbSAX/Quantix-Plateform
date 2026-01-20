@@ -1,0 +1,323 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Gower pour variables catégorielles asymétriques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Gower pour variables catégorielles
+asymétriques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des données catégorielles est une problématique centrale en
+statistique et en apprentissage automatique. Parmi les défis majeurs,
+l’asymétrie des variables catégorielles complique la mesure de
+similarité entre observations. La distance de Gower émerge comme une
+solution élégante, combinant flexibilité et robustesse pour traiter ces
+variables.</p>
+<p>Historiquement, la distance de Gower a été introduite par G. H. Gower
+en 1971 pour unifier les mesures de dissimilarité sur des données
+mixtes. Son innovation réside dans la pondération des contributions des
+variables, permettant de capturer l’asymétrie inhérente aux données
+catégorielles.</p>
+<p>Cette distance est indispensable dans des domaines tels que la
+bioinformatique, la sociologie, et l’économie, où les données sont
+souvent hétérogènes. Elle permet de comparer des individus ou des objets
+décrits par des variables de nature différente, tout en respectant les
+spécificités de chaque type de variable.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Gower, considérons un ensemble de <span
+class="math inline">\(n\)</span> observations décrites par <span
+class="math inline">\(p\)</span> variables. Chaque observation est un
+vecteur <span class="math inline">\(x_i = (x_{i1}, x_{i2}, \ldots,
+x_{ip})\)</span>, où <span class="math inline">\(x_{ij}\)</span> est la
+valeur de la <span class="math inline">\(j\)</span>-ème variable pour
+l’observation <span class="math inline">\(i\)</span>.</p>
+<p>Nous cherchons une mesure de dissimilarité qui capture la distance
+entre deux observations <span class="math inline">\(x_i\)</span> et
+<span class="math inline">\(x_k\)</span>. Pour les variables
+catégorielles, cette distance doit refléter l’asymétrie potentielle des
+catégories.</p>
+<p>Formellement, la distance de Gower entre deux observations <span
+class="math inline">\(x_i\)</span> et <span
+class="math inline">\(x_k\)</span> est définie comme :</p>
+<p><span class="math display">\[d_{G}(x_i, x_k) = \frac{\sum_{j=1}^{p}
+w_j d_{jk}(x_{ij}, x_{kj})}{\sum_{j=1}^{p} w_j}\]</span></p>
+<p>où <span class="math inline">\(d_{jk}(x_{ij}, x_{kj})\)</span> est la
+dissimilarité entre les valeurs <span
+class="math inline">\(x_{ij}\)</span> et <span
+class="math inline">\(x_{kj}\)</span> de la variable <span
+class="math inline">\(j\)</span>, et <span
+class="math inline">\(w_j\)</span> est le poids associé à la variable
+<span class="math inline">\(j\)</span>.</p>
+<p>Pour les variables catégorielles, la dissimilarité <span
+class="math inline">\(d_{jk}(x_{ij}, x_{kj})\)</span> est définie comme
+:</p>
+<p><span class="math display">\[d_{jk}(x_{ij}, x_{kj}) =
+\begin{cases}
+0 &amp; \text{si } x_{ij} = x_{kj}, \\
+1 &amp; \text{sinon.}
+\end{cases}\]</span></p>
+<p>Cette définition peut être généralisée pour tenir compte de
+l’asymétrie des variables catégorielles. Par exemple, si les catégories
+sont ordonnées, la dissimilarité peut être définie comme la distance
+relative entre les catégories.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Gower est le théorème de
+l’optimalité, qui garantit que la distance de Gower minimise une
+certaine fonction de coût sous contraintes.</p>
+<p>Considérons un ensemble de <span class="math inline">\(n\)</span>
+observations et une matrice de dissimilarité <span
+class="math inline">\(D\)</span>. Le théorème de l’optimalité stipule
+que la distance de Gower minimise la somme des carrés des différences
+entre les dissimilarités observées et les distances calculées.</p>
+<p>Formellement, ce théorème peut être énoncé comme suit :</p>
+<p><span class="math display">\[\min_{D} \sum_{i &lt; k} (d_{ik} -
+D_{ik})^2\]</span></p>
+<p>sous les contraintes que <span class="math inline">\(D\)</span> est
+une matrice de distance euclidienne et que <span
+class="math inline">\(d_{ik}\)</span> est la distance de Gower entre les
+observations <span class="math inline">\(i\)</span> et <span
+class="math inline">\(k\)</span>.</p>
+<p>La preuve de ce théorème repose sur des techniques d’optimisation
+convexe et utilise des propriétés des matrices de distance. Elle montre
+que la distance de Gower est une solution optimale pour mesurer la
+dissimilarité entre observations dans un cadre multivarié.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de l’optimalité, nous commençons par
+réécrire la fonction de coût en termes de matrices. Soit <span
+class="math inline">\(D\)</span> la matrice des distances euclidiennes
+et <span class="math inline">\(G\)</span> la matrice des dissimilarités
+de Gower.</p>
+<p>La fonction de coût peut être exprimée comme :</p>
+<p><span class="math display">\[\sum_{i &lt; k} (d_{ik} - D_{ik})^2 =
+\text{tr}(G - D)^T (G - D)\]</span></p>
+<p>où <span class="math inline">\(\text{tr}\)</span> désigne la trace
+d’une matrice.</p>
+<p>En utilisant des techniques d’optimisation convexe, nous pouvons
+montrer que cette fonction de coût est minimisée lorsque <span
+class="math inline">\(D\)</span> est la projection orthogonale de <span
+class="math inline">\(G\)</span> sur l’ensemble des matrices de distance
+euclidienne.</p>
+<p>Cette projection peut être calculée en utilisant la décomposition en
+valeurs propres de <span class="math inline">\(G\)</span>. Les détails
+techniques de cette preuve sont complexes et reposent sur des résultats
+avancés en algèbre linéaire et en optimisation.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Gower possède plusieurs propriétés intéressantes, que
+nous énumérons ci-dessous :</p>
+<ul>
+<li><p>La distance de Gower est une mesure de dissimilarité valide,
+c’est-à-dire qu’elle satisfait les propriétés d’une distance métrique :
+non-négativité, identité des indiscernables, symétrie et inégalité
+triangulaire.</p></li>
+<li><p>La distance de Gower est robuste aux variables manquantes. Si
+certaines valeurs sont manquantes, elles peuvent être exclues du calcul
+de la distance sans affecter la validité globale.</p></li>
+<li><p>La distance de Gower peut être généralisée pour inclure des
+variables numériques et ordinales, en adaptant la définition de la
+dissimilarité <span class="math inline">\(d_{jk}(x_{ij},
+x_{kj})\)</span> en conséquence.</p></li>
+<li><p>La distance de Gower est particulièrement utile pour l’analyse
+des données mixtes, où les observations sont décrites par des variables
+de différents types.</p></li>
+</ul>
+<p>Chacune de ces propriétés peut être démontrée rigoureusement en
+utilisant des techniques mathématiques appropriées. Par exemple, la
+validité de la distance de Gower peut être prouvée en vérifiant
+explicitement les propriétés d’une distance métrique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

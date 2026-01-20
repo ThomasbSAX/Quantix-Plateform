@@ -1,0 +1,371 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de FastText Cosine : Une Approche Innovante pour la Similarité Sémantique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de FastText Cosine : Une Approche Innovante
+pour la Similarité Sémantique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse de la similarité sémantique entre les mots est une tâche
+fondamentale en traitement automatique du langage naturel (TALN).
+Historiquement, les approches basées sur des sacs de mots ou des
+n-grammes ont dominé le paysage, mais elles souffrent souvent d’une
+incapacité à capturer les nuances sémantiques. L’émergence des modèles
+de mots distribués, tels que Word2Vec et GloVe, a marqué un tournant en
+permettant une représentation vectorielle des mots qui encode leur
+signification. Cependant, ces modèles ne prennent pas en compte la
+structure interne des mots, ce qui limite leur capacité à généraliser
+aux mots inconnus.</p>
+<p>FastText, développé par Facebook AI Research (FAIR), introduit une
+innovation majeure en intégrant la représentation des sous-mots
+(n-grammes de caractères) dans le modèle de mots distribués. Cette
+approche permet de mieux capturer les similarités sémantiques entre des
+mots même non rencontrés pendant l’entraînement. Pour mesurer la
+similarité entre ces représentations vectorielles, la distance cosinus
+s’est imposée comme une métrique de choix en raison de sa simplicité et
+de son efficacité.</p>
+<p>Dans ce chapitre, nous explorons la distance de FastText cosinus, en
+détaillant sa définition, ses propriétés mathématiques et ses
+applications pratiques. Nous montrerons comment cette métrique permet de
+quantifier la similarité sémantique entre les mots de manière robuste et
+efficace.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de FastText cosinus, il est essentiel de
+définir d’abord les concepts fondamentaux de représentation vectorielle
+des mots et de distance cosinus.</p>
+<h2 class="unnumbered"
+id="représentation-vectorielle-des-mots">Représentation Vectorielle des
+Mots</h2>
+<p>Considérons un corpus de texte composé d’un vocabulaire <span
+class="math inline">\(V = \{w_1, w_2, \dots, w_n\}\)</span>. Chaque mot
+<span class="math inline">\(w_i\)</span> peut être représenté par un
+vecteur dans un espace de dimension <span
+class="math inline">\(d\)</span>, noté <span
+class="math inline">\(\mathbf{v}_i \in \mathbb{R}^d\)</span>. Ce vecteur
+est obtenu en apprenant une fonction <span class="math inline">\(f: V
+\rightarrow \mathbb{R}^d\)</span> qui associe à chaque mot son vecteur
+de représentation.</p>
+<p>En FastText, la représentation d’un mot <span
+class="math inline">\(w_i\)</span> est obtenue en combinant les vecteurs
+de ses sous-mots (n-grammes de caractères). Soit <span
+class="math inline">\(S(w_i)\)</span> l’ensemble des sous-mots de <span
+class="math inline">\(w_i\)</span>. La représentation vectorielle de
+<span class="math inline">\(w_i\)</span> est donnée par :</p>
+<p><span class="math display">\[\mathbf{v}_i = \sum_{s \in S(w_i)}
+\mathbf{u}_s\]</span></p>
+<p>où <span class="math inline">\(\mathbf{u}_s\)</span> est le vecteur
+de représentation du sous-mot <span
+class="math inline">\(s\)</span>.</p>
+<h2 class="unnumbered" id="distance-cosinus">Distance Cosinus</h2>
+<p>La distance cosinus entre deux vecteurs <span
+class="math inline">\(\mathbf{v}_i\)</span> et <span
+class="math inline">\(\mathbf{v}_j\)</span> est une mesure de similarité
+qui évalue l’angle entre eux. Elle est définie comme le cosinus de
+l’angle <span class="math inline">\(\theta\)</span> entre les deux
+vecteurs :</p>
+<p><span class="math display">\[\cos(\theta) = \frac{\mathbf{v}_i \cdot
+\mathbf{v}_j}{\|\mathbf{v}_i\| \|\mathbf{v}_j\|}\]</span></p>
+<p>où <span class="math inline">\(\cdot\)</span> désigne le produit
+scalaire et <span class="math inline">\(\|\cdot\|\)</span> la norme
+euclidienne.</p>
+<p>La distance cosinus est donc définie comme :</p>
+<p><span class="math display">\[d_{\text{cos}}(\mathbf{v}_i,
+\mathbf{v}_j) = 1 - \cos(\theta)\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-similarité-cosinus">Théorème de
+Similarité Cosinus</h2>
+<p>Nous présentons ici un théorème fondamental concernant la distance
+cosinus dans le contexte des représentations vectorielles de mots.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\mathbf{v}_i\)</span> et <span
+class="math inline">\(\mathbf{v}_j\)</span> les représentations
+vectorielles de deux mots <span class="math inline">\(w_i\)</span> et
+<span class="math inline">\(w_j\)</span>. La distance cosinus entre ces
+deux vecteurs est donnée par :</p>
+<p><span class="math display">\[d_{\text{cos}}(\mathbf{v}_i,
+\mathbf{v}_j) = 1 - \frac{\sum_{k=1}^d v_{i,k}
+v_{j,k}}{\sqrt{\sum_{k=1}^d v_{i,k}^2} \sqrt{\sum_{k=1}^d
+v_{j,k}^2}}\]</span></p>
+<p>où <span class="math inline">\(v_{i,k}\)</span> et <span
+class="math inline">\(v_{j,k}\)</span> sont les composantes des vecteurs
+<span class="math inline">\(\mathbf{v}_i\)</span> et <span
+class="math inline">\(\mathbf{v}_j\)</span> respectivement.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-similarité-cosinus">Preuve du Théorème de
+Similarité Cosinus</h2>
+<p>Pour prouver ce théorème, nous allons développer chaque étape de
+manière détaillée.</p>
+<p>1. **Produit Scalaire** : Le produit scalaire entre <span
+class="math inline">\(\mathbf{v}_i\)</span> et <span
+class="math inline">\(\mathbf{v}_j\)</span> est donné par :</p>
+<p><span class="math display">\[\mathbf{v}_i \cdot \mathbf{v}_j =
+\sum_{k=1}^d v_{i,k} v_{j,k}\]</span></p>
+<p>2. **Norme Euclidienne** : Les normes euclidiennes de <span
+class="math inline">\(\mathbf{v}_i\)</span> et <span
+class="math inline">\(\mathbf{v}_j\)</span> sont respectivement :</p>
+<p><span class="math display">\[\|\mathbf{v}_i\| = \sqrt{\sum_{k=1}^d
+v_{i,k}^2}, \quad \|\mathbf{v}_j\| = \sqrt{\sum_{k=1}^d
+v_{j,k}^2}\]</span></p>
+<p>3. **Cosinus de l’Angle** : Le cosinus de l’angle <span
+class="math inline">\(\theta\)</span> entre <span
+class="math inline">\(\mathbf{v}_i\)</span> et <span
+class="math inline">\(\mathbf{v}_j\)</span> est :</p>
+<p><span class="math display">\[\cos(\theta) = \frac{\mathbf{v}_i \cdot
+\mathbf{v}_j}{\|\mathbf{v}_i\| \|\mathbf{v}_j\|} = \frac{\sum_{k=1}^d
+v_{i,k} v_{j,k}}{\sqrt{\sum_{k=1}^d v_{i,k}^2} \sqrt{\sum_{k=1}^d
+v_{j,k}^2}}\]</span></p>
+<p>4. **Distance Cosinus** : La distance cosinus est définie comme :</p>
+<p><span class="math display">\[d_{\text{cos}}(\mathbf{v}_i,
+\mathbf{v}_j) = 1 - \cos(\theta)\]</span></p>
+<p>En substituant l’expression de <span
+class="math inline">\(\cos(\theta)\)</span>, nous obtenons :</p>
+<p><span class="math display">\[d_{\text{cos}}(\mathbf{v}_i,
+\mathbf{v}_j) = 1 - \frac{\sum_{k=1}^d v_{i,k}
+v_{j,k}}{\sqrt{\sum_{k=1}^d v_{i,k}^2} \sqrt{\sum_{k=1}^d
+v_{j,k}^2}}\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+distance cosinus dans le contexte des représentations vectorielles de
+mots.</p>
+<ol>
+<li><p>**Symétrie** : La distance cosinus est symétrique, c’est-à-dire
+que :</p>
+<p><span class="math display">\[d_{\text{cos}}(\mathbf{v}_i,
+\mathbf{v}_j) = d_{\text{cos}}(\mathbf{v}_j,
+\mathbf{v}_i)\]</span></p></li>
+<li><p>**Bornes** : La distance cosinus est bornée entre 0 et 2 :</p>
+<p><span class="math display">\[0 \leq d_{\text{cos}}(\mathbf{v}_i,
+\mathbf{v}_j) \leq 2\]</span></p></li>
+<li><p>**Invariance par Normalisation** : La distance cosinus est
+invariante par normalisation des vecteurs. Si <span
+class="math inline">\(\mathbf{v}_i&#39; =
+\frac{\mathbf{v}_i}{\|\mathbf{v}_i\|}\)</span> et <span
+class="math inline">\(\mathbf{v}_j&#39; =
+\frac{\mathbf{v}_j}{\|\mathbf{v}_j\|}\)</span>, alors :</p>
+<p><span class="math display">\[d_{\text{cos}}(\mathbf{v}_i,
+\mathbf{v}_j) = d_{\text{cos}}(\mathbf{v}_i&#39;,
+\mathbf{v}_j&#39;)\]</span></p></li>
+<li><p>**Linéarité** : La distance cosinus est linéaire par rapport aux
+composantes des vecteurs. Si <span class="math inline">\(\mathbf{v}_i =
+a\mathbf{u} + b\mathbf{w}\)</span> et <span
+class="math inline">\(\mathbf{v}_j = c\mathbf{u} + d\mathbf{w}\)</span>,
+alors :</p>
+<p><span class="math display">\[d_{\text{cos}}(\mathbf{v}_i,
+\mathbf{v}_j) = 1 - \frac{a c + b d}{\sqrt{a^2 + b^2} \sqrt{c^2 +
+d^2}}\]</span></p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de FastText cosinus représente une avancée significative
+dans le domaine de la similarité sémantique. En combinant les avantages
+des représentations vectorielles de mots avec la métrique cosinus, elle
+permet une quantification robuste et efficace des similarités entre les
+mots. Les propriétés mathématiques de cette distance, telles que la
+symétrie et l’invariance par normalisation, en font un outil précieux
+pour les applications de TALN.</p>
+<p>À l’avenir, des recherches supplémentaires pourraient explorer
+l’intégration de la distance cosinus dans d’autres modèles de
+représentation vectorielle, ainsi que son application à des tâches plus
+complexes telles que la traduction automatique et la génération de
+texte.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

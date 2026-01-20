@@ -1,0 +1,319 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>GloVe: Global Vectors for Word Representation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">GloVe: Global Vectors for Word Representation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’apprentissage de représentations vectorielles pour les mots,
+souvent appelées embeddings, a révolutionné le traitement automatique du
+langage naturel (TALN). Ces représentations permettent de capturer des
+relations sémantiques et syntaxiques entre les mots, facilitant ainsi
+des tâches telles que la classification de texte, la traduction
+automatique et l’analyse des sentiments.</p>
+<p>Parmi les méthodes d’apprentissage d’embeddings, GloVe (Global
+Vectors for Word Representation) se distingue par son approche innovante
+qui combine les avantages des modèles basés sur le contexte local et
+global. Introduit par Pennington, Socher et Manning en 2014, GloVe
+exploite les statistiques globales des co-occurrences de mots tout en
+capturant des relations linéaires entre les mots, comme la capacité à
+représenter des analogies.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement GloVe, il est essentiel de comprendre
+les concepts sous-jacents. Supposons que nous avons un corpus de texte
+et que nous voulons représenter chaque mot par un vecteur dans un espace
+vectoriel de dimension <span class="math inline">\(d\)</span>.
+L’objectif est que des mots sémantiquement proches soient représentés
+par des vecteurs proches dans cet espace.</p>
+<p>Pour cela, nous devons d’abord définir la matrice de co-occurrence
+<span class="math inline">\(X\)</span>, où chaque élément <span
+class="math inline">\(X_{ij}\)</span> représente le nombre de fois que
+le mot <span class="math inline">\(j\)</span> apparaît dans le contexte
+du mot <span class="math inline">\(i\)</span>. Le contexte peut être
+défini comme une fenêtre glissante de taille fixe autour du mot
+cible.</p>
+<div class="definition">
+<p>La matrice de co-occurrence <span class="math inline">\(X\)</span>
+est définie comme suit: <span class="math display">\[X_{ij} =
+\text{nombre de fois que le mot } j \text{ apparaît dans le contexte du
+mot } i\]</span></p>
+</div>
+<p>L’objectif de GloVe est d’apprendre des vecteurs <span
+class="math inline">\(\mathbf{w}_i\)</span> et <span
+class="math inline">\(\mathbf{\tilde{w}}_j\)</span> pour chaque mot
+<span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> tels que le produit scalaire <span
+class="math inline">\(\mathbf{w}_i^T \mathbf{\tilde{w}}_j\)</span>
+prédit la probabilité de co-occurrence <span
+class="math inline">\(P_{ij}\)</span>.</p>
+<div class="definition">
+<p>La fonction de coût de GloVe est définie comme: <span
+class="math display">\[J = \sum_{i,j=1}^{V} f(X_{ij}) (\mathbf{w}_i^T
+\mathbf{\tilde{w}}_j + b_i + \tilde{b}_j - \log P_{ij})^2\]</span> où
+<span class="math inline">\(V\)</span> est le vocabulaire, <span
+class="math inline">\(f\)</span> est une fonction de pondération, et
+<span class="math inline">\(b_i\)</span>, <span
+class="math inline">\(\tilde{b}_j\)</span> sont des biais.</p>
+</div>
+<h1 id="théorèmes-et-propriétés">Théorèmes et Propriétés</h1>
+<p>GloVe repose sur plusieurs propriétés importantes qui permettent de
+capturer les relations linéaires entre les mots. L’une des propriétés
+clés est la capacité à représenter des analogies, comme dans l’exemple
+classique "roi" - "homme" + "femme" ≈ "reine".</p>
+<div class="theorem">
+<p>Pour des mots <span class="math inline">\(i, j, k\)</span>, si les
+vecteurs <span class="math inline">\(\mathbf{w}_i, \mathbf{w}_j,
+\mathbf{w}_k\)</span> capturent des relations sémantiques, alors: <span
+class="math display">\[\mathbf{w}_i - \mathbf{w}_j + \mathbf{w}_k
+\approx \mathbf{w}_l\]</span> où <span class="math inline">\(l\)</span>
+est le mot qui complète l’analogie.</p>
+</div>
+<h1 id="preuves-et-démonstrations">Preuves et Démonstrations</h1>
+<p>Pour démontrer la propriété des analogies, nous devons montrer que
+les vecteurs appris par GloVe capturent effectivement ces relations.
+Supposons que nous avons trois mots <span class="math inline">\(i, j,
+k\)</span> et que nous voulons trouver le mot <span
+class="math inline">\(l\)</span> qui complète l’analogie.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons les vecteurs <span
+class="math inline">\(\mathbf{w}_i, \mathbf{w}_j, \mathbf{w}_k\)</span>
+appris par GloVe. Nous voulons montrer que: <span
+class="math display">\[\mathbf{w}_i - \mathbf{w}_j + \mathbf{w}_k
+\approx \mathbf{w}_l\]</span></p>
+<p>En utilisant la fonction de coût de GloVe, nous savons que: <span
+class="math display">\[\mathbf{w}_i^T \mathbf{\tilde{w}}_j + b_i +
+\tilde{b}_j \approx \log P_{ij}\]</span></p>
+<p>Pour les mots <span class="math inline">\(i, j, k\)</span>, nous
+avons: <span class="math display">\[\mathbf{w}_i^T \mathbf{\tilde{w}}_j
+\approx \log P_{ij}\]</span> <span class="math display">\[\mathbf{w}_j^T
+\mathbf{\tilde{w}}_k \approx \log P_{jk}\]</span> <span
+class="math display">\[\mathbf{w}_i^T \mathbf{\tilde{w}}_k \approx \log
+P_{ik}\]</span></p>
+<p>En combinant ces équations, nous pouvons déduire que: <span
+class="math display">\[\mathbf{w}_i - \mathbf{w}_j + \mathbf{w}_k
+\approx \mathbf{w}_l\]</span></p>
+<p>Cela montre que les vecteurs appris par GloVe capturent effectivement
+les relations linéaires entre les mots, permettant ainsi de représenter
+des analogies. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>GloVe possède plusieurs propriétés intéressantes qui en font une
+méthode puissante pour l’apprentissage d’embeddings. Voici quelques-unes
+des propriétés clés:</p>
+<ol>
+<li><p>**Capture des Relations Linéaires**: GloVe capture les relations
+linéaires entre les mots, permettant de représenter des
+analogies.</p></li>
+<li><p>**Efficacité Computationnelle**: GloVe est plus efficace que les
+méthodes basées sur le contexte local, telles que Word2Vec, car il
+exploite les statistiques globales des co-occurrences.</p></li>
+<li><p>**Scalabilité**: GloVe peut être entraîné sur de grands corpus de
+texte, ce qui permet d’apprendre des représentations vectorielles riches
+et informatives.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>GloVe est une méthode puissante pour l’apprentissage de
+représentations vectorielles pour les mots. En combinant les avantages
+des modèles basés sur le contexte local et global, GloVe capture
+efficacement les relations sémantiques et syntaxiques entre les mots.
+Ses propriétés clés, telles que la capture des relations linéaires et
+l’efficacité computationnelle, en font une méthode de choix pour le
+traitement automatique du langage naturel.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,420 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Décomposition de Cholesky : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Décomposition de Cholesky : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La décomposition de Cholesky, nommée en l’honneur du mathématicien
+français André-Louis Cholesky (1875-1918), est une méthode fondamentale
+en algèbre linéaire numérique pour décomposer des matrices symétriques
+définies positives. Cette technique, initialement développée pour
+résoudre des systèmes d’équations linéaires, trouve aujourd’hui des
+applications dans une multitude de domaines, allant de l’optimisation
+numérique à la modélisation statistique.</p>
+<p>L’émergence de cette méthode est intimement liée aux besoins
+croissants en calcul numérique précis et efficace. En effet, la
+résolution de systèmes linéaires est un problème central dans de
+nombreuses disciplines scientifiques et ingénieries. La décomposition de
+Cholesky offre une solution optimale en termes de stabilité numérique et
+de complexité algorithmique, ce qui en fait un outil indispensable dans
+l’arsenal des mathématiciens appliqués et des ingénieurs.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la décomposition de Cholesky, il est essentiel de
+commencer par définir les concepts clés qui sous-tendent cette
+méthode.</p>
+<h2 class="unnumbered"
+id="matrices-symétriques-définies-positives">Matrices Symétriques
+Définies Positives</h2>
+<p>Considérons une matrice <span class="math inline">\(A \in
+\mathbb{R}^{n \times n}\)</span>. On cherche à déterminer les conditions
+sous lesquelles <span class="math inline">\(A\)</span> est symétrique et
+définie positive.</p>
+<div class="definition">
+<p>Une matrice <span class="math inline">\(A\)</span> est dite
+symétrique si elle vérifie la condition : <span class="math display">\[A
+= A^T\]</span> où <span class="math inline">\(A^T\)</span> désigne la
+transposée de <span class="math inline">\(A\)</span>.</p>
+</div>
+<div class="definition">
+<p>Une matrice <span class="math inline">\(A\)</span> est dite définie
+positive si pour tout vecteur non nul <span class="math inline">\(x \in
+\mathbb{R}^n\)</span>, on a : <span class="math display">\[x^T A x &gt;
+0\]</span></p>
+</div>
+<h2 class="unnumbered" id="décomposition-de-cholesky">Décomposition de
+Cholesky</h2>
+<p>La décomposition de Cholesky permet d’exprimer une matrice symétrique
+définie positive <span class="math inline">\(A\)</span> comme le produit
+d’une matrice triangulaire inférieure et de sa transposée.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A \in \mathbb{R}^{n \times
+n}\)</span> une matrice symétrique définie positive. Il existe une
+unique matrice triangulaire inférieure <span class="math inline">\(L \in
+\mathbb{R}^{n \times n}\)</span> avec des éléments diagonaux strictement
+positifs, telle que : <span class="math display">\[A = L
+L^T\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Plusieurs théorèmes fondamentaux sont associés à la décomposition de
+Cholesky. Nous en présentons quelques-uns ci-dessous.</p>
+<h2 class="unnumbered" id="théorème-dexistence-et-dunicité">Théorème
+d’Existence et d’Unicité</h2>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A \in \mathbb{R}^{n \times
+n}\)</span> une matrice symétrique définie positive. Alors, il existe
+une unique matrice triangulaire inférieure <span class="math inline">\(L
+\in \mathbb{R}^{n \times n}\)</span> avec des éléments diagonaux
+strictement positifs, telle que : <span class="math display">\[A = L
+L^T\]</span></p>
+</div>
+<h2 class="unnumbered" id="théorème-de-stabilité-numérique">Théorème de
+Stabilité Numérique</h2>
+<div class="theorem">
+<p>La décomposition de Cholesky est numériquement stable. Plus
+précisément, pour toute matrice <span class="math inline">\(A\)</span>
+symétrique définie positive, l’algorithme de Cholesky produit une
+matrice <span class="math inline">\(L\)</span> telle que : <span
+class="math display">\[\| A - L L^T \|_2 \leq c n^2 \epsilon \| A
+\|_2\]</span> où <span class="math inline">\(c\)</span> est une
+constante, <span class="math inline">\(n\)</span> est la dimension de
+<span class="math inline">\(A\)</span>, et <span
+class="math inline">\(\epsilon\)</span> est l’erreur d’arrondi
+machine.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Nous fournissons ci-dessous les preuves détaillées des théorèmes
+présentés.</p>
+<h2 class="unnumbered"
+id="preuve-du-théorème-dexistence-et-dunicité">Preuve du Théorème
+d’Existence et d’Unicité</h2>
+<p>Pour démontrer l’existence et l’unicité de la décomposition de
+Cholesky, nous procédons par récurrence sur la dimension <span
+class="math inline">\(n\)</span> de la matrice <span
+class="math inline">\(A\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Cas de base (<span class="math inline">\(n =
+1\)</span>) :</strong> Soit <span class="math inline">\(A = [a]\)</span>
+avec <span class="math inline">\(a &gt; 0\)</span>. Alors, <span
+class="math inline">\(L = [\sqrt{a}]\)</span>, et on a bien <span
+class="math inline">\(A = L L^T\)</span>.</p>
+<p><strong>Hypothèse de récurrence :</strong> Supposons que pour toute
+matrice <span class="math inline">\(A&#39; \in \mathbb{R}^{k \times
+k}\)</span> symétrique définie positive, il existe une unique matrice
+triangulaire inférieure <span class="math inline">\(L&#39; \in
+\mathbb{R}^{k \times k}\)</span> avec des éléments diagonaux strictement
+positifs, telle que <span class="math inline">\(A&#39; = L&#39;
+L&#39;^T\)</span>.</p>
+<p><strong>Étape de récurrence (<span class="math inline">\(n = k +
+1\)</span>) :</strong> Considérons une matrice <span
+class="math inline">\(A \in \mathbb{R}^{(k+1) \times (k+1)}\)</span>
+symétrique définie positive. Nous pouvons écrire <span
+class="math inline">\(A\)</span> sous la forme : <span
+class="math display">\[A = \begin{pmatrix}
+a &amp; b^T \\
+b &amp; A&#39;
+\end{pmatrix}\]</span> où <span class="math inline">\(a \in
+\mathbb{R}\)</span>, <span class="math inline">\(b \in
+\mathbb{R}^k\)</span>, et <span class="math inline">\(A&#39; \in
+\mathbb{R}^{k \times k}\)</span>. Puisque <span
+class="math inline">\(A\)</span> est définie positive, on a <span
+class="math inline">\(a &gt; 0\)</span>.</p>
+<p>Nous cherchons une matrice <span class="math inline">\(L\)</span> de
+la forme : <span class="math display">\[L = \begin{pmatrix}
+l &amp; 0^T \\
+c &amp; L&#39;
+\end{pmatrix}\]</span> où <span class="math inline">\(l \in
+\mathbb{R}\)</span>, <span class="math inline">\(c \in
+\mathbb{R}^k\)</span>, et <span class="math inline">\(L&#39; \in
+\mathbb{R}^{k \times k}\)</span>.</p>
+<p>En imposant la condition <span class="math inline">\(A = L
+L^T\)</span>, nous obtenons les équations suivantes : <span
+class="math display">\[a = l^2 + c^T c\]</span> <span
+class="math display">\[b = L&#39; c + l c\]</span> <span
+class="math display">\[A&#39; = L&#39; L&#39;^T + c c^T\]</span></p>
+<p>En résolvant ces équations, nous trouvons que <span
+class="math inline">\(l = \sqrt{a - c^T c}\)</span>, et <span
+class="math inline">\(L&#39;\)</span> est la matrice de Cholesky de
+<span class="math inline">\(A&#39; - c c^T\)</span>. L’hypothèse de
+récurrence garantit l’existence et l’unicité de <span
+class="math inline">\(L&#39;\)</span>, ce qui achève la preuve. ◻</p>
+</div>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-stabilité-numérique">Preuve du Théorème de
+Stabilité Numérique</h2>
+<p>La preuve de la stabilité numérique de la décomposition de Cholesky
+repose sur l’analyse des erreurs d’arrondi lors de l’exécution de
+l’algorithme.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons une matrice <span class="math inline">\(A
+\in \mathbb{R}^{n \times n}\)</span> symétrique définie positive.
+L’algorithme de Cholesky calcule les éléments de <span
+class="math inline">\(L\)</span> en résolvant successivement des
+systèmes triangulaires. Chaque étape de l’algorithme introduit une
+erreur d’arrondi, mais ces erreurs sont contrôlées en raison de la
+structure triangulaire de <span class="math inline">\(L\)</span>.</p>
+<p>Plus précisément, pour chaque élément <span
+class="math inline">\(l_{ij}\)</span> de <span
+class="math inline">\(L\)</span>, on a : <span
+class="math display">\[l_{ij} = \frac{a_{ij} - \sum_{k=1}^{i-1} l_{ik}
+l_{jk}}{l_{ii}}\]</span> où <span class="math inline">\(a_{ij}\)</span>
+est l’élément correspondant de <span class="math inline">\(A\)</span>.
+L’erreur d’arrondi introduite à chaque étape est bornée par l’erreur
+d’arrondi machine <span class="math inline">\(\epsilon\)</span>.</p>
+<p>En utilisant des techniques d’analyse d’erreurs, on peut montrer que
+l’erreur globale sur <span class="math inline">\(L\)</span> est bornée
+par : <span class="math display">\[\| A - L L^T \|_2 \leq c n^2 \epsilon
+\| A \|_2\]</span> où <span class="math inline">\(c\)</span> est une
+constante dépendant de la conditionnement de <span
+class="math inline">\(A\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous présentons ci-dessous quelques propriétés importantes de la
+décomposition de Cholesky.</p>
+<h2 class="unnumbered" id="propriétés">Propriétés</h2>
+<ol>
+<li><p>La décomposition de Cholesky est unique si l’on impose que les
+éléments diagonaux de <span class="math inline">\(L\)</span> soient
+strictement positifs.</p></li>
+<li><p>La décomposition de Cholesky peut être utilisée pour résoudre des
+systèmes linéaires <span class="math inline">\(A x = b\)</span> en deux
+étapes : d’abord la résolution de <span class="math inline">\(L y =
+b\)</span>, puis la résolution de <span class="math inline">\(L^T x =
+y\)</span>.</p></li>
+<li><p>La décomposition de Cholesky est particulièrement efficace pour
+les matrices creuses, car elle préserve la structure creuse de <span
+class="math inline">\(A\)</span> dans <span
+class="math inline">\(L\)</span>.</p></li>
+</ol>
+<h2 class="unnumbered" id="corollaires">Corollaires</h2>
+<div class="corollary">
+<p>Soit <span class="math inline">\(A \in \mathbb{R}^{n \times
+n}\)</span> une matrice symétrique définie positive, et <span
+class="math inline">\(b \in \mathbb{R}^n\)</span>. Alors, le système
+linéaire <span class="math inline">\(A x = b\)</span> peut être résolu
+en utilisant la décomposition de Cholesky comme suit : <span
+class="math display">\[L y = b \quad \text{et} \quad L^T x = y\]</span>
+où <span class="math inline">\(L\)</span> est la matrice triangulaire
+inférieure obtenue par la décomposition de Cholesky.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve découle directement des propriétés de la
+décomposition de Cholesky. En effet, si <span class="math inline">\(A =
+L L^T\)</span>, alors le système <span class="math inline">\(A x =
+b\)</span> est équivalent à <span class="math inline">\(L (L^T x) =
+b\)</span>. En posant <span class="math inline">\(y = L^T x\)</span>, on
+obtient le système <span class="math inline">\(L y = b\)</span>. Une
+fois <span class="math inline">\(y\)</span> calculé, on peut résoudre
+<span class="math inline">\(L^T x = y\)</span> pour obtenir la solution
+<span class="math inline">\(x\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La décomposition de Cholesky est un outil puissant et polyvalent en
+algèbre linéaire numérique. Son importance réside non seulement dans sa
+capacité à résoudre efficacement des systèmes linéaires, mais aussi dans
+ses nombreuses applications en optimisation, modélisation statistique,
+et bien d’autres domaines. Les théorèmes et propriétés présentés dans
+cet article soulignent la robustesse et la stabilité de cette méthode,
+ce qui en fait un choix privilégié pour les calculs numériques
+précis.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

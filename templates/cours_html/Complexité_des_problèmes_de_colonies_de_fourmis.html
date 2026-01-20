@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de colonies de fourmis</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de colonies de fourmis</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les problèmes de colonies de fourmis, souvent étudiés dans le cadre
+de l’optimisation combinatoire, trouvent leurs racines dans les
+comportements collectifs observés chez les fourmis. Ces insectes sociaux
+résolvent des problèmes complexes, tels que la recherche de nourriture
+ou l’organisation des nids, grâce à des mécanismes simples mais
+puissants basés sur la communication chimique et l’auto-organisation.
+L’étude de ces phénomènes a donné naissance à des algorithmes inspirés
+par la nature, comme l’algorithme de colonies de fourmis (ACO), qui sont
+utilisés pour résoudre des problèmes d’optimisation difficiles.</p>
+<p>L’émergence de ces notions est motivée par le besoin de comprendre
+comment des systèmes complexes peuvent émerger de l’interaction de
+composants simples. Les problèmes de colonies de fourmis sont
+indispensables dans des domaines tels que la logistique, les réseaux de
+communication et l’intelligence artificielle, où des solutions efficaces
+sont nécessaires pour des problèmes NP-difficiles.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la complexité des problèmes de colonies de fourmis,
+il est essentiel de définir les concepts clés. Commençons par le
+problème du voyageur de commerce, qui est souvent utilisé comme modèle
+pour étudier ces problèmes.</p>
+<div class="definition">
+<p>Considérons un graphe pondéré <span class="math inline">\(G = (V,
+E)\)</span>, où <span class="math inline">\(V\)</span> est l’ensemble
+des sommets et <span class="math inline">\(E\)</span> est l’ensemble des
+arêtes pondérées. Le problème du voyageur de commerce consiste à trouver
+un cycle hamiltonien de poids minimal, c’est-à-dire un chemin qui visite
+chaque sommet exactement une fois et revient au point de départ, avec la
+somme des poids des arêtes minimisée.</p>
+<p>Formellement, nous cherchons un cycle <span
+class="math inline">\(C\)</span> tel que : <span
+class="math display">\[C = (v_1, v_2, \ldots, v_n, v_1) \quad \text{où}
+\quad \sum_{i=1}^{n-1} w(v_i, v_{i+1}) + w(v_n, v_1) \quad \text{est
+minimisé.}\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental dans l’étude des problèmes de colonies de
+fourmis est le théorème de complexité NP-difficile pour le problème du
+voyageur de commerce.</p>
+<div class="theorem">
+<p>Le problème du voyageur de commerce est NP-difficile. Cela signifie
+qu’il n’existe pas d’algorithme polynomial connu pour résoudre ce
+problème dans le pire des cas.</p>
+<p>Preuve : Nous allons montrer que le problème du voyageur de commerce
+est NP-difficile en réduisant un problème connu comme étant NP-complet,
+tel que le problème du cycle hamiltonien, au problème du voyageur de
+commerce.</p>
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un graphe non
+orienté. Nous pouvons construire un graphe pondéré <span
+class="math inline">\(G&#39; = (V, E&#39;)\)</span> en assignant un
+poids de 1 à chaque arête. Le problème du cycle hamiltonien dans <span
+class="math inline">\(G\)</span> est équivalent au problème du voyageur
+de commerce dans <span class="math inline">\(G&#39;\)</span>, où nous
+cherchons un cycle hamiltonien de poids minimal, qui est nécessairement
+égal à <span class="math inline">\(n\)</span> (le nombre de
+sommets).</p>
+<p>Puisque le problème du cycle hamiltonien est NP-complet, le problème
+du voyageur de commerce est également NP-difficile.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer la complexité des problèmes de colonies de fourmis,
+nous devons examiner les preuves détaillées des théorèmes clés.
+Considérons le théorème de NP-difficulté pour le problème du voyageur de
+commerce.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous avons déjà esquissé la preuve dans la section
+précédente. Pour être plus précis, nous allons détailler chaque étape de
+la réduction.</p>
+<p>1. **Réduction du problème du cycle hamiltonien au problème du
+voyageur de commerce** : - Soit <span class="math inline">\(G = (V,
+E)\)</span> un graphe non orienté. - Construisons <span
+class="math inline">\(G&#39; = (V, E&#39;)\)</span> en assignant un
+poids de 1 à chaque arête. - Le problème du cycle hamiltonien dans <span
+class="math inline">\(G\)</span> est équivalent au problème du voyageur
+de commerce dans <span class="math inline">\(G&#39;\)</span>, où nous
+cherchons un cycle hamiltonien de poids minimal.</p>
+<p>2. **Preuve de l’équivalence** : - Si <span
+class="math inline">\(G\)</span> a un cycle hamiltonien, alors <span
+class="math inline">\(G&#39;\)</span> a un cycle hamiltonien de poids
+<span class="math inline">\(n\)</span>. - Si <span
+class="math inline">\(G&#39;\)</span> a un cycle hamiltonien de poids
+minimal, alors ce poids est nécessairement <span
+class="math inline">\(n\)</span>, et donc <span
+class="math inline">\(G\)</span> a un cycle hamiltonien.</p>
+<p>3. **Conclusion** : - Puisque le problème du cycle hamiltonien est
+NP-complet, le problème du voyageur de commerce est également
+NP-difficile. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant examiner quelques propriétés et corollaires
+importants liés aux problèmes de colonies de fourmis.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un graphe
+pondéré. Si <span class="math inline">\(C\)</span> est une solution
+optimale au problème du voyageur de commerce dans <span
+class="math inline">\(G\)</span>, alors tout sous-graphe de <span
+class="math inline">\(C\)</span> est également une solution optimale
+pour le problème du voyageur de commerce restreint à ce sous-graphe.</p>
+<p>Preuve : Supposons que <span class="math inline">\(C\)</span> est une
+solution optimale pour <span class="math inline">\(G\)</span>. Pour tout
+sous-graphe <span class="math inline">\(H\)</span> de <span
+class="math inline">\(C\)</span>, la restriction de <span
+class="math inline">\(C\)</span> à <span
+class="math inline">\(H\)</span> est également une solution optimale
+pour le problème du voyageur de commerce dans <span
+class="math inline">\(H\)</span>, car toute autre solution dans <span
+class="math inline">\(H\)</span> aurait un poids supérieur ou égal à
+celui de la restriction de <span class="math inline">\(C\)</span>.</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un graphe
+pondéré symétrique, c’est-à-dire que pour toute arête <span
+class="math inline">\((u, v)\)</span>, le poids <span
+class="math inline">\(w(u, v) = w(v, u)\)</span>. Alors, toute solution
+optimale au problème du voyageur de commerce dans <span
+class="math inline">\(G\)</span> peut être transformée en une solution
+optimale symétrique.</p>
+<p>Preuve : Soit <span class="math inline">\(C\)</span> une solution
+optimale pour <span class="math inline">\(G\)</span>. Si <span
+class="math inline">\(C\)</span> n’est pas symétrique, nous pouvons
+construire une solution symétrique en inversant l’ordre des sommets dans
+<span class="math inline">\(C\)</span>. Le poids de la solution
+symétrique est égal au poids de <span class="math inline">\(C\)</span>,
+car le graphe est symétrique.</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les problèmes de colonies de fourmis, tels que le problème du
+voyageur de commerce, sont des exemples fascinants de problèmes
+complexes qui émergent de l’interaction de composants simples. L’étude
+de ces problèmes a donné naissance à des algorithmes puissants et
+efficaces, inspirés par la nature, qui sont utilisés dans de nombreux
+domaines. La compréhension de leur complexité est essentielle pour
+développer des solutions optimales et efficaces à ces problèmes
+difficiles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

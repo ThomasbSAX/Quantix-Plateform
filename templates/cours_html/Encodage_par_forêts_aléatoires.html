@@ -1,0 +1,332 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par forêts aléatoires : Une approche robuste pour l’apprentissage automatique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par forêts aléatoires : Une approche robuste
+pour l’apprentissage automatique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’encodage par forêts aléatoires (Random Forest Encoding) émerge
+comme une technique puissante dans le domaine de l’apprentissage
+automatique, particulièrement pour les tâches de classification et de
+régression. Inspirée par l’algorithme des forêts aléatoires introduit
+par Leo Breiman, cette méthode combine la robustesse et la capacité de
+généralisation des forêts aléatoires avec les avantages des techniques
+d’encodage.</p>
+<p>Les forêts aléatoires sont connues pour leur capacité à réduire la
+variance et à éviter le surapprentissage, tout en fournissant des
+résultats précis. L’encodage par forêts aléatoires pousse cette idée
+plus loin en utilisant les arbres de décision pour transformer des
+données brutes en représentations codées, facilitant ainsi l’analyse et
+la prise de décision.</p>
+<p>Dans cet article, nous explorons les fondements théoriques de
+l’encodage par forêts aléatoires, en mettant l’accent sur les
+définitions formelles, les théorèmes clés et leurs preuves. Nous
+examinons également les propriétés et les corollaires qui découlent de
+cette approche, ainsi que ses applications pratiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’encodage par forêts aléatoires, il est essentiel de
+définir plusieurs concepts fondamentaux.</p>
+<h2 class="unnumbered" id="forêt-aléatoire">Forêt Aléatoire</h2>
+<p>Une forêt aléatoire est un ensemble d’arbres de décision construits à
+partir de sous-ensembles aléatoires des données. Chaque arbre est
+entraîné sur un échantillon bootstrap des données d’origine et utilise
+un sous-ensemble aléatoire de caractéristiques à chaque nœud.</p>
+<p>Formellement, une forêt aléatoire <span
+class="math inline">\(\mathcal{F}\)</span> est définie comme suit :</p>
+<p><span class="math display">\[\mathcal{F} = \{ T_1, T_2, \ldots, T_n
+\}\]</span></p>
+<p>où chaque <span class="math inline">\(T_i\)</span> est un arbre de
+décision construit à partir d’un échantillon bootstrap des données <span
+class="math inline">\(\mathcal{D}\)</span> et utilise un sous-ensemble
+aléatoire de caractéristiques <span class="math inline">\(\mathcal{S}_i
+\subset \mathcal{X}\)</span>.</p>
+<h2 class="unnumbered" id="encodage-par-forêt-aléatoire">Encodage par
+Forêt Aléatoire</h2>
+<p>L’encodage par forêt aléatoire consiste à transformer un vecteur de
+caractéristiques <span class="math inline">\(\mathbf{x} \in
+\mathcal{X}\)</span> en une représentation codée basée sur les
+prédictions des arbres de la forêt.</p>
+<p>Formellement, l’encodage d’un vecteur <span
+class="math inline">\(\mathbf{x}\)</span> par une forêt aléatoire <span
+class="math inline">\(\mathcal{F}\)</span> est défini comme :</p>
+<p><span class="math display">\[\text{Encode}(\mathbf{x}, \mathcal{F}) =
+\{ P(T_i, \mathbf{x}) \mid T_i \in \mathcal{F} \}\]</span></p>
+<p>où <span class="math inline">\(P(T_i, \mathbf{x})\)</span> représente
+la prédiction de l’arbre <span class="math inline">\(T_i\)</span> pour
+le vecteur <span class="math inline">\(\mathbf{x}\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons quelques théorèmes clés liés à
+l’encodage par forêts aléatoires.</p>
+<h2 class="unnumbered"
+id="théorème-de-la-loi-des-grands-nombres-pour-les-forêts-aléatoires">Théorème
+de la Loi des Grands Nombres pour les Forêts Aléatoires</h2>
+<p>Le théorème de la loi des grands nombres pour les forêts aléatoires
+stipule que, lorsque le nombre d’arbres dans la forêt tend vers
+l’infini, les prédictions de la forêt convergent vers une distribution
+stable.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{F}_n\)</span>
+une séquence de forêts aléatoires avec <span
+class="math inline">\(n\)</span> arbres. Alors, pour tout vecteur <span
+class="math inline">\(\mathbf{x} \in \mathcal{X}\)</span>,</p>
+<p><span class="math display">\[\lim_{n \to \infty} \frac{1}{n}
+\sum_{i=1}^n P(T_i, \mathbf{x}) = \mathbb{E}[P(T,
+\mathbf{x})]\]</span></p>
+<p>où <span class="math inline">\(\mathbb{E}[P(T, \mathbf{x})]\)</span>
+est l’espérance de la prédiction d’un arbre aléatoire <span
+class="math inline">\(T\)</span> pour le vecteur <span
+class="math inline">\(\mathbf{x}\)</span>.</p>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-la-loi-des-grands-nombres">Preuve du Théorème
+de la Loi des Grands Nombres</h2>
+<p>La preuve de ce théorème repose sur le fait que chaque arbre de la
+forêt est construit indépendamment et identiquement distribué (i.i.d.).
+En appliquant la loi des grands nombres aux prédictions des arbres, nous
+obtenons :</p>
+<p><span class="math display">\[\lim_{n \to \infty} \frac{1}{n}
+\sum_{i=1}^n P(T_i, \mathbf{x}) = \mathbb{E}[P(T,
+\mathbf{x})]\]</span></p>
+<p>Cette convergence garantit que les prédictions de la forêt deviennent
+plus stables et précises à mesure que le nombre d’arbres augmente.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Dans cette section, nous examinons quelques propriétés et corollaires
+importants de l’encodage par forêts aléatoires.</p>
+<h2 class="unnumbered"
+id="propriété-de-réduction-de-la-variance">Propriété de Réduction de la
+Variance</h2>
+<p>L’une des propriétés les plus remarquables des forêts aléatoires est
+leur capacité à réduire la variance des prédictions. En combinant les
+prédictions de plusieurs arbres, la forêt aléatoire atténue les
+fluctuations dues aux variations dans les données d’entraînement.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{F}\)</span>
+une forêt aléatoire et <span class="math inline">\(\mathbf{x} \in
+\mathcal{X}\)</span>. La variance des prédictions de la forêt est donnée
+par :</p>
+<p><span class="math display">\[\text{Var}(\text{Encode}(\mathbf{x},
+\mathcal{F})) = \frac{1}{n} \sum_{i=1}^n (P(T_i, \mathbf{x}) -
+\mathbb{E}[P(T, \mathbf{x})])^2\]</span></p>
+<p>où <span class="math inline">\(n\)</span> est le nombre d’arbres dans
+la forêt.</p>
+<h2 class="unnumbered"
+id="corollaire-de-la-stabilité-des-prédictions">Corollaire de la
+Stabilité des Prédictions</h2>
+<p>Un corollaire important de la propriété de réduction de la variance
+est que les prédictions de la forêt aléatoire deviennent plus stables à
+mesure que le nombre d’arbres augmente. Cela signifie que les
+prédictions sont moins sensibles aux variations dans les données
+d’entraînement, ce qui améliore la généralisation du modèle.</p>
+<p>Formellement, pour tout <span class="math inline">\(\epsilon &gt;
+0\)</span>, il existe un nombre <span class="math inline">\(N\)</span>
+tel que pour toute forêt aléatoire <span
+class="math inline">\(\mathcal{F}\)</span> avec <span
+class="math inline">\(n \geq N\)</span> arbres,</p>
+<p><span class="math display">\[\text{Var}(\text{Encode}(\mathbf{x},
+\mathcal{F})) &lt; \epsilon\]</span></p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par forêts aléatoires représente une avancée significative
+dans le domaine de l’apprentissage automatique. En combinant la
+robustesse des forêts aléatoires avec les techniques d’encodage, cette
+approche offre une méthode puissante pour transformer et analyser des
+données complexes. Les théorèmes et les propriétés présentés dans cet
+article fournissent une base solide pour comprendre et appliquer cette
+technique dans diverses applications pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

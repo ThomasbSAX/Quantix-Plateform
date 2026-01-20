@@ -1,0 +1,333 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Analyse de la Variance avec Blocs Aléatoires : Une Approche Complète</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Analyse de la Variance avec Blocs Aléatoires : Une
+Approche Complète</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse de la variance (ANOVA) est une méthode statistique
+fondamentale pour comparer les moyennes de plusieurs groupes. Cependant,
+dans de nombreuses expériences, les observations ne sont pas
+indépendantes mais organisées en blocs. Les blocs aléatoires
+introduisent une composante de variabilité supplémentaire, nécessitant
+des modèles spécifiques pour une analyse rigoureuse.</p>
+<p>L’ANOVA avec blocs aléatoires émerge comme une solution indispensable
+lorsque les effets de bloc sont considérés comme aléatoires plutôt que
+fixes. Cette approche est cruciale dans des domaines tels que
+l’agriculture, la biologie et les sciences sociales, où les expériences
+sont souvent soumises à des variations environnementales ou
+individuelles non contrôlables.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’ANOVA avec blocs aléatoires, commençons par définir
+les concepts clés.</p>
+<h2 class="unnumbered" id="modèle-linéaire-général">Modèle Linéaire
+Général</h2>
+<p>Considérons une expérience avec <span
+class="math inline">\(a\)</span> traitements et <span
+class="math inline">\(b\)</span> blocs. Nous cherchons à modéliser la
+réponse <span class="math inline">\(y_{ij}\)</span> pour le traitement
+<span class="math inline">\(i\)</span> dans le bloc <span
+class="math inline">\(j\)</span>. L’idée est de décomposer la
+variabilité totale en composantes attribuables aux traitements, aux
+blocs et à l’erreur résiduelle.</p>
+<p>Formellement, le modèle linéaire général pour l’ANOVA avec blocs
+aléatoires s’écrit :</p>
+<p><span class="math display">\[y_{ij} = \mu + \tau_i + b_j +
+e_{ij}\]</span></p>
+<p>où : - <span class="math inline">\(\mu\)</span> est la moyenne
+globale, - <span class="math inline">\(\tau_i\)</span> est l’effet fixe
+du traitement <span class="math inline">\(i\)</span>, - <span
+class="math inline">\(b_j\)</span> est l’effet aléatoire du bloc <span
+class="math inline">\(j\)</span>, avec <span class="math inline">\(b_j
+\sim N(0, \sigma_b^2)\)</span>, - <span
+class="math inline">\(e_{ij}\)</span> est l’erreur résiduelle, avec
+<span class="math inline">\(e_{ij} \sim N(0, \sigma_e^2)\)</span>.</p>
+<h2 class="unnumbered" id="hypothèses-de-base">Hypothèses de Base</h2>
+<p>Les hypothèses fondamentales pour l’ANOVA avec blocs aléatoires sont
+:</p>
+<ul>
+<li><p>Les effets de bloc <span class="math inline">\(b_j\)</span> sont
+des variables aléatoires indépendantes et normalement distribuées avec
+une moyenne de zéro et une variance <span
+class="math inline">\(\sigma_b^2\)</span>.</p></li>
+<li><p>Les erreurs résiduelles <span
+class="math inline">\(e_{ij}\)</span> sont des variables aléatoires
+indépendantes et normalement distribuées avec une moyenne de zéro et une
+variance <span class="math inline">\(\sigma_e^2\)</span>.</p></li>
+<li><p>Les effets de bloc et les erreurs résiduelles sont
+indépendants.</p></li>
+</ul>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-randomeffet">Théorème de
+Randomeffet</h2>
+<p>Le théorème de Randomeffet est central dans l’ANOVA avec blocs
+aléatoires. Il permet de tester l’effet des traitements en présence de
+variabilité due aux blocs aléatoires.</p>
+<p><strong>Théorème :</strong> Soit <span class="math inline">\(y_{ij} =
+\mu + \tau_i + b_j + e_{ij}\)</span> le modèle pour l’ANOVA avec blocs
+aléatoires. Alors, sous les hypothèses de normalité et d’indépendance,
+le rapport de variance <span class="math inline">\(F =
+\frac{MS_{Traitements}}{MS_{Erreur}}\)</span> suit une distribution
+<span class="math inline">\(F\)</span> de Snedecor avec <span
+class="math inline">\(a-1\)</span> et <span
+class="math inline">\(N-ab\)</span> degrés de liberté, où <span
+class="math inline">\(MS_{Traitements}\)</span> et <span
+class="math inline">\(MS_{Erreur}\)</span> sont les carrés moyens des
+traitements et de l’erreur, respectivement.</p>
+<h2 class="unnumbered" id="preuve-du-théorème">Preuve du Théorème</h2>
+<p>Pour prouver ce théorème, nous devons démontrer que le rapport <span
+class="math inline">\(F\)</span> suit une distribution <span
+class="math inline">\(F\)</span>. Commençons par exprimer les carrés
+moyens :</p>
+<p><span class="math display">\[MS_{Traitements} =
+\frac{SS_{Traitements}}{a-1}\]</span></p>
+<p><span class="math display">\[MS_{Erreur} =
+\frac{SS_{Erreur}}{N-ab}\]</span></p>
+<p>où <span class="math inline">\(SS_{Traitements}\)</span> et <span
+class="math inline">\(SS_{Erreur}\)</span> sont les sommes de carrés des
+traitements et de l’erreur, respectivement.</p>
+<p>Sous les hypothèses du modèle, <span
+class="math inline">\(SS_{Traitements}\)</span> et <span
+class="math inline">\(SS_{Erreur}\)</span> sont indépendants et suivent
+des distributions du chi-carré. Par conséquent, le rapport <span
+class="math inline">\(F\)</span> suit une distribution <span
+class="math inline">\(F\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriété-i-indépendance-des-estimateurs">Propriété (i) :
+Indépendance des Estimateurs</h2>
+<p>Les estimateurs des effets de traitement <span
+class="math inline">\(\tau_i\)</span> et des effets de bloc <span
+class="math inline">\(b_j\)</span> sont indépendants. Cela découle de
+l’indépendance des composantes aléatoires dans le modèle.</p>
+<h2 class="unnumbered" id="preuve-de-la-propriété-i">Preuve de la
+Propriété (i)</h2>
+<p>Pour montrer l’indépendance, nous utilisons le fait que les effets de
+bloc et les erreurs résiduelles sont indépendants par hypothèse. Les
+estimateurs des effets de traitement et des effets de bloc sont obtenus
+par des combinaisons linéaires de <span
+class="math inline">\(y_{ij}\)</span>, et l’indépendance des composantes
+aléatoires garantit que ces estimateurs sont indépendants.</p>
+<h2 class="unnumbered"
+id="corollaire-ii-estimation-de-la-variance-des-blocs">Corollaire (ii) :
+Estimation de la Variance des Blocs</h2>
+<p>La variance des effets de bloc <span
+class="math inline">\(\sigma_b^2\)</span> peut être estimée par :</p>
+<p><span class="math display">\[\hat{\sigma}_b^2 = \frac{MS_{Blocs} -
+MS_{Erreur}}{n}\]</span></p>
+<p>où <span class="math inline">\(n\)</span> est le nombre
+d’observations par bloc.</p>
+<h2 class="unnumbered" id="preuve-du-corollaire-ii">Preuve du Corollaire
+(ii)</h2>
+<p>L’estimateur de la variance des blocs est dérivé en utilisant les
+propriétés des moments des variables aléatoires normales. En
+particulier, nous utilisons le fait que <span
+class="math inline">\(E[MS_{Blocs}] = \sigma_e^2 + n\sigma_b^2\)</span>
+et <span class="math inline">\(E[MS_{Erreur}] = \sigma_e^2\)</span>.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’ANOVA avec blocs aléatoires est une méthode puissante pour analyser
+les données expérimentales en présence de variabilité due aux blocs. En
+comprenant les définitions, les théorèmes et les propriétés
+fondamentales, nous pouvons appliquer cette méthode de manière
+rigoureuse et obtenir des conclusions fiables.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

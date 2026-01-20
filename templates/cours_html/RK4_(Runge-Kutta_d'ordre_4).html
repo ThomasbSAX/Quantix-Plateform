@@ -1,0 +1,337 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthodes de Runge-Kutta : L’intégration numérique d’ordre 4</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthodes de Runge-Kutta : L’intégration numérique
+d’ordre 4</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’intégration numérique des équations différentielles ordinaires
+(EDO) est une problématique centrale en mathématiques appliquées,
+physique et ingénierie. Parmi les méthodes les plus utilisées, la
+méthode de Runge-Kutta d’ordre 4 (RK4) se distingue par son équilibre
+entre précision et simplicité. Introduite par le mathématicien allemand
+Carl Runge au début du XXe siècle, cette méthode est devenue un pilier
+des simulations numériques grâce à sa stabilité et son efficacité.</p>
+<p>Le besoin de telles méthodes naît des limitations analytiques. En
+effet, la plupart des EDO rencontrées dans les applications pratiques ne
+possèdent pas de solutions explicites. Les méthodes numériques, comme
+RK4, permettent alors d’approximer ces solutions avec une précision
+contrôlée. Le cadre de l’intégration numérique est indispensable dans
+des domaines variés, allant de la dynamique des fluides à la
+modélisation financière.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir formellement RK4, commençons par rappeler le problème
+fondamental : soit une EDO de la forme <span
+class="math display">\[\frac{dy}{dt} = f(t, y),\]</span> avec <span
+class="math inline">\(y(t_0) = y_0\)</span>. L’objectif est d’approximer
+la solution <span class="math inline">\(y(t)\)</span> en un point <span
+class="math inline">\(t_n = t_0 + n \Delta t\)</span>, où <span
+class="math inline">\(\Delta t\)</span> est le pas de
+discrétisation.</p>
+<p>La méthode RK4 est une méthode à quatre étapes, chacune introduisant
+un coefficient de pondération. Pour mieux comprendre cette approche,
+imaginons que nous cherchions à estimer <span
+class="math inline">\(y(t_{n+1})\)</span> en fonction de <span
+class="math inline">\(y(t_n)\)</span>. Nous pourrions envisager une
+combinaison linéaire des valeurs de la fonction <span
+class="math inline">\(f\)</span> en différents points intermédiaires.
+C’est précisément ce que fait RK4, en utilisant quatre évaluations de
+<span class="math inline">\(f\)</span> pour obtenir une approximation
+d’ordre 4.</p>
+<p>Formellement, la méthode RK4 est définie par les étapes suivantes :
+<span class="math display">\[\begin{align*}
+k_1 &amp;= \Delta t \cdot f(t_n, y_n), \\
+k_2 &amp;= \Delta t \cdot f\left(t_n + \frac{\Delta t}{2}, y_n +
+\frac{k_1}{2}\right), \\
+k_3 &amp;= \Delta t \cdot f\left(t_n + \frac{\Delta t}{2}, y_n +
+\frac{k_2}{2}\right), \\
+k_4 &amp;= \Delta t \cdot f(t_n + \Delta t, y_n + k_3), \\
+y_{n+1} &amp;= y_n + \frac{1}{6}(k_1 + 2k_2 + 2k_3 + k_4).
+\end{align*}\]</span></p>
+<p>Cette méthode peut également être exprimée sous forme matricielle,
+bien que cela soit moins courant en pratique. Les coefficients <span
+class="math inline">\(\frac{1}{6}, \frac{1}{3}, \frac{1}{3},
+\frac{1}{6}\)</span> sont choisis pour garantir la précision d’ordre
+4.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux associés à RK4 est celui de la
+convergence. Ce théorème stipule que l’erreur d’approximation diminue
+comme <span class="math inline">\(O(\Delta t^4)\)</span>, où <span
+class="math inline">\(\Delta t\)</span> est le pas de discrétisation.
+Autrement dit, en réduisant <span class="math inline">\(\Delta
+t\)</span> par un facteur 2, l’erreur est réduite par un facteur <span
+class="math inline">\(16\)</span>.</p>
+<p>Pour formuler ce théorème, introduisons l’erreur locale et globale.
+L’erreur locale est définie comme la différence entre la solution exacte
+<span class="math inline">\(y(t_{n+1})\)</span> et l’approximation <span
+class="math inline">\(y_{n+1}\)</span>, en supposant que <span
+class="math inline">\(y_n\)</span> est exact. L’erreur globale, quant à
+elle, est l’accumulation de ces erreurs locales sur plusieurs pas.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(y(t)\)</span> la solution exacte
+d’une EDO <span class="math inline">\(\frac{dy}{dt} = f(t, y)\)</span>,
+avec <span class="math inline">\(y(t_0) = y_0\)</span>. Soit <span
+class="math inline">\(\{y_n\}\)</span> la suite définie par RK4 avec un
+pas <span class="math inline">\(\Delta t\)</span>. Alors, il existe une
+constante <span class="math inline">\(C &gt; 0\)</span> telle que <span
+class="math display">\[\|y(t_n) - y_n\| \leq C \Delta t^4,\]</span> pour
+tout <span class="math inline">\(n\)</span>.</p>
+</div>
+<p>La démonstration de ce théorème repose sur des techniques d’analyse
+numérique avancées, notamment l’utilisation du théorème du point fixe et
+des estimations d’erreur. Nous ne détaillerons pas cette démonstration
+ici, mais elle est cruciale pour comprendre la fiabilité de RK4.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour illustrer les techniques de preuve utilisées dans le cadre des
+méthodes RK4, considérons un résultat plus simple : l’ordre de la
+méthode. Nous voulons montrer que RK4 est effectivement d’ordre 4,
+c’est-à-dire que l’erreur locale est proportionnelle à <span
+class="math inline">\(\Delta t^5\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> L’erreur locale de RK4 peut être exprimée comme <span
+class="math display">\[y(t_{n+1}) - y_{n+1} = \frac{1}{6}(k_1 + 2k_2 +
+2k_3 + k_4) - \Delta t f(t_n, y_n) + O(\Delta t^5).\]</span></p>
+<p>En développant chaque terme <span class="math inline">\(k_i\)</span>
+en série de Taylor autour de <span class="math inline">\(t_n\)</span>,
+nous obtenons <span class="math display">\[\begin{align*}
+k_1 &amp;= \Delta t f(t_n, y_n) + O(\Delta t^2), \\
+k_2 &amp;= \Delta t f\left(t_n, y_n\right) + \frac{\Delta t^2}{2}
+\frac{\partial f}{\partial t}(t_n, y_n) + O(\Delta t^3), \\
+k_3 &amp;= \Delta t f\left(t_n, y_n\right) + \frac{\Delta t^2}{2}
+\frac{\partial f}{\partial t}(t_n, y_n) + O(\Delta t^3), \\
+k_4 &amp;= \Delta t f(t_{n+1}, y_{n+1}) + O(\Delta t^2).
+\end{align*}\]</span></p>
+<p>En combinant ces expressions, nous trouvons que l’erreur locale est
+effectivement d’ordre <span class="math inline">\(O(\Delta
+t^5)\)</span>, ce qui prouve que RK4 est une méthode d’ordre 4. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La méthode RK4 possède plusieurs propriétés intéressantes, que nous
+énumérons ci-dessous :</p>
+<ol>
+<li><p><strong>Conservation de l’énergie</strong> : Dans certains cas,
+RK4 conserve des quantités physiques comme l’énergie. Cela est
+particulièrement utile en mécanique classique.</p></li>
+<li><p><strong>Stabilité</strong> : RK4 est une méthode stable pour un
+large éventail de problèmes. Cela signifie que les erreurs ne
+s’accumulent pas de manière exponentielle, même pour des pas
+relativement grands.</p></li>
+<li><p><strong>Adaptabilité</strong> : RK4 peut être adapté pour des pas
+variables, ce qui permet d’augmenter l’efficacité dans les régions où la
+solution varie rapidement.</p></li>
+</ol>
+<p>Pour illustrer ces propriétés, considérons le corollaire suivant
+concernant la conservation de l’énergie.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(H(t, y)\)</span> une fonction
+d’énergie associée à l’EDO <span class="math inline">\(\frac{dy}{dt} =
+f(t, y)\)</span>. Si RK4 est appliqué avec un pas constant <span
+class="math inline">\(\Delta t\)</span>, alors <span
+class="math display">\[H(t_{n+1}, y_{n+1}) = H(t_n, y_n) + O(\Delta
+t^5).\]</span></p>
+</div>
+<p>La démonstration de ce corollaire repose sur des techniques
+similaires à celles utilisées pour prouver l’ordre de la méthode. Elle
+montre que RK4 est particulièrement adapté aux problèmes où la
+conservation des quantités physiques est cruciale.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

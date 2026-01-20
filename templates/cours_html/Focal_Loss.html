@@ -1,0 +1,339 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Focal Loss: Une Approche Innovante pour l’Apprentissage Imbalancé</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Focal Loss: Une Approche Innovante pour
+l’Apprentissage Imbalancé</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’apprentissage automatique, en particulier dans le contexte de la
+classification, se heurte souvent à des problèmes de déséquilibre de
+classes. Lorsque certaines catégories sont sous-représentées, les
+modèles traditionnels tendent à favoriser les classes majoritaires,
+entraînant des performances médiocres sur les classes minoritaires. La
+<em>Focal Loss</em> a été introduite pour remédier à cette limitation,
+en mettant l’accent sur les échantillons difficiles et mal classés.</p>
+<p>Historiquement, la perte croisée entropique a été le pilier des
+tâches de classification. Cependant, elle ne parvient pas à traiter
+efficacement les déséquilibres de classes. La Focal Loss, proposée par
+Lin et al. en 2017, introduit un facteur d’atténuation dynamique qui
+réduit l’importance des échantillons bien classés et accentue celle des
+échantillons difficiles. Cette approche est particulièrement utile dans
+les applications de détection d’objets et de segmentation sémantique, où
+le déséquilibre de classes est courant.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la Focal Loss, il est essentiel de définir quelques
+concepts préliminaires. Considérons un problème de classification
+binaire, où nous avons deux classes : positive et négative. Soit <span
+class="math inline">\(p_t\)</span> la probabilité prédite pour la classe
+vraie.</p>
+<h4 id="probabilité-de-la-classe-vraie">Probabilité de la classe
+vraie</h4>
+<p>Nous cherchons à modéliser la probabilité que l’échantillon
+appartienne à la classe vraie. Cette probabilité est notée <span
+class="math inline">\(p_t\)</span>, où <span
+class="math inline">\(t\)</span> est un indicateur de la classe vraie.
+Formellement, nous avons : <span class="math display">\[p_t =
+\begin{cases}
+p &amp; \text{si la classe vraie est positive} \\
+1 - p &amp; \text{sinon}
+\end{cases}\]</span> où <span class="math inline">\(p\)</span> est la
+probabilité prédite pour la classe positive.</p>
+<h4 id="focal-loss">Focal Loss</h4>
+<p>La Focal Loss est une variante de la perte croisée entropique qui
+introduit un facteur d’atténuation pour réduire l’importance des
+échantillons bien classés. La définition formelle est la suivante :
+<span class="math display">\[\text{Focal Loss}(p_t) = -\alpha_t (1 -
+p_t)^\gamma \log(p_t)\]</span> où <span
+class="math inline">\(\alpha_t\)</span> est un facteur d’équilibrage de
+classe et <span class="math inline">\(\gamma\)</span> est le facteur
+d’atténuation. Le paramètre <span class="math inline">\(\gamma\)</span>
+contrôle la réduction de l’importance des échantillons bien classés.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h4 id="théorème-de-convergence">Théorème de Convergence</h4>
+<p>Nous allons maintenant énoncer un théorème fondamental concernant la
+convergence de l’algorithme utilisant la Focal Loss.</p>
+<h4 id="énoncé">Énoncé</h4>
+<p>Soit <span class="math inline">\(\mathcal{L}(p_t)\)</span> la Focal
+Loss définie précédemment. Si <span class="math inline">\(p_t\)</span>
+est la probabilité prédite pour la classe vraie et <span
+class="math inline">\(y\)</span> est la classe vraie, alors l’algorithme
+d’optimisation utilisant la Focal Loss converge vers un minimum local si
+les conditions suivantes sont satisfaites :</p>
+<ol>
+<li><p>La fonction de perte est continue et différentiable.</p></li>
+<li><p>Le taux d’apprentissage <span class="math inline">\(\eta\)</span>
+est suffisamment petit.</p></li>
+<li><p>Les échantillons sont indépendants et identiquement distribués
+(i.i.d.).</p></li>
+</ol>
+<h4 id="démonstration">Démonstration</h4>
+<p>Nous allons démontrer ce théorème en plusieurs étapes.</p>
+<p>1. **Continuité et Différentiabilité** : La Focal Loss est continue
+et différentiable par rapport à <span class="math inline">\(p_t\)</span>
+pour <span class="math inline">\(p_t \in (0, 1)\)</span>. Cela garantit
+que nous pouvons appliquer les méthodes d’optimisation standard.</p>
+<p>2. **Taux d’Apprentissage** : Un taux d’apprentissage <span
+class="math inline">\(\eta\)</span> suffisamment petit garantit que les
+mises à jour des paramètres du modèle ne sont pas trop grandes, ce qui
+permet une convergence stable.</p>
+<p>3. **Échantillons i.i.d.** : L’indépendance et l’identique
+distribution des échantillons garantissent que les gradients calculés
+sont des estimateurs non biaisés de la véritable direction de
+descente.</p>
+<p>En combinant ces conditions, nous pouvons conclure que l’algorithme
+converge vers un minimum local.</p>
+<h1 id="preuves">Preuves</h1>
+<h4 id="preuve-de-la-continuité-et-différentiabilité">Preuve de la
+Continuité et Différentiabilité</h4>
+<p>Pour démontrer que la Focal Loss est continue et différentiable, nous
+devons examiner sa dérivée par rapport à <span
+class="math inline">\(p_t\)</span>.</p>
+<p>La Focal Loss est donnée par : <span
+class="math display">\[\mathcal{L}(p_t) = -\alpha_t (1 - p_t)^\gamma
+\log(p_t)\]</span></p>
+<p>La dérivée de <span class="math inline">\(\mathcal{L}(p_t)\)</span>
+par rapport à <span class="math inline">\(p_t\)</span> est : <span
+class="math display">\[\frac{\partial \mathcal{L}(p_t)}{\partial p_t} =
+-\alpha_t \left[ \gamma (1 - p_t)^{\gamma - 1} \log(p_t) + \frac{(1 -
+p_t)^\gamma}{p_t} \right]\]</span></p>
+<p>Cette dérivée existe et est finie pour <span
+class="math inline">\(p_t \in (0, 1)\)</span>, ce qui prouve que la
+Focal Loss est différentiable dans cet intervalle.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h4
+id="propriété-1-réduction-de-limpact-des-échantillons-bien-classés">Propriété
+1 : Réduction de l’Impact des Échantillons Bien Classés</h4>
+<p>La Focal Loss réduit l’importance des échantillons bien classés en
+introduisant le facteur <span class="math inline">\((1 -
+p_t)^\gamma\)</span>. Plus <span class="math inline">\(p_t\)</span> est
+proche de 1, plus ce facteur est petit, réduisant ainsi la contribution
+de ces échantillons à la perte totale.</p>
+<h4
+id="propriété-2-mise-en-évidence-des-échantillons-difficiles">Propriété
+2 : Mise en Évidence des Échantillons Difficiles</h4>
+<p>Inversement, pour les échantillons mal classés (où <span
+class="math inline">\(p_t\)</span> est proche de 0), le facteur <span
+class="math inline">\((1 - p_t)^\gamma\)</span> est proche de 1, ce qui
+accentue leur contribution à la perte totale. Cela permet au modèle de
+se concentrer sur les échantillons difficiles.</p>
+<h4 id="corollaire-1-équilibrage-des-classes">Corollaire 1 : Équilibrage
+des Classes</h4>
+<p>En ajustant le paramètre <span
+class="math inline">\(\alpha_t\)</span>, nous pouvons équilibrer
+l’importance des différentes classes. Par exemple, pour une classe
+minoritaire, nous pouvons choisir <span class="math inline">\(\alpha_t
+&gt; 1\)</span> pour augmenter son poids dans la fonction de perte.</p>
+<h4 id="corollaire-2-robustesse-aux-déséquilibres-de-classes">Corollaire
+2 : Robustesse aux Déséquilibres de Classes</h4>
+<p>La combinaison des propriétés 1 et 2 rend la Focal Loss
+particulièrement robuste aux déséquilibres de classes. Elle permet au
+modèle de bien performer sur les classes minoritaires sans sacrifier la
+performance sur les classes majoritaires.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La Focal Loss représente une avancée significative dans le domaine de
+l’apprentissage automatique, particulièrement pour les tâches impliquant
+des déséquilibres de classes. En introduisant un facteur d’atténuation
+dynamique, elle permet aux modèles de se concentrer sur les échantillons
+difficiles et mal classés, améliorant ainsi les performances globales.
+Les propriétés et théorèmes présentés dans cet article montrent la
+robustesse et l’efficacité de cette approche, ouvrant la voie à de
+nouvelles applications et améliorations.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

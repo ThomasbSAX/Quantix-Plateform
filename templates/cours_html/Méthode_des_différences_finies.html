@@ -1,0 +1,301 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode des différences finies : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode des différences finies : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La méthode des différences finies émerge comme une réponse élégante
+aux défis posés par la résolution numérique des équations
+différentielles. Historiquement, cette approche trouve ses racines dans
+les travaux pionniers de Euler et d’autres mathématiciens qui
+cherchaient à approximer des dérivées par des différences discrètes.
+Aujourd’hui, cette méthode est indispensable dans de nombreux domaines,
+notamment en mécanique des fluides, en physique quantique et en
+ingénierie. Elle permet de transformer des problèmes continus en
+systèmes d’équations algébriques, rendant ainsi les solutions
+accessibles aux calculs numériques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la méthode des différences finies, commençons par
+définir ce que nous cherchons à approximer. Supposons que nous ayons une
+fonction <span class="math inline">\(u(x)\)</span> dont nous voulons
+approximer la dérivée. L’idée est de remplacer cette dérivée par une
+différence finie, c’est-à-dire une approximation basée sur les valeurs
+de la fonction en des points discrets.</p>
+<p>Formellement, considérons une fonction <span
+class="math inline">\(u(x)\)</span> définie sur un intervalle <span
+class="math inline">\([a, b]\)</span>. Nous divisons cet intervalle en
+<span class="math inline">\(N\)</span> sous-intervalles de taille
+uniforme <span class="math inline">\(h = \frac{b - a}{N}\)</span>. Les
+points de division sont notés <span class="math inline">\(x_i = a + i
+h\)</span> pour <span class="math inline">\(i = 0, 1, \ldots,
+N\)</span>.</p>
+<p>La dérivée première de <span class="math inline">\(u\)</span> en
+<span class="math inline">\(x_i\)</span> peut être approchée par : <span
+class="math display">\[u&#39;(x_i) \approx \frac{u(x_{i+1}) -
+u(x_i)}{h}\]</span> Cette approximation est connue sous le nom de
+différence finie avant. De même, la dérivée seconde peut être approchée
+par : <span class="math display">\[u&#39;&#39;(x_i) \approx
+\frac{u(x_{i+1}) - 2 u(x_i) + u(x_{i-1})}{h^2}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental dans la méthode des différences finies est le
+théorème de convergence, qui garantit que l’approximation devient exacte
+lorsque la taille des pas <span class="math inline">\(h\)</span> tend
+vers zéro. Ce théorème repose sur l’idée que les erreurs d’approximation
+diminuent avec <span class="math inline">\(h\)</span>.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(u(x)\)</span> une fonction deux fois
+continûment différentiable sur <span class="math inline">\([a,
+b]\)</span>. Alors, pour tout <span class="math inline">\(\epsilon &gt;
+0\)</span>, il existe un <span class="math inline">\(h_0 &gt; 0\)</span>
+tel que pour tout <span class="math inline">\(h &lt; h_0\)</span>,
+l’erreur d’approximation de la dérivée seconde satisfait : <span
+class="math display">\[\left| u&#39;&#39;(x_i) - \frac{u(x_{i+1}) - 2
+u(x_i) + u(x_{i-1})}{h^2} \right| &lt; \epsilon\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous utilisons le développement de Taylor
+de <span class="math inline">\(u\)</span> autour de <span
+class="math inline">\(x_i\)</span>. Le développement de Taylor nous
+donne : <span class="math display">\[u(x_{i+1}) = u(x_i) + h u&#39;(x_i)
++ \frac{h^2}{2} u&#39;&#39;(x_i) + \frac{h^3}{6} u&#39;&#39;&#39;(x_i) +
+O(h^4)\]</span> <span class="math display">\[u(x_{i-1}) = u(x_i) - h
+u&#39;(x_i) + \frac{h^2}{2} u&#39;&#39;(x_i) - \frac{h^3}{6}
+u&#39;&#39;&#39;(x_i) + O(h^4)\]</span> En soustrayant ces deux
+équations et en divisant par <span class="math inline">\(h^2\)</span>,
+nous obtenons : <span class="math display">\[\frac{u(x_{i+1}) - 2 u(x_i)
++ u(x_{i-1})}{h^2} = u&#39;&#39;(x_i) + \frac{h^2}{6} u^{(4)}(x_i) +
+O(h^3)\]</span> Ainsi, l’erreur d’approximation est : <span
+class="math display">\[\left| u&#39;&#39;(x_i) - \frac{u(x_{i+1}) - 2
+u(x_i) + u(x_{i-1})}{h^2} \right| = \left| \frac{h^2}{6} u^{(4)}(x_i) +
+O(h^3) \right|\]</span> Puisque <span
+class="math inline">\(u^{(4)}(x_i)\)</span> est bornée, l’erreur tend
+vers zéro lorsque <span class="math inline">\(h\)</span> tend vers
+zéro.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<ol>
+<li><p><strong>Stabilité</strong> : La méthode des différences finies
+est stable si les erreurs d’arrondi ne croissent pas de manière
+exponentielle avec le nombre de pas. Cela est souvent assuré par des
+conditions de CFL (Courant-Friedrichs-Lewy) dans les problèmes
+hyperboliques.</p></li>
+<li><p><strong>Consistance</strong> : Une méthode est consistante si
+l’erreur d’approximation tend vers zéro lorsque <span
+class="math inline">\(h\)</span> tend vers zéro. Le théorème de
+Lax-Richtmyer stipule que la stabilité et la consistance impliquent la
+convergence.</p></li>
+<li><p><strong>Ordre de Convergence</strong> : L’ordre de convergence
+d’une méthode est la vitesse à laquelle l’erreur diminue lorsque <span
+class="math inline">\(h\)</span> tend vers zéro. Par exemple, la
+différence finie pour la dérivée seconde est d’ordre <span
+class="math inline">\(h^2\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La méthode des différences finies est un outil puissant et polyvalent
+pour la résolution numérique des équations différentielles. Son succès
+repose sur sa simplicité, sa robustesse et sa capacité à être
+implémentée efficacement sur des ordinateurs. En comprenant ses
+fondements théoriques et ses applications pratiques, nous pouvons mieux
+apprécier son rôle crucial dans la modélisation mathématique
+moderne.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

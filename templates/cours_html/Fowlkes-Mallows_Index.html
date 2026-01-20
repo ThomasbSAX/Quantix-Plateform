@@ -1,0 +1,329 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Fowlkes-Mallows Index: A Measure of Cluster Similarity</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Fowlkes-Mallows Index: A Measure of Cluster
+Similarity</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-and-motivations">Introduction
+and Motivations</h1>
+<p>The Fowlkes-Mallows Index (FMI) is a metric used to evaluate the
+similarity between two clusterings of a dataset. It was introduced by
+Fowlkes and Mallows in 1983 as an alternative to the Rand Index,
+providing a more interpretable measure of clustering similarity. The FMI
+is particularly useful in the context of comparing the results of
+different clustering algorithms or evaluating the stability of a
+clustering method.</p>
+<p>The need for such an index arises from the fact that clustering is an
+unsupervised learning task, meaning there is no ground truth to compare
+against. Instead, we often want to compare different clustering results
+to understand their similarities and differences.</p>
+<h1 class="unnumbered" id="definitions">Definitions</h1>
+<p>To understand the Fowlkes-Mallows Index, we first need to define some
+basic concepts.</p>
+<div class="definition">
+<p>A clustering of a dataset <span class="math inline">\(X = \{x_1, x_2,
+\dots, x_n\}\)</span> is a partition of <span
+class="math inline">\(X\)</span> into <span
+class="math inline">\(k\)</span> subsets <span class="math inline">\(C =
+\{C_1, C_2, \dots, C_k\}\)</span> such that: <span
+class="math display">\[\bigcup_{i=1}^k C_i = X \quad \text{and} \quad
+C_i \cap C_j = \emptyset \quad \forall i \neq j.\]</span></p>
+</div>
+<p>Given two clusterings <span class="math inline">\(C\)</span> and
+<span class="math inline">\(C&#39;\)</span> of the same dataset, we can
+define a contingency table where each entry <span
+class="math inline">\(n_{ij}\)</span> represents the number of points
+that are in cluster <span class="math inline">\(C_i\)</span> and cluster
+<span class="math inline">\(C&#39;_j\)</span>.</p>
+<div class="definition">
+<p>For two clusterings <span class="math inline">\(C = \{C_1, \dots,
+C_k\}\)</span> and <span class="math inline">\(C&#39; = \{C&#39;_1,
+\dots, C&#39;_l\}\)</span>, the contingency table <span
+class="math inline">\(n\)</span> is defined as: <span
+class="math display">\[n_{ij} = |C_i \cap C&#39;_j|, \quad \forall i \in
+\{1, \dots, k\}, j \in \{1, \dots, l\}.\]</span></p>
+</div>
+<p>The Fowlkes-Mallows Index is then defined based on the precision and
+recall of the clusters.</p>
+<h1 class="unnumbered" id="fowlkes-mallows-index">Fowlkes-Mallows
+Index</h1>
+<div class="definition">
+<p>Given two clusterings <span class="math inline">\(C\)</span> and
+<span class="math inline">\(C&#39;\)</span>, the Fowlkes-Mallows Index
+is defined as: <span class="math display">\[\text{FMI}(C, C&#39;) =
+\sqrt{\frac{TP}{FP} \cdot \frac{TP}{FN}},\]</span> where <span
+class="math inline">\(TP\)</span> (true positives), <span
+class="math inline">\(FP\)</span> (false positives), and <span
+class="math inline">\(FN\)</span> (false negatives) are defined based on
+the contingency table.</p>
+</div>
+<p>To compute <span class="math inline">\(TP\)</span>, <span
+class="math inline">\(FP\)</span>, and <span
+class="math inline">\(FN\)</span>, we need to consider pairs of points.
+For each pair of points, we can define:</p>
+<ul>
+<li><p><span class="math inline">\(TP\)</span>: The number of pairs of
+points that are in the same cluster in both <span
+class="math inline">\(C\)</span> and <span
+class="math inline">\(C&#39;\)</span>.</p></li>
+<li><p><span class="math inline">\(FP\)</span>: The number of pairs of
+points that are in the same cluster in <span
+class="math inline">\(C\)</span> but not in <span
+class="math inline">\(C&#39;\)</span>.</p></li>
+<li><p><span class="math inline">\(FN\)</span>: The number of pairs of
+points that are in the same cluster in <span
+class="math inline">\(C&#39;\)</span> but not in <span
+class="math inline">\(C\)</span>.</p></li>
+</ul>
+<p>These can be computed as follows: <span class="math display">\[TP =
+\sum_{i=1}^k \sum_{j=1}^l \binom{n_{ij}}{2}, \quad FP = \sum_{i=1}^k
+\left( \binom{|C_i|}{2} - \sum_{j=1}^l \binom{n_{ij}}{2} \right), \quad
+FN = \sum_{j=1}^l \left( \binom{|C&#39;_j|}{2} - \sum_{i=1}^k
+\binom{n_{ij}}{2} \right).\]</span></p>
+<h1 class="unnumbered" id="properties">Properties</h1>
+<p>The Fowlkes-Mallows Index has several important properties:</p>
+<ol>
+<li><p>The FMI is symmetric, i.e., <span
+class="math inline">\(\text{FMI}(C, C&#39;) = \text{FMI}(C&#39;,
+C)\)</span>.</p></li>
+<li><p>The FMI ranges from 0 to 1, where 1 indicates perfect agreement
+between the two clusterings and 0 indicates no agreement.</p></li>
+<li><p>The FMI is not affected by the number of clusters, making it a
+robust measure for comparing clusterings with different numbers of
+clusters.</p></li>
+</ol>
+<h1 class="unnumbered" id="proofs-and-examples">Proofs and Examples</h1>
+<p>To illustrate the computation of the FMI, let’s consider a simple
+example.</p>
+<div class="example">
+<p>Consider a dataset with 4 points <span class="math inline">\(X =
+\{x_1, x_2, x_3, x_4\}\)</span>. Suppose we have two clusterings: <span
+class="math display">\[C = \{ \{x_1, x_2\}, \{x_3, x_4\} \} \quad
+\text{and} \quad C&#39; = \{ \{x_1, x_3\}, \{x_2, x_4\} \}.\]</span></p>
+<p>The contingency table is: <span class="math display">\[n =
+\begin{pmatrix}
+1 &amp; 1 \\
+1 &amp; 1
+\end{pmatrix},\]</span> where <span class="math inline">\(n_{11} =
+|\{x_1, x_2\} \cap \{x_1, x_3\}| = 1\)</span>, <span
+class="math inline">\(n_{12} = |\{x_1, x_2\} \cap \{x_2, x_4\}| =
+1\)</span>, and so on.</p>
+<p>Computing <span class="math inline">\(TP\)</span>, <span
+class="math inline">\(FP\)</span>, and <span
+class="math inline">\(FN\)</span>: <span class="math display">\[TP =
+\sum_{i=1}^2 \sum_{j=1}^2 \binom{n_{ij}}{2} = 0 + 0 + 0 + 0 =
+0,\]</span> <span class="math display">\[FP = \sum_{i=1}^2 \left(
+\binom{|C_i|}{2} - \sum_{j=1}^2 \binom{n_{ij}}{2} \right) = 0 + 0 =
+0,\]</span> <span class="math display">\[FN = \sum_{j=1}^2 \left(
+\binom{|C&#39;_j|}{2} - \sum_{i=1}^2 \binom{n_{ij}}{2} \right) = 0 + 0 =
+0.\]</span></p>
+<p>Thus, the FMI is: <span class="math display">\[\text{FMI}(C, C&#39;)
+= \sqrt{\frac{0}{0} \cdot \frac{0}{0}},\]</span> which is undefined in
+this case. This example shows that the FMI can be undefined for certain
+clusterings.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>The Fowlkes-Mallows Index is a valuable tool for comparing
+clusterings, providing a measure of similarity that is interpretable and
+robust. While it has some limitations, such as being undefined for
+certain clusterings, it remains a widely used metric in the field of
+clustering analysis.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

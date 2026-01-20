@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Autocorrélation dans les Chaînes de Markov par Chaînage (MCMC)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Autocorrélation dans les Chaînes de Markov par
+Chaînage (MCMC)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’autocorrélation dans les chaînes de Markov par Chaînage (MCMC) est
+un phénomène crucial à comprendre pour évaluer l’efficacité des méthodes
+d’échantillonnage. Les méthodes MCMC, telles que Metropolis-Hastings ou
+Gibbs Sampling, sont largement utilisées en statistique bayésienne pour
+estimer des distributions de probabilité complexes. Cependant, ces
+méthodes peuvent produire des échantillons fortement corrélés, ce qui
+affecte la précision des estimations. L’autocorrélation mesure cette
+dépendance entre les échantillons successifs et est essentielle pour
+diagnostiquer la convergence des chaînes MCMC.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’autocorrélation dans les chaînes MCMC, commençons
+par définir quelques concepts clés.</p>
+<h2 class="unnumbered" id="chaîne-de-markov">Chaîne de Markov</h2>
+<p>Une chaîne de Markov est un processus stochastique où la probabilité
+de transition vers un état futur dépend uniquement de l’état présent et
+non des états précédents. Formellement, une chaîne de Markov est définie
+par un espace d’états <span class="math inline">\(S\)</span> et une
+matrice de transition <span class="math inline">\(P\)</span> telle que
+:</p>
+<p><span class="math display">\[P(x, y) = \mathbb{P}(X_{n+1} = y | X_n =
+x)\]</span></p>
+<p>où <span class="math inline">\(P(x, y)\)</span> est la probabilité de
+transition de l’état <span class="math inline">\(x\)</span> à l’état
+<span class="math inline">\(y\)</span>.</p>
+<h2 class="unnumbered" id="autocorrélation">Autocorrélation</h2>
+<p>L’autocorrélation mesure la corrélation entre une série temporelle et
+une version décalée d’elle-même. Pour une chaîne de Markov <span
+class="math inline">\(\{X_n\}\)</span>, l’autocorrélation à lag <span
+class="math inline">\(k\)</span> est définie comme :</p>
+<p><span class="math display">\[\rho(k) = \frac{\text{Cov}(X_n,
+X_{n+k})}{\text{Var}(X_n)}\]</span></p>
+<p>où <span class="math inline">\(\text{Cov}\)</span> désigne la
+covariance et <span class="math inline">\(\text{Var}\)</span> la
+variance.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered"
+id="théorème-de-convergence-de-la-chaîne-de-markov">Théorème de
+Convergence de la Chaîne de Markov</h2>
+<p>Un résultat fondamental en théorie des chaînes de Markov est le
+théorème d’ergodicité, qui stipule que sous certaines conditions, une
+chaîne de Markov converge vers une distribution stationnaire <span
+class="math inline">\(\pi\)</span>. Formellement, si la chaîne est
+irréductible et apériodique, alors :</p>
+<p><span class="math display">\[\lim_{n \to \infty} \mathbb{P}(X_n = x)
+= \pi(x)\]</span></p>
+<p>pour tout <span class="math inline">\(x \in S\)</span>.</p>
+<h2 class="unnumbered" id="théorème-de-lautocorrélation">Théorème de
+l’Autocorrélation</h2>
+<p>Un théorème important concernant l’autocorrélation dans les chaînes
+MCMC est le suivant :</p>
+<p>Soit <span class="math inline">\(\{X_n\}\)</span> une chaîne de
+Markov irréductible et apériodique avec distribution stationnaire <span
+class="math inline">\(\pi\)</span>. Alors, l’autocorrélation à lag <span
+class="math inline">\(k\)</span> est donnée par :</p>
+<p><span class="math display">\[\rho(k) = \frac{\mathbb{E}_{\pi}[(X_0 -
+\mu)(X_k - \mu)]}{\text{Var}_{\pi}(X_0)}\]</span></p>
+<p>où <span class="math inline">\(\mu = \mathbb{E}_{\pi}[X_0]\)</span>
+est l’espérance sous la distribution stationnaire <span
+class="math inline">\(\pi\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-lautocorrélation">Preuve du Théorème de
+l’Autocorrélation</h2>
+<p>Pour prouver le théorème de l’autocorrélation, nous commençons par
+exprimer la covariance entre <span class="math inline">\(X_0\)</span> et
+<span class="math inline">\(X_k\)</span> sous la distribution
+stationnaire <span class="math inline">\(\pi\)</span>.</p>
+<p><span class="math display">\[\text{Cov}(X_0, X_k) =
+\mathbb{E}_{\pi}[(X_0 - \mu)(X_k - \mu)]\]</span></p>
+<p>En utilisant la définition de l’espérance conditionnelle, nous avons
+:</p>
+<p><span class="math display">\[\mathbb{E}_{\pi}[X_k | X_0 = x] =
+\mathbb{E}_{\pi}[X_k | X_0 = x]\]</span></p>
+<p>Puis, en utilisant la loi des chaînages de Markov, nous obtenons
+:</p>
+<p><span class="math display">\[\mathbb{E}_{\pi}[X_k | X_0 = x] =
+\mathbb{E}_{\pi}[X_k]\]</span></p>
+<p>Ainsi, la covariance peut être réécrite comme :</p>
+<p><span class="math display">\[\text{Cov}(X_0, X_k) =
+\mathbb{E}_{\pi}[(X_0 - \mu)(\mathbb{E}_{\pi}[X_k | X_0] -
+\mu)]\]</span></p>
+<p>En utilisant la linéarité de l’espérance, nous avons :</p>
+<p><span class="math display">\[\mathbb{E}_{\pi}[X_k | X_0] =
+\mathbb{E}_{\pi}[X_k]\]</span></p>
+<p>Donc, la covariance devient :</p>
+<p><span class="math display">\[\text{Cov}(X_0, X_k) =
+\mathbb{E}_{\pi}[(X_0 - \mu)(\mathbb{E}_{\pi}[X_k] - \mu)]\]</span></p>
+<p>En utilisant la définition de l’autocorrélation, nous obtenons
+finalement :</p>
+<p><span class="math display">\[\rho(k) = \frac{\mathbb{E}_{\pi}[(X_0 -
+\mu)(X_k - \mu)]}{\text{Var}_{\pi}(X_0)}\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriété-1-autocorrélation-à-lag-zéro">Propriété 1: Autocorrélation
+à Lag Zéro</h2>
+<p>L’autocorrélation à lag zéro est toujours égale à 1 :</p>
+<p><span class="math display">\[\rho(0) =
+\frac{\text{Var}(X_n)}{\text{Var}(X_n)} = 1\]</span></p>
+<h2 class="unnumbered"
+id="propriété-2-décroissance-de-lautocorrélation">Propriété 2:
+Décroissance de l’Autocorrélation</h2>
+<p>Pour une chaîne de Markov irréductible et apériodique,
+l’autocorrélation décroît exponentiellement avec le lag <span
+class="math inline">\(k\)</span> :</p>
+<p><span class="math display">\[\rho(k) \leq C e^{-\lambda
+k}\]</span></p>
+<p>où <span class="math inline">\(C\)</span> et <span
+class="math inline">\(\lambda\)</span> sont des constantes positives
+dépendant de la chaîne.</p>
+<h2 class="unnumbered"
+id="propriété-3-estimation-de-lautocorrélation">Propriété 3: Estimation
+de l’Autocorrélation</h2>
+<p>L’autocorrélation peut être estimée à partir des échantillons générés
+par la chaîne MCMC. Pour un échantillon <span
+class="math inline">\(\{X_1, X_2, \ldots, X_n\}\)</span>, l’estimateur
+de l’autocorrélation à lag <span class="math inline">\(k\)</span> est
+donné par :</p>
+<p><span class="math display">\[\hat{\rho}(k) = \frac{\sum_{t=1}^{n-k}
+(X_t - \bar{X})(X_{t+k} - \bar{X})}{\sum_{t=1}^n (X_t -
+\bar{X})^2}\]</span></p>
+<p>où <span class="math inline">\(\bar{X}\)</span> est la moyenne
+empirique de l’échantillon.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’autocorrélation dans les chaînes MCMC est un concept fondamental
+pour évaluer l’efficacité des méthodes d’échantillonnage. En comprenant
+et en estimant l’autocorrélation, les praticiens peuvent diagnostiquer
+la convergence des chaînes et améliorer la précision de leurs
+estimations. Les propriétés et théorèmes présentés dans cet article
+fournissent une base solide pour l’analyse de l’autocorrélation dans les
+chaînes MCMC.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

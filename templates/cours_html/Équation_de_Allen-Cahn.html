@@ -1,0 +1,321 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Équation d’Allen-Cahn : Une étude mathématique et physique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Équation d’Allen-Cahn : Une étude mathématique et
+physique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’équation d’Allen-Cahn, nommée d’après les physiciens John W. Cahn
+et William George Allen, émerge dans le cadre de la modélisation des
+transitions de phase dans les matériaux. Cette équation différentielle
+partielle non linéaire décrit l’évolution d’une variable d’ordre dans un
+système thermodynamique, capturant ainsi les phénomènes de nucléation et
+de croissance. Son importance réside dans sa capacité à modéliser des
+interfaces entre différentes phases, un problème central en physique des
+matériaux et en science des surfaces.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’équation d’Allen-Cahn, considérons un système où
+une variable <span class="math inline">\(u(x,t)\)</span> représente
+l’état local du matériau à la position <span
+class="math inline">\(x\)</span> et au temps <span
+class="math inline">\(t\)</span>. Cette variable peut être vue comme une
+mesure de l’écart par rapport à un état d’équilibre. L’équation
+d’Allen-Cahn cherche à décrire comment cette variable évolue dans le
+temps en réponse à des forces thermodynamiques.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\Omega \subset \mathbb{R}^n\)</span>
+un domaine borné et régulier, et <span class="math inline">\(T &gt;
+0\)</span>. L’équation d’Allen-Cahn s’écrit : <span
+class="math display">\[\frac{\partial u}{\partial t} = \Delta u -
+f(u),\]</span> où <span class="math inline">\(u : \Omega \times (0, T)
+\rightarrow \mathbb{R}\)</span>, <span class="math inline">\(f :
+\mathbb{R} \rightarrow \mathbb{R}\)</span> est une fonction non
+linéaire, et <span class="math inline">\(\Delta\)</span> désigne le
+Laplacien.</p>
+</div>
+<p>Une formulation plus générale, incluant des conditions aux limites de
+Neumann homogènes, est : <span class="math display">\[\frac{\partial
+u}{\partial t} = \nabla \cdot (D \nabla u) - f(u),\]</span> où <span
+class="math inline">\(D\)</span> est un coefficient de diffusion
+positif.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’équation d’Allen-Cahn est celui de
+l’existence et de l’unicité des solutions. Ce théorème assure que, sous
+certaines conditions initiales et de régularité, l’équation admet une
+solution unique.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> une fonction
+Lipschitzienne, c’est-à-dire qu’il existe une constante <span
+class="math inline">\(L &gt; 0\)</span> telle que pour tout <span
+class="math inline">\(u, v \in \mathbb{R}\)</span>, <span
+class="math display">\[|f(u) - f(v)| \leq L |u - v|.\]</span> Alors,
+pour toute condition initiale <span class="math inline">\(u_0 \in
+H^1(\Omega)\)</span>, il existe une solution unique <span
+class="math inline">\(u \in L^2(0, T; H^1(\Omega)) \cap C([0, T];
+L^2(\Omega))\)</span> de l’équation d’Allen-Cahn avec des conditions aux
+limites de Neumann homogènes.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer ce théorème, nous utilisons des techniques classiques
+d’analyse fonctionnelle et de théorie des semi-groupes. La preuve repose
+sur le théorème de Leray-Lions, qui garantit l’existence de solutions
+faibles pour des équations paraboliques non linéaires.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons l’opérateur <span
+class="math inline">\(A\)</span> défini par <span
+class="math inline">\(Au = -\Delta u + f(u)\)</span>. Cet opérateur est
+maximal monotone, ce qui permet d’appliquer le théorème de Leray-Lions.
+En effet, pour tout <span class="math inline">\(u \in
+H^1(\Omega)\)</span>, nous avons : <span class="math display">\[(Au,
+u)_{L^2} = (\nabla u, \nabla u)_{L^2} + (f(u), u)_{L^2}.\]</span> La
+première terme est positif, et le second terme peut être contrôlé grâce
+à la condition de Lipschitz de <span class="math inline">\(f\)</span>.
+Ainsi, l’opérateur <span class="math inline">\(A\)</span> est coercif et
+pseudo-monotone, ce qui garantit l’existence d’une solution faible.</p>
+<p>Pour l’unicité, supposons qu’il existe deux solutions <span
+class="math inline">\(u\)</span> et <span
+class="math inline">\(v\)</span>. En soustrayant les équations
+satisfaites par <span class="math inline">\(u\)</span> et <span
+class="math inline">\(v\)</span>, nous obtenons : <span
+class="math display">\[\frac{\partial (u - v)}{\partial t} = \Delta (u -
+v) - (f(u) - f(v)).\]</span> En multipliant par <span
+class="math inline">\(u - v\)</span> et en intégrant sur <span
+class="math inline">\(\Omega\)</span>, nous utilisons la condition de
+Lipschitz pour obtenir : <span class="math display">\[\frac{1}{2}
+\frac{d}{dt} \|u - v\|_{L^2}^2 + \|\nabla (u - v)\|_{L^2}^2 \leq L \|u -
+v\|_{L^2}^2.\]</span> Par le lemme de Gronwall, il s’ensuit que <span
+class="math inline">\(u = v\)</span> presque partout. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’équation d’Allen-Cahn possède plusieurs propriétés intéressantes,
+notamment en ce qui concerne la stabilité et l’asymptotique.</p>
+<ol>
+<li><p><strong>Stabilité des états d’équilibre</strong> : Les solutions
+stationnaires de l’équation d’Allen-Cahn, c’est-à-dire les solutions de
+<span class="math inline">\(\Delta u - f(u) = 0\)</span>, sont stables
+si elles minimisent l’énergie libre associée au système.</p></li>
+<li><p><strong>Convergence vers l’équilibre</strong> : Sous des
+conditions appropriées, les solutions de l’équation d’Allen-Cahn
+convergent vers un état d’équilibre lorsque <span
+class="math inline">\(t \rightarrow +\infty\)</span>.</p></li>
+<li><p><strong>Interface mince</strong> : Dans la limite où le paramètre
+de diffusion tend vers zéro, les solutions de l’équation d’Allen-Cahn
+développent des interfaces minces entre différentes phases, ce qui est
+crucial pour modéliser les transitions de phase.</p></li>
+</ol>
+<p>Pour la propriété (i), considérons l’énergie libre <span
+class="math inline">\(E(u) = \int_{\Omega} \left( \frac{1}{2} |\nabla
+u|^2 + F(u) \right) dx\)</span>, où <span
+class="math inline">\(F\)</span> est une primitive de <span
+class="math inline">\(f\)</span>. Les états d’équilibre minimisent cette
+énergie, et la stabilité peut être démontrée en analysant le spectre de
+l’opérateur linéarisé autour de ces états.</p>
+<p>Pour la propriété (ii), nous utilisons des techniques de Lyapunov
+pour montrer que l’énergie libre décroît au cours du temps, ce qui
+implique la convergence vers un état d’équilibre.</p>
+<p>Enfin, pour la propriété (iii), nous utilisons des méthodes
+asymptotiques pour analyser le comportement des solutions lorsque le
+paramètre de diffusion tend vers zéro. Cela révèle la formation
+d’interfaces minces, un phénomène clé dans les applications
+physiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized Spectral Clustering: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized Spectral Clustering: A Comprehensive
+Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le clustering est une tâche fondamentale en apprentissage
+automatique, visant à regrouper des données similaires sans supervision.
+Parmi les nombreuses méthodes de clustering, le <em>Spectral
+Clustering</em> s’est imposé comme une approche puissante et flexible.
+Son extension, le <em>Kernelized Spectral Clustering</em>, permet de
+capturer des structures complexes dans les données en projetant
+celles-ci dans un espace de caractéristiques de dimension
+supérieure.</p>
+<p>L’émergence du Kernelized Spectral Clustering est motivée par la
+nécessité de traiter des données non linéairement séparables. En effet,
+les méthodes traditionnelles de clustering, telles que le K-means,
+supposent une structure géométrique simple des données. En revanche, le
+Kernelized Spectral Clustering exploite la théorie des graphes et
+l’analyse spectrale pour découvrir des structures latentes dans les
+données.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de plonger dans le Kernelized Spectral Clustering, il est
+essentiel de comprendre quelques concepts clés.</p>
+<h2 class="unnumbered" id="similarité-et-matrice-daffinités">Similarité
+et Matrice d’Affinités</h2>
+<p>Considérons un ensemble de données <span
+class="math inline">\(\mathcal{X} = \{x_1, x_2, \dots, x_n\}\)</span>
+dans un espace euclidien <span
+class="math inline">\(\mathbb{R}^d\)</span>. Nous cherchons à mesurer la
+similarité entre les points de données. Une fonction de similarité <span
+class="math inline">\(k: \mathcal{X} \times \mathcal{X} \rightarrow
+\mathbb{R}\)</span> est définie de telle sorte que <span
+class="math inline">\(k(x_i, x_j)\)</span> représente la similarité
+entre les points <span class="math inline">\(x_i\)</span> et <span
+class="math inline">\(x_j\)</span>.</p>
+<p>La matrice d’affinités <span class="math inline">\(W \in
+\mathbb{R}^{n \times n}\)</span> est définie par: <span
+class="math display">\[W_{ij} = k(x_i, x_j)\]</span></p>
+<h2 class="unnumbered" id="matrice-de-degré">Matrice de Degré</h2>
+<p>La matrice de degré <span class="math inline">\(D\)</span> est une
+matrice diagonale dont les éléments sont les sommes des lignes de la
+matrice d’affinités <span class="math inline">\(W\)</span>: <span
+class="math display">\[D_{ii} = \sum_{j=1}^n W_{ij}\]</span></p>
+<h2 class="unnumbered" id="matrice-laplacienne">Matrice Laplacienne</h2>
+<p>La matrice Laplacienne <span class="math inline">\(L\)</span> est
+définie comme: <span class="math display">\[L = D - W\]</span></p>
+<h2 class="unnumbered" id="kernel">Kernel</h2>
+<p>Un noyau (ou kernel) est une fonction <span class="math inline">\(k:
+\mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}\)</span> qui
+satisfait les conditions de symétrie et de positivité définie. Les
+noyaux couramment utilisés incluent le noyau Gaussien (RBF) et le noyau
+polynomial.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-lapproximation-du-noyau">Théorème
+de l’Approximation du Noyau</h2>
+<p>Le théorème de l’approximation du noyau stipule que toute fonction
+continue définie sur un espace compact peut être approximée par une
+combinaison linéaire de noyaux. Ce théorème justifie l’utilisation des
+noyaux pour capturer des structures complexes dans les données.</p>
+<h2 class="unnumbered" id="théorème-de-lanalyse-spectrale">Théorème de
+l’Analyse Spectrale</h2>
+<p>Le théorème de l’analyse spectrale affirme que les valeurs propres et
+les vecteurs propres de la matrice Laplacienne contiennent des
+informations cruciales sur la structure des données. Plus précisément,
+les plus petites valeurs propres correspondent aux composants principaux
+de la structure des données.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-lapproximation-du-noyau">Preuve du Théorème de
+l’Approximation du Noyau</h2>
+<p>Considérons une fonction <span class="math inline">\(f: \mathcal{X}
+\rightarrow \mathbb{R}\)</span> continue définie sur un espace compact
+<span class="math inline">\(\mathcal{X}\)</span>. Nous voulons montrer
+que <span class="math inline">\(f\)</span> peut être approximée par une
+combinaison linéaire de noyaux.</p>
+<p>Soit <span class="math inline">\(\{\phi_i\}_{i=1}^\infty\)</span> une
+base orthonormale de l’espace de Hilbert associé au noyau <span
+class="math inline">\(k\)</span>. Nous pouvons écrire: <span
+class="math display">\[f(x) = \sum_{i=1}^\infty c_i
+\phi_i(x)\]</span></p>
+<p>où les coefficients <span class="math inline">\(c_i\)</span> sont
+donnés par: <span class="math display">\[c_i = \int_{\mathcal{X}} f(x)
+\phi_i(x) \, dx\]</span></p>
+<p>En utilisant la propriété de reproduction du noyau, nous avons: <span
+class="math display">\[k(x, \cdot) = \sum_{i=1}^\infty \phi_i(x)
+\phi_i(\cdot)\]</span></p>
+<p>Ainsi, nous pouvons approximer <span class="math inline">\(f\)</span>
+par: <span class="math display">\[f(x) \approx \sum_{i=1}^N c_i
+\phi_i(x)\]</span></p>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-lanalyse-spectrale">Preuve du Théorème de
+l’Analyse Spectrale</h2>
+<p>Considérons la matrice Laplacienne <span class="math inline">\(L = D
+- W\)</span>. Les valeurs propres de <span
+class="math inline">\(L\)</span> sont réelles et non négatives. Les plus
+petites valeurs propres correspondent aux composants principaux de la
+structure des données.</p>
+<p>Soit <span class="math inline">\(\lambda_1 \leq \lambda_2 \leq \dots
+\leq \lambda_n\)</span> les valeurs propres de <span
+class="math inline">\(L\)</span>, et soit <span
+class="math inline">\(u_1, u_2, \dots, u_n\)</span> les vecteurs propres
+associés. Les vecteurs propres correspondant aux plus petites valeurs
+propres capturent la structure globale des données.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriété-1-symétrie-de-la-matrice-laplacienne">Propriété 1:
+Symétrie de la Matrice Laplacienne</h2>
+<p>La matrice Laplacienne <span class="math inline">\(L\)</span> est
+symétrique si et seulement si la matrice d’affinités <span
+class="math inline">\(W\)</span> est symétrique. Cette propriété est
+cruciale pour garantir que les valeurs propres de <span
+class="math inline">\(L\)</span> sont réelles.</p>
+<h2 class="unnumbered"
+id="propriété-2-positivité-définie-de-la-matrice-laplacienne">Propriété
+2: Positivité Définie de la Matrice Laplacienne</h2>
+<p>La matrice Laplacienne <span class="math inline">\(L\)</span> est
+semi-définie positive. Cela signifie que toutes ses valeurs propres sont
+non négatives.</p>
+<h2 class="unnumbered"
+id="propriété-3-convergence-des-vecteurs-propres">Propriété 3:
+Convergence des Vecteurs Propres</h2>
+<p>Les vecteurs propres de la matrice Laplacienne convergent vers les
+composants principaux de la structure des données lorsque le nombre de
+points de données tend vers l’infini.</p>
+<h2 class="unnumbered"
+id="corollaire-1-clustering-par-analyse-spectrale">Corollaire 1:
+Clustering par Analyse Spectrale</h2>
+<p>En utilisant les vecteurs propres correspondant aux plus petites
+valeurs propres de la matrice Laplacienne, nous pouvons effectuer un
+clustering des données en appliquant une méthode de clustering simple,
+telle que le K-means, dans l’espace des vecteurs propres.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Kernelized Spectral Clustering est une méthode puissante pour le
+clustering de données non linéairement séparables. En exploitant la
+théorie des graphes et l’analyse spectrale, cette méthode permet de
+découvrir des structures latentes dans les données. Les théorèmes et
+propriétés présentés dans cet article fournissent une base solide pour
+comprendre et appliquer le Kernelized Spectral Clustering dans diverses
+applications.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

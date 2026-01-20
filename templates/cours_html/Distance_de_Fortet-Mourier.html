@@ -1,0 +1,383 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Fortet-Mourier : Une mesure de la distance entre lois de probabilité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Fortet-Mourier : Une mesure de la distance
+entre lois de probabilité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La distance de Fortet-Mourier est une mesure fondamentale en théorie
+des probabilités et en statistique. Elle permet de quantifier la
+distance entre deux lois de probabilité, ce qui est crucial dans de
+nombreux domaines tels que l’apprentissage automatique, la théorie des
+jeux et les modèles économiques. Cette distance a été introduite par
+Charles Fortet en 1948 et développée davantage par Jean Mourier dans les
+années suivantes.</p>
+<p>L’intérêt principal de la distance de Fortet-Mourier réside dans sa
+capacité à capturer les différences entre deux distributions de
+probabilité de manière efficace et calculable. Elle est particulièrement
+utile lorsque l’on travaille avec des distributions continues ou
+discrètes, et elle offre une alternative robuste à d’autres mesures de
+distance telles que la distance de Lévy ou la distance de
+Kolmogorov.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la distance de Fortet-Mourier, commençons par rappeler
+ce que nous cherchons à mesurer. Imaginons deux lois de probabilité
+<span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> sur un espace métrique <span
+class="math inline">\((E, d)\)</span>. Nous voulons quantifier la
+différence entre ces deux lois en utilisant une fonction de test <span
+class="math inline">\(f\)</span> qui est Lipschitzienne, c’est-à-dire
+que la variation de <span class="math inline">\(f\)</span> est bornée
+par la distance <span class="math inline">\(d\)</span>.</p>
+<p>La distance de Fortet-Mourier entre <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est alors définie comme la borne
+supérieure de l’écart des espérances de <span
+class="math inline">\(f\)</span> sous <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>, pour toutes les fonctions
+Lipschitziennes <span class="math inline">\(f\)</span>.</p>
+<p>Formellement, nous avons :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((E, d)\)</span> un espace métrique
+et <span class="math inline">\(P, Q\)</span> deux lois de probabilité
+sur <span class="math inline">\(E\)</span>. La distance de
+Fortet-Mourier entre <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est définie par : <span
+class="math display">\[d_{\text{FM}}(P, Q) = \sup_{f : E \to \mathbb{R},
+\text{Lipschitzienne}} \left| \int_E f \, dP - \int_E f \, dQ
+\right|\]</span> où la borne supérieure est prise sur toutes les
+fonctions <span class="math inline">\(f : E \to \mathbb{R}\)</span>
+Lipschitziennes.</p>
+</div>
+<p>Une autre manière de formuler cette définition est d’utiliser la
+notation des espérances conditionnelles. Soit <span
+class="math inline">\(\mathcal{F}\)</span> l’ensemble de toutes les
+fonctions Lipschitziennes sur <span class="math inline">\(E\)</span>.
+Alors : <span class="math display">\[d_{\text{FM}}(P, Q) = \sup_{f \in
+\mathcal{F}} \left| \mathbb{E}_P[f] - \mathbb{E}_Q[f]
+\right|\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Fortet-Mourier est le
+théorème de convergence en loi. Ce théorème nous permet de comprendre
+comment la distance de Fortet-Mourier se comporte lorsque les lois <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> convergent.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((E, d)\)</span> un espace métrique
+complet et séparable. Soient <span class="math inline">\(P_n\)</span> et
+<span class="math inline">\(P\)</span> des lois de probabilité sur <span
+class="math inline">\(E\)</span>. Alors, les assertions suivantes sont
+équivalentes :</p>
+<ol>
+<li><p>La suite <span class="math inline">\((P_n)\)</span> converge
+faiblement vers <span class="math inline">\(P\)</span>, c’est-à-dire que
+pour toute fonction continue bornée <span class="math inline">\(f : E
+\to \mathbb{R}\)</span>, on a : <span class="math display">\[\lim_{n \to
+\infty} \int_E f \, dP_n = \int_E f \, dP\]</span></p></li>
+<li><p>La distance de Fortet-Mourier entre <span
+class="math inline">\(P_n\)</span> et <span
+class="math inline">\(P\)</span> tend vers zéro : <span
+class="math display">\[\lim_{n \to \infty} d_{\text{FM}}(P_n, P) =
+0\]</span></p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de convergence en loi, nous allons utiliser
+plusieurs étapes clés. Tout d’abord, nous rappelons que la convergence
+faible implique la convergence des espérances pour les fonctions
+continues bornées. Ensuite, nous utilisons le fait que toute fonction
+Lipschitzienne est continue et bornée sur un espace métrique
+compact.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour montrer l’équivalence entre les deux assertions,
+nous procédons en deux étapes.</p>
+<p><strong>Étape 1 : Convergence faible implique convergence de la
+distance de Fortet-Mourier.</strong></p>
+<p>Supposons que <span class="math inline">\(P_n\)</span> converge
+faiblement vers <span class="math inline">\(P\)</span>. Soit <span
+class="math inline">\(f : E \to \mathbb{R}\)</span> une fonction
+Lipschitzienne. Puisque <span class="math inline">\(f\)</span> est
+continue et bornée, par hypothèse de convergence faible, nous avons :
+<span class="math display">\[\lim_{n \to \infty} \int_E f \, dP_n =
+\int_E f \, dP\]</span> Cela implique que : <span
+class="math display">\[\lim_{n \to \infty} \left| \int_E f \, dP_n -
+\int_E f \, dP \right| = 0\]</span> En prenant la borne supérieure sur
+toutes les fonctions Lipschitziennes <span
+class="math inline">\(f\)</span>, nous obtenons : <span
+class="math display">\[\lim_{n \to \infty} d_{\text{FM}}(P_n, P) =
+0\]</span></p>
+<p><strong>Étape 2 : Convergence de la distance de Fortet-Mourier
+implique convergence faible.</strong></p>
+<p>Supposons maintenant que <span
+class="math inline">\(d_{\text{FM}}(P_n, P) \to 0\)</span>. Soit <span
+class="math inline">\(f : E \to \mathbb{R}\)</span> une fonction
+continue bornée. Nous devons montrer que : <span
+class="math display">\[\lim_{n \to \infty} \int_E f \, dP_n = \int_E f
+\, dP\]</span> Pour cela, nous utilisons le fait que toute fonction
+continue bornée sur un espace métrique compact peut être approchée par
+des fonctions Lipschitziennes. En utilisant cette approximation et la
+définition de la distance de Fortet-Mourier, nous obtenons le résultat
+désiré. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La distance de Fortet-Mourier possède plusieurs propriétés
+intéressantes qui en font un outil puissant pour l’analyse des lois de
+probabilité.</p>
+<div class="corollaire">
+<p>Soient <span class="math inline">\(P, Q, R\)</span> des lois de
+probabilité sur un espace métrique <span class="math inline">\((E,
+d)\)</span>. Les propriétés suivantes sont satisfaites :</p>
+<ol>
+<li><p><strong>Non-négativité</strong> : <span
+class="math inline">\(d_{\text{FM}}(P, Q) \geq 0\)</span>, et <span
+class="math inline">\(d_{\text{FM}}(P, Q) = 0\)</span> si et seulement
+si <span class="math inline">\(P = Q\)</span>.</p></li>
+<li><p><strong>Symétrie</strong> : <span
+class="math inline">\(d_{\text{FM}}(P, Q) = d_{\text{FM}}(Q,
+P)\)</span>.</p></li>
+<li><p><strong>Inégalité triangulaire</strong> : <span
+class="math inline">\(d_{\text{FM}}(P, R) \leq d_{\text{FM}}(P, Q) +
+d_{\text{FM}}(Q, R)\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ces propriétés est relativement directe
+et utilise les définitions fondamentales de la distance de
+Fortet-Mourier.</p>
+<p><strong>Preuve de la non-négativité :</strong></p>
+<p>Par définition, <span class="math inline">\(d_{\text{FM}}(P,
+Q)\)</span> est une borne supérieure de valeurs absolues, donc elle est
+toujours non-négative. Si <span class="math inline">\(d_{\text{FM}}(P,
+Q) = 0\)</span>, alors pour toute fonction Lipschitzienne <span
+class="math inline">\(f\)</span>, nous avons : <span
+class="math display">\[\left| \int_E f \, dP - \int_E f \, dQ \right| =
+0\]</span> Cela implique que <span class="math inline">\(P\)</span> et
+<span class="math inline">\(Q\)</span> coïncident sur toutes les
+fonctions Lipschitziennes, donc <span class="math inline">\(P =
+Q\)</span>.</p>
+<p><strong>Preuve de la symétrie :</strong></p>
+<p>La définition de <span class="math inline">\(d_{\text{FM}}(P,
+Q)\)</span> est symétrique en <span class="math inline">\(P\)</span> et
+<span class="math inline">\(Q\)</span>, donc la propriété de symétrie
+est immédiate.</p>
+<p><strong>Preuve de l’inégalité triangulaire :</strong></p>
+<p>Pour toute fonction Lipschitzienne <span
+class="math inline">\(f\)</span>, nous avons : <span
+class="math display">\[\left| \int_E f \, dP - \int_E f \, dR \right|
+\leq \left| \int_E f \, dP - \int_E f \, dQ \right| + \left| \int_E f \,
+dQ - \int_E f \, dR \right|\]</span> En prenant la borne supérieure sur
+toutes les fonctions Lipschitziennes <span
+class="math inline">\(f\)</span>, nous obtenons : <span
+class="math display">\[d_{\text{FM}}(P, R) \leq d_{\text{FM}}(P, Q) +
+d_{\text{FM}}(Q, R)\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Fortet-Mourier est un outil essentiel pour l’étude des
+lois de probabilité. Elle permet de quantifier la distance entre deux
+distributions de manière efficace et calculable, ce qui est crucial dans
+de nombreux domaines appliqués. Les propriétés et théorèmes associés à
+cette distance en font un sujet de recherche riche et passionnant, avec
+de nombreuses applications potentielles dans l’apprentissage
+automatique, la théorie des jeux et bien d’autres domaines.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

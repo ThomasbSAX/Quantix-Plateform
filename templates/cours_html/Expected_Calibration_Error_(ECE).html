@@ -1,0 +1,317 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Expected Calibration Error (ECE)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Expected Calibration Error (ECE)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’Expected Calibration Error (ECE) est une métrique cruciale dans
+l’évaluation des modèles de classification probabiliste. Elle mesure la
+calibration d’un modèle, c’est-à-dire la cohérence entre les
+probabilités prédites et les résultats observés. Dans un contexte où les
+modèles de machine learning sont de plus en plus utilisés pour des
+décisions critiques, la calibration devient un aspect indispensable pour
+garantir la fiabilité et l’interprétabilité des prédictions.</p>
+<p>L’ECE émerge comme une réponse à la nécessité de quantifier et
+d’améliorer la calibration des modèles. Elle est particulièrement utile
+dans les domaines où les décisions doivent être prises en fonction de
+probabilités, comme la médecine, la finance ou l’ingénierie. L’ECE
+permet de diagnostiquer les biais potentiels dans les prédictions et
+d’ajuster les modèles en conséquence.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’ECE, il est essentiel de définir quelques concepts
+préliminaires. Considérons un modèle de classification binaire qui
+prédit une probabilité <span class="math inline">\(p\)</span> pour
+chaque échantillon. Nous voulons que cette probabilité reflète la
+véritable probabilité que l’échantillon appartienne à la classe
+positive.</p>
+<div class="definition">
+<p>Un modèle est bien calibré si, pour chaque probabilité prédite <span
+class="math inline">\(p\)</span>, la proportion d’échantillons positifs
+parmi ceux pour lesquels le modèle a prédit <span
+class="math inline">\(p\)</span> est égale à <span
+class="math inline">\(p\)</span>. Formellement, pour tout <span
+class="math inline">\(p \in [0, 1]\)</span>, nous avons : <span
+class="math display">\[\mathbb{E}[Y | P = p] = p\]</span> où <span
+class="math inline">\(Y\)</span> est la variable indicatrice de la
+classe positive et <span class="math inline">\(P\)</span> est la
+probabilité prédite par le modèle.</p>
+</div>
+<p>L’ECE mesure l’écart entre cette condition idéale et la réalité. Pour
+ce faire, nous divisons les intervalles de probabilités en bins et
+calculons l’erreur de calibration pour chaque bin.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(B\)</span> le nombre de bins, et
+<span class="math inline">\(p_i\)</span> la probabilité moyenne dans le
+bin <span class="math inline">\(i\)</span>. Soit <span
+class="math inline">\(n_i\)</span> le nombre d’échantillons dans le bin
+<span class="math inline">\(i\)</span>, et <span
+class="math inline">\(acc_i\)</span> la proportion d’échantillons
+positifs dans le bin <span class="math inline">\(i\)</span>. L’ECE est
+défini comme : <span class="math display">\[ECE = \sum_{i=1}^{B}
+\frac{n_i}{n} |acc_i - p_i|\]</span> où <span
+class="math inline">\(n\)</span> est le nombre total d’échantillons.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’ECE est une métrique empirique, mais elle peut être analysée dans
+un cadre théorique. Un résultat important est que l’ECE converge vers
+zéro lorsque le nombre d’échantillons tend vers l’infini, sous certaines
+conditions.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\hat{p}_i\)</span> la probabilité
+prédite pour l’échantillon <span class="math inline">\(i\)</span>, et
+<span class="math inline">\(y_i\)</span> la vraie classe. Supposons que
+les prédictions sont indépendantes et identiquement distribuées
+(i.i.d.). Alors, pour tout <span class="math inline">\(\epsilon &gt;
+0\)</span>, nous avons : <span class="math display">\[\lim_{n \to
+\infty} P(|ECE| &gt; \epsilon) = 0\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve de ce théorème repose sur le théorème des grands nombres et
+la loi des grands nombres. En effet, lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini, les erreurs de
+calibration dans chaque bin convergent vers zéro en probabilité. Cela
+signifie que l’ECE, qui est une moyenne pondérée de ces erreurs,
+converge également vers zéro.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un bin <span
+class="math inline">\(i\)</span>. La proportion d’échantillons positifs
+dans ce bin est une moyenne empirique. Par le théorème des grands
+nombres, cette moyenne converge vers la véritable proportion <span
+class="math inline">\(p_i\)</span> lorsque <span
+class="math inline">\(n_i\)</span> tend vers l’infini. De même, la
+probabilité moyenne <span class="math inline">\(p_i\)</span> converge
+vers la véritable probabilité prédite.</p>
+<p>Ainsi, l’erreur de calibration <span class="math inline">\(|acc_i -
+p_i|\)</span> converge vers zéro. Puisque cette convergence a lieu pour
+chaque bin, et que l’ECE est une moyenne pondérée de ces erreurs, nous
+avons : <span class="math display">\[\lim_{n \to \infty} ECE =
+0\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’ECE possède plusieurs propriétés intéressantes qui en font une
+métrique puissante pour évaluer la calibration des modèles.</p>
+<ul>
+<li><p><strong>Invariance par transformation</strong> : L’ECE est
+invariant par toute transformation monotone des probabilités prédites.
+Cela signifie que si nous appliquons une fonction strictement croissante
+<span class="math inline">\(\phi\)</span> aux probabilités prédites,
+l’ECE reste inchangé.</p></li>
+<li><p><strong>Sensibilité aux biais</strong> : L’ECE est sensible aux
+biais dans les prédictions. Si un modèle a tendance à surestimer ou
+sous-estimer systématiquement les probabilités, cela se reflétera dans
+une valeur élevée de l’ECE.</p></li>
+<li><p><strong>Interprétabilité</strong> : L’ECE est facile à
+interpréter. Une valeur de 0 indique une calibration parfaite, tandis
+qu’une valeur élevée indique un manque de calibration. Cela permet aux
+praticiens de comprendre rapidement la qualité des prédictions d’un
+modèle.</p></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’Expected Calibration Error (ECE) est une métrique essentielle pour
+évaluer la calibration des modèles de classification probabiliste. Elle
+permet de quantifier l’écart entre les probabilités prédites et les
+résultats observés, offrant ainsi une mesure de la fiabilité des
+modèles. En comprenant et en utilisant l’ECE, les praticiens peuvent
+améliorer la qualité de leurs modèles et garantir des décisions plus
+fiables dans des domaines critiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

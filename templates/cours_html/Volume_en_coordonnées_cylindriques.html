@@ -1,0 +1,319 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Volume en Coordonnées Cylindriques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Volume en Coordonnées Cylindriques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les coordonnées cylindriques constituent un système de coordonnées
+orthogonal tridimensionnel, souvent utilisé pour décrire des objets
+symétriques autour d’un axe central. Ce système est particulièrement
+adapté aux problèmes possédant une symétrie cylindrique, tels que ceux
+rencontrés en physique et en ingénierie. L’un des aspects fondamentaux
+de ce système est le calcul du volume d’un objet, qui peut être exprimé
+de manière élégante en utilisant les coordonnées cylindriques.</p>
+<p>Dans cet article, nous explorerons la notion de volume dans ce
+système de coordonnées. Nous commencerons par définir les coordonnées
+cylindriques et discuterons de leur utilité. Ensuite, nous introduirons
+le concept de volume en coordonnées cylindriques et démontrerons les
+théorèmes associés. Enfin, nous examinerons quelques propriétés et
+corollaires intéressants.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de plonger dans le calcul du volume, il est essentiel de
+comprendre les coordonnées cylindriques. Imaginons un point dans
+l’espace tridimensionnel. En coordonnées cartésiennes, ce point est
+défini par trois nombres <span class="math inline">\((x, y, z)\)</span>.
+Cependant, si nous considérons la symétrie autour de l’axe <span
+class="math inline">\(z\)</span>, il peut être plus avantageux
+d’utiliser les coordonnées cylindriques <span class="math inline">\((r,
+\theta, z)\)</span>.</p>
+<p>Pour comprendre ce que représentent <span
+class="math inline">\(r\)</span>, <span
+class="math inline">\(\theta\)</span> et <span
+class="math inline">\(z\)</span>, considérons un point dans l’espace. Le
+paramètre <span class="math inline">\(r\)</span> représente la distance
+du point à l’axe <span class="math inline">\(z\)</span>. Le paramètre
+<span class="math inline">\(\theta\)</span> est l’angle entre la
+projection du point sur le plan <span class="math inline">\(xy\)</span>
+et l’axe <span class="math inline">\(x\)</span>. Enfin, <span
+class="math inline">\(z\)</span> est la même coordonnée que dans le
+système cartésien.</p>
+<p>Formellement, les coordonnées cylindriques <span
+class="math inline">\((r, \theta, z)\)</span> sont définies par les
+relations suivantes : <span class="math display">\[x = r \cos \theta,
+\quad y = r \sin \theta, \quad z = z\]</span> où <span
+class="math inline">\(r \geq 0\)</span>, <span class="math inline">\(0
+\leq \theta &lt; 2\pi\)</span>, et <span class="math inline">\(-\infty
+&lt; z &lt; \infty\)</span>.</p>
+<h1 class="unnumbered" id="volume-en-coordonnées-cylindriques">Volume en
+Coordonnées Cylindriques</h1>
+<p>Le volume d’un objet dans l’espace peut être calculé en utilisant une
+intégrale triple. En coordonnées cartésiennes, cette intégrale est
+exprimée comme : <span class="math display">\[V = \iiint\limits_V dV =
+\iiint\limits_V dx \, dy \, dz\]</span> En coordonnées cylindriques,
+l’élément de volume <span class="math inline">\(dV\)</span> est donné
+par : <span class="math display">\[dV = r \, dr \, d\theta \,
+dz\]</span> Ainsi, le volume en coordonnées cylindriques s’écrit : <span
+class="math display">\[V = \iiint\limits_V r \, dr \, d\theta \,
+dz\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour calculer le volume d’un objet en coordonnées cylindriques, nous
+avons besoin de quelques théorèmes fondamentaux. Considérons un objet
+borné par les surfaces <span class="math inline">\(r = r_1(\theta,
+z)\)</span>, <span class="math inline">\(r = r_2(\theta, z)\)</span>,
+<span class="math inline">\(\theta = \theta_1(z)\)</span>, <span
+class="math inline">\(\theta = \theta_2(z)\)</span>, <span
+class="math inline">\(z = z_1\)</span>, et <span class="math inline">\(z
+= z_2\)</span>. Le volume de cet objet est donné par : <span
+class="math display">\[V = \int_{z_1}^{z_2}
+\int_{\theta_1(z)}^{\theta_2(z)} \int_{r_1(\theta, z)}^{r_2(\theta, z)}
+r \, dr \, d\theta \, dz\]</span></p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous devons comprendre comment l’élément de
+volume <span class="math inline">\(dV\)</span> est transformé en
+coordonnées cylindriques. L’élément de volume dans les coordonnées
+cartésiennes est <span class="math inline">\(dx \, dy \, dz\)</span>. En
+passant aux coordonnées cylindriques, nous avons : <span
+class="math display">\[dx = \cos \theta \, dr - r \sin \theta \,
+d\theta, \quad dy = \sin \theta \, dr + r \cos \theta \, d\theta, \quad
+dz = dz\]</span> Le jacobien de cette transformation est donné par le
+déterminant de la matrice jacobienne : <span class="math display">\[J =
+\begin{vmatrix}
+\cos \theta &amp; -r \sin \theta &amp; 0 \\
+\sin \theta &amp; r \cos \theta &amp; 0 \\
+0 &amp; 0 &amp; 1
+\end{vmatrix} = r\]</span> Ainsi, l’élément de volume en coordonnées
+cylindriques est : <span class="math display">\[dV = |J| \, dr \,
+d\theta \, dz = r \, dr \, d\theta \, dz\]</span> En intégrant cet
+élément de volume sur le domaine approprié, nous obtenons le volume de
+l’objet.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Plusieurs propriétés intéressantes découlent de la formule du volume
+en coordonnées cylindriques. En voici quelques-unes :</p>
+<ol>
+<li><p>Si un objet est symétrique autour de l’axe <span
+class="math inline">\(z\)</span>, alors <span
+class="math inline">\(\theta_1(z) = 0\)</span> et <span
+class="math inline">\(\theta_2(z) = 2\pi\)</span>. Dans ce cas, le
+volume se simplifie en : <span class="math display">\[V =
+\int_{z_1}^{z_2} \int_{0}^{2\pi} \int_{r_1(z)}^{r_2(z)} r \, dr \,
+d\theta \, dz\]</span></p></li>
+<li><p>Pour un cylindre de rayon <span class="math inline">\(R\)</span>
+et de hauteur <span class="math inline">\(H\)</span>, le volume est
+donné par : <span class="math display">\[V = \int_{0}^{H}
+\int_{0}^{2\pi} \int_{0}^{R} r \, dr \, d\theta \, dz = \pi R^2
+H\]</span></p></li>
+<li><p>Pour une sphère de rayon <span class="math inline">\(R\)</span>
+centrée à l’origine, le volume en coordonnées cylindriques est : <span
+class="math display">\[V = \int_{-R}^{R} \int_{0}^{2\pi}
+\int_{0}^{\sqrt{R^2 - z^2}} r \, dr \, d\theta \, dz = \frac{4}{3} \pi
+R^3\]</span></p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les coordonnées cylindriques offrent une manière élégante et
+puissante de calculer le volume des objets symétriques autour d’un axe.
+En comprenant les transformations et les intégrales associées, nous
+pouvons résoudre une variété de problèmes en physique et en ingénierie.
+Les théorèmes et propriétés présentés dans cet article fournissent les
+outils nécessaires pour maîtriser le calcul du volume en coordonnées
+cylindriques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,330 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Transformée de Fourier et Dualité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title"><strong>Transformée de Fourier et
+Dualité</strong></h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La transformée de Fourier est un outil fondamental en analyse
+mathématique, en physique et en ingénierie. Elle permet de décomposer
+une fonction en une somme (ou une intégrale) de fonctions sinusoïdales,
+facilitant ainsi l’étude des propriétés fréquentielles d’un signal ou
+d’une fonction. L’idée de base remonte à Joseph Fourier, qui a introduit
+cette notion pour résoudre des problèmes de conduction thermique. Depuis
+lors, la transformée de Fourier a trouvé des applications dans divers
+domaines, allant du traitement du signal à l’analyse spectrale.</p>
+<p>La dualité est un concept profond qui émerge naturellement dans le
+cadre de la transformée de Fourier. Elle met en évidence une symétrie
+entre l’espace des fonctions et l’espace des fréquences, révélant des
+propriétés intrinsèques des fonctions étudiées. Cette dualité est
+essentielle pour comprendre les comportements asymptotiques, les
+propriétés de régularité et les relations entre différentes
+transformations.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la transformée de Fourier, commençons par considérer
+une fonction <span class="math inline">\(f\)</span> intégrable sur <span
+class="math inline">\(\mathbb{R}\)</span>. Nous cherchons à décomposer
+cette fonction en une somme de fonctions sinusoïdales. Intuitivement,
+chaque composante fréquentielle de <span
+class="math inline">\(f\)</span> peut être obtenue en projetant <span
+class="math inline">\(f\)</span> sur une onde sinusoïdale de fréquence
+donnée.</p>
+<p>Formellement, la transformée de Fourier de <span
+class="math inline">\(f\)</span> est définie par:</p>
+<p><span class="math display">\[\hat{f}(\xi) = \int_{\mathbb{R}} f(x)
+e^{-2i\pi\xi x} \, dx\]</span></p>
+<p>où <span class="math inline">\(\xi\)</span> représente la fréquence.
+Cette intégrale existe pour toute fonction <span
+class="math inline">\(f\)</span> dans l’espace de Schwartz, c’est-à-dire
+une fonction rapidement décroissante ainsi que toutes ses dérivées.</p>
+<p>Une autre manière de formuler la transformée de Fourier est
+d’utiliser des cosinus et sinus:</p>
+<p><span class="math display">\[\hat{f}(\xi) = \int_{\mathbb{R}} f(x)
+\cos(2\pi\xi x) \, dx - i \int_{\mathbb{R}} f(x) \sin(2\pi\xi x) \,
+dx\]</span></p>
+<p>Cette formulation met en évidence la décomposition en parties réelles
+et imaginaires de la transformée.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant la transformée de Fourier
+est le théorème d’inversion, qui permet de retrouver une fonction à
+partir de sa transformée de Fourier.</p>
+<p>Supposons que <span class="math inline">\(f\)</span> soit une
+fonction intégrable et que sa transformée de Fourier <span
+class="math inline">\(\hat{f}\)</span> soit également intégrable. Alors,
+pour presque tout <span class="math inline">\(x \in \mathbb{R}\)</span>,
+nous avons:</p>
+<p><span class="math display">\[f(x) = \int_{\mathbb{R}} \hat{f}(\xi)
+e^{2i\pi\xi x} \, d\xi\]</span></p>
+<p>Ce théorème montre que la transformée de Fourier est une opération
+inversible, ce qui est crucial pour de nombreuses applications.</p>
+<p>Un autre théorème important est le théorème de Plancherel, qui
+établit une relation entre les normes <span
+class="math inline">\(L^2\)</span> des fonctions et de leurs
+transformées de Fourier.</p>
+<p>Pour toute fonction <span class="math inline">\(f \in
+L^2(\mathbb{R})\)</span>, nous avons:</p>
+<p><span class="math display">\[\|f\|_{L^2}^2 =
+\|\hat{f}\|_{L^2}^2\]</span></p>
+<p>Ce théorème est à la base de nombreuses applications en traitement du
+signal et en analyse spectrale.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème d’inversion, nous utilisons la formule de
+Fubini et les propriétés de l’intégrale de Riemann. Supposons que <span
+class="math inline">\(f\)</span> soit une fonction intégrable et que
+<span class="math inline">\(\hat{f}\)</span> soit également intégrable.
+Alors, pour tout <span class="math inline">\(x \in \mathbb{R}\)</span>,
+nous avons:</p>
+<p><span class="math display">\[\int_{\mathbb{R}} \hat{f}(\xi)
+e^{2i\pi\xi x} \, d\xi = \int_{\mathbb{R}} \left( \int_{\mathbb{R}} f(y)
+e^{-2i\pi\xi y} \, dy \right) e^{2i\pi\xi x} \, d\xi\]</span></p>
+<p>En utilisant la formule de Fubini, nous pouvons intervertir les
+intégrales:</p>
+<p><span class="math display">\[\int_{\mathbb{R}} f(y) \left(
+\int_{\mathbb{R}} e^{-2i\pi\xi (y - x)} \, d\xi \right) dy\]</span></p>
+<p>L’intégrale intérieure est une intégrale de Dirac, qui vaut <span
+class="math inline">\(\delta(y - x)\)</span>. Par conséquent, nous
+obtenons:</p>
+<p><span class="math display">\[\int_{\mathbb{R}} f(y) \delta(y - x) \,
+dy = f(x)\]</span></p>
+<p>Ce qui prouve le théorème d’inversion.</p>
+<p>Pour prouver le théorème de Plancherel, nous utilisons la formule
+d’inversion et les propriétés des fonctions <span
+class="math inline">\(L^2\)</span>. Supposons que <span
+class="math inline">\(f \in L^2(\mathbb{R})\)</span>. Alors, pour toute
+fonction <span class="math inline">\(g \in L^1(\mathbb{R}) \cap
+L^2(\mathbb{R})\)</span>, nous avons:</p>
+<p><span class="math display">\[\int_{\mathbb{R}} f(x) \overline{g(x)}
+\, dx = \int_{\mathbb{R}} \hat{f}(\xi) \overline{\hat{g}(\xi)} \,
+d\xi\]</span></p>
+<p>En prenant <span class="math inline">\(g = f\)</span>, nous
+obtenons:</p>
+<p><span class="math display">\[\|f\|_{L^2}^2 =
+\|\hat{f}\|_{L^2}^2\]</span></p>
+<p>Ce qui prouve le théorème de Plancherel.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La transformée de Fourier possède plusieurs propriétés intéressantes,
+que nous énumérons ci-dessous:</p>
+<ol>
+<li><p><strong>Linearité</strong>: Pour toutes fonctions <span
+class="math inline">\(f, g \in L^1(\mathbb{R})\)</span> et tous
+scalaires <span class="math inline">\(a, b \in \mathbb{C}\)</span>, nous
+avons: <span class="math display">\[\widehat{af + bg} = a\hat{f} +
+b\hat{g}\]</span></p></li>
+<li><p><strong>Translation</strong>: Pour toute fonction <span
+class="math inline">\(f \in L^1(\mathbb{R})\)</span> et tout <span
+class="math inline">\(h \in \mathbb{R}\)</span>, nous avons: <span
+class="math display">\[\widehat{f(\cdot - h)} = e^{-2i\pi\xi h}
+\hat{f}(\xi)\]</span></p></li>
+<li><p><strong>Dérivation</strong>: Pour toute fonction <span
+class="math inline">\(f \in L^1(\mathbb{R})\)</span> dérivable et telle
+que <span class="math inline">\(f&#39; \in L^1(\mathbb{R})\)</span>,
+nous avons: <span class="math display">\[\widehat{f&#39;} = 2i\pi\xi
+\hat{f}(\xi)\]</span></p></li>
+<li><p><strong>Convolution</strong>: Pour toutes fonctions <span
+class="math inline">\(f, g \in L^1(\mathbb{R})\)</span>, nous avons:
+<span class="math display">\[\widehat{f * g} = \hat{f} \cdot
+\hat{g}\]</span></p></li>
+</ol>
+<p>Ces propriétés sont essentielles pour manipuler les transformées de
+Fourier dans divers contextes mathématiques et appliqués.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

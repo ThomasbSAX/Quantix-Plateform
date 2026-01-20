@@ -1,0 +1,370 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La Distance de Canberra : Une Mesure Métrique pour les Données Hétérogènes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La Distance de Canberra : Une Mesure Métrique pour les
+Données Hétérogènes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Canberra, introduite initialement dans le contexte des
+analyses de données biologiques, émerge comme une solution élégante pour
+mesurer la dissimilarité entre des vecteurs dans un espace métrique. Son
+origine historique remonte aux travaux de L.P. Gower en 1967, où elle
+fut proposée comme une alternative aux distances euclidiennes
+classiques. Cette mesure se distingue par sa capacité à pondérer les
+différences relatives entre les composantes des vecteurs, ce qui la rend
+particulièrement adaptée aux données où les échelles de mesure varient
+considérablement.</p>
+<p>La notion de distance de Canberra est indispensable dans des cadres
+où les données présentent une forte variabilité d’échelle. Par exemple,
+en bioinformatique, elle permet de comparer des profils génétiques où
+certaines caractéristiques peuvent être exprimées en ordres de grandeur
+différents. De même, en économie, elle offre un outil puissant pour
+évaluer les disparités entre des indices économiques diversement
+pondérés.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Canberra, considérons deux vecteurs
+<span class="math inline">\(\mathbf{x} = (x_1, x_2, \ldots,
+x_n)\)</span> et <span class="math inline">\(\mathbf{y} = (y_1, y_2,
+\ldots, y_n)\)</span> dans un espace euclidien <span
+class="math inline">\(\mathbb{R}^n\)</span>. Nous cherchons une mesure
+qui capture la dissimilarité entre ces vecteurs, en tenant compte des
+différences relatives de leurs composantes.</p>
+<p>La distance de Canberra est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(\mathbf{x}, \mathbf{y} \in
+\mathbb{R}^n\)</span>. La distance de Canberra entre <span
+class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span> est donnée par : <span
+class="math display">\[d_C(\mathbf{x}, \mathbf{y}) = \sum_{i=1}^n
+\frac{|x_i - y_i|}{|x_i| + |y_i|}\]</span> où <span
+class="math inline">\(\forall i, x_i, y_i \neq 0\)</span>.</p>
+</div>
+<p>Une formulation alternative, utilisant des quantificateurs
+universels, est :</p>
+<p><span class="math display">\[d_C(\mathbf{x}, \mathbf{y}) =
+\sum_{i=1}^n \frac{\left| x_i - y_i \right|}{\max(|x_i|, |y_i|) +
+\min(|x_i|, |y_i|)}\]</span></p>
+<p>Cette définition met en évidence la propriété de pondération relative
+inhérente à la distance de Canberra.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Canberra est celui de sa
+validité en tant que mesure métrique. Pour ce faire, nous devons
+vérifier les propriétés suivantes : non-négativité, identité des
+indiscernables, symétrie et inégalité triangulaire.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(d_C\)</span> la distance de Canberra
+définie sur <span class="math inline">\(\mathbb{R}^n\)</span>. Alors,
+pour tout <span class="math inline">\(\mathbf{x}, \mathbf{y}, \mathbf{z}
+\in \mathbb{R}^n\)</span> :</p>
+<ol>
+<li><p>(Non-négativité) <span class="math inline">\(d_C(\mathbf{x},
+\mathbf{y}) \geq 0\)</span></p></li>
+<li><p>(Identité des indiscernables) <span
+class="math inline">\(d_C(\mathbf{x}, \mathbf{y}) = 0 \iff \mathbf{x} =
+\mathbf{y}\)</span></p></li>
+<li><p>(Symétrie) <span class="math inline">\(d_C(\mathbf{x},
+\mathbf{y}) = d_C(\mathbf{y}, \mathbf{x})\)</span></p></li>
+<li><p>(Inégalité Triangulaire) <span
+class="math inline">\(d_C(\mathbf{x}, \mathbf{z}) \leq d_C(\mathbf{x},
+\mathbf{y}) + d_C(\mathbf{y}, \mathbf{z})\)</span></p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<div class="proof">
+<p><em>Preuve des Propriétés Métriques.</em> Nous allons démontrer
+chaque propriété une par une.</p>
+<ol>
+<li><p><strong>Non-négativité</strong> : Par définition, le numérateur
+<span class="math inline">\(|x_i - y_i|\)</span> est toujours
+non-négatif, et le dénominateur <span class="math inline">\(|x_i| +
+|y_i|\)</span> est strictement positif. Ainsi, chaque terme de la somme
+est non-négatif, et donc <span class="math inline">\(d_C(\mathbf{x},
+\mathbf{y}) \geq 0\)</span>.</p></li>
+<li><p><strong>Identité des indiscernables</strong> : Si <span
+class="math inline">\(\mathbf{x} = \mathbf{y}\)</span>, alors <span
+class="math inline">\(x_i = y_i\)</span> pour tout <span
+class="math inline">\(i\)</span>, et donc <span
+class="math inline">\(d_C(\mathbf{x}, \mathbf{y}) = 0\)</span>.
+Réciproquement, si <span class="math inline">\(d_C(\mathbf{x},
+\mathbf{y}) = 0\)</span>, alors chaque terme de la somme doit être nul,
+ce qui implique <span class="math inline">\(x_i = y_i\)</span> pour tout
+<span class="math inline">\(i\)</span>.</p></li>
+<li><p><strong>Symétrie</strong> : Par la symétrie de l’absolue valeur
+et du dénominateur, nous avons <span class="math inline">\(\frac{|x_i -
+y_i|}{|x_i| + |y_i|} = \frac{|y_i - x_i|}{|y_i| + |x_i|}\)</span>. La
+somme étant commutative, il s’ensuit que <span
+class="math inline">\(d_C(\mathbf{x}, \mathbf{y}) = d_C(\mathbf{y},
+\mathbf{x})\)</span>.</p></li>
+<li><p><strong>Inégalité Triangulaire</strong> : Pour démontrer cette
+propriété, nous utilisons l’inégalité triangulaire pour les nombres
+réels. Pour chaque composante <span class="math inline">\(i\)</span>,
+nous avons : <span class="math display">\[|x_i - z_i| \leq |x_i - y_i| +
+|y_i - z_i|\]</span> En divisant par <span class="math inline">\(|x_i| +
+|z_i|\)</span> et en utilisant l’inégalité de Minkowski, nous obtenons :
+<span class="math display">\[\frac{|x_i - z_i|}{|x_i| + |z_i|} \leq
+\frac{|x_i - y_i| + |y_i - z_i|}{|x_i| + |z_i|} \leq \frac{|x_i -
+y_i|}{|x_i| + |y_i|} + \frac{|y_i - z_i|}{|y_i| + |z_i|}\]</span> En
+sommant sur <span class="math inline">\(i\)</span>, nous obtenons
+l’inégalité triangulaire pour la distance de Canberra.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+distance de Canberra, suivies de leurs preuves détaillées.</p>
+<ol>
+<li><p><strong>Invariance par Translation</strong> : La distance de
+Canberra est invariante par translation. Plus précisément, pour tout
+vecteur <span class="math inline">\(\mathbf{a} \in
+\mathbb{R}^n\)</span>, nous avons : <span
+class="math display">\[d_C(\mathbf{x} + \mathbf{a}, \mathbf{y} +
+\mathbf{a}) = d_C(\mathbf{x}, \mathbf{y})\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> En effet, pour chaque composante <span
+class="math inline">\(i\)</span>, nous avons : <span
+class="math display">\[\frac{|(x_i + a_i) - (y_i + a_i)|}{|x_i + a_i| +
+|y_i + a_i|} = \frac{|x_i - y_i|}{|x_i + a_i| + |y_i + a_i|}\]</span>
+Cependant, cette propriété n’est pas toujours vraie en général. Elle
+nécessite des conditions supplémentaires sur <span
+class="math inline">\(\mathbf{a}\)</span> et <span
+class="math inline">\(\mathbf{x}, \mathbf{y}\)</span>. ◻</p>
+</div></li>
+<li><p><strong>Homogénéité</strong> : La distance de Canberra est
+homogène de degré 1. Pour tout scalaire <span
+class="math inline">\(\lambda \in \mathbb{R}\)</span>, nous avons :
+<span class="math display">\[d_C(\lambda \mathbf{x}, \lambda \mathbf{y})
+= |\lambda| d_C(\mathbf{x}, \mathbf{y})\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> Pour chaque composante <span
+class="math inline">\(i\)</span>, nous avons : <span
+class="math display">\[\frac{|\lambda x_i - \lambda y_i|}{|\lambda x_i|
++ |\lambda y_i|} = \frac{|\lambda| |x_i - y_i|}{|\lambda| (|x_i| +
+|y_i|)} = \frac{|x_i - y_i|}{|x_i| + |y_i|}\]</span> En sommant sur
+<span class="math inline">\(i\)</span>, nous obtenons le résultat
+désiré. ◻</p>
+</div></li>
+<li><p><strong>Sensibilité aux Valeurs Aberrantes</strong> : La distance
+de Canberra est moins sensible aux valeurs aberrantes que la distance
+euclidienne. Cela signifie qu’une grande différence entre deux
+composantes n’affecte pas disproportionnellement la distance totale.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux vecteurs <span
+class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span> où une composante <span
+class="math inline">\(k\)</span> est très différente. La contribution de
+cette composante à la distance de Canberra est : <span
+class="math display">\[\frac{|x_k - y_k|}{|x_k| + |y_k|}\]</span> Cette
+contribution est relativement plus petite que celle de la distance
+euclidienne, qui serait <span class="math inline">\((x_k -
+y_k)^2\)</span>, car le dénominateur <span class="math inline">\(|x_k| +
+|y_k|\)</span> peut être très grand. ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Canberra offre une alternative robuste et flexible aux
+mesures de dissimilarité traditionnelles. Son aptitude à pondérer les
+différences relatives entre les composantes des vecteurs en fait un
+outil précieux dans de nombreux domaines, notamment la bioinformatique
+et l’analyse économique. Les propriétés métriques et les corollaires
+associés enrichissent notre compréhension de cette mesure et ouvrent la
+voie à des applications futures dans des contextes encore plus
+variés.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,326 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Aire de surface par intégrale de surface</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Aire de surface par intégrale de surface</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’aire de surface d’un objet géométrique est une notion fondamentale
+en mathématiques, en physique et en ingénierie. Elle permet de
+quantifier la taille d’une surface dans l’espace euclidien. L’intégrale
+de surface est un outil puissant pour calculer cette aire, surtout
+lorsque la surface n’est pas plane. L’origine de cette notion remonte
+aux travaux des mathématiciens du XVIIe siècle, comme Isaac Newton et
+Gottfried Wilhelm Leibniz, qui ont développé le calcul intégral. Plus
+tard, Augustin-Louis Cauchy et Bernhard Riemann ont formalisé les
+concepts d’intégrales sur des surfaces.</p>
+<p>L’aire de surface par intégrale de surface émerge comme une
+généralisation naturelle du calcul d’aire pour les surfaces planes. Elle
+est indispensable dans de nombreux domaines, tels que la physique des
+fluides, l’électromagnétisme, et la modélisation géométrique. En effet,
+le calcul de l’aire permet de déterminer des quantités physiques comme
+le flux d’un champ vectoriel à travers une surface, ou la charge totale
+sur un conducteur.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir l’aire de surface par intégrale de surface, commençons
+par comprendre ce que nous cherchons à mesurer. Imaginons une surface
+dans l’espace tridimensionnel. Nous voulons quantifier la taille de
+cette surface, c’est-à-dire l’étendue qu’elle occupe. Pour cela, nous
+devons envisager de découper la surface en petites portions infiniment
+petites et sommer leurs aires.</p>
+<p>Formellement, soit <span class="math inline">\(S\)</span> une surface
+lisse dans <span class="math inline">\(\mathbb{R}^3\)</span>. Nous
+voulons définir l’aire de <span class="math inline">\(S\)</span>, notée
+<span class="math inline">\(A(S)\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(S\)</span> une surface paramétrée
+par <span class="math inline">\(\mathbf{r}(u, v) = (x(u, v), y(u, v),
+z(u, v))\)</span> définie sur un domaine <span class="math inline">\(D
+\subset \mathbb{R}^2\)</span>. L’élément d’aire de surface est donné par
+: <span class="math display">\[dA = \left\| \frac{\partial
+\mathbf{r}}{\partial u} \times \frac{\partial \mathbf{r}}{\partial v}
+\right\| du \, dv\]</span> où <span
+class="math inline">\(\times\)</span> désigne le produit vectoriel et
+<span class="math inline">\(\| \cdot \|\)</span> la norme
+euclidienne.</p>
+</div>
+<p>L’aire totale de la surface <span class="math inline">\(S\)</span>
+est alors obtenue en intégrant cet élément d’aire sur le domaine <span
+class="math inline">\(D\)</span> : <span class="math display">\[A(S) =
+\iint_D \left\| \frac{\partial \mathbf{r}}{\partial u} \times
+\frac{\partial \mathbf{r}}{\partial v} \right\| du \, dv\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’aire de surface est le théorème de la
+divergence, également connu sous le nom de théorème d’Ostrogradsky. Ce
+théorème relie l’intégrale de volume d’un champ vectoriel divergent à
+une intégrale de surface.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\Omega\)</span> un domaine borné
+dans <span class="math inline">\(\mathbb{R}^3\)</span> avec une
+frontière <span class="math inline">\(\partial \Omega\)</span> lisse.
+Soit <span class="math inline">\(\mathbf{F}\)</span> un champ vectoriel
+de classe <span class="math inline">\(C^1\)</span> dans <span
+class="math inline">\(\Omega\)</span>. Alors : <span
+class="math display">\[\iiint_{\Omega} (\nabla \cdot \mathbf{F}) \, dV =
+\iint_{\partial \Omega} \mathbf{F} \cdot \mathbf{n} \, dA\]</span> où
+<span class="math inline">\(\nabla \cdot \mathbf{F}\)</span> est la
+divergence de <span class="math inline">\(\mathbf{F}\)</span>, et <span
+class="math inline">\(\mathbf{n}\)</span> est le vecteur normal unitaire
+sortant à la surface <span class="math inline">\(\partial
+\Omega\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la divergence, nous utilisons plusieurs
+outils mathématiques avancés. La preuve repose sur des résultats de
+l’analyse vectorielle et du calcul différentiel.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un petit cube dans <span
+class="math inline">\(\Omega\)</span> et appliquons le théorème de la
+divergence à ce cube. En sommant sur tous les petits cubes qui composent
+<span class="math inline">\(\Omega\)</span>, nous obtenons une
+approximation de l’intégrale de volume. En prenant la limite lorsque la
+taille des cubes tend vers zéro, nous retrouvons l’égalité du théorème
+de la divergence.</p>
+<p>De manière plus formelle, nous utilisons le fait que pour tout champ
+vectoriel <span class="math inline">\(\mathbf{F}\)</span> de classe
+<span class="math inline">\(C^1\)</span>, nous avons : <span
+class="math display">\[\iiint_{\Omega} (\nabla \cdot \mathbf{F}) \, dV =
+\lim_{n \to \infty} \sum_{i=1}^n (\nabla \cdot \mathbf{F})(\mathbf{x}_i)
+\, dV_i\]</span> où <span class="math inline">\(dV_i\)</span> est le
+volume du petit cube autour de <span
+class="math inline">\(\mathbf{x}_i\)</span>.</p>
+<p>En utilisant la divergence, nous pouvons réécrire cette somme comme
+une somme de flux à travers les faces des cubes. En prenant la limite,
+nous obtenons : <span class="math display">\[\iiint_{\Omega} (\nabla
+\cdot \mathbf{F}) \, dV = \iint_{\partial \Omega} \mathbf{F} \cdot
+\mathbf{n} \, dA\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés et corollaires importants
+liés à l’aire de surface.</p>
+<ol>
+<li><p><strong>Additivité</strong> : L’aire de surface est additive. Si
+<span class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span> sont deux surfaces disjointes, alors
+: <span class="math display">\[A(S_1 \cup S_2) = A(S_1) +
+A(S_2)\]</span></p></li>
+<li><p><strong>Invariance par isométrie</strong> : L’aire de surface est
+invariante par isométrie. Si <span class="math inline">\(\phi\)</span>
+est une isométrie (c’est-à-dire une transformation qui préserve les
+distances), alors pour toute surface <span
+class="math inline">\(S\)</span> : <span
+class="math display">\[A(\phi(S)) = A(S)\]</span></p></li>
+<li><p><strong>Relation avec le gradient</strong> : Pour une surface
+<span class="math inline">\(S\)</span> définie par <span
+class="math inline">\(z = f(x, y)\)</span>, l’aire peut être exprimée
+comme : <span class="math display">\[A(S) = \iint_D \sqrt{1 + \left(
+\frac{\partial f}{\partial x} \right)^2 + \left( \frac{\partial
+f}{\partial y} \right)^2} \, dx \, dy\]</span></p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’aire de surface par intégrale de surface est un concept puissant et
+polyvalent en mathématiques appliquées. Il permet de quantifier la
+taille des surfaces dans l’espace et est essentiel pour le calcul de
+diverses grandeurs physiques. Les théorèmes et propriétés associés,
+comme le théorème de la divergence, sont des outils fondamentaux pour la
+résolution de problèmes complexes en physique et en ingénierie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

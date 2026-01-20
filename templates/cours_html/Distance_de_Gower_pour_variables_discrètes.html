@@ -1,0 +1,412 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Gower pour variables discrètes : Une approche unifiée</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Gower pour variables discrètes : Une
+approche unifiée</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des données multivariées, notamment celles de nature
+discrète, représente un défi fondamental en statistique et en
+apprentissage automatique. Les variables discrètes, souvent qualitatives
+ou catégorielles, ne peuvent être traitées par les distances classiques
+telles que la distance euclidienne ou de Manhattan, conçues pour des
+données continues. C’est dans ce contexte que la distance de Gower
+émerge comme une solution élégante et unifiée.</p>
+<p>Proposée par le statisticien britannique Michael A. Gower en 1971,
+cette distance permet de mesurer la dissimilarité entre des objets
+décrits par un mélange de variables qualitatives et quantitatives. Son
+originalité réside dans sa capacité à normaliser les contributions de
+chaque variable, assurant ainsi une comparaison équitable entre des
+attributs de natures différentes.</p>
+<p>Dans ce chapitre, nous explorons la distance de Gower pour les
+variables discrètes. Nous commençons par en définir rigoureusement le
+cadre, puis nous détaillons ses propriétés mathématiques et ses
+applications pratiques. Enfin, nous illustrons son utilisation par des
+exemples concrets.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Gower, considérons un ensemble
+d’objets décrits par des variables discrètes. Notre objectif est de
+définir une mesure de dissimilarité qui capture la différence entre ces
+objets, tout en tenant compte des spécificités des variables
+discrètes.</p>
+<p>Supposons que nous ayons un ensemble de <span
+class="math inline">\(n\)</span> objets <span
+class="math inline">\(\{O_1, O_2, \ldots, O_n\}\)</span>, chacun décrit
+par <span class="math inline">\(p\)</span> variables discrètes <span
+class="math inline">\(\{X_1, X_2, \ldots, X_p\}\)</span>. Chaque
+variable <span class="math inline">\(X_j\)</span> peut prendre un nombre
+fini de valeurs distinctes, notées <span class="math inline">\(\{x_{j1},
+x_{j2}, \ldots, x_{jk_j}\}\)</span>, où <span
+class="math inline">\(k_j\)</span> est le nombre de modalités de la
+variable <span class="math inline">\(X_j\)</span>.</p>
+<p>Nous cherchons une fonction <span class="math inline">\(d: \{O_1,
+O_2, \ldots, O_n\} \times \{O_1, O_2, \ldots, O_n\} \rightarrow [0,
+1]\)</span> qui mesure la dissimilarité entre deux objets <span
+class="math inline">\(O_i\)</span> et <span
+class="math inline">\(O_l\)</span>. Cette fonction doit satisfaire les
+propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(d(O_i, O_l) = 0\)</span> si et
+seulement si <span class="math inline">\(O_i = O_l\)</span>,</p></li>
+<li><p><span class="math inline">\(d(O_i, O_l) = d(O_l,
+O_i)\)</span>,</p></li>
+<li><p><span class="math inline">\(d(O_i, O_k) \leq d(O_i, O_l) + d(O_l,
+O_k)\)</span>.</p></li>
+</ol>
+<p>La distance de Gower pour les variables discrètes est définie comme
+suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(O_i\)</span> et <span
+class="math inline">\(O_l\)</span> deux objets décrits par <span
+class="math inline">\(p\)</span> variables discrètes. La distance de
+Gower entre <span class="math inline">\(O_i\)</span> et <span
+class="math inline">\(O_l\)</span> est donnée par : <span
+class="math display">\[d(O_i, O_l) = \frac{1}{p} \sum_{j=1}^{p} d_j(O_i,
+O_l),\]</span> où <span class="math inline">\(d_j(O_i, O_l)\)</span> est
+la dissimilarité entre les valeurs des objets <span
+class="math inline">\(O_i\)</span> et <span
+class="math inline">\(O_l\)</span> pour la variable <span
+class="math inline">\(X_j\)</span>.</p>
+</div>
+<p>Pour une variable discrète <span class="math inline">\(X_j\)</span>,
+la dissimilarité <span class="math inline">\(d_j(O_i, O_l)\)</span> est
+définie par : <span class="math display">\[d_j(O_i, O_l) = \begin{cases}
+0 &amp; \text{si } X_j(O_i) = X_j(O_l), \\
+1 &amp; \text{sinon.}
+\end{cases}\]</span></p>
+<p>Cette définition peut être généralisée pour tenir compte des
+variables ordinales ou des variables avec des poids spécifiques.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour mieux comprendre les propriétés de la distance de Gower, nous
+présentons quelques théorèmes clés.</p>
+<div class="theorem">
+<p>La distance de Gower <span class="math inline">\(d\)</span> définie
+ci-dessus est une distance métrique, c’est-à-dire qu’elle satisfait les
+trois propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(d(O_i, O_l) = 0\)</span> si et
+seulement si <span class="math inline">\(O_i = O_l\)</span>,</p></li>
+<li><p><span class="math inline">\(d(O_i, O_l) = d(O_l,
+O_i)\)</span>,</p></li>
+<li><p><span class="math inline">\(d(O_i, O_k) \leq d(O_i, O_l) + d(O_l,
+O_k)\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver que <span
+class="math inline">\(d\)</span> est une distance métrique, nous devons
+vérifier chacune des propriétés énoncées.</p>
+<ol>
+<li><p>Supposons que <span class="math inline">\(O_i = O_l\)</span>.
+Alors, pour toute variable <span class="math inline">\(X_j\)</span>,
+nous avons <span class="math inline">\(X_j(O_i) = X_j(O_l)\)</span>. Par
+conséquent, <span class="math inline">\(d_j(O_i, O_l) = 0\)</span> pour
+tout <span class="math inline">\(j\)</span>, et donc <span
+class="math inline">\(d(O_i, O_l) = 0\)</span>.</p>
+<p>Réciproquement, supposons que <span class="math inline">\(d(O_i, O_l)
+= 0\)</span>. Cela implique que <span
+class="math inline">\(\sum_{j=1}^{p} d_j(O_i, O_l) = 0\)</span>. Puisque
+<span class="math inline">\(d_j(O_i, O_l) \geq 0\)</span> pour tout
+<span class="math inline">\(j\)</span>, nous avons <span
+class="math inline">\(d_j(O_i, O_l) = 0\)</span> pour tout <span
+class="math inline">\(j\)</span>. Cela signifie que <span
+class="math inline">\(X_j(O_i) = X_j(O_l)\)</span> pour tout <span
+class="math inline">\(j\)</span>, et donc <span
+class="math inline">\(O_i = O_l\)</span>.</p></li>
+<li><p>La symétrie de <span class="math inline">\(d\)</span> découle
+directement de la symétrie de <span class="math inline">\(d_j\)</span>.
+En effet, pour toute variable <span class="math inline">\(X_j\)</span>,
+nous avons <span class="math inline">\(d_j(O_i, O_l) = d_j(O_l,
+O_i)\)</span>. Par conséquent, <span class="math display">\[d(O_i, O_l)
+= \frac{1}{p} \sum_{j=1}^{p} d_j(O_i, O_l) = \frac{1}{p} \sum_{j=1}^{p}
+d_j(O_l, O_i) = d(O_l, O_i).\]</span></p></li>
+<li><p>Pour prouver l’inégalité triangulaire, nous utilisons le fait que
+<span class="math inline">\(d_j\)</span> satisfait l’inégalité
+triangulaire. En effet, pour toute variable <span
+class="math inline">\(X_j\)</span>, nous avons <span
+class="math display">\[d_j(O_i, O_k) \leq d_j(O_i, O_l) + d_j(O_l,
+O_k).\]</span> En sommant sur <span class="math inline">\(j\)</span>,
+nous obtenons <span class="math display">\[\sum_{j=1}^{p} d_j(O_i, O_k)
+\leq \sum_{j=1}^{p} d_j(O_i, O_l) + \sum_{j=1}^{p} d_j(O_l,
+O_k).\]</span> En divisant par <span class="math inline">\(p\)</span>,
+nous avons <span class="math display">\[d(O_i, O_k) \leq d(O_i, O_l) +
+d(O_l, O_k).\]</span></p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer les preuves détaillées, considérons un exemple
+simple.</p>
+<div class="example">
+<p>Supposons que nous avons trois objets <span
+class="math inline">\(O_1, O_2, O_3\)</span> décrits par deux variables
+discrètes <span class="math inline">\(X_1\)</span> et <span
+class="math inline">\(X_2\)</span>. Les valeurs des variables sont les
+suivantes : <span class="math display">\[\begin{array}{c|c|c}
+        &amp; X_1 &amp; X_2 \\
+        \hline
+        O_1 &amp; A &amp; 1 \\
+        O_2 &amp; B &amp; 1 \\
+        O_3 &amp; A &amp; 2 \\
+    \end{array}\]</span></p>
+</div>
+<p>Calculons la distance de Gower entre <span
+class="math inline">\(O_1\)</span> et <span
+class="math inline">\(O_2\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour la variable <span
+class="math inline">\(X_1\)</span>, nous avons <span
+class="math inline">\(X_1(O_1) = A\)</span> et <span
+class="math inline">\(X_1(O_2) = B\)</span>. Par conséquent, <span
+class="math inline">\(d_1(O_1, O_2) = 1\)</span>.</p>
+<p>Pour la variable <span class="math inline">\(X_2\)</span>, nous avons
+<span class="math inline">\(X_2(O_1) = 1\)</span> et <span
+class="math inline">\(X_2(O_2) = 1\)</span>. Par conséquent, <span
+class="math inline">\(d_2(O_1, O_2) = 0\)</span>.</p>
+<p>La distance de Gower entre <span class="math inline">\(O_1\)</span>
+et <span class="math inline">\(O_2\)</span> est donc : <span
+class="math display">\[d(O_1, O_2) = \frac{1}{2} (d_1(O_1, O_2) +
+d_2(O_1, O_2)) = \frac{1}{2} (1 + 0) = \frac{1}{2}.\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Gower possède plusieurs propriétés intéressantes, que
+nous énumérons ci-dessous.</p>
+<div class="proposition">
+<p>Les propriétés suivantes découlent directement de la définition de la
+distance de Gower :</p>
+<ol>
+<li><p>La distance de Gower est normalisée entre 0 et 1.</p></li>
+<li><p>La distance de Gower est invariante par permutation des
+variables.</p></li>
+<li><p>La distance de Gower peut être étendue pour inclure des variables
+continues en utilisant une normalisation appropriée.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>Par définition, <span class="math inline">\(d_j(O_i, O_l) \in
+\{0, 1\}\)</span>. Par conséquent, <span class="math inline">\(d(O_i,
+O_l) \in [0, 1]\)</span>.</p></li>
+<li><p>La distance de Gower est la moyenne des dissimilarités sur toutes
+les variables. Par conséquent, permuter les variables ne change pas la
+valeur de <span class="math inline">\(d\)</span>.</p></li>
+<li><p>Pour inclure des variables continues, nous pouvons normaliser
+chaque variable de sorte que sa contribution à la distance soit
+également comprise entre 0 et 1. Par exemple, pour une variable continue
+<span class="math inline">\(X_j\)</span>, nous pouvons définir <span
+class="math display">\[d_j(O_i, O_l) = \frac{|X_j(O_i) -
+X_j(O_l)|}{\max(X_j) - \min(X_j)}.\]</span></p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Gower pour variables discrètes offre une approche
+unifiée et flexible pour mesurer la dissimilarité entre des objets
+décrits par des variables de natures différentes. Son utilisation est
+particulièrement utile dans les domaines où les données sont
+hétérogènes, tels que la bioinformatique, la sociologie, et l’analyse de
+texte.</p>
+<p>En conclusion, nous avons présenté la distance de Gower, ses
+propriétés mathématiques, et ses applications pratiques. Nous espérons
+que ce chapitre aura permis de mieux comprendre cette notion
+fondamentale en analyse des données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

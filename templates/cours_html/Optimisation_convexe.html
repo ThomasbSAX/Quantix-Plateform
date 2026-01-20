@@ -1,0 +1,446 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Optimisation convexe : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Optimisation convexe : Fondements et Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’optimisation convexe est un domaine central en mathématiques
+appliquées, en sciences de l’ingénieur et en économie. Elle trouve ses
+racines dans les travaux pionniers de Joseph-Louis Lagrange au XVIIIe
+siècle, avec le développement du multiplicateur de Lagrange.
+L’optimisation convexe émerge comme une réponse naturelle aux problèmes
+d’optimisation où les contraintes et la fonction objectif présentent des
+propriétés de convexité. Ces propriétés garantissent l’existence et
+l’unicité des solutions, ainsi que la possibilité de les trouver
+efficacement.</p>
+<p>L’importance de l’optimisation convexe réside dans sa capacité à
+modéliser une grande variété de problèmes réels. Que ce soit en
+ingénierie pour la conception de structures optimales, en économie pour
+l’allocation des ressources, ou en apprentissage automatique pour la
+classification et la régression, les méthodes d’optimisation convexe
+sont indispensables.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans les théorèmes et les applications, il est
+essentiel de définir rigoureusement les concepts fondamentaux de
+l’optimisation convexe.</p>
+<h2 id="ensembles-convexes">Ensembles convexes</h2>
+<p>Considérons un ensemble <span class="math inline">\(S\)</span> dans
+un espace vectoriel. Intuitivement, nous souhaitons que pour tout couple
+de points <span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> dans <span
+class="math inline">\(S\)</span>, le segment de droite les reliant soit
+entièrement contenu dans <span class="math inline">\(S\)</span>. Cette
+propriété est formellement définie comme suit :</p>
+<div class="definition">
+<p>Un ensemble <span class="math inline">\(S \subseteq
+\mathbb{R}^n\)</span> est dit convexe si pour tous <span
+class="math inline">\(x, y \in S\)</span> et pour tout <span
+class="math inline">\(\lambda \in [0, 1]\)</span>, on a : <span
+class="math display">\[\lambda x + (1 - \lambda) y \in S.\]</span></p>
+</div>
+<h2 id="fonctions-convexes">Fonctions convexes</h2>
+<p>Une fonction <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> est convexe si son épigraphe est un ensemble
+convexe. Plus précisément, nous avons la définition suivante :</p>
+<div class="definition">
+<p>Une fonction <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> est convexe si pour tous <span
+class="math inline">\(x, y \in \mathbb{R}^n\)</span> et pour tout <span
+class="math inline">\(\lambda \in [0, 1]\)</span>, on a : <span
+class="math display">\[f(\lambda x + (1 - \lambda) y) \leq \lambda f(x)
++ (1 - \lambda) f(y).\]</span></p>
+</div>
+<h2 id="problème-doptimisation-convexe">Problème d’optimisation
+convexe</h2>
+<p>Un problème d’optimisation convexe est un problème d’optimisation où
+la fonction objectif et les contraintes sont convexes. Formellement,
+nous avons :</p>
+<div class="definition">
+<p>Un problème d’optimisation convexe est un problème de la forme :
+<span class="math display">\[\begin{cases}
+\min_{x \in \mathbb{R}^n} &amp; f(x) \\
+\text{tel que} &amp; g_i(x) \leq 0, \quad i = 1, \ldots, m \\
+&amp; h_j(x) = 0, \quad j = 1, \ldots, p
+\end{cases}\]</span> où <span class="math inline">\(f: \mathbb{R}^n
+\rightarrow \mathbb{R}\)</span> est une fonction convexe, <span
+class="math inline">\(g_i: \mathbb{R}^n \rightarrow \mathbb{R}\)</span>
+sont des fonctions convexes, et <span class="math inline">\(h_j:
+\mathbb{R}^n \rightarrow \mathbb{R}\)</span> sont des fonctions
+affines.</p>
+</div>
+<h1 id="théorèmes-fondamentaux">Théorèmes Fondamentaux</h1>
+<h2 id="théorème-de-séparation-des-ensembles-convexes">Théorème de
+séparation des ensembles convexes</h2>
+<p>Le théorème de séparation est un résultat fondamental en optimisation
+convexe. Il stipule que deux ensembles convexes disjoints peuvent être
+séparés par un hyperplan.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span> deux ensembles convexes disjoints
+dans <span class="math inline">\(\mathbb{R}^n\)</span>. Alors, il existe
+un hyperplan qui sépare <span class="math inline">\(S_1\)</span> et
+<span class="math inline">\(S_2\)</span>. Autrement dit, il existe un
+vecteur <span class="math inline">\(a \in \mathbb{R}^n\)</span> et un
+scalaire <span class="math inline">\(b \in \mathbb{R}\)</span> tels que
+: <span class="math display">\[a^T x_1 \leq b \leq a^T x_2, \quad
+\forall x_1 \in S_1, \forall x_2 \in S_2.\]</span></p>
+</div>
+<h2 id="théorème-de-dualité-faible">Théorème de dualité faible</h2>
+<p>Le théorème de dualité faible est un résultat clé en optimisation
+convexe. Il établit une relation entre le problème primal et son
+problème dual.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction convexe et <span
+class="math inline">\(g_i: \mathbb{R}^n \rightarrow \mathbb{R}\)</span>
+des fonctions convexes. Considérons le problème primal : <span
+class="math display">\[\begin{cases}
+\min_{x \in \mathbb{R}^n} &amp; f(x) \\
+\text{tel que} &amp; g_i(x) \leq 0, \quad i = 1, \ldots, m
+\end{cases}\]</span> et son problème dual : <span
+class="math display">\[\begin{cases}
+\max_{\lambda \in \mathbb{R}^m_+} &amp; - \sum_{i=1}^m \lambda_i g_i(0)
+\\
+\text{tel que} &amp; f^*(a) = \inf_{x \in \mathbb{R}^n} \{ f(x) - a^T x
+\} \\
+&amp; a = \sum_{i=1}^m \lambda_i \nabla g_i(0)
+\end{cases}\]</span> où <span class="math inline">\(f^*\)</span> est la
+fonction conjuguée de <span class="math inline">\(f\)</span>. Alors, on
+a : <span class="math display">\[\inf_{x \in \mathbb{R}^n} f(x) \geq
+\sup_{\lambda \in \mathbb{R}^m_+} - \sum_{i=1}^m \lambda_i
+g_i(0).\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-séparation-des-ensembles-convexes">Preuve
+du théorème de séparation des ensembles convexes</h2>
+<p>Pour prouver le théorème de séparation, nous utilisons la méthode de
+projection. Soit <span class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span> deux ensembles convexes disjoints.
+Nous cherchons à trouver un hyperplan qui les sépare.</p>
+<p>1. **Projection** : Pour tout <span class="math inline">\(x \in
+S_1\)</span>, nous projetons <span class="math inline">\(x\)</span> sur
+<span class="math inline">\(S_2\)</span>. La projection de <span
+class="math inline">\(x\)</span> sur <span
+class="math inline">\(S_2\)</span> est le point <span
+class="math inline">\(y \in S_2\)</span> qui minimise la distance entre
+<span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span>.</p>
+<p>2. **Distance minimale** : Soit <span
+class="math inline">\(d\)</span> la distance minimale entre <span
+class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span>. Nous avons : <span
+class="math display">\[d = \min_{x \in S_1, y \in S_2} \| x - y
+\|.\]</span></p>
+<p>3. **Hyperplan de séparation** : Nous choisissons un point <span
+class="math inline">\(x_0 \in S_1\)</span> et son projeté <span
+class="math inline">\(y_0 \in S_2\)</span> tels que <span
+class="math inline">\(\| x_0 - y_0 \| = d\)</span>. Nous définissons le
+vecteur normal <span class="math inline">\(a = x_0 - y_0\)</span> et le
+scalaire <span class="math inline">\(b = \frac{1}{2} (a^T x_0 + a^T
+y_0)\)</span>.</p>
+<p>4. **Vérification** : Pour tout <span class="math inline">\(x \in
+S_1\)</span> et <span class="math inline">\(y \in S_2\)</span>, nous
+avons : <span class="math display">\[a^T x = a^T (x - y_0) + a^T y_0
+\geq d \| x - y_0 \| + a^T y_0 \geq b.\]</span> De même, pour tout <span
+class="math inline">\(y \in S_2\)</span>, nous avons : <span
+class="math display">\[a^T y = a^T (y - x_0) + a^T x_0 \leq d \| y - x_0
+\| + a^T x_0 \leq b.\]</span> Ainsi, l’hyperplan <span
+class="math inline">\(\{ z \in \mathbb{R}^n : a^T z = b \}\)</span>
+sépare <span class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span>.</p>
+<h2 id="preuve-du-théorème-de-dualité-faible">Preuve du théorème de
+dualité faible</h2>
+<p>Pour prouver le théorème de dualité faible, nous utilisons la méthode
+des multiplicateurs de Lagrange.</p>
+<p>1. **Fonction de Lagrange** : La fonction de Lagrange associée au
+problème primal est : <span class="math display">\[\mathcal{L}(x,
+\lambda) = f(x) + \sum_{i=1}^m \lambda_i g_i(x),\]</span> où <span
+class="math inline">\(\lambda \in \mathbb{R}^m_+\)</span> sont les
+multiplicateurs de Lagrange.</p>
+<p>2. **Problème dual** : Le problème dual est défini comme : <span
+class="math display">\[\sup_{\lambda \in \mathbb{R}^m_+} \inf_{x \in
+\mathbb{R}^n} \mathcal{L}(x, \lambda).\]</span></p>
+<p>3. **Inégalité de dualité** : Pour tout <span class="math inline">\(x
+\in \mathbb{R}^n\)</span> et <span class="math inline">\(\lambda \in
+\mathbb{R}^m_+\)</span>, nous avons : <span class="math display">\[f(x)
+\geq \mathcal{L}(x, \lambda).\]</span> En prenant l’infimum sur <span
+class="math inline">\(x \in \mathbb{R}^n\)</span>, nous obtenons : <span
+class="math display">\[\inf_{x \in \mathbb{R}^n} f(x) \geq \sup_{\lambda
+\in \mathbb{R}^m_+} \inf_{x \in \mathbb{R}^n} \mathcal{L}(x,
+\lambda).\]</span> Ce qui prouve le théorème de dualité faible.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriétés-des-ensembles-convexes">Propriétés des ensembles
+convexes</h2>
+<ol>
+<li><p>L’intersection de deux ensembles convexes est convexe.</p>
+<div class="proof">
+<p><em>Proof.</em> Soient <span class="math inline">\(S_1\)</span> et
+<span class="math inline">\(S_2\)</span> deux ensembles convexes. Pour
+tout <span class="math inline">\(x, y \in S_1 \cap S_2\)</span> et pour
+tout <span class="math inline">\(\lambda \in [0, 1]\)</span>, nous avons
+: <span class="math display">\[\lambda x + (1 - \lambda) y \in S_1 \quad
+\text{et} \quad \lambda x + (1 - \lambda) y \in S_2.\]</span> Donc,
+<span class="math inline">\(\lambda x + (1 - \lambda) y \in S_1 \cap
+S_2\)</span>, ce qui prouve que <span class="math inline">\(S_1 \cap
+S_2\)</span> est convexe. ◻</p>
+</div></li>
+<li><p>L’image d’un ensemble convexe par une fonction affine est
+convexe.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(S \subseteq
+\mathbb{R}^n\)</span> un ensemble convexe et <span
+class="math inline">\(A: \mathbb{R}^n \rightarrow \mathbb{R}^m\)</span>
+une fonction affine. Pour tout <span class="math inline">\(x, y \in
+S\)</span> et pour tout <span class="math inline">\(\lambda \in [0,
+1]\)</span>, nous avons : <span class="math display">\[A(\lambda x + (1
+- \lambda) y) = \lambda A(x) + (1 - \lambda) A(y).\]</span> Puisque
+<span class="math inline">\(S\)</span> est convexe, <span
+class="math inline">\(\lambda x + (1 - \lambda) y \in S\)</span>. Donc,
+<span class="math inline">\(A(\lambda x + (1 - \lambda) y) \in
+A(S)\)</span>, ce qui prouve que <span
+class="math inline">\(A(S)\)</span> est convexe. ◻</p>
+</div></li>
+</ol>
+<h2 id="corollaires-du-théorème-de-dualité-faible">Corollaires du
+théorème de dualité faible</h2>
+<ol>
+<li><p>Si le problème primal admet une solution optimale <span
+class="math inline">\(x^*\)</span>, alors la valeur optimale du problème
+dual est inférieure ou égale à <span
+class="math inline">\(f(x^*)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(x^*\)</span> une
+solution optimale du problème primal. Alors, pour tout <span
+class="math inline">\(\lambda \in \mathbb{R}^m_+\)</span>, nous avons :
+<span class="math display">\[f(x^*) = \inf_{x \in \mathbb{R}^n} f(x)
+\geq \sup_{\lambda \in \mathbb{R}^m_+} \inf_{x \in \mathbb{R}^n}
+\mathcal{L}(x, \lambda).\]</span> Ce qui prouve le corollaire. ◻</p>
+</div></li>
+<li><p>Si le problème dual admet une solution optimale <span
+class="math inline">\(\lambda^*\)</span>, alors la valeur optimale du
+problème primal est supérieure ou égale à <span
+class="math inline">\(-\sum_{i=1}^m \lambda_i^* g_i(0)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\lambda^*\)</span>
+une solution optimale du problème dual. Alors, pour tout <span
+class="math inline">\(x \in \mathbb{R}^n\)</span>, nous avons : <span
+class="math display">\[f(x) \geq \mathcal{L}(x, \lambda^*) = f(x) +
+\sum_{i=1}^m \lambda_i^* g_i(x).\]</span> En prenant l’infimum sur <span
+class="math inline">\(x \in \mathbb{R}^n\)</span>, nous obtenons : <span
+class="math display">\[\inf_{x \in \mathbb{R}^n} f(x) \geq -\sum_{i=1}^m
+\lambda_i^* g_i(0).\]</span> Ce qui prouve le corollaire. ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’optimisation convexe est un domaine riche et fascinant, avec des
+applications dans de nombreux domaines. Les propriétés de convexité
+garantissent l’existence et l’unicité des solutions, ainsi que la
+possibilité de les trouver efficacement. Les théorèmes fondamentaux,
+tels que le théorème de séparation des ensembles convexes et le théorème
+de dualité faible, sont des outils puissants pour résoudre les problèmes
+d’optimisation convexe. Les preuves détaillées de ces théorèmes et leurs
+corollaires illustrent la profondeur et la beauté des concepts
+impliqués.</p>
+<p>En conclusion, l’optimisation convexe est un domaine essentiel pour
+les mathématiciens appliqués, les ingénieurs et les économistes. Ses
+méthodes et ses théorèmes continuent de jouer un rôle crucial dans la
+résolution des problèmes complexes du monde réel.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de similarité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de
+similarité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’encodage par extraction de caractéristiques de similarité est une
+technique fondamentale en apprentissage automatique et en traitement du
+signal. Elle émerge d’un besoin croissant de représenter des données
+complexes sous une forme exploitable par les algorithmes de machine
+learning. L’idée centrale est de transformer des données brutes en un
+espace de caractéristiques où les similarités entre les objets sont
+préservées et mises en évidence.</p>
+<p>Cette approche est indispensable dans de nombreux domaines, tels que
+la reconnaissance d’images, le traitement du langage naturel, et la
+bioinformatique. Elle permet de réduire la dimension des données tout en
+conservant les informations essentielles, facilitant ainsi l’analyse et
+la classification.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’encodage par extraction de caractéristiques de
+similarité, commençons par définir quelques concepts clés.</p>
+<h2 class="unnumbered" id="caractéristiques">Caractéristiques</h2>
+<p>Les caractéristiques (ou <em>features</em>) sont des propriétés
+mesurables des données qui permettent de les décrire de manière concise.
+Par exemple, pour une image, les caractéristiques peuvent inclure la
+couleur moyenne, le contraste, ou les contours.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{X}\)</span>
+un ensemble de données. Une caractéristique est une fonction <span
+class="math inline">\(f: \mathcal{X} \rightarrow \mathbb{R}\)</span> qui
+associe à chaque élément <span class="math inline">\(x \in
+\mathcal{X}\)</span> une valeur réelle.</p>
+<h2 class="unnumbered" id="similarité">Similarité</h2>
+<p>La similarité mesure le degré de ressemblance entre deux éléments.
+Elle peut être définie par une fonction de similarité <span
+class="math inline">\(s: \mathcal{X} \times \mathcal{X} \rightarrow [0,
+1]\)</span>, où <span class="math inline">\(s(x, y) = 1\)</span> indique
+que <span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> sont identiques, et <span
+class="math inline">\(s(x, y) = 0\)</span> indique qu’ils sont
+complètement différents.</p>
+<h2 class="unnumbered" id="encodage">Encodage</h2>
+<p>L’encodage est le processus de transformation des données brutes en
+un ensemble de caractéristiques. Formellement, un encodage est une
+fonction <span class="math inline">\(\phi: \mathcal{X} \rightarrow
+\mathbb{R}^d\)</span> qui mappe chaque élément <span
+class="math inline">\(x \in \mathcal{X}\)</span> à un vecteur de
+caractéristiques de dimension <span
+class="math inline">\(d\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-johnson-lindenstrauss">Théorème
+de Johnson-Lindenstrauss</h2>
+<p>Un théorème fondamental en extraction de caractéristiques est le
+théorème de Johnson-Lindenstrauss, qui montre que les données peuvent
+être projetées dans un espace de dimension inférieure tout en préservant
+les distances entre les points.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{X} \subset
+\mathbb{R}^n\)</span> un ensemble de points et <span
+class="math inline">\(0 &lt; \epsilon &lt; 1\)</span>. Il existe une
+projection linéaire <span class="math inline">\(P: \mathbb{R}^n
+\rightarrow \mathbb{R}^k\)</span> avec <span class="math inline">\(k =
+O(\frac{\log n}{\epsilon^2})\)</span> telle que pour tout <span
+class="math inline">\(x, y \in \mathcal{X}\)</span>, <span
+class="math display">\[(1 - \epsilon) \|x - y\|^2 \leq \|P(x) - P(y)\|^2
+\leq (1 + \epsilon) \|x - y\|^2.\]</span></p>
+</div>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-johnson-lindenstrauss">Preuve du Théorème de
+Johnson-Lindenstrauss</h2>
+<p>La preuve de ce théorème repose sur des techniques probabilistes et
+utilise le lemme de concentration de mesure. Voici un aperçu des étapes
+clés :</p>
+<p>1. **Construction de la Projection** : On construit une matrice de
+projection <span class="math inline">\(P\)</span> en utilisant des
+variables aléatoires gaussiennes.</p>
+<p>2. **Estimation de la Distance** : On montre que pour tout <span
+class="math inline">\(x, y \in \mathcal{X}\)</span>, la distance entre
+<span class="math inline">\(P(x)\)</span> et <span
+class="math inline">\(P(y)\)</span> est proche de la distance entre
+<span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span>.</p>
+<p>3. **Lemme de Concentration** : On utilise le lemme de concentration
+pour montrer que la probabilité que la distance soit hors des bornes
+spécifiées est faible.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriété-de-préservation-des-similarités">Propriété de Préservation
+des Similarités</h2>
+<p>L’une des propriétés clés de l’encodage par extraction de
+caractéristiques est la préservation des similarités. Formellement, si
+<span class="math inline">\(\phi: \mathcal{X} \rightarrow
+\mathbb{R}^d\)</span> est un encodage, alors pour tout <span
+class="math inline">\(x, y \in \mathcal{X}\)</span>, la similarité entre
+<span class="math inline">\(\phi(x)\)</span> et <span
+class="math inline">\(\phi(y)\)</span> doit être proche de la similarité
+entre <span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span>.</p>
+<div class="property">
+<p>Soit <span class="math inline">\(s: \mathcal{X} \times \mathcal{X}
+\rightarrow [0, 1]\)</span> une fonction de similarité et <span
+class="math inline">\(\phi: \mathcal{X} \rightarrow
+\mathbb{R}^d\)</span> un encodage. On dit que <span
+class="math inline">\(\phi\)</span> préserve les similarités si pour
+tout <span class="math inline">\(x, y \in \mathcal{X}\)</span>, <span
+class="math display">\[|s(x, y) - s(\phi(x), \phi(y))| &lt;
+\epsilon,\]</span> où <span class="math inline">\(\epsilon &gt;
+0\)</span> est une constante petite.</p>
+</div>
+<h2 class="unnumbered"
+id="corollaire-de-réduction-de-dimension">Corollaire de Réduction de
+Dimension</h2>
+<p>Un corollaire important de l’encodage par extraction de
+caractéristiques est la réduction de dimension. En projetant les données
+dans un espace de dimension inférieure, on peut réduire le coût
+computationnel tout en conservant les informations essentielles.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\mathcal{X} \subset
+\mathbb{R}^n\)</span> un ensemble de points et <span
+class="math inline">\(\phi: \mathcal{X} \rightarrow
+\mathbb{R}^d\)</span> un encodage avec <span class="math inline">\(d
+&lt; n\)</span>. Si <span class="math inline">\(\phi\)</span> préserve
+les similarités, alors on peut effectuer des tâches de machine learning
+sur <span class="math inline">\(\phi(\mathcal{X})\)</span> avec une
+complexité réduite.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de similarité est une
+technique puissante et polyvalente qui trouve des applications dans de
+nombreux domaines. En transformant les données brutes en un espace de
+caractéristiques, on peut préserver les similarités et réduire la
+dimension des données, facilitant ainsi l’analyse et la
+classification.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

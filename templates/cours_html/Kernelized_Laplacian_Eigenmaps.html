@@ -1,0 +1,373 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized Laplacian Eigenmaps: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized Laplacian Eigenmaps: A Comprehensive
+Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>The field of manifold learning has seen significant advancements with
+the introduction of techniques like Isomap, Locally Linear Embedding
+(LLE), and Laplacian Eigenmaps. These methods aim to uncover the
+underlying structure of high-dimensional data by leveraging the
+geometric properties of the data manifold. Among these, Laplacian
+Eigenmaps has garnered considerable attention due to its ability to
+preserve local neighborhood relationships while embedding data into a
+lower-dimensional space.</p>
+<p>The concept of Laplacian Eigenmaps originates from the spectral graph
+theory, where the Laplace-Beltrami operator plays a crucial role in
+analyzing the geometric properties of manifolds. The kernelization of
+this method further enhances its applicability by allowing for more
+flexible and non-linear embeddings. This article delves into the
+theoretical foundations, definitions, theorems, proofs, and properties
+of Kernelized Laplacian Eigenmaps, providing a comprehensive
+understanding of this powerful technique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>To understand Kernelized Laplacian Eigenmaps, we first need to grasp
+the concept of the graph Laplacian. Consider a dataset represented as a
+set of points <span class="math inline">\(X = \{x_1, x_2, \dots,
+x_n\}\)</span> in a high-dimensional space. We can construct a
+neighborhood graph <span class="math inline">\(G\)</span> where each
+point is connected to its <span class="math inline">\(k\)</span>-nearest
+neighbors.</p>
+<p>The adjacency matrix <span class="math inline">\(W\)</span> of this
+graph is defined as: <span class="math display">\[W_{ij} = \begin{cases}
+e^{-\frac{\|x_i - x_j\|^2}{2\sigma^2}} &amp; \text{if } x_j \in
+\mathcal{N}_k(x_i) \text{ or } x_i \in \mathcal{N}_k(x_j), \\
+0 &amp; \text{otherwise},
+\end{cases}\]</span> where <span
+class="math inline">\(\mathcal{N}_k(x_i)\)</span> denotes the set of
+<span class="math inline">\(k\)</span>-nearest neighbors of <span
+class="math inline">\(x_i\)</span>, and <span
+class="math inline">\(\sigma\)</span> is a scaling parameter.</p>
+<p>The graph Laplacian <span class="math inline">\(L\)</span> is then
+defined as: <span class="math display">\[L = D - W,\]</span> where <span
+class="math inline">\(D\)</span> is the degree matrix, a diagonal matrix
+with entries <span class="math inline">\(D_{ii} = \sum_j
+W_{ij}\)</span>.</p>
+<p>The Laplacian Eigenmaps embedding is obtained by solving the
+generalized eigenvalue problem: <span class="math display">\[L f =
+\lambda D f,\]</span> where <span class="math inline">\(f\)</span>
+represents the embedding coordinates, and <span
+class="math inline">\(\lambda\)</span> is the eigenvalue.</p>
+<p>Kernelization involves mapping the data into a higher-dimensional
+feature space using a kernel function <span
+class="math inline">\(\kappa(x_i, x_j)\)</span>. The kernelized
+adjacency matrix <span class="math inline">\(W^\kappa\)</span> is
+defined as: <span class="math display">\[W^\kappa_{ij} = \kappa(x_i,
+x_j).\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>One of the fundamental theorems in Laplacian Eigenmaps is the
+relationship between the eigenvalues and the embedding quality.
+Specifically, the smallest eigenvectors of the graph Laplacian
+correspond to smooth functions on the data manifold.</p>
+<div class="theorem">
+<p>Let <span class="math inline">\(f\)</span> be a smooth function on
+the data manifold <span class="math inline">\(M\)</span>. The
+eigenvalues <span class="math inline">\(\lambda_k\)</span> of the graph
+Laplacian <span class="math inline">\(L\)</span> converge to the
+eigenvalues of the Laplace-Beltrami operator on <span
+class="math inline">\(M\)</span> as the number of data points <span
+class="math inline">\(n\)</span> tends to infinity.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The proof of this theorem relies on the convergence
+properties of graph Laplacians to the Laplace-Beltrami operator. By the
+theory of spectral convergence, as the graph becomes denser, the
+eigenvalues and eigenfunctions of the graph Laplacian approximate those
+of the continuous operator.</p>
+<p>The key steps involve:</p>
+<ol>
+<li><p>Constructing a sequence of graphs <span
+class="math inline">\(G_n\)</span> with increasing number of
+points.</p></li>
+<li><p>Showing that the graph Laplacians <span
+class="math inline">\(L_n\)</span> converge to the Laplace-Beltrami
+operator <span class="math inline">\(\Delta\)</span> in the spectral
+sense.</p></li>
+<li><p>Utilizing the properties of eigenfunctions and eigenvalues to
+establish the convergence.</p></li>
+</ol>
+<p>The detailed analysis involves advanced tools from spectral graph
+theory and differential geometry, ensuring that the discrete
+approximations faithfully represent the continuous manifold
+structure. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>To further elucidate the properties of Kernelized Laplacian
+Eigenmaps, we present a proof of the following theorem:</p>
+<div class="theorem">
+<p>Given a kernel function <span class="math inline">\(\kappa(x_i,
+x_j)\)</span>, the embedding obtained by solving the generalized
+eigenvalue problem in the kernel space preserves local neighborhood
+relationships.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Consider the kernelized adjacency matrix <span
+class="math inline">\(W^\kappa\)</span> and the corresponding graph
+Laplacian <span class="math inline">\(L^\kappa = D^\kappa -
+W^\kappa\)</span>, where <span class="math inline">\(D^\kappa\)</span>
+is the degree matrix in the kernel space.</p>
+<p>The embedding coordinates <span
+class="math inline">\(f^\kappa\)</span> are obtained by solving: <span
+class="math display">\[L^\kappa f^\kappa = \lambda D^\kappa
+f^\kappa.\]</span></p>
+<p>To show that this embedding preserves local neighborhood
+relationships, we need to demonstrate that points close in the original
+space remain close in the embedded space.</p>
+<p>1. **Kernel Properties**: The kernel function <span
+class="math inline">\(\kappa(x_i, x_j)\)</span> ensures that points
+close in the original space have high similarity in the kernel space.
+This is a direct consequence of the properties of positive definite
+kernels.</p>
+<p>2. **Graph Laplacian**: The graph Laplacian <span
+class="math inline">\(L^\kappa\)</span> encodes the local neighborhood
+relationships in the kernel space. The smallest eigenvectors of <span
+class="math inline">\(L^\kappa\)</span> correspond to smooth functions
+that vary slowly over the data manifold.</p>
+<p>3. **Embedding Quality**: By the spectral properties of the graph
+Laplacian, the embedding <span class="math inline">\(f^\kappa\)</span>
+preserves the local geometry of the data. This is because the
+eigenvectors corresponding to small eigenvalues capture the global
+structure, while those corresponding to larger eigenvalues capture local
+variations.</p>
+<p>4. **Convergence**: As the number of data points increases, the
+kernelized graph Laplacian converges to the Laplace-Beltrami operator in
+the kernel space, ensuring that the embedding becomes increasingly
+accurate.</p>
+<p>Thus, the kernelized Laplacian eigenmaps embedding preserves local
+neighborhood relationships, making it a powerful tool for manifold
+learning. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et corollaires</h1>
+<p>We now list several important properties and corollaries of
+Kernelized Laplacian Eigenmaps:</p>
+<ol>
+<li><p><strong>Locality Preservation</strong>: The embedding preserves
+local neighborhood relationships, ensuring that nearby points in the
+original space remain close in the embedded space.</p></li>
+<li><p><strong>Non-Linearity</strong>: The use of kernel functions
+allows for non-linear embeddings, capturing complex geometric structures
+that linear methods might miss.</p></li>
+<li><p><strong>Stability</strong>: The embedding is stable under small
+perturbations of the data, making it robust to noise and
+outliers.</p></li>
+<li><p><strong>Convergence</strong>: As the number of data points
+increases, the kernelized graph Laplacian converges to the
+Laplace-Beltrami operator in the kernel space, ensuring accurate
+embeddings for large datasets.</p></li>
+<li><p><strong>Computational Efficiency</strong>: The method can be
+computationally efficient, especially when using sparse kernel matrices
+and optimized eigenvalue solvers.</p></li>
+</ol>
+<p>Each of these properties can be rigorously proven using tools from
+spectral graph theory, differential geometry, and kernel methods. The
+detailed proofs involve advanced mathematical techniques and are beyond
+the scope of this article.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Kernelized Laplacian Eigenmaps is a powerful technique for manifold
+learning, combining the strengths of spectral graph theory and kernel
+methods. By preserving local neighborhood relationships and allowing for
+non-linear embeddings, it provides a robust framework for analyzing
+high-dimensional data. The theoretical foundations, theorems, proofs,
+and properties discussed in this article offer a comprehensive
+understanding of this method, highlighting its importance in the field
+of machine learning and data analysis.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

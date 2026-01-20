@@ -1,0 +1,365 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Compression de données : Théorie et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Compression de données : Théorie et Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La compression de données est une discipline fondamentale en
+informatique théorique et appliquée, née de la nécessité croissante de
+stocker et transmettre des informations de manière efficace. L’explosion
+exponentielle des données numériques, qu’elles soient textuelles,
+audio-visuelles ou scientifiques, a rendu indispensable le développement
+de techniques permettant de réduire leur volume sans perte significative
+d’information.</p>
+<p>Historiquement, les premiers travaux sur la compression remontent aux
+années 1940 avec le théorème de Shannon sur l’entropie, qui pose les
+bases théoriques de la compression sans perte. Depuis, cette discipline
+a connu des avancées majeures avec l’émergence de standards comme le
+format ZIP pour les données textuelles, ou encore JPEG et MPEG pour les
+médias audiovisuels.</p>
+<p>La compression de données est indispensable dans de nombreux domaines
+: elle optimise l’utilisation des ressources de stockage, réduit les
+coûts de transmission et améliore les performances des systèmes
+informatiques. Par exemple, dans le domaine médical, la compression
+d’images radiologiques permet de stocker et transmettre rapidement des
+données volumineuses, facilitant ainsi le diagnostic à distance.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la compression de données, il est essentiel de
+définir quelques concepts clés.</p>
+<h2 id="entropie">Entropie</h2>
+<p>L’entropie d’une source d’information mesure son contenu en
+information. Intuitivement, plus une source est imprévisible, plus son
+entropie est élevée.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+discrète prenant ses valeurs dans un ensemble fini <span
+class="math inline">\(\mathcal{X} = \{x_1, x_2, \ldots, x_n\}\)</span>
+avec une probabilité <span class="math inline">\(P(X = x_i) =
+p_i\)</span>. L’entropie de <span class="math inline">\(X\)</span> est
+définie par : <span class="math display">\[H(X) = -\sum_{i=1}^{n} p_i
+\log_2 p_i\]</span></p>
+</div>
+<p>L’entropie <span class="math inline">\(H(X)\)</span> est exprimée en
+bits et représente la quantité moyenne d’information produite par la
+source <span class="math inline">\(X\)</span>. Plus précisément, <span
+class="math inline">\(H(X)\)</span> est le nombre moyen de bits
+nécessaires pour coder une réalisation de <span
+class="math inline">\(X\)</span>.</p>
+<h2 id="code-sans-perte">Code sans perte</h2>
+<p>Un code sans perte est un algorithme qui permet de compresser des
+données de manière réversible, c’est-à-dire que les données originales
+peuvent être parfaitement reconstruites à partir des données
+compressées.</p>
+<div class="definition">
+<p>Un code sans perte est une fonction <span class="math inline">\(C:
+\mathcal{X} \rightarrow \{0,1\}^*\)</span> telle que pour toute séquence
+<span class="math inline">\(x \in \mathcal{X}\)</span>, il existe une
+fonction de décodage <span class="math inline">\(D: \{0,1\}^*
+\rightarrow \mathcal{X}\)</span> vérifiant : <span
+class="math display">\[D(C(x)) = x\]</span></p>
+</div>
+<p>Un code sans perte est dit optimal si la longueur moyenne des codes
+produits est égale à l’entropie de la source.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-shannon">Théorème de Shannon</h2>
+<p>Le théorème fondamental de la théorie de l’information, dû à Claude
+Shannon, établit une borne inférieure sur la longueur moyenne des codes
+sans perte.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+discrète avec entropie <span class="math inline">\(H(X)\)</span>. Pour
+tout code sans perte <span class="math inline">\(C\)</span>, la longueur
+moyenne des codes satisfait : <span
+class="math display">\[\mathbb{E}[|C(X)|] \geq H(X)\]</span></p>
+</div>
+<p>Ce théorème montre que l’entropie <span
+class="math inline">\(H(X)\)</span> est une borne inférieure sur la
+quantité d’information nécessaire pour coder une source <span
+class="math inline">\(X\)</span>. En d’autres termes, il est impossible
+de compresser une source en dessous de son entropie sans perte
+d’information.</p>
+<h2 id="théorème-de-kraft-mcmillan">Théorème de Kraft-McMillan</h2>
+<p>Le théorème de Kraft-McMillan donne une condition nécessaire et
+suffisante pour qu’un ensemble de codes binaires soit décodable sans
+ambiguïté.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(l_1, l_2, \ldots, l_n\)</span> des
+entiers positifs. Il existe un code binaire prefixe avec longueurs de
+codes <span class="math inline">\(l_1, l_2, \ldots, l_n\)</span> si et
+seulement si : <span class="math display">\[\sum_{i=1}^{n} 2^{-l_i} \leq
+1\]</span></p>
+</div>
+<p>Ce théorème est crucial pour la construction de codes efficaces, car
+il garantit que les codes produits peuvent être décodés sans
+ambiguïté.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-shannon">Preuve du Théorème de
+Shannon</h2>
+<p>Pour prouver le théorème de Shannon, nous utilisons l’inégalité de
+Gibbs et la convexité de la fonction <span class="math inline">\(f(x) =
+-x \log_2 x\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un code sans perte <span
+class="math inline">\(C\)</span> avec longueurs de codes <span
+class="math inline">\(l_1, l_2, \ldots, l_n\)</span>. La longueur
+moyenne des codes est donnée par : <span
+class="math display">\[\mathbb{E}[|C(X)|] = \sum_{i=1}^{n} p_i
+l_i\]</span> Par l’inégalité de Gibbs, nous avons : <span
+class="math display">\[\sum_{i=1}^{n} p_i \log_2 \frac{1}{p_i} \leq
+-\sum_{i=1}^{n} p_i \log_2 p_i = H(X)\]</span> En utilisant la convexité
+de <span class="math inline">\(f(x) = -x \log_2 x\)</span>, nous pouvons
+appliquer l’inégalité de Jensen pour obtenir : <span
+class="math display">\[\sum_{i=1}^{n} p_i l_i \geq H(X)\]</span> Ce qui
+achève la preuve. ◻</p>
+</div>
+<h2 id="preuve-du-théorème-de-kraft-mcmillan">Preuve du Théorème de
+Kraft-McMillan</h2>
+<p>La preuve du théorème de Kraft-McMillan repose sur l’arithmétique
+binaire et la théorie des ensembles.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons qu’il existe un code binaire prefixe avec
+longueurs de codes <span class="math inline">\(l_1, l_2, \ldots,
+l_n\)</span>. Chaque code peut être représenté par un chemin dans un
+arbre binaire. La condition de prefixe implique que les chemins ne se
+chevauchent pas, ce qui signifie que la somme des poids des feuilles est
+inférieure ou égale à 1.</p>
+<p>Réciproquement, supposons que <span
+class="math inline">\(\sum_{i=1}^{n} 2^{-l_i} \leq 1\)</span>. Nous
+pouvons construire un code binaire prefixe en assignant à chaque symbole
+<span class="math inline">\(x_i\)</span> un code de longueur <span
+class="math inline">\(l_i\)</span>. La condition garantit que les codes
+peuvent être décodés sans ambiguïté. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriétés-des-codes-de-huffman">Propriétés des Codes de
+Huffman</h2>
+<p>Les codes de Huffman sont une méthode populaire pour construire des
+codes sans perte optimaux.</p>
+<div class="proposition">
+<p>Les codes de Huffman satisfont les propriétés suivantes :</p>
+<ol>
+<li><p>Les longueurs des codes sont inversement proportionnelles aux
+probabilités des symboles.</p></li>
+<li><p>Les codes de Huffman sont optimaux au sens où ils atteignent la
+borne inférieure donnée par le théorème de Shannon.</p></li>
+<li><p>Les codes de Huffman sont prefixes, ce qui garantit un décodage
+sans ambiguïté.</p></li>
+</ol>
+</div>
+<h2 id="corollaire-du-théorème-de-shannon">Corollaire du Théorème de
+Shannon</h2>
+<p>Le théorème de Shannon implique que la compression sans perte est
+limitée par l’entropie de la source.</p>
+<div class="corollary">
+<p>Pour toute source <span class="math inline">\(X\)</span> avec
+entropie <span class="math inline">\(H(X)\)</span>, il existe un code
+sans perte <span class="math inline">\(C\)</span> tel que : <span
+class="math display">\[\mathbb{E}[|C(X)|] = H(X)\]</span></p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La compression de données est un domaine riche et dynamique, avec des
+applications dans de nombreux domaines. Les concepts fondamentaux comme
+l’entropie et les codes sans perte, ainsi que les théorèmes de Shannon
+et Kraft-McMillan, fournissent une base solide pour le développement de
+techniques de compression avancées. Les progrès futurs dans ce domaine
+promettent de nouvelles avancées, notamment dans les domaines de
+l’intelligence artificielle et du traitement des données massives.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

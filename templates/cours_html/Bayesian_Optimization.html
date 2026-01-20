@@ -1,0 +1,381 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Bayesian Optimization: A Comprehensive Overview</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Bayesian Optimization: A Comprehensive Overview</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Bayesian Optimization (BO) is a powerful technique for optimizing
+black-box functions, particularly those that are expensive to evaluate.
+The origins of BO can be traced back to the works of Kiefer and
+Wolfowitz (1952) on sequential design, but it was not until the 2000s
+that BO gained significant traction in machine learning and related
+fields. The primary motivation behind BO is to efficiently navigate the
+trade-off between exploration and exploitation when optimizing complex,
+expensive-to-evaluate functions.</p>
+<p>BO is indispensable in various domains such as hyperparameter tuning
+for machine learning models, robotics, and drug discovery. Its ability
+to model the uncertainty of the objective function allows it to make
+informed decisions about where to sample next, making it a preferred
+choice for high-dimensional and expensive optimization problems.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Before formally defining Bayesian Optimization, let’s consider what
+we aim to achieve. We want to find the minimum (or maximum) of a
+function <span class="math inline">\(f: \mathcal{X} \rightarrow
+\mathbb{R}\)</span>, where <span
+class="math inline">\(\mathcal{X}\)</span> is a compact subset of <span
+class="math inline">\(\mathbb{R}^d\)</span>. The function <span
+class="math inline">\(f\)</span> is often expensive to evaluate, and we
+may not have access to its gradient or other structural properties. Our
+goal is to find <span class="math inline">\(x_* \in \mathcal{X}\)</span>
+such that:</p>
+<p><span class="math display">\[f(x_*) = \min_{x \in \mathcal{X}}
+f(x)\]</span></p>
+<p>Bayesian Optimization achieves this by modeling the unknown function
+<span class="math inline">\(f\)</span> using a probabilistic model,
+typically a Gaussian Process (GP). The GP provides a posterior
+distribution over the function values, which is updated with each new
+observation. The optimization process involves selecting the next point
+to evaluate based on an acquisition function that balances exploration
+and exploitation.</p>
+<p>Formally, Bayesian Optimization can be defined as follows:</p>
+<div class="definition">
+<p>Let <span class="math inline">\(\mathcal{X} \subseteq
+\mathbb{R}^d\)</span> be a compact set, and let <span
+class="math inline">\(f: \mathcal{X} \rightarrow \mathbb{R}\)</span> be
+an unknown function. Bayesian Optimization is a sequential optimization
+method that:</p>
+<ol>
+<li><p>Models <span class="math inline">\(f\)</span> using a Gaussian
+Process prior: <span class="math inline">\(f(\cdot) \sim
+\mathcal{GP}(m(\cdot), k(\cdot, \cdot))\)</span>, where <span
+class="math inline">\(m: \mathcal{X} \rightarrow \mathbb{R}\)</span> is
+the mean function and <span class="math inline">\(k: \mathcal{X} \times
+\mathcal{X} \rightarrow \mathbb{R}\)</span> is the covariance
+function.</p></li>
+<li><p>Updates the posterior distribution of <span
+class="math inline">\(f\)</span> given the observed data <span
+class="math inline">\(D_n = \{ (x_1, y_1), \ldots, (x_n, y_n)
+\}\)</span>, where <span class="math inline">\(y_i = f(x_i) +
+\epsilon_i\)</span> and <span class="math inline">\(\epsilon_i \sim
+\mathcal{N}(0, \sigma^2)\)</span>.</p></li>
+<li><p>Selects the next point <span
+class="math inline">\(x_{n+1}\)</span> to evaluate using an acquisition
+function <span class="math inline">\(\alpha_n: \mathcal{X} \rightarrow
+\mathbb{R}\)</span> that balances exploration and exploitation.</p></li>
+<li><p>Repeats the process until a stopping criterion is met, such as a
+maximum number of iterations or a convergence threshold.</p></li>
+</ol>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>One of the key theoretical results in Bayesian Optimization is the
+convergence properties of the method. Under certain conditions, BO can
+be shown to converge to the global optimum of the objective
+function.</p>
+<div class="theorem">
+<p>Assume that <span class="math inline">\(f\)</span> is a continuous
+function on a compact set <span
+class="math inline">\(\mathcal{X}\)</span>, and that the Gaussian
+Process prior is such that the covariance function <span
+class="math inline">\(k\)</span> is continuous and positive definite.
+Then, for any <span class="math inline">\(\epsilon &gt; 0\)</span>, the
+probability that the Bayesian Optimization algorithm finds a point <span
+class="math inline">\(x_n\)</span> such that:</p>
+<p><span class="math display">\[f(x_n) \leq \min_{x \in \mathcal{X}}
+f(x) + \epsilon\]</span></p>
+<p>converges to 1 as <span class="math inline">\(n \rightarrow
+\infty\)</span>.</p>
+</div>
+<p>The proof of this theorem relies on the properties of Gaussian
+Processes and the fact that the acquisition function guides the
+optimization process towards regions of high uncertainty and low
+function values. The detailed proof involves showing that the posterior
+variance of the GP decreases as more observations are made, and that the
+acquisition function ensures that the algorithm explores the entire
+space <span class="math inline">\(\mathcal{X}\)</span> sufficiently.</p>
+<h1 id="preuves">Preuves</h1>
+<p>To prove the convergence of Bayesian Optimization, we need to
+establish several intermediate results. The first step is to show that
+the posterior variance of the GP decreases as more observations are
+made.</p>
+<div class="lemma">
+<p>Let <span class="math inline">\(f \sim \mathcal{GP}(m, k)\)</span> be
+a Gaussian Process prior, and let <span class="math inline">\(D_n = \{
+(x_1, y_1), \ldots, (x_n, y_n) \}\)</span> be the observed data. Then,
+for any <span class="math inline">\(x \in \mathcal{X}\)</span>, the
+posterior variance <span class="math inline">\(\sigma_n^2(x)\)</span>
+satisfies:</p>
+<p><span class="math display">\[\sigma_n^2(x) \leq
+\sigma_0^2(x)\]</span></p>
+<p>where <span class="math inline">\(\sigma_0^2(x)\)</span> is the prior
+variance at point <span class="math inline">\(x\)</span>, and <span
+class="math inline">\(\sigma_n^2(x)\)</span> is the posterior variance
+given the data <span class="math inline">\(D_n\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The posterior variance of a Gaussian Process is given
+by:</p>
+<p><span class="math display">\[\sigma_n^2(x) = k(x, x) - k_x^n (K_n +
+\sigma^2 I)^{-1} k_x^n\]</span></p>
+<p>where <span class="math inline">\(k_x^n\)</span> is the vector of
+covariances between <span class="math inline">\(x\)</span> and the
+observed points <span class="math inline">\(\{x_1, \ldots,
+x_n\}\)</span>, and <span class="math inline">\(K_n\)</span> is the
+covariance matrix of the observed points. Since <span
+class="math inline">\((K_n + \sigma^2 I)^{-1}\)</span> is positive
+semi-definite, it follows that:</p>
+<p><span class="math display">\[k_x^n (K_n + \sigma^2 I)^{-1} k_x^n \geq
+0\]</span></p>
+<p>Thus, <span class="math inline">\(\sigma_n^2(x) \leq k(x, x) =
+\sigma_0^2(x)\)</span>, which completes the proof. ◻</p>
+</div>
+<p>Using this lemma, we can now prove the convergence theorem.</p>
+<div class="proof">
+<p><em>Proof of Theorem 1.</em> Let <span class="math inline">\(\epsilon
+&gt; 0\)</span> be given, and let <span class="math inline">\(B_\epsilon
+= \{ x \in \mathcal{X} : f(x) \leq \min_{x \in \mathcal{X}} f(x) +
+\epsilon \}\)</span>. Since <span class="math inline">\(f\)</span> is
+continuous and <span class="math inline">\(\mathcal{X}\)</span> is
+compact, <span class="math inline">\(B_\epsilon\)</span> is
+non-empty.</p>
+<p>By the properties of Gaussian Processes, for any <span
+class="math inline">\(x \in B_\epsilon\)</span>, the probability that
+<span class="math inline">\(f(x) \leq \min_{x \in \mathcal{X}} f(x) +
+\epsilon\)</span> given the data <span
+class="math inline">\(D_n\)</span> increases as <span
+class="math inline">\(n\)</span> increases. This is because the
+posterior variance <span class="math inline">\(\sigma_n^2(x)\)</span>
+decreases, and the posterior mean converges to the true function
+value.</p>
+<p>The acquisition function <span
+class="math inline">\(\alpha_n\)</span> is designed to balance
+exploration and exploitation, ensuring that the algorithm explores the
+entire space <span class="math inline">\(\mathcal{X}\)</span>
+sufficiently. Therefore, with probability 1, the algorithm will
+eventually sample a point <span class="math inline">\(x_n\)</span> in
+<span class="math inline">\(B_\epsilon\)</span>, which completes the
+proof. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Bayesian Optimization has several important properties and
+corollaires that make it a powerful optimization technique.</p>
+<ol>
+<li><p><strong>Adaptivity</strong>: Bayesian Optimization adapts to the
+structure of the objective function <span
+class="math inline">\(f\)</span> by updating the posterior distribution
+of the GP with each new observation. This allows it to efficiently
+navigate complex, multi-modal landscapes.</p></li>
+<li><p><strong>Parallelization</strong>: While traditional BO is
+sequential, several extensions allow for parallel evaluations of the
+objective function. This can significantly speed up the optimization
+process, especially when evaluating <span
+class="math inline">\(f\)</span> is expensive.</p></li>
+<li><p><strong>Robustness</strong>: Bayesian Optimization is robust to
+noise in the objective function evaluations. The GP model inherently
+accounts for uncertainty, making it less sensitive to outliers and
+measurement errors.</p></li>
+</ol>
+<p>Each of these properties can be formally stated and proved using the
+framework of Gaussian Processes and acquisition functions. The
+adaptivity of BO is a direct consequence of the updating mechanism of
+the GP posterior, while parallelization and robustness are enabled by
+careful design of the acquisition function and the use of noisy
+observations in the GP model.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

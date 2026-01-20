@@ -1,0 +1,323 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Longueur d’un arc paramétré</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Longueur d’un arc paramétré</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La notion de longueur d’un arc paramétré est fondamentale en analyse
+mathématique, notamment dans le cadre des courbes différentiables. Elle
+permet de quantifier la distance parcourue le long d’une trajectoire
+donnée par une fonction vectorielle. Cette notion trouve ses origines
+dans les travaux des mathématiciens du XVIIe siècle, tels que Newton et
+Leibniz, qui ont posé les bases du calcul infinitésimal. La longueur
+d’un arc est indispensable en physique pour décrire le mouvement des
+particules, en géométrie différentielle pour étudier les propriétés des
+courbes et des surfaces, ainsi qu’en ingénierie pour calculer les
+distances le long de trajectoires complexes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la longueur d’un arc paramétré, considérons une courbe
+dans l’espace euclidien <span
+class="math inline">\(\mathbb{R}^n\)</span> donnée par une fonction
+vectorielle <span class="math inline">\(\gamma : [a, b] \rightarrow
+\mathbb{R}^n\)</span> de classe <span
+class="math inline">\(C^1\)</span>. Nous cherchons à mesurer la distance
+totale parcourue le long de cette courbe entre les points <span
+class="math inline">\(\gamma(a)\)</span> et <span
+class="math inline">\(\gamma(b)\)</span>.</p>
+<div class="definition">
+<p>La longueur <span class="math inline">\(L\)</span> de l’arc paramétré
+par <span class="math inline">\(\gamma : [a, b] \rightarrow
+\mathbb{R}^n\)</span> est définie comme la limite de la somme des
+longueurs des segments reliant les points <span
+class="math inline">\(\gamma(t_i)\)</span> et <span
+class="math inline">\(\gamma(t_{i+1})\)</span> lorsque la subdivision
+<span class="math inline">\(a = t_0 &lt; t_1 &lt; \dots &lt; t_n =
+b\)</span> devient infiniment fine. Formellement, on a : <span
+class="math display">\[L = \lim_{n \to \infty} \sum_{i=0}^{n-1}
+\|\gamma(t_{i+1}) - \gamma(t_i)\|\]</span> où <span
+class="math inline">\(\|\cdot\|\)</span> désigne la norme euclidienne
+dans <span class="math inline">\(\mathbb{R}^n\)</span>.</p>
+</div>
+<p>Une autre manière de formuler cette définition est d’utiliser
+l’intégrale des différences infinitésimales : <span
+class="math display">\[L = \int_{a}^{b} \left\| \frac{d\gamma}{dt}(t)
+\right\| dt\]</span> où <span
+class="math inline">\(\frac{d\gamma}{dt}\)</span> est la dérivée de
+<span class="math inline">\(\gamma\)</span> par rapport à <span
+class="math inline">\(t\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la longueur d’un arc paramétré est
+le suivant :</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(\gamma : [a, b] \rightarrow
+\mathbb{R}^n\)</span> une fonction de classe <span
+class="math inline">\(C^1\)</span>. Alors la longueur <span
+class="math inline">\(L\)</span> de l’arc paramétré par <span
+class="math inline">\(\gamma\)</span> est donnée par : <span
+class="math display">\[L = \int_{a}^{b} \sqrt{\sum_{i=1}^n \left(
+\frac{d\gamma_i}{dt}(t) \right)^2} dt\]</span> où <span
+class="math inline">\(\gamma_i\)</span> désigne la <span
+class="math inline">\(i\)</span>-ème composante de <span
+class="math inline">\(\gamma\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer ce théorème, nous utilisons la définition de
+l’intégrale de Riemann et les propriétés des fonctions continues.
+Considérons une subdivision <span class="math inline">\(a = t_0 &lt; t_1
+&lt; \dots &lt; t_n = b\)</span> de l’intervalle <span
+class="math inline">\([a, b]\)</span>. La longueur de chaque segment
+reliant <span class="math inline">\(\gamma(t_i)\)</span> à <span
+class="math inline">\(\gamma(t_{i+1})\)</span> est donnée par : <span
+class="math display">\[\|\gamma(t_{i+1}) - \gamma(t_i)\| =
+\sqrt{\sum_{j=1}^n (\gamma_j(t_{i+1}) - \gamma_j(t_i))^2}\]</span> En
+appliquant le théorème des accroissements finis à chaque composante
+<span class="math inline">\(\gamma_j\)</span>, nous obtenons : <span
+class="math display">\[\gamma_j(t_{i+1}) - \gamma_j(t_i) =
+\frac{d\gamma_j}{dt}(\xi_i)(t_{i+1} - t_i)\]</span> pour un certain
+<span class="math inline">\(\xi_i \in [t_i, t_{i+1}]\)</span>. Ainsi, la
+somme des longueurs devient : <span
+class="math display">\[\sum_{i=0}^{n-1} \|\gamma(t_{i+1}) -
+\gamma(t_i)\| = \sum_{i=0}^{n-1} \sqrt{\sum_{j=1}^n \left(
+\frac{d\gamma_j}{dt}(\xi_i) \right)^2} (t_{i+1} - t_i)\]</span> En
+prenant la limite lorsque la subdivision devient infiniment fine, cette
+somme converge vers l’intégrale : <span class="math display">\[L =
+\int_{a}^{b} \sqrt{\sum_{j=1}^n \left( \frac{d\gamma_j}{dt}(t)
+\right)^2} dt\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons quelques propriétés importantes de la longueur d’un arc
+paramétré :</p>
+<ol>
+<li><p><strong>Invariance par reparamétrisation</strong> : Si <span
+class="math inline">\(\gamma\)</span> est une paramétrisation régulière
+de la courbe, alors la longueur <span class="math inline">\(L\)</span>
+ne dépend pas du choix du paramètre <span
+class="math inline">\(t\)</span>. Plus précisément, si <span
+class="math inline">\(\phi : [c, d] \rightarrow [a, b]\)</span> est un
+difféomorphisme de classe <span class="math inline">\(C^1\)</span>,
+alors : <span class="math display">\[L = \int_{c}^{d} \left\|
+\frac{d(\gamma \circ \phi)}{dt}(t) \right\| dt\]</span></p></li>
+<li><p><strong>Additivité</strong> : Si <span
+class="math inline">\(\gamma\)</span> est une paramétrisation de la
+courbe sur <span class="math inline">\([a, b]\)</span>, et si <span
+class="math inline">\(c \in [a, b]\)</span>, alors la longueur de l’arc
+entre <span class="math inline">\(\gamma(a)\)</span> et <span
+class="math inline">\(\gamma(c)\)</span> est donnée par : <span
+class="math display">\[L_{a}^{c} = \int_{a}^{c} \left\|
+\frac{d\gamma}{dt}(t) \right\| dt\]</span> et la longueur de l’arc entre
+<span class="math inline">\(\gamma(c)\)</span> et <span
+class="math inline">\(\gamma(b)\)</span> est donnée par : <span
+class="math display">\[L_{c}^{b} = \int_{c}^{b} \left\|
+\frac{d\gamma}{dt}(t) \right\| dt\]</span> De plus, on a : <span
+class="math display">\[L_{a}^{b} = L_{a}^{c} +
+L_{c}^{b}\]</span></p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La notion de longueur d’un arc paramétré est essentielle en analyse
+mathématique et trouve des applications dans de nombreux domaines
+scientifiques. À travers ce chapitre, nous avons vu comment définir
+rigoureusement cette longueur, énoncé et démontré le théorème
+fondamental qui la caractérise, et exploré quelques-unes de ses
+propriétés les plus importantes. Ces outils sont indispensables pour
+l’étude des courbes et des surfaces, ainsi que pour la résolution de
+problèmes concrets en physique et en ingénierie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

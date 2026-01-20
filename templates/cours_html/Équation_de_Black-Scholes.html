@@ -1,0 +1,395 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Équation de Black-Scholes : Modélisation Mathématique des Options Financières</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Équation de Black-Scholes : Modélisation
+Mathématique des Options Financières</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’équation de Black-Scholes, formulée en 1973 par les économistes
+Fischer Black et Myron Scholes, constitue une pierre angulaire de la
+finance mathématique moderne. Cette équation différentielle partielle
+révolutionna l’évaluation des options financières en fournissant un
+cadre théorique rigoureux pour déterminer la valeur d’une option
+européenne.</p>
+<p>L’origine de cette équation remonte aux travaux de Louis Bachelier
+sur les mouvements browniens, mais c’est Black et Scholes qui ont
+formalisé le modèle en intégrant des hypothèses clés : l’absence
+d’arbitrage, la liquidité parfaite des marchés et la volatilité
+constante du sous-jacent. L’équation de Black-Scholes résout le problème
+de l’évaluation des options en postulant que la valeur d’une option suit
+un processus stochastique géométrique brownien.</p>
+<p>L’importance de cette équation est multiple. D’une part, elle permet
+aux investisseurs et aux institutions financières d’évaluer précisément
+le prix des options, réduisant ainsi les risques de marché. D’autre
+part, elle a ouvert la voie à une multitude de modèles plus sophistiqués
+en finance quantitative, tels que les modèles stochastiques de
+volatilité ou les modèles à sauts.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’aborder l’équation de Black-Scholes, il est essentiel de
+définir les concepts fondamentaux qui la sous-tendent.</p>
+<h2 id="processus-stochastique-géométrique-brownien">Processus
+Stochastique Géométrique Brownien</h2>
+<p>Considérons un actif financier dont le prix <span
+class="math inline">\(S_t\)</span> à l’instant <span
+class="math inline">\(t\)</span> évolue selon un processus stochastique.
+Nous cherchons à modéliser ce prix de manière à capturer les
+fluctuations aléatoires du marché.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((\Omega, \mathcal{F},
+\mathbb{P})\)</span> un espace de probabilité filtré. Un processus <span
+class="math inline">\(\{S_t\}_{t \geq 0}\)</span> est dit géométrique
+brownien si : <span class="math display">\[dS_t = \mu S_t dt + \sigma
+S_t dW_t,\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(\mu\)</span> est le taux de
+croissance attendu (drift),</p></li>
+<li><p><span class="math inline">\(\sigma\)</span> est la
+volatilité,</p></li>
+<li><p><span class="math inline">\(\{W_t\}_{t \geq 0}\)</span> est un
+mouvement brownien standard sous <span
+class="math inline">\(\mathbb{P}\)</span>.</p></li>
+</ul>
+</div>
+<h2 id="fonction-de-prix-dune-option">Fonction de Prix d’une Option</h2>
+<p>Une option est un contrat financier qui donne le droit, mais non
+l’obligation, d’acheter (option d’achat ou call) ou de vendre (option de
+vente ou put) un actif sous-jacent à un prix déterminé, appelé prix
+d’exercice, à une date d’échéance donnée.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(V(S_t, t)\)</span> la valeur à
+l’instant <span class="math inline">\(t\)</span> d’une option sur un
+actif dont le prix est <span class="math inline">\(S_t\)</span>. La
+fonction de prix <span class="math inline">\(V\)</span> dépend des
+paramètres du marché et des caractéristiques de l’option.</p>
+</div>
+<h1 id="léquation-de-black-scholes">L’Équation de Black-Scholes</h1>
+<h2 id="formulation-de-léquation">Formulation de l’Équation</h2>
+<p>L’équation de Black-Scholes décrit l’évolution temporelle de la
+fonction de prix <span class="math inline">\(V(S_t, t)\)</span> d’une
+option européenne. Cette équation est dérivée en utilisant des arguments
+d’arbitrage et des hypothèses sur le mouvement du prix de l’actif
+sous-jacent.</p>
+<div class="theorem">
+<p>Sous les hypothèses du modèle de Black-Scholes, la fonction de prix
+<span class="math inline">\(V(S_t, t)\)</span> satisfait l’équation
+différentielle partielle suivante : <span
+class="math display">\[\frac{\partial V}{\partial t} + \frac{1}{2}
+\sigma^2 S_t^2 \frac{\partial^2 V}{\partial S_t^2} + r S_t
+\frac{\partial V}{\partial S_t} - r V = 0,\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(r\)</span> est le taux d’intérêt sans
+risque,</p></li>
+<li><p><span class="math inline">\(\sigma\)</span> est la volatilité du
+sous-jacent,</p></li>
+<li><p><span class="math inline">\(S_t\)</span> est le prix de l’actif
+sous-jacent à l’instant <span class="math inline">\(t\)</span>.</p></li>
+</ul>
+</div>
+<h2 id="démonstration-de-léquation">Démonstration de l’Équation</h2>
+<p>Pour démontrer cette équation, nous utilisons un argument
+d’arbitrage. Considérons un portefeuille composé de l’option et d’une
+position courte sur l’actif sous-jacent. Le principe est que ce
+portefeuille doit être sans risque, c’est-à-dire que son rendement doit
+être égal au taux d’intérêt sans risque.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\Delta\)</span> la
+sensibilité de l’option au prix du sous-jacent, définie par : <span
+class="math display">\[\Delta = \frac{\partial V}{\partial
+S_t}.\]</span> Le portefeuille est constitué de <span
+class="math inline">\(\Delta\)</span> unités courtes sur l’actif
+sous-jacent et d’une unité longue sur l’option. La valeur du
+portefeuille à l’instant <span class="math inline">\(t\)</span> est :
+<span class="math display">\[\Pi_t = V(S_t, t) - \Delta S_t.\]</span> En
+utilisant le théorème d’Itô pour le processus géométrique brownien <span
+class="math inline">\(S_t\)</span>, nous obtenons : <span
+class="math display">\[dS_t = \mu S_t dt + \sigma S_t dW_t.\]</span> La
+variation infinitésimale de la valeur du portefeuille est : <span
+class="math display">\[d\Pi_t = dV - \Delta dS_t.\]</span> En
+développant <span class="math inline">\(dV\)</span> à l’aide du théorème
+de Taylor, nous avons : <span class="math display">\[dV = \frac{\partial
+V}{\partial t} dt + \frac{\partial V}{\partial S_t} dS_t + \frac{1}{2}
+\frac{\partial^2 V}{\partial S_t^2} (dS_t)^2.\]</span> En substituant
+<span class="math inline">\(dS_t\)</span> et en simplifiant, nous
+obtenons : <span class="math display">\[d\Pi_t = \left( \frac{\partial
+V}{\partial t} + \frac{1}{2} \sigma^2 S_t^2 \frac{\partial^2 V}{\partial
+S_t^2} + (\mu - r) S_t \frac{\partial V}{\partial S_t} - r V \right)
+dt.\]</span> Pour que le portefeuille soit sans risque, la partie
+stochastique doit disparaître. Cela implique : <span
+class="math display">\[\mu - r = 0.\]</span> En éliminant ce terme, nous
+obtenons l’équation de Black-Scholes : <span
+class="math display">\[\frac{\partial V}{\partial t} + \frac{1}{2}
+\sigma^2 S_t^2 \frac{\partial^2 V}{\partial S_t^2} + r S_t
+\frac{\partial V}{\partial S_t} - r V = 0.\]</span> ◻</p>
+</div>
+<h1 id="solution-de-léquation-de-black-scholes">Solution de l’Équation
+de Black-Scholes</h1>
+<h2
+id="fonction-de-prix-pour-une-option-européenne-dachat-call">Fonction de
+Prix pour une Option Européenne d’Achat (Call)</h2>
+<p>La solution de l’équation de Black-Scholes pour une option européenne
+d’achat est donnée par la formule suivante :</p>
+<div class="theorem">
+<p>La valeur <span class="math inline">\(C(S_t, t)\)</span> d’une option
+européenne d’achat à l’instant <span class="math inline">\(t\)</span>
+est donnée par : <span class="math display">\[C(S_t, t) = S_t \Phi(d_1)
+- K e^{-r(T-t)} \Phi(d_2),\]</span> où : <span
+class="math display">\[d_1 = \frac{\ln(S_t / K) + (r + \sigma^2 / 2)(T -
+t)}{\sigma \sqrt{T - t}},\]</span> <span class="math display">\[d_2 =
+d_1 - \sigma \sqrt{T - t},\]</span> et <span
+class="math inline">\(\Phi\)</span> est la fonction de répartition de la
+loi normale centrée réduite.</p>
+</div>
+<h2 id="démonstration-de-la-solution">Démonstration de la Solution</h2>
+<p>La solution de l’équation de Black-Scholes est obtenue en utilisant
+la transformation de variables et les conditions aux limites.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous cherchons une solution de la forme : <span
+class="math display">\[V(S_t, t) = S_t \Phi(d_1) - K e^{-r(T-t)}
+\Phi(d_2).\]</span> En substituant cette forme dans l’équation de
+Black-Scholes et en utilisant les propriétés des fonctions <span
+class="math inline">\(\Phi\)</span>, nous pouvons vérifier que cette
+solution satisfait l’équation différentielle partielle.</p>
+<p>Les conditions aux limites sont les suivantes :</p>
+<ul>
+<li><p><span class="math inline">\(V(S_T, T) = \max(S_T - K, 0)\)</span>
+pour une option d’achat,</p></li>
+<li><p><span class="math inline">\(V(0, t) = 0\)</span>,</p></li>
+<li><p><span class="math inline">\(\lim_{S_t \to +\infty} V(S_t, t) =
+S_t\)</span>.</p></li>
+</ul>
+<p>La solution proposée satisfait ces conditions aux limites, ce qui
+garantit son exactitude. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-parité-put-call">Propriété de Parité Put-Call</h2>
+<p>La parité put-call est une relation fondamentale entre les prix des
+options d’achat et de vente.</p>
+<div class="theorem">
+<p>Pour une option européenne, la parité put-call s’exprime par : <span
+class="math display">\[C(S_t, t) - P(S_t, t) = S_t - K
+e^{-r(T-t)},\]</span> où <span class="math inline">\(C\)</span> et <span
+class="math inline">\(P\)</span> sont respectivement les prix des
+options d’achat et de vente.</p>
+</div>
+<h2 id="démonstration-de-la-parité-put-call">Démonstration de la Parité
+Put-Call</h2>
+<p>La parité put-call est démontrée en utilisant un argument
+d’arbitrage.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un portefeuille composé d’une option
+d’achat, d’une position courte sur une option de vente et d’un actif
+sous-jacent. La valeur du portefeuille à l’échéance est : <span
+class="math display">\[\max(S_T - K, 0) - \max(K - S_T, 0) + S_T = S_T -
+K.\]</span> La valeur actuelle de ce portefeuille est : <span
+class="math display">\[C(S_t, t) - P(S_t, t) + S_t = K
+e^{-r(T-t)}.\]</span> En réarrangeant, nous obtenons la parité put-call
+: <span class="math display">\[C(S_t, t) - P(S_t, t) = S_t - K
+e^{-r(T-t)}.\]</span> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’équation de Black-Scholes a marqué un tournant dans l’histoire de
+la finance mathématique. Son impact sur les marchés financiers est
+immense, permettant une évaluation précise des options et une meilleure
+gestion des risques. Bien que le modèle présente certaines limites,
+notamment l’hypothèse de volatilité constante, il reste un outil
+fondamental pour les praticiens et les chercheurs en finance
+quantitative.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,320 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’inégalité de Rao-Blackwell : Optimisation des Estimateurs</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’inégalité de Rao-Blackwell : Optimisation des
+Estimateurs</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’inégalité de Rao-Blackwell, découverte indépendamment par C.
+Radhakrishna Rao et David Blackwell en 1947, est un résultat fondamental
+de la théorie statistique. Elle offre une méthode systématique pour
+améliorer des estimateurs par le biais d’une technique appelée
+<em>raffinement de Blackwell</em>. L’importance historique et
+conceptuelle de cette inégalité réside dans sa capacité à transformer
+des estimateurs non optimaux en estimateurs de variance minimale, sous
+certaines conditions.</p>
+<p>Cette notion émerge naturellement dans le cadre de l’estimation
+ponctuelle, où l’objectif est de trouver un estimateur qui minimise la
+variance tout en restant non biaisé. L’inégalité de Rao-Blackwell répond
+à ce besoin en fournissant une méthode pour comparer et améliorer les
+estimateurs. Elle est indispensable dans le développement de méthodes
+statistiques robustes et efficaces.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’énoncer l’inégalité de Rao-Blackwell, il est essentiel de
+définir quelques concepts clés. Considérons un paramètre <span
+class="math inline">\(\theta\)</span> que nous souhaitons estimer à
+partir d’un échantillon <span class="math inline">\(X_1, X_2, \ldots,
+X_n\)</span> issu d’une distribution de probabilité <span
+class="math inline">\(P_\theta\)</span>. Un estimateur <span
+class="math inline">\(\hat{\theta}\)</span> est une fonction mesurable
+de l’échantillon.</p>
+<div class="definition">
+<p>Un estimateur <span class="math inline">\(\hat{\theta}\)</span> est
+dit <em>non biaisé</em> pour le paramètre <span
+class="math inline">\(\theta\)</span> si <span
+class="math display">\[\mathbb{E}_\theta[\hat{\theta}] = \theta, \quad
+\forall \theta.\]</span></p>
+</div>
+<div class="definition">
+<p>La variance d’un estimateur <span
+class="math inline">\(\hat{\theta}\)</span> est définie par <span
+class="math display">\[\text{Var}(\hat{\theta}) =
+\mathbb{E}_\theta[(\hat{\theta} -
+\mathbb{E}_\theta[\hat{\theta}])^2].\]</span></p>
+</div>
+<h1 class="unnumbered" id="linégalité-de-rao-blackwell">L’inégalité de
+Rao-Blackwell</h1>
+<p>Pour énoncer l’inégalité de Rao-Blackwell, nous avons besoin
+d’introduire la notion d’estimateur suffisant. Un estimateur <span
+class="math inline">\(T\)</span> est dit <em>suffisant</em> pour <span
+class="math inline">\(\theta\)</span> si la loi de <span
+class="math inline">\(X_1, X_2, \ldots, X_n\)</span> conditionnellement
+à <span class="math inline">\(T = t\)</span> ne dépend pas de <span
+class="math inline">\(\theta\)</span>.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> un
+échantillon aléatoire issu d’une distribution <span
+class="math inline">\(P_\theta\)</span>, et soit <span
+class="math inline">\(\hat{\theta}\)</span> un estimateur non biaisé de
+<span class="math inline">\(\theta\)</span>. Si <span
+class="math inline">\(T\)</span> est un estimateur suffisant pour <span
+class="math inline">\(\theta\)</span>, alors l’estimateur raffiné de
+Blackwell <span class="math display">\[\hat{\theta}^* =
+\mathbb{E}[\hat{\theta} | T],\]</span> est également non biaisé et
+possède une variance inférieure ou égale à celle de <span
+class="math inline">\(\hat{\theta}\)</span> : <span
+class="math display">\[\text{Var}(\hat{\theta}^*) \leq
+\text{Var}(\hat{\theta}).\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer l’inégalité de Rao-Blackwell, nous utilisons la
+propriété fondamentale des estimateurs suffisants et les résultats sur
+l’espérance conditionnelle.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous commençons par montrer que <span
+class="math inline">\(\hat{\theta}^*\)</span> est non biaisé : <span
+class="math display">\[\mathbb{E}_\theta[\hat{\theta}^*] =
+\mathbb{E}_\theta[\mathbb{E}[\hat{\theta} | T]] =
+\mathbb{E}_\theta[\hat{\theta}] = \theta.\]</span></p>
+<p>Ensuite, nous démontrons que <span
+class="math inline">\(\text{Var}(\hat{\theta}^*) \leq
+\text{Var}(\hat{\theta})\)</span>. Nous utilisons la décomposition de la
+variance : <span class="math display">\[\text{Var}(\hat{\theta}) =
+\mathbb{E}_\theta[\text{Var}(\hat{\theta} | T)] +
+\text{Var}_\theta(\mathbb{E}[\hat{\theta} | T]).\]</span></p>
+<p>Puisque <span class="math inline">\(\text{Var}(\hat{\theta}^*) =
+\text{Var}_\theta(\mathbb{E}[\hat{\theta} | T])\)</span>, nous avons :
+<span class="math display">\[\text{Var}(\hat{\theta}) =
+\mathbb{E}_\theta[\text{Var}(\hat{\theta} | T)] +
+\text{Var}(\hat{\theta}^*).\]</span></p>
+<p>Comme <span
+class="math inline">\(\mathbb{E}_\theta[\text{Var}(\hat{\theta} | T)]
+\geq 0\)</span>, il s’ensuit que : <span
+class="math display">\[\text{Var}(\hat{\theta}^*) \leq
+\text{Var}(\hat{\theta}).\]</span></p>
+<p>Ainsi, l’inégalité de Rao-Blackwell est démontrée. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’inégalité de Rao-Blackwell possède plusieurs propriétés
+intéressantes et corollaires importants.</p>
+<ul>
+<li><p>Si <span class="math inline">\(T\)</span> est un estimateur
+suffisant et complet, alors l’estimateur raffiné de Blackwell <span
+class="math inline">\(\hat{\theta}^*\)</span> est l’estimateur non
+biaisé de variance minimale (UMVUE).</p></li>
+<li><p>L’inégalité de Rao-Blackwell peut être utilisée pour améliorer
+n’importe quel estimateur non biaisé en le conditionnant par un
+estimateur suffisant.</p></li>
+<li><p>Dans le cas où <span class="math inline">\(T\)</span> est une
+statistique complète et suffisante, l’estimateur raffiné de Blackwell
+est unique.</p></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’inégalité de Rao-Blackwell est un outil puissant dans la théorie
+statistique, permettant d’améliorer les estimateurs en réduisant leur
+variance. Son importance réside dans sa capacité à transformer des
+estimateurs non optimaux en estimateurs de variance minimale, sous
+certaines conditions. Cette inégalité continue d’être une source
+d’inspiration pour le développement de nouvelles méthodes statistiques
+et reste un pilier fondamental dans l’analyse statistique moderne.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,330 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Capacité VC (Vapnik-Chervonenkis)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Capacité VC (Vapnik-Chervonenkis)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La théorie de l’apprentissage statistique, développée par Vladimir
+Vapnik et Alexey Chervonenkis dans les années 1960-70, a révolutionné
+notre compréhension de la généralisation dans les modèles
+d’apprentissage. Au cœur de cette théorie se trouve le concept de
+capacité VC (Vapnik-Chervonenkis), une mesure fondamentale qui quantifie
+la complexité d’un ensemble de fonctions ou d’un modèle d’apprentissage.
+Cette notion est indispensable pour comprendre et contrôler le phénomène
+de surapprentissage (overfitting) dans les algorithmes d’apprentissage
+automatique.</p>
+<p>La capacité VC émerge comme une réponse à la question suivante :
+comment mesurer la capacité d’un modèle à s’adapter aux données
+d’entraînement tout en généralisant bien aux données non vues ? Elle est
+indispensable dans le cadre de la théorie de l’apprentissage
+probablement approximativement correct (PAC), qui vise à fournir des
+garanties théoriques sur la performance des modèles d’apprentissage.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la capacité VC, commençons par comprendre ce que nous
+cherchons à mesurer. Imaginons un ensemble de fonctions (par exemple,
+des hypothèses dans un espace d’hypothèses) et un ensemble de points de
+données. Nous voulons savoir combien de configurations différentes ces
+fonctions peuvent produire sur ces points. La capacité VC capture cette
+idée en mesurant le nombre maximal de configurations distinctes qu’un
+ensemble de fonctions peut générer.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{H}\)</span>
+un ensemble d’hypothèses (ou fonctions) et <span class="math inline">\(S
+= \{x_1, x_2, \ldots, x_n\}\)</span> un ensemble de <span
+class="math inline">\(n\)</span> points distincts. Une configuration est
+une classification binaire des points de <span
+class="math inline">\(S\)</span>. Le nombre de configurations distinctes
+que <span class="math inline">\(\mathcal{H}\)</span> peut produire sur
+<span class="math inline">\(S\)</span> est appelé le nombre de
+shattering.</p>
+<p>La capacité VC de <span class="math inline">\(\mathcal{H}\)</span>,
+notée <span class="math inline">\(\text{VC}(\mathcal{H})\)</span>, est
+le plus petit entier <span class="math inline">\(d\)</span> tel que pour
+tout ensemble de <span class="math inline">\(n\)</span> points, le
+nombre de configurations distinctes est au plus <span
+class="math inline">\(\sum_{i=0}^d \binom{n}{i}\)</span>.</p>
+<p>Mathématiquement, cela s’écrit : <span
+class="math display">\[\text{VC}(\mathcal{H}) = \sup_{n} \left\{ n :
+\exists S \text{ tel que } | \{ h|_{S} : h \in \mathcal{H} \}| = 2^n
+\right\}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la capacité VC est le théorème de
+l’union stable, qui fournit une borne sur la probabilité que plusieurs
+événements se produisent simultanément. Ce théorème est crucial pour
+dériver des garanties de généralisation dans la théorie PAC.</p>
+<p>Commençons par comprendre ce que nous cherchons à obtenir. Supposons
+que nous ayons un ensemble d’événements et que nous voulions contrôler
+la probabilité que plusieurs de ces événements se produisent en même
+temps. Le théorème de l’union stable nous permet de faire cela en
+fournissant une borne sur cette probabilité.</p>
+<p>Formellement, soit <span
+class="math inline">\(\{A_i\}_{i=1}^n\)</span> une famille d’événements.
+Le théorème de l’union stable affirme que : <span
+class="math display">\[\mathbb{P}\left( \bigcup_{i=1}^n A_i \right) \leq
+\sum_{i=1}^n \mathbb{P}(A_i)\]</span></p>
+<p>Cependant, cette borne est souvent trop lâche. Une version plus
+raffinée du théorème de l’union stable, adaptée au contexte des
+ensembles d’hypothèses, est la suivante :</p>
+<p>Soit <span class="math inline">\(\mathcal{H}\)</span> un ensemble
+d’hypothèses et <span class="math inline">\(S\)</span> un ensemble de
+points. Le théorème de l’union stable pour les ensembles d’hypothèses
+affirme que : <span class="math display">\[\mathbb{P}\left( \exists h
+\in \mathcal{H} : \text{erreur}(h) &gt; \epsilon \right) \leq 2^{d \log
+\left( \frac{e n}{d} \right)} e^{-\frac{\epsilon^2 n}{8}}\]</span> où
+<span class="math inline">\(d = \text{VC}(\mathcal{H})\)</span> et <span
+class="math inline">\(n\)</span> est la taille de l’ensemble
+d’entraînement.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de l’union stable dans le contexte des
+ensembles d’hypothèses, nous devons justifier chaque étape en détail.
+Commençons par rappeler que la capacité VC <span
+class="math inline">\(d\)</span> de l’ensemble d’hypothèses <span
+class="math inline">\(\mathcal{H}\)</span> est le plus petit entier tel
+que pour tout ensemble de <span class="math inline">\(n\)</span> points,
+le nombre de configurations distinctes est au plus <span
+class="math inline">\(\sum_{i=0}^d \binom{n}{i}\)</span>.</p>
+<p>En utilisant le lemme de Sauer-Shelah, nous savons que : <span
+class="math display">\[| \{ h|_{S} : h \in \mathcal{H} \}| \leq
+\sum_{i=0}^d \binom{n}{i}\]</span></p>
+<p>Ensuite, nous utilisons le théorème de Hoeffding pour borner la
+probabilité que l’erreur d’une hypothèse <span
+class="math inline">\(h\)</span> soit supérieure à un certain seuil
+<span class="math inline">\(\epsilon\)</span>. Le théorème de Hoeffding
+nous donne : <span class="math display">\[\mathbb{P}\left(
+\text{erreur}(h) &gt; \epsilon \right) \leq e^{-\frac{\epsilon^2
+n}{8}}\]</span></p>
+<p>En combinant ces résultats, nous obtenons la borne souhaitée : <span
+class="math display">\[\mathbb{P}\left( \exists h \in \mathcal{H} :
+\text{erreur}(h) &gt; \epsilon \right) \leq 2^{d \log \left( \frac{e
+n}{d} \right)} e^{-\frac{\epsilon^2 n}{8}}\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+capacité VC :</p>
+<p>(i) La capacité VC d’un ensemble d’hypothèses est un nombre entier ou
+infini. Si la capacité VC est finie, l’ensemble d’hypothèses est dit de
+capacité VC finie.</p>
+<p>(ii) La capacité VC d’un ensemble d’hypothèses est une mesure de sa
+complexité. Plus la capacité VC est élevée, plus l’ensemble d’hypothèses
+peut s’adapter aux données d’entraînement, mais cela peut également
+entraîner un surapprentissage.</p>
+<p>(iii) La capacité VC d’un ensemble d’hypothèses est liée au nombre de
+paramètres du modèle. Par exemple, pour un modèle linéaire dans <span
+class="math inline">\(\mathbb{R}^d\)</span>, la capacité VC est <span
+class="math inline">\(d + 1\)</span>.</p>
+<p>Pour prouver ces propriétés, nous devons développer chaque point en
+détail. Par exemple, pour la propriété (i), nous pouvons utiliser le
+fait que la capacité VC est définie comme le plus petit entier <span
+class="math inline">\(d\)</span> tel que pour tout ensemble de <span
+class="math inline">\(n\)</span> points, le nombre de configurations
+distinctes est au plus <span class="math inline">\(\sum_{i=0}^d
+\binom{n}{i}\)</span>. Si aucun tel entier <span
+class="math inline">\(d\)</span> n’existe, la capacité VC est
+infinie.</p>
+<p>Pour la propriété (ii), nous pouvons utiliser le théorème de l’union
+stable pour montrer que plus la capacité VC est élevée, plus la
+probabilité de surapprentissage augmente.</p>
+<p>Pour la propriété (iii), nous pouvons utiliser le fait que pour un
+modèle linéaire dans <span class="math inline">\(\mathbb{R}^d\)</span>,
+l’ensemble d’hypothèses peut être paramétré par <span
+class="math inline">\(d + 1\)</span> paramètres, et donc la capacité VC
+est également <span class="math inline">\(d + 1\)</span>.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

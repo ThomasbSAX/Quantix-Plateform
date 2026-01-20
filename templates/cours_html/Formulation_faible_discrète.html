@@ -1,0 +1,419 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Formulation faible discrète : Une approche numérique pour les équations aux dérivées partielles</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Formulation faible discrète : Une approche numérique
+pour les équations aux dérivées partielles</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les équations aux dérivées partielles (EDP) sont omniprésentes en
+sciences de l’ingénieur, en physique et en mathématiques appliquées.
+Elles modélisent des phénomènes complexes tels que la propagation de la
+chaleur, les écoulements fluides ou encore les vibrations mécaniques.
+Cependant, leur résolution analytique est souvent impossible pour des
+géométries complexes ou des conditions aux limites non triviales. C’est
+dans ce contexte que les méthodes numériques, et en particulier la
+formulation faible discrète, jouent un rôle crucial.</p>
+<p>La formulation faible discrète est une méthode numérique qui permet
+de transformer une EDP en un système d’équations algébriques. Cette
+approche est particulièrement utile pour les problèmes où les solutions
+sont recherchées dans un espace fonctionnel approprié. Elle combine les
+avantages des méthodes d’éléments finis et des méthodes de volumes
+finis, offrant ainsi une grande flexibilité dans la modélisation.</p>
+<p>Dans cet article, nous explorerons les fondements mathématiques de la
+formulation faible discrète. Nous commencerons par une introduction
+historique et conceptuelle, puis nous présenterons les définitions clés
+et les théorèmes fondamentaux. Enfin, nous illustrerons cette méthode
+par des exemples concrets et discuterons de ses applications
+pratiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails techniques, il est essentiel de
+comprendre ce que nous cherchons à obtenir. Supposons que nous ayons une
+EDP de la forme :</p>
+<p><span class="math display">\[\mathcal{L}u = f \quad \text{dans }
+\Omega,\]</span></p>
+<p>où <span class="math inline">\(\mathcal{L}\)</span> est un opérateur
+différentiel linéaire, <span class="math inline">\(u\)</span> est la
+fonction inconnue que nous cherchons à déterminer, et <span
+class="math inline">\(f\)</span> est une fonction donnée. Notre objectif
+est de trouver une approximation numérique de <span
+class="math inline">\(u\)</span>.</p>
+<p>Pour ce faire, nous introduisons un espace fonctionnel <span
+class="math inline">\(V\)</span> et une base <span
+class="math inline">\(\{\phi_i\}_{i=1}^N\)</span> de cet espace. L’idée
+est de chercher une solution <span class="math inline">\(u_h\)</span>
+dans l’espace engendré par cette base, c’est-à-dire :</p>
+<p><span class="math display">\[u_h = \sum_{i=1}^N u_i
+\phi_i.\]</span></p>
+<p>La formulation faible discrète consiste à multiplier l’EDP par des
+fonctions test <span class="math inline">\(\psi_j\)</span> appartenant à
+<span class="math inline">\(V\)</span>, puis à intégrer sur le domaine
+<span class="math inline">\(\Omega\)</span>. Cela conduit à un système
+d’équations algébriques pour les coefficients <span
+class="math inline">\(u_i\)</span>.</p>
+<p>Formellement, la formulation faible discrète s’écrit :</p>
+<p><span class="math display">\[\sum_{i=1}^N u_i \int_{\Omega}
+\mathcal{L}\phi_i(x) \psi_j(x) \, dx = \int_{\Omega} f(x) \psi_j(x) \,
+dx, \quad \forall j = 1, \dots, N.\]</span></p>
+<p>En utilisant les propriétés de l’opérateur <span
+class="math inline">\(\mathcal{L}\)</span> et en intégrant par parties,
+nous pouvons réécrire cette équation sous une forme plus maniable. Par
+exemple, pour l’équation de Poisson :</p>
+<p><span class="math display">\[-\Delta u = f \quad \text{dans }
+\Omega,\]</span></p>
+<p>avec des conditions aux limites appropriées, la formulation faible
+discrète devient :</p>
+<p><span class="math display">\[\sum_{i=1}^N u_i \int_{\Omega} \nabla
+\phi_i(x) \cdot \nabla \psi_j(x) \, dx = \int_{\Omega} f(x) \psi_j(x) \,
+dx, \quad \forall j = 1, \dots, N.\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour garantir la convergence de la formulation faible discrète, il
+est crucial d’établir des théorèmes de stabilité et de convergence. Un
+résultat fondamental est le théorème de Céa, qui fournit une estimation
+d’erreur pour la solution approchée.</p>
+<p>Avant d’énoncer le théorème de Céa, nous avons besoin de quelques
+définitions et propriétés. Soit <span class="math inline">\(V\)</span>
+un espace de Hilbert muni d’un produit scalaire <span
+class="math inline">\((\cdot, \cdot)_V\)</span>. Considérons un problème
+variationnel de la forme :</p>
+<p><span class="math display">\[\text{Trouver } u \in V \text{ tel que }
+a(u, v) = (f, v)_V \quad \forall v \in V,\]</span></p>
+<p>où <span class="math inline">\(a(\cdot, \cdot)\)</span> est une forme
+bilinéaire continue et coercive.</p>
+<p>La formulation faible discrète consiste à chercher <span
+class="math inline">\(u_h \in V_h\)</span>, où <span
+class="math inline">\(V_h\)</span> est un sous-espace de dimension finie
+de <span class="math inline">\(V\)</span>, tel que :</p>
+<p><span class="math display">\[a(u_h, v_h) = (f, v_h)_V \quad \forall
+v_h \in V_h.\]</span></p>
+<p>Le théorème de Céa nous donne une estimation d’erreur entre la
+solution exacte <span class="math inline">\(u\)</span> et la solution
+approchée <span class="math inline">\(u_h\)</span>.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(u\)</span> la solution exacte du
+problème variationnel et <span class="math inline">\(u_h\)</span> la
+solution approchée obtenue par la formulation faible discrète. Supposons
+que <span class="math inline">\(a(\cdot, \cdot)\)</span> est continue et
+coercive sur <span class="math inline">\(V\)</span>. Alors, il existe
+une constante <span class="math inline">\(C &gt; 0\)</span> indépendante
+de <span class="math inline">\(h\)</span> telle que :</p>
+<p><span class="math display">\[\|u - u_h\|_V \leq C \inf_{v_h \in V_h}
+\|u - v_h\|_V.\]</span></p>
+</div>
+<p>La preuve de ce théorème repose sur des propriétés fondamentales des
+formes bilinéaires et des espaces de Hilbert. Nous allons maintenant
+détailler cette preuve.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Céa, nous commençons par écrire l’erreur
+d’approximation :</p>
+<p><span class="math display">\[\|u - u_h\|_V.\]</span></p>
+<p>En utilisant la triangulaire inversée, nous avons :</p>
+<p><span class="math display">\[\|u - u_h\|_V \leq \|u - v_h\|_V + \|v_h
+- u_h\|_V, \quad \forall v_h \in V_h.\]</span></p>
+<p>Il suffit donc de majorer <span class="math inline">\(\|v_h -
+u_h\|_V\)</span> pour tout <span class="math inline">\(v_h \in
+V_h\)</span>.</p>
+<p>Considérons l’équation variationnelle vérifiée par <span
+class="math inline">\(u_h\)</span> :</p>
+<p><span class="math display">\[a(u_h, v_h) = (f, v_h)_V \quad \forall
+v_h \in V_h.\]</span></p>
+<p>En utilisant la linéarité de <span class="math inline">\(a(\cdot,
+\cdot)\)</span>, nous pouvons écrire :</p>
+<p><span class="math display">\[a(u_h - v_h, w_h) = a(u_h, w_h) - a(v_h,
+w_h), \quad \forall w_h \in V_h.\]</span></p>
+<p>En particulier, pour <span class="math inline">\(w_h = u_h -
+v_h\)</span>, nous avons :</p>
+<p><span class="math display">\[a(u_h - v_h, u_h - v_h) = a(u_h, u_h -
+v_h) - a(v_h, u_h - v_h).\]</span></p>
+<p>En utilisant l’équation variationnelle pour <span
+class="math inline">\(u_h\)</span>, nous obtenons :</p>
+<p><span class="math display">\[a(u_h - v_h, u_h - v_h) = (f, u_h -
+v_h)_V - a(v_h, u_h - v_h).\]</span></p>
+<p>En ajoutant et en soustrayant <span class="math inline">\(a(v_h, u_h
+- v_h)\)</span>, nous avons :</p>
+<p><span class="math display">\[a(u_h - v_h, u_h - v_h) = (f, u_h -
+v_h)_V - a(v_h, u_h - v_h) + a(v_h, u_h - v_h).\]</span></p>
+<p>Ce qui simplifie en :</p>
+<p><span class="math display">\[a(u_h - v_h, u_h - v_h) = (f, u_h -
+v_h)_V.\]</span></p>
+<p>En utilisant l’équation variationnelle pour <span
+class="math inline">\(u\)</span>, nous avons :</p>
+<p><span class="math display">\[(f, u_h - v_h)_V = a(u, u_h -
+v_h).\]</span></p>
+<p>Ainsi,</p>
+<p><span class="math display">\[a(u_h - v_h, u_h - v_h) = a(u, u_h -
+v_h).\]</span></p>
+<p>En utilisant la coercivité de <span class="math inline">\(a(\cdot,
+\cdot)\)</span>, il existe une constante <span
+class="math inline">\(\alpha &gt; 0\)</span> telle que :</p>
+<p><span class="math display">\[\alpha \|u_h - v_h\|_V^2 \leq a(u_h -
+v_h, u_h - v_h).\]</span></p>
+<p>En combinant les résultats précédents, nous obtenons :</p>
+<p><span class="math display">\[\alpha \|u_h - v_h\|_V^2 \leq a(u, u_h -
+v_h).\]</span></p>
+<p>En utilisant la continuité de <span class="math inline">\(a(\cdot,
+\cdot)\)</span>, il existe une constante <span class="math inline">\(M
+&gt; 0\)</span> telle que :</p>
+<p><span class="math display">\[a(u, u_h - v_h) \leq M \|u\|_V \|u_h -
+v_h\|_V.\]</span></p>
+<p>Ainsi,</p>
+<p><span class="math display">\[\alpha \|u_h - v_h\|_V \leq M
+\|u\|_V.\]</span></p>
+<p>En utilisant la triangulaire inversée, nous avons :</p>
+<p><span class="math display">\[\|u - u_h\|_V \leq \|u - v_h\|_V +
+\frac{M}{\alpha} \|u\|_V.\]</span></p>
+<p>En prenant l’infimum sur <span class="math inline">\(v_h \in
+V_h\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\|u - u_h\|_V \leq C \inf_{v_h \in V_h}
+\|u - v_h\|_V,\]</span></p>
+<p>où <span class="math inline">\(C = 1 + \frac{M}{\alpha}\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le théorème de Céa a plusieurs implications importantes pour la
+formulation faible discrète. Nous en listons quelques-unes
+ci-dessous.</p>
+<ol>
+<li><p><strong>Stabilité</strong> : Le théorème de Céa garantit que la
+solution approchée <span class="math inline">\(u_h\)</span> est stable
+par rapport à la solution exacte <span class="math inline">\(u\)</span>.
+Cela signifie que les erreurs d’approximation sont contrôlées par la
+distance entre <span class="math inline">\(u\)</span> et l’espace <span
+class="math inline">\(V_h\)</span>.</p></li>
+<li><p><strong>Convergence</strong> : En choisissant une famille
+d’espaces <span class="math inline">\(V_h\)</span> qui approxime bien
+<span class="math inline">\(V\)</span>, nous pouvons garantir la
+convergence de <span class="math inline">\(u_h\)</span> vers <span
+class="math inline">\(u\)</span> lorsque la taille des éléments tend
+vers zéro.</p></li>
+<li><p><strong>Optimalité</strong> : Le théorème de Céa montre que la
+formulation faible discrète est optimale dans le sens où l’erreur
+d’approximation est minimisée par rapport à la meilleure approximation
+de <span class="math inline">\(u\)</span> dans <span
+class="math inline">\(V_h\)</span>.</p></li>
+</ol>
+<p>Pour illustrer ces propriétés, considérons l’exemple de l’équation de
+Poisson. Supposons que nous utilisions des éléments finis linéaires pour
+discrétiser le problème. Dans ce cas, l’espace <span
+class="math inline">\(V_h\)</span> est engendré par des fonctions de
+base linéaires <span class="math inline">\(\phi_i\)</span>.</p>
+<p>En appliquant le théorème de Céa, nous pouvons montrer que l’erreur
+d’approximation <span class="math inline">\(\|u - u_h\|_V\)</span> est
+de l’ordre de <span class="math inline">\(h\)</span>, où <span
+class="math inline">\(h\)</span> est la taille des éléments. Cela
+signifie que la méthode converge linéairement lorsque <span
+class="math inline">\(h\)</span> tend vers zéro.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La formulation faible discrète est une méthode puissante pour la
+résolution numérique des équations aux dérivées partielles. Elle combine
+les avantages des méthodes d’éléments finis et des méthodes de volumes
+finis, offrant ainsi une grande flexibilité dans la modélisation. Les
+théorèmes de stabilité et de convergence, tels que le théorème de Céa,
+garantissent que cette méthode est robuste et efficace.</p>
+<p>Dans cet article, nous avons exploré les fondements mathématiques de
+la formulation faible discrète. Nous avons présenté les définitions
+clés, les théorèmes fondamentaux et leurs preuves détaillées. Enfin,
+nous avons discuté des propriétés et des corollaires de cette
+méthode.</p>
+<p>Les applications pratiques de la formulation faible discrète sont
+nombreuses et variées. Elle est utilisée dans des domaines tels que la
+mécanique des fluides, la thermique, l’électromagnétisme et bien
+d’autres. Grâce à sa flexibilité et à sa robustesse, cette méthode
+continue de jouer un rôle crucial dans la résolution des problèmes
+scientifiques et industriels complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

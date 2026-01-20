@@ -1,0 +1,330 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Hyperopt: Optimisation Hyperparamétrique par Algorithmes d’Optimisation Bayésienne</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Hyperopt: Optimisation Hyperparamétrique par
+Algorithmes d’Optimisation Bayésienne</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’optimisation hyperparamétrique est un problème central en
+apprentissage automatique. Les modèles d’apprentissage automatique sont
+souvent définis par des hyperparamètres qui ne peuvent pas être estimés
+directement à partir des données. Ces hyperparamètres doivent être
+optimisés pour obtenir les meilleures performances possibles du
+modèle.</p>
+<p>L’approche traditionnelle consiste à utiliser des méthodes de
+recherche en grille ou de recherche aléatoire. Cependant, ces méthodes
+peuvent être inefficaces et coûteuses en termes de temps de calcul,
+surtout lorsque le nombre d’hyperparamètres est élevé.</p>
+<p>Hyperopt est une bibliothèque Python qui propose une approche
+alternative basée sur les algorithmes d’optimisation bayésienne. Ces
+algorithmes utilisent des modèles probabilistes pour modéliser la
+fonction objectif et pour sélectionner les points d’échantillonnage
+suivants de manière à maximiser l’information obtenue.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Nous commençons par définir formellement le problème d’optimisation
+hyperparamétrique. Soit <span class="math inline">\(\mathcal{X}\)</span>
+l’espace des hyperparamètres et <span class="math inline">\(f:
+\mathcal{X} \rightarrow \mathbb{R}\)</span> la fonction objectif qui
+évalue les performances d’un modèle donné un ensemble
+d’hyperparamètres.</p>
+<div class="definition">
+<p>Le problème d’optimisation hyperparamétrique consiste à trouver <span
+class="math display">\[x^* = \arg\min_{x \in \mathcal{X}}
+f(x).\]</span></p>
+</div>
+<p>Hyperopt utilise un algorithme d’optimisation bayésienne pour
+résoudre ce problème. L’idée est de modéliser la fonction objectif <span
+class="math inline">\(f\)</span> par un modèle probabiliste, appelé
+surrogat, et d’utiliser ce modèle pour sélectionner les points
+d’échantillonnage suivants.</p>
+<div class="definition">
+<p>Un algorithme d’optimisation bayésienne est défini par les étapes
+suivantes:</p>
+<ol>
+<li><p>Choisir un modèle probabiliste pour la fonction objectif <span
+class="math inline">\(f\)</span>.</p></li>
+<li><p>Initialiser le modèle avec quelques échantillons.</p></li>
+<li><p>Pour chaque itération:</p>
+<ul>
+<li><p>Mettre à jour le modèle avec les échantillons
+précédents.</p></li>
+<li><p>Sélectionner le point d’échantillonnage suivant en maximisant une
+fonction d’acquisition.</p></li>
+<li><p>Évaluer la fonction objectif au point sélectionné et ajouter
+l’échantillon au modèle.</p></li>
+</ul></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="théorèmes-et-propriétés">Théorèmes et
+Propriétés</h1>
+<p>Hyperopt utilise un algorithme d’optimisation bayésienne appelé
+Tree-structured Parzen Estimator (TPE). Cet algorithme est basé sur un
+modèle de densité de probabilité non paramétrique qui est mis à jour à
+chaque itération.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(l(x)\)</span> la fonction
+d’acquisition définie par: <span class="math display">\[l(x) =
+\frac{\sum_{x_i \in X_{\text{success}}} K(x, x_i)}{\sum_{x_j \in X} K(x,
+x_j)},\]</span> où <span class="math inline">\(K\)</span> est une
+fonction noyau et <span
+class="math inline">\(X_{\text{success}}\)</span> est l’ensemble des
+points d’échantillonnage qui ont donné de bonnes performances.</p>
+<p>Alors, le TPE sélectionne le point d’échantillonnage suivant en
+maximisant <span class="math inline">\(l(x)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve du théorème précédent repose sur l’analyse de la fonction
+d’acquisition. La fonction d’acquisition <span
+class="math inline">\(l(x)\)</span> est définie comme le rapport entre
+la densité de probabilité des points d’échantillonnage qui ont donné de
+bonnes performances et la densité de probabilité de tous les points
+d’échantillonnage.</p>
+<div class="proof">
+<p><em>Proof.</em> La fonction d’acquisition <span
+class="math inline">\(l(x)\)</span> est définie par: <span
+class="math display">\[l(x) = \frac{\sum_{x_i \in X_{\text{success}}}
+K(x, x_i)}{\sum_{x_j \in X} K(x, x_j)}.\]</span> La maximisation de
+<span class="math inline">\(l(x)\)</span> revient donc à maximiser la
+densité de probabilité des points d’échantillonnage qui ont donné de
+bonnes performances.</p>
+<p>En utilisant les propriétés des fonctions noyau, on peut montrer que
+cette maximisation est équivalente à une recherche dans l’espace des
+hyperparamètres qui favorise les régions où la fonction objectif est
+minimale. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Hyperopt possède plusieurs propriétés intéressantes qui en font une
+méthode puissante pour l’optimisation hyperparamétrique.</p>
+<div class="proposition">
+<p>Les propriétés suivantes sont vérifiées:</p>
+<ol>
+<li><p>Hyperopt est efficace pour l’optimisation de fonctions objectives
+coûteuses.</p></li>
+<li><p>Hyperopt est capable de traiter des espaces d’hyperparamètres
+complexes.</p></li>
+<li><p>Hyperopt est parallélisable, ce qui permet de réduire le temps de
+calcul.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ul>
+<li><p>Hyperopt utilise un modèle probabiliste pour modéliser la
+fonction objectif, ce qui permet de réduire le nombre d’évaluations
+nécessaires.</p></li>
+<li><p>Le modèle TPE est capable de capturer des structures complexes
+dans l’espace des hyperparamètres.</p></li>
+<li><p>Hyperopt peut être parallélisé en évaluant la fonction objectif à
+plusieurs points simultanément.</p></li>
+</ul>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Hyperopt est une méthode puissante pour l’optimisation
+hyperparamétrique. Elle combine les avantages des algorithmes
+d’optimisation bayésienne avec une modélisation flexible de la fonction
+objectif. Les propriétés et les théorèmes présentés dans cet article
+montrent que Hyperopt est une méthode efficace et robuste pour
+l’optimisation des hyperparamètres dans les modèles d’apprentissage
+automatique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

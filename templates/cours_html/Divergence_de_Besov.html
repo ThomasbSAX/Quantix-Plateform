@@ -1,0 +1,407 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Besov</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Besov</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les espaces de Besov, introduits par le mathématicien russe Oleg
+Vladimirovitch Besov dans les années 1950, jouent un rôle fondamental en
+analyse fonctionnelle et en théorie des fonctions. Ces espaces
+généralisent les espaces de Sobolev et permettent une description fine
+des propriétés régularité des fonctions. La divergence de Besov, quant à
+elle, émerge comme un outil puissant pour étudier les propriétés
+asymptotiques des fonctions dans ces espaces.</p>
+<p>L’intérêt pour la divergence de Besov réside dans sa capacité à
+capturer des comportements singuliers et à fournir des critères de
+convergence pour les séries et intégrales dans ces espaces. Elle trouve
+des applications dans divers domaines, notamment en théorie du signal,
+en traitement d’images et en modélisation mathématique de phénomènes
+physiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la divergence de Besov, commençons par rappeler
+quelques notions préliminaires. Considérons un espace de Besov <span
+class="math inline">\(B_{p,q}^s(\mathbb{R}^n)\)</span>, où <span
+class="math inline">\(1 \leq p, q \leq \infty\)</span> et <span
+class="math inline">\(s \in \mathbb{R}\)</span>. Cet espace est défini
+comme l’ensemble des fonctions <span class="math inline">\(f\)</span>
+telles que la norme suivante soit finie:</p>
+<p><span class="math display">\[\|f\|_{B_{p,q}^s} = \left(
+\sum_{j=0}^{\infty} 2^{jsq} \| \Delta_j f \|_{L^p}^q
+\right)^{1/q}\]</span></p>
+<p>où <span class="math inline">\(\Delta_j\)</span> représente les
+projecteurs de Littlewood-Paley.</p>
+<p>La divergence de Besov peut être vue comme une mesure de la
+"distance" entre deux fonctions dans un espace de Besov. Plus
+précisément, nous cherchons à quantifier la manière dont une fonction
+<span class="math inline">\(f\)</span> diverge par rapport à une autre
+fonction <span class="math inline">\(g\)</span> dans cet espace.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f, g \in
+B_{p,q}^s(\mathbb{R}^n)\)</span>. La divergence de Besov entre <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> est définie par:</p>
+<p><span class="math display">\[D_{B_{p,q}^s}(f, g) = \sup_{j \geq 0}
+2^{js} \| \Delta_j (f - g) \|_{L^p}\]</span></p>
+<p>Cette définition capture l’idée que la divergence est contrôlée par
+les différences des projections de Littlewood-Paley des fonctions <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span>.</p>
+</div>
+<p>Une autre formulation équivalente de la divergence de Besov est
+donnée par:</p>
+<p><span class="math display">\[D_{B_{p,q}^s}(f, g) =
+\sup_{\|h\|_{B_{-p,-q}^{-s}} \leq 1} \left| \int_{\mathbb{R}^n} (f(x) -
+g(x)) h(x) \, dx \right|\]</span></p>
+<p>où <span class="math inline">\(B_{-p,-q}^{-s}\)</span> est l’espace
+dual de <span class="math inline">\(B_{p,q}^s\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un résultat fondamental concernant la divergence de Besov est le
+théorème suivant, qui établit une relation entre la divergence et les
+normes dans les espaces de Besov.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\{f_n\}_{n \in \mathbb{N}}\)</span>
+une suite d’éléments de <span
+class="math inline">\(B_{p,q}^s(\mathbb{R}^n)\)</span> et soit <span
+class="math inline">\(f \in B_{p,q}^s(\mathbb{R}^n)\)</span>. Alors, les
+assertions suivantes sont équivalentes:</p>
+<ol>
+<li><p><span class="math inline">\(f_n\)</span> converge vers <span
+class="math inline">\(f\)</span> dans <span
+class="math inline">\(B_{p,q}^s(\mathbb{R}^n)\)</span>, c’est-à-dire
+<span class="math inline">\(\|f_n - f\|_{B_{p,q}^s} \to 0\)</span>
+lorsque <span class="math inline">\(n \to \infty\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(\epsilon &gt; 0\)</span>,
+il existe <span class="math inline">\(N \in \mathbb{N}\)</span> tel que
+pour tout <span class="math inline">\(n, m \geq N\)</span>, on a <span
+class="math inline">\(D_{B_{p,q}^s}(f_n, f_m) &lt;
+\epsilon\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(h \in
+B_{-p,-q}^{-s}(\mathbb{R}^n)\)</span>, on a <span
+class="math inline">\(\int_{\mathbb{R}^n} f_n(x) h(x) \, dx \to
+\int_{\mathbb{R}^n} f(x) h(x) \, dx\)</span> lorsque <span
+class="math inline">\(n \to \infty\)</span>.</p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de convergence dans les espaces de Besov,
+nous procédons comme suit:</p>
+<div class="proof">
+<p><em>Proof.</em> Montrons d’abord que (i) implique (ii). Supposons que
+<span class="math inline">\(f_n \to f\)</span> dans <span
+class="math inline">\(B_{p,q}^s(\mathbb{R}^n)\)</span>. Alors, pour tout
+<span class="math inline">\(\epsilon &gt; 0\)</span>, il existe <span
+class="math inline">\(N \in \mathbb{N}\)</span> tel que pour tout <span
+class="math inline">\(n \geq N\)</span>, on a <span
+class="math inline">\(\|f_n - f\|_{B_{p,q}^s} &lt; \epsilon/2\)</span>.
+En particulier, pour tout <span class="math inline">\(n, m \geq
+N\)</span>, on a:</p>
+<p><span class="math display">\[D_{B_{p,q}^s}(f_n, f_m) \leq
+D_{B_{p,q}^s}(f_n, f) + D_{B_{p,q}^s}(f, f_m) \leq \|f_n -
+f\|_{B_{p,q}^s} + \|f_m - f\|_{B_{p,q}^s} &lt; \epsilon\]</span></p>
+<p>où nous avons utilisé le fait que <span
+class="math inline">\(D_{B_{p,q}^s}(f, f) = 0\)</span> et l’inégalité
+triangulaire pour la divergence de Besov.</p>
+<p>Montrons maintenant que (ii) implique (iii). Supposons que pour tout
+<span class="math inline">\(\epsilon &gt; 0\)</span>, il existe <span
+class="math inline">\(N \in \mathbb{N}\)</span> tel que pour tout <span
+class="math inline">\(n, m \geq N\)</span>, on a <span
+class="math inline">\(D_{B_{p,q}^s}(f_n, f_m) &lt; \epsilon\)</span>.
+Soit <span class="math inline">\(h \in
+B_{-p,-q}^{-s}(\mathbb{R}^n)\)</span> avec <span
+class="math inline">\(\|h\|_{B_{-p,-q}^{-s}} \leq 1\)</span>. Alors,
+pour tout <span class="math inline">\(n, m \geq N\)</span>, on a:</p>
+<p><span class="math display">\[\left| \int_{\mathbb{R}^n} (f_n(x) -
+f_m(x)) h(x) \, dx \right| \leq D_{B_{p,q}^s}(f_n, f_m)
+\|h\|_{B_{-p,-q}^{-s}} &lt; \epsilon\]</span></p>
+<p>Ce qui montre que la suite <span
+class="math inline">\(\int_{\mathbb{R}^n} f_n(x) h(x) \, dx\)</span> est
+de Cauchy. Comme <span class="math inline">\(\mathbb{R}\)</span> est
+complet, cette suite converge. En particulier, pour tout <span
+class="math inline">\(h \in B_{-p,-q}^{-s}(\mathbb{R}^n)\)</span>, on
+a:</p>
+<p><span class="math display">\[\lim_{n \to \infty} \int_{\mathbb{R}^n}
+f_n(x) h(x) \, dx = \lim_{m \to \infty} \int_{\mathbb{R}^n} f_m(x) h(x)
+\, dx\]</span></p>
+<p>Ce qui prouve (iii).</p>
+<p>Enfin, montrons que (iii) implique (i). Supposons que pour tout <span
+class="math inline">\(h \in B_{-p,-q}^{-s}(\mathbb{R}^n)\)</span>, on a
+<span class="math inline">\(\int_{\mathbb{R}^n} f_n(x) h(x) \, dx \to
+\int_{\mathbb{R}^n} f(x) h(x) \, dx\)</span> lorsque <span
+class="math inline">\(n \to \infty\)</span>. Soit <span
+class="math inline">\(\epsilon &gt; 0\)</span>. Alors, il existe <span
+class="math inline">\(N \in \mathbb{N}\)</span> tel que pour tout <span
+class="math inline">\(n \geq N\)</span>, on a:</p>
+<p><span class="math display">\[\left| \int_{\mathbb{R}^n} (f_n(x) -
+f(x)) h(x) \, dx \right| &lt; \epsilon
+\|h\|_{B_{-p,-q}^{-s}}\]</span></p>
+<p>pour tout <span class="math inline">\(h \in
+B_{-p,-q}^{-s}(\mathbb{R}^n)\)</span>. En particulier, en prenant <span
+class="math inline">\(h = \Delta_j (f_n - f)\)</span>, on obtient:</p>
+<p><span class="math display">\[2^{js} \| \Delta_j (f_n - f) \|_{L^p} =
+2^{js} \left| \int_{\mathbb{R}^n} (f_n(x) - f(x)) \Delta_j (f_n - f)(x)
+\, dx \right| &lt; \epsilon 2^{js} \| \Delta_j (f_n - f)
+\|_{L^{-p}}\]</span></p>
+<p>où nous avons utilisé le fait que <span
+class="math inline">\(\Delta_j\)</span> est une projection orthogonale
+dans <span class="math inline">\(L^p\)</span>. En sommant sur <span
+class="math inline">\(j \geq 0\)</span>, on obtient:</p>
+<p><span class="math display">\[\|f_n - f\|_{B_{p,q}^s} \leq \epsilon
+\|f_n - f\|_{B_{-p,-q}^{-s}}\]</span></p>
+<p>Ce qui prouve que <span class="math inline">\(f_n \to f\)</span> dans
+<span class="math inline">\(B_{p,q}^s(\mathbb{R}^n)\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+divergence de Besov.</p>
+<ol>
+<li><p>La divergence de Besov est une distance semi-métrique sur <span
+class="math inline">\(B_{p,q}^s(\mathbb{R}^n)\)</span>, c’est-à-dire
+qu’elle satisfait les propriétés suivantes:</p>
+<ul>
+<li><p><span class="math inline">\(D_{B_{p,q}^s}(f, g) =
+D_{B_{p,q}^s}(g, f)\)</span> pour tout <span class="math inline">\(f, g
+\in B_{p,q}^s(\mathbb{R}^n)\)</span>.</p></li>
+<li><p><span class="math inline">\(D_{B_{p,q}^s}(f, f) = 0\)</span> pour
+tout <span class="math inline">\(f \in
+B_{p,q}^s(\mathbb{R}^n)\)</span>.</p></li>
+<li><p>L’inégalité triangulaire: <span
+class="math inline">\(D_{B_{p,q}^s}(f, h) \leq D_{B_{p,q}^s}(f, g) +
+D_{B_{p,q}^s}(g, h)\)</span> pour tout <span class="math inline">\(f, g,
+h \in B_{p,q}^s(\mathbb{R}^n)\)</span>.</p></li>
+</ul></li>
+<li><p>La divergence de Besov est continue par rapport à la norme dans
+<span class="math inline">\(B_{p,q}^s(\mathbb{R}^n)\)</span>,
+c’est-à-dire qu’il existe une constante <span class="math inline">\(C
+&gt; 0\)</span> telle que pour tout <span class="math inline">\(f, g \in
+B_{p,q}^s(\mathbb{R}^n)\)</span>, on a:</p>
+<p><span class="math display">\[D_{B_{p,q}^s}(f, g) \leq C \|f -
+g\|_{B_{p,q}^s}\]</span></p></li>
+<li><p>La divergence de Besov est invariante par translation et
+rotation, c’est-à-dire que pour tout <span class="math inline">\(f, g
+\in B_{p,q}^s(\mathbb{R}^n)\)</span>, tout <span
+class="math inline">\(\tau \in \mathbb{R}^n\)</span> et toute matrice
+orthogonale <span class="math inline">\(R\)</span>, on a:</p>
+<p><span class="math display">\[D_{B_{p,q}^s}(f(\cdot - \tau), g(\cdot -
+\tau)) = D_{B_{p,q}^s}(f, g)\]</span></p>
+<p><span class="math display">\[D_{B_{p,q}^s}(f(R \cdot), g(R \cdot)) =
+D_{B_{p,q}^s}(f, g)\]</span></p></li>
+<li><p>La divergence de Besov est homogène par dilatation, c’est-à-dire
+que pour tout <span class="math inline">\(f, g \in
+B_{p,q}^s(\mathbb{R}^n)\)</span> et tout <span
+class="math inline">\(\lambda &gt; 0\)</span>, on a:</p>
+<p><span class="math display">\[D_{B_{p,q}^s}(f(\lambda \cdot),
+g(\lambda \cdot)) = \lambda^{-s} D_{B_{p,q}^s}(f, g)\]</span></p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La divergence de Besov est un outil puissant pour étudier les
+propriétés asymptotiques des fonctions dans les espaces de Besov. Elle
+trouve des applications dans divers domaines, notamment en théorie du
+signal et en traitement d’images. Les résultats présentés dans cet
+article montrent que la divergence de Besov est un outil précieux pour
+comprendre le comportement des fonctions dans ces espaces.</p>
+<p>Des perspectives de recherche futures pourraient inclure l’étude de
+la divergence de Besov dans des contextes plus généraux, tels que les
+espaces de Besov sur des variétés ou les espaces de Besov sur des
+groupes de Lie. De plus, il serait intéressant d’explorer les
+applications de la divergence de Besov dans des domaines tels que
+l’apprentissage automatique et la modélisation mathématique de
+phénomènes complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

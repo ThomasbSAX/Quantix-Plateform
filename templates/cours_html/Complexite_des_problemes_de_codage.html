@@ -1,0 +1,374 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de codage</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de codage</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’étude de la complexité des problèmes de codage émerge naturellement
+dans le contexte croissant de l’information numérique et de la
+communication. À l’ère du big data, où les volumes d’informations à
+traiter sont exponentiels, la compréhension des limites et des
+performances des algorithmes de codage devient indispensable.</p>
+<p>Historiquement, les premiers travaux sur le codage remontent aux
+années 1940 avec Claude Shannon et son célèbre théorème de codage de
+source. Ce théorème pose les bases de la théorie de l’information et
+introduit des concepts fondamentaux comme l’entropie, qui mesure le
+degré d’incertitude ou de désordre dans un ensemble de données.</p>
+<p>Les problèmes de codage se révèlent cruciaux dans divers domaines
+tels que la compression de données, les systèmes de communication sans
+fil, et la cryptographie. Par exemple, dans un système de communication,
+le codage permet de réduire la redondance des données pour optimiser
+l’utilisation de la bande passante. De même, en cryptographie, le codage
+est utilisé pour transformer les données en un format sécurisé et
+difficile à déchiffrer sans la clé appropriée.</p>
+<p>Dans ce chapitre, nous explorons les différentes facettes de la
+complexité des problèmes de codage. Nous commençons par définir
+formellement les notions clés, puis nous examinons les théorèmes
+fondamentaux et leurs preuves. Enfin, nous discutons des propriétés et
+corollaires qui découlent de ces résultats.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’aborder les théorèmes, il est essentiel de définir
+rigoureusement les concepts fondamentaux liés à la complexité des
+problèmes de codage.</p>
+<h2 id="entropie">Entropie</h2>
+<p>L’entropie est une mesure de l’incertitude ou du désordre dans un
+ensemble de données. Pour comprendre ce concept, considérons une source
+d’information qui génère des symboles selon une certaine distribution de
+probabilité. L’entropie quantifie la quantité moyenne d’information
+produite par chaque symbole.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> une
+variable aléatoire discrète prenant ses valeurs dans un ensemble fini
+<span class="math inline">\(\mathcal{X} = \{x_1, x_2, \ldots,
+x_n\}\)</span> avec une distribution de probabilité <span
+class="math inline">\(P(X = x_i) = p_i\)</span>. L’entropie <span
+class="math inline">\(H(X)\)</span> de la variable aléatoire <span
+class="math inline">\(X\)</span> est définie comme :</p>
+<p><span class="math display">\[H(X) = -\sum_{i=1}^n p_i \log_2
+p_i\]</span></p>
+<p>où <span class="math inline">\(\log_2\)</span> désigne le logarithme
+en base 2.</p>
+<h2 id="capacité-de-canal">Capacité de canal</h2>
+<p>La capacité de canal est une mesure de la quantité maximale
+d’information qui peut être transmise à travers un canal de
+communication bruité. Pour définir cette notion, considérons un canal de
+communication modélisé par une matrice de transition <span
+class="math inline">\(P(Y|X)\)</span>, où <span
+class="math inline">\(X\)</span> est la variable aléatoire représentant
+les symboles d’entrée et <span class="math inline">\(Y\)</span> est la
+variable aléatoire représentant les symboles de sortie.</p>
+<p>La capacité de canal <span class="math inline">\(C\)</span> est
+définie comme la borne supérieure de l’information mutuelle <span
+class="math inline">\(I(X;Y)\)</span> entre les variables d’entrée et de
+sortie, maximisée sur toutes les distributions d’entrée possibles <span
+class="math inline">\(P(X)\)</span> :</p>
+<p><span class="math display">\[C = \max_{P(X)} I(X;Y)\]</span></p>
+<p>où <span class="math inline">\(I(X;Y)\)</span> est l’information
+mutuelle définie par :</p>
+<p><span class="math display">\[I(X;Y) = \sum_{x \in \mathcal{X}}
+\sum_{y \in \mathcal{Y}} P(x,y) \log_2 \left( \frac{P(x,y)}{P(x)P(y)}
+\right)\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons les théorèmes fondamentaux de la
+théorie de l’information et de la complexité des problèmes de
+codage.</p>
+<h2 id="théorème-de-codage-de-source">Théorème de codage de source</h2>
+<p>Le théorème de codage de source, également connu sous le nom de
+premier théorème de Shannon, établit une borne inférieure sur la
+longueur moyenne des codes sans perte. Ce théorème montre que l’entropie
+d’une source est la quantité minimale d’information nécessaire pour
+représenter les symboles de cette source.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> une
+variable aléatoire discrète avec une distribution de probabilité <span
+class="math inline">\(P(X)\)</span>. Pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe un code sans
+perte de longueur moyenne <span class="math inline">\(L\)</span> tel que
+:</p>
+<p><span class="math display">\[L &lt; H(X) + \epsilon\]</span></p>
+<p>De plus, pour tout code sans perte de longueur moyenne <span
+class="math inline">\(L&#39;\)</span>, nous avons :</p>
+<p><span class="math display">\[L&#39; \geq H(X)\]</span></p>
+<h2 id="théorème-de-codage-de-canal">Théorème de codage de canal</h2>
+<p>Le théorème de codage de canal, également connu sous le nom de
+deuxième théorème de Shannon, établit une borne supérieure sur la
+capacité d’un canal de communication bruité. Ce théorème montre que la
+capacité de canal est la quantité maximale d’information qui peut être
+transmise à travers le canal avec une probabilité d’erreur
+arbitrairement faible.</p>
+<p>Formellement, soit <span class="math inline">\(C\)</span> la capacité
+de canal d’un canal bruité. Pour tout <span class="math inline">\(R &lt;
+C\)</span>, il existe un code correcteur d’erreurs de taux <span
+class="math inline">\(R\)</span> tel que la probabilité d’erreur tend
+vers zéro lorsque la longueur du code tend vers l’infini. De plus, pour
+tout <span class="math inline">\(R &gt; C\)</span>, la probabilité
+d’erreur reste bornée inférieurement par une constante positive,
+indépendamment de la longueur du code.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Dans cette section, nous fournissons des preuves détaillées des
+théorèmes présentés dans la section précédente.</p>
+<h2 id="preuve-du-théorème-de-codage-de-source">Preuve du théorème de
+codage de source</h2>
+<p>Pour prouver le théorème de codage de source, nous utilisons les
+concepts d’entropie et de codes sans perte. Supposons que nous avons une
+source <span class="math inline">\(X\)</span> avec une distribution de
+probabilité <span class="math inline">\(P(X)\)</span>. Nous voulons
+montrer qu’il existe un code sans perte de longueur moyenne <span
+class="math inline">\(L\)</span> tel que :</p>
+<p><span class="math display">\[L &lt; H(X) + \epsilon\]</span></p>
+<p>Pour ce faire, nous utilisons le principe de compression optimale et
+le fait que l’entropie est la quantité minimale d’information nécessaire
+pour représenter les symboles de la source. En appliquant le théorème de
+compression de Kraft et en utilisant des techniques d’approximation,
+nous pouvons construire un code qui satisfait la condition
+souhaitée.</p>
+<h2 id="preuve-du-théorème-de-codage-de-canal">Preuve du théorème de
+codage de canal</h2>
+<p>Pour prouver le théorème de codage de canal, nous utilisons les
+concepts d’information mutuelle et de capacité de canal. Supposons que
+nous avons un canal bruité avec une matrice de transition <span
+class="math inline">\(P(Y|X)\)</span>. Nous voulons montrer que pour
+tout <span class="math inline">\(R &lt; C\)</span>, il existe un code
+correcteur d’erreurs de taux <span class="math inline">\(R\)</span> tel
+que la probabilité d’erreur tend vers zéro lorsque la longueur du code
+tend vers l’infini.</p>
+<p>Pour ce faire, nous utilisons le principe de codage correcteur
+d’erreurs et le fait que la capacité de canal est la borne supérieure de
+l’information mutuelle entre les variables d’entrée et de sortie. En
+appliquant le théorème de codage de canal de Shannon et en utilisant des
+techniques d’approximation, nous pouvons construire un code qui
+satisfait la condition souhaitée.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Dans cette section, nous présentons les propriétés et corollaires qui
+découlent des théorèmes fondamentaux de la théorie de l’information et
+de la complexité des problèmes de codage.</p>
+<h2 id="propriétés-de-lentropie">Propriétés de l’entropie</h2>
+<ol>
+<li><p>L’entropie <span class="math inline">\(H(X)\)</span> est une
+mesure de l’incertitude ou du désordre dans un ensemble de données. Elle
+est toujours non négative et atteint son minimum lorsque la variable
+aléatoire <span class="math inline">\(X\)</span> est
+déterministe.</p></li>
+<li><p>L’entropie est une fonction concave de la distribution de
+probabilité <span class="math inline">\(P(X)\)</span>. Cela signifie que
+pour toute combinaison convexe de distributions, l’entropie est
+inférieure ou égale à la combinaison convexe des entropies.</p></li>
+<li><p>L’entropie est invariante par transformation bijective. Cela
+signifie que si <span class="math inline">\(Y\)</span> est une
+transformation bijective de <span class="math inline">\(X\)</span>,
+alors <span class="math inline">\(H(Y) = H(X)\)</span>.</p></li>
+</ol>
+<h2 id="corollaires-du-théorème-de-codage-de-canal">Corollaires du
+théorème de codage de canal</h2>
+<ol>
+<li><p>Le théorème de codage de canal implique que la capacité de canal
+est une borne supérieure sur le taux de transmission d’information à
+travers un canal bruité. Cela signifie que pour tout taux de
+transmission supérieur à la capacité, la probabilité d’erreur reste
+bornée inférieurement par une constante positive.</p></li>
+<li><p>Le théorème de codage de canal implique que pour tout taux de
+transmission inférieur à la capacité, il existe un code correcteur
+d’erreurs qui permet de transmettre l’information avec une probabilité
+d’erreur arbitrairement faible.</p></li>
+<li><p>Le théorème de codage de canal implique que la capacité de canal
+est une mesure fondamentale des performances d’un canal de
+communication. Elle dépend uniquement de la matrice de transition du
+canal et est indépendante des autres paramètres.</p></li>
+</ol>
+</body>
+</html>
+{% include "footer.html" %}
+

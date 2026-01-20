@@ -1,0 +1,319 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de réseaux neuronaux</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de réseaux neuronaux</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les réseaux neuronaux, inspirés du fonctionnement biologique des
+neurones, ont révolutionné le domaine de l’intelligence artificielle.
+Leur capacité à modéliser des relations complexes dans les données a
+conduit à des avancées significatives dans divers domaines, tels que la
+reconnaissance d’images, le traitement du langage naturel et les
+systèmes de recommandation.</p>
+<p>L’origine des réseaux neuronaux remonte aux années 1940 avec le
+modèle de neurone formel proposé par McCulloch et Pitts. Cependant, ce
+n’est qu’avec l’avènement des ordinateurs puissants et des algorithmes
+d’apprentissage efficaces que les réseaux neuronaux ont commencé à
+montrer leur véritable potentiel. Aujourd’hui, ils sont au cœur de
+nombreuses applications pratiques et théoriques.</p>
+<p>La complexité des problèmes liés aux réseaux neuronaux est un sujet
+de recherche actif. Comprendre cette complexité permet de mieux
+concevoir des architectures efficaces, d’optimiser les algorithmes
+d’apprentissage et de garantir la robustesse des modèles. Dans cet
+article, nous explorons les définitions fondamentales, les théorèmes
+clés et les propriétés des réseaux neuronaux, en mettant l’accent sur
+leur complexité.</p>
+<h1 id="définitions">Définitions</h1>
+<h2 id="description-intuitive">Description intuitive</h2>
+<p>Considérons un réseau neuronal comme une fonction qui prend en entrée
+des données et produit une sortie. Cette fonction est composée de
+plusieurs couches de neurones, chacun appliquant une transformation
+linéaire suivie d’une fonction d’activation non linéaire. La complexité
+du réseau dépend de la taille des couches, du type de fonctions
+d’activation et de la structure globale.</p>
+<h2 id="définition-formelle">Définition formelle</h2>
+<p>Soit <span class="math inline">\(\mathcal{N}\)</span> un réseau
+neuronal avec <span class="math inline">\(L\)</span> couches. Chaque
+couche <span class="math inline">\(l\)</span> est définie par une
+matrice de poids <span class="math inline">\(W^{(l)} \in \mathbb{R}^{n_l
+\times n_{l-1}}\)</span> et un vecteur de biais <span
+class="math inline">\(b^{(l)} \in \mathbb{R}^{n_l}\)</span>, où <span
+class="math inline">\(n_l\)</span> est le nombre de neurones dans la
+couche <span class="math inline">\(l\)</span>. La fonction d’activation
+est notée <span class="math inline">\(\sigma\)</span>.</p>
+<p>Le réseau neuronal peut être formalisé comme suit : <span
+class="math display">\[\mathcal{N}(x) = \sigma^{(L)}(W^{(L)}
+\sigma^{(L-1)}(W^{(L-1)} \cdots \sigma^{(1)}(W^{(1)} x + b^{(1)}) \cdots
+) + b^{(L)})\]</span> où <span class="math inline">\(x \in
+\mathbb{R}^n\)</span> est l’entrée et <span
+class="math inline">\(\sigma^{(l)}\)</span> est la fonction d’activation
+de la couche <span class="math inline">\(l\)</span>.</p>
+<h2 id="complexité">Complexité</h2>
+<p>La complexité d’un réseau neuronal peut être mesurée en termes de
+nombre de paramètres, qui est la somme du nombre d’éléments dans toutes
+les matrices de poids et vecteurs de biais. Formellement, la complexité
+<span class="math inline">\(C\)</span> est donnée par : <span
+class="math display">\[C = \sum_{l=1}^{L} (n_l n_{l-1} + n_l)\]</span>
+où <span class="math inline">\(n_0 = n\)</span> est la dimension de
+l’entrée.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-universel-dapproximation">Théorème universel
+d’approximation</h2>
+<p>Le théorème universel d’approximation, dû à Cybenko (1989), montre
+que les réseaux neuronaux avec une couche cachée et une fonction
+d’activation non linéaire peuvent approximer toute fonction continue sur
+un domaine compact.</p>
+<h2 id="énoncé-formel">Énoncé formel</h2>
+<p>Soit <span class="math inline">\(\sigma\)</span> une fonction
+d’activation non linéaire et continue. Pour toute fonction continue
+<span class="math inline">\(f: [0,1]^n \rightarrow \mathbb{R}\)</span>
+et tout <span class="math inline">\(\epsilon &gt; 0\)</span>, il existe
+un réseau neuronal <span class="math inline">\(\mathcal{N}\)</span> avec
+une couche cachée tel que : <span class="math display">\[\sup_{x \in
+[0,1]^n} |f(x) - \mathcal{N}(x)| &lt; \epsilon\]</span></p>
+<h2 id="démonstration">Démonstration</h2>
+<p>La démonstration repose sur l’utilisation de la fonction d’activation
+<span class="math inline">\(\sigma\)</span> pour approximer des
+fonctions de base. En utilisant le théorème de Stone-Weierstrass, on
+peut montrer que les réseaux neuronaux peuvent approximer toute fonction
+continue avec une précision arbitraire.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="justification-des-étapes">Justification des étapes</h2>
+<p>La preuve du théorème universel d’approximation repose sur plusieurs
+étapes clés. Tout d’abord, on utilise la fonction d’activation <span
+class="math inline">\(\sigma\)</span> pour approximer des fonctions de
+base. Ensuite, on montre que ces approximations peuvent être combinées
+pour former une approximation de la fonction cible <span
+class="math inline">\(f\)</span>.</p>
+<h2 id="propriétés-et-théorèmes-utilisés">Propriétés et théorèmes
+utilisés</h2>
+<p>Les propriétés clés utilisées dans la preuve incluent la continuité
+de <span class="math inline">\(\sigma\)</span> et le théorème de
+Stone-Weierstrass. Le théorème de Stone-Weierstrass garantit que les
+polynômes peuvent approximer toute fonction continue sur un domaine
+compact.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-i">Propriété (i)</h2>
+<p>La complexité d’un réseau neuronal augmente avec le nombre de couches
+et le nombre de neurones par couche.</p>
+<h2 id="démonstration-1">Démonstration</h2>
+<p>La complexité <span class="math inline">\(C\)</span> est définie
+comme la somme du nombre de paramètres dans chaque couche. En augmentant
+le nombre de couches <span class="math inline">\(L\)</span> ou le nombre
+de neurones <span class="math inline">\(n_l\)</span>, la complexité
+<span class="math inline">\(C\)</span> augmente également.</p>
+<h2 id="propriété-ii">Propriété (ii)</h2>
+<p>Les réseaux neuronaux avec des fonctions d’activation non linéaires
+peuvent approximer des fonctions complexes.</p>
+<h2 id="démonstration-2">Démonstration</h2>
+<p>Cela découle directement du théorème universel d’approximation. La
+non linéarité de <span class="math inline">\(\sigma\)</span> permet au
+réseau neuronal de modéliser des relations complexes dans les
+données.</p>
+<h2 id="propriété-iii">Propriété (iii)</h2>
+<p>La complexité d’un réseau neuronal peut être contrôlée en ajustant la
+taille des couches et le type de fonctions d’activation.</p>
+<h2 id="démonstration-3">Démonstration</h2>
+<p>En choisissant des architectures avec un nombre approprié de couches
+et de neurones, ainsi qu’en utilisant des fonctions d’activation
+efficaces, on peut optimiser la complexité du réseau pour une tâche
+donnée.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

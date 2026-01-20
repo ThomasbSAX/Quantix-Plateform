@@ -1,0 +1,359 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’inégalité de Doob : Un outil fondamental en théorie des martingales</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’inégalité de Doob : Un outil fondamental en théorie
+des martingales</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’inégalité de Doob est un résultat central dans la théorie des
+martingales, une branche des probabilités qui étudie les suites de
+variables aléatoires présentant certaines propriétés de moyenne
+conditionnelle. Introduite par le mathématicien américain Joseph L. Doob
+dans les années 1940, cette inégalité joue un rôle crucial dans
+l’analyse des propriétés de convergence et de régularité des
+martingales.</p>
+<p>L’émergence de cette notion est intimement liée au développement de
+la théorie des processus stochastiques et à l’étude des jeux d’argent
+équitables, où les martingales modélisent la valeur espérée d’un jeu à
+chaque étape. L’inégalité de Doob permet de contrôler les excès des
+martingales, c’est-à-dire les moments où la valeur de la martingale
+dépasse un certain seuil. Elle est donc indispensable pour établir des
+bornes sur les probabilités de tels excès, ce qui a des applications
+dans divers domaines comme la finance mathématique, l’analyse
+statistique et même la biologie.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’énoncer l’inégalité de Doob, il est essentiel de rappeler
+quelques définitions fondamentales.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((\Omega, \mathcal{F}, P)\)</span> un
+espace probabilisé et <span class="math inline">\(\mathbb{F} =
+(\mathcal{F}_n)_{n \geq 0}\)</span> une filtration, c’est-à-dire une
+suite croissante de sous-tribus de <span
+class="math inline">\(\mathcal{F}\)</span>. Une martingale par rapport à
+la filtration <span class="math inline">\(\mathbb{F}\)</span> est une
+suite <span class="math inline">\((X_n)_{n \geq 0}\)</span> de variables
+aléatoires intégrables telle que, pour tout <span
+class="math inline">\(n \geq 0\)</span>, <span
+class="math display">\[\mathbb{E}[X_{n+1} | \mathcal{F}_n] = X_n \quad
+P\text{-p.s.}\]</span> En d’autres termes, la valeur espérée de <span
+class="math inline">\(X_{n+1}\)</span> sachant l’information disponible
+jusqu’à l’instant <span class="math inline">\(n\)</span> est égale à la
+valeur actuelle <span class="math inline">\(X_n\)</span>.</p>
+</div>
+<div class="definition">
+<p>De manière similaire, une sous-martingale satisfait <span
+class="math inline">\(\mathbb{E}[X_{n+1} | \mathcal{F}_n] \geq
+X_n\)</span> et une sur-martingale satisfait <span
+class="math inline">\(\mathbb{E}[X_{n+1} | \mathcal{F}_n] \leq
+X_n\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="linégalité-de-doob">L’inégalité de Doob</h1>
+<p>L’inégalité de Doob fournit une borne sur la probabilité que la
+martingale dépasse un certain seuil. Voici l’énoncé formel :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((X_n)_{n \geq 0}\)</span> une
+martingale positive par rapport à la filtration <span
+class="math inline">\(\mathbb{F} = (\mathcal{F}_n)_{n \geq 0}\)</span>.
+Pour tout <span class="math inline">\(a &gt; 0\)</span> et pour tout
+entier <span class="math inline">\(N \geq 1\)</span>, on a <span
+class="math display">\[P\left(\max_{0 \leq n \leq N} X_n \geq a\right)
+\leq \frac{\mathbb{E}[X_N]}{a}.\]</span></p>
+</div>
+<p>Pour comprendre cette inégalité, imaginons que nous avons une
+martingale positive <span class="math inline">\((X_n)_{n \geq
+0}\)</span>. L’inégalité de Doob nous dit que la probabilité que le
+maximum de cette martingale jusqu’à l’instant <span
+class="math inline">\(N\)</span> dépasse un seuil <span
+class="math inline">\(a\)</span> est contrôlée par le rapport entre la
+valeur espérée de <span class="math inline">\(X_N\)</span> et ce seuil
+<span class="math inline">\(a\)</span>.</p>
+<h1 class="unnumbered" id="preuve-de-linégalité-de-doob">Preuve de
+l’inégalité de Doob</h1>
+<p>Nous allons maintenant démontrer cette inégalité étape par étape.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(a &gt; 0\)</span> et
+définissons la variable aléatoire <span class="math inline">\(T =
+\inf\{n \geq 0 : X_n \geq a\}\)</span>, où <span
+class="math inline">\(\inf \emptyset = +\infty\)</span>. Par définition,
+<span class="math inline">\(T\)</span> est le premier instant où la
+martingale dépasse le seuil <span class="math inline">\(a\)</span>.</p>
+<p>Nous introduisons également une nouvelle variable aléatoire <span
+class="math inline">\(Y_n = X_{n \wedge T}\)</span>, où <span
+class="math inline">\(n \wedge T\)</span> désigne le minimum entre <span
+class="math inline">\(n\)</span> et <span
+class="math inline">\(T\)</span>. La variable <span
+class="math inline">\(Y_n\)</span> représente la valeur de la martingale
+à l’instant <span class="math inline">\(n\)</span>, mais arrêtée dès que
+la martingale dépasse le seuil <span
+class="math inline">\(a\)</span>.</p>
+<p>Montrons d’abord que <span class="math inline">\((Y_n)_{n \geq
+0}\)</span> est une martingale. Pour tout <span class="math inline">\(n
+\geq 0\)</span>, <span class="math display">\[\mathbb{E}[Y_{n+1} |
+\mathcal{F}_n] = \mathbb{E}[X_{(n+1) \wedge T} |
+\mathcal{F}_n].\]</span> Par définition de <span
+class="math inline">\(T\)</span>, si <span class="math inline">\(T &gt;
+n\)</span>, alors <span class="math inline">\((n+1) \wedge T =
+n+1\)</span> et <span class="math inline">\(\mathbb{E}[X_{n+1} |
+\mathcal{F}_n] = X_n\)</span>. Si <span class="math inline">\(T \leq
+n\)</span>, alors <span class="math inline">\((n+1) \wedge T =
+T\)</span> et <span class="math inline">\(\mathbb{E}[X_T |
+\mathcal{F}_n] = X_T\)</span>. Dans les deux cas, <span
+class="math inline">\(\mathbb{E}[Y_{n+1} | \mathcal{F}_n] =
+Y_n\)</span>, donc <span class="math inline">\((Y_n)_{n \geq 0}\)</span>
+est bien une martingale.</p>
+<p>Ensuite, nous utilisons le fait que pour toute martingale <span
+class="math inline">\((Z_n)_{n \geq 0}\)</span> et pour tout <span
+class="math inline">\(N \geq 1\)</span>, <span
+class="math display">\[\mathbb{E}[Z_N] = \mathbb{E}[Z_0].\]</span> En
+effet, par la propriété de martingale, <span
+class="math display">\[\mathbb{E}[Z_N] = \mathbb{E}[\mathbb{E}[Z_N |
+\mathcal{F}_{N-1}]] = \mathbb{E}[Z_{N-1}].\]</span> En itérant ce
+raisonnement, on obtient <span class="math inline">\(\mathbb{E}[Z_N] =
+\mathbb{E}[Z_0]\)</span>.</p>
+<p>Appliquons ceci à la martingale <span class="math inline">\((Y_n)_{n
+\geq 0}\)</span> : <span class="math display">\[\mathbb{E}[Y_N] =
+\mathbb{E}[X_0].\]</span> De plus, pour tout <span
+class="math inline">\(\omega \in \{T \leq N\}\)</span>, on a <span
+class="math inline">\(Y_N(\omega) = X_{N \wedge T}(\omega) = X_T(\omega)
+\geq a\)</span>. Par conséquent, <span
+class="math display">\[\mathbb{E}[Y_N] = \mathbb{E}[X_0] \geq a P(T \leq
+N).\]</span> Enfin, comme <span class="math inline">\(P\left(\max_{0
+\leq n \leq N} X_n \geq a\right) = P(T \leq N)\)</span>, on obtient
+<span class="math display">\[P\left(\max_{0 \leq n \leq N} X_n \geq
+a\right) = P(T \leq N) \leq \frac{\mathbb{E}[X_0]}{a}.\]</span> Puisque
+<span class="math inline">\((X_n)_{n \geq 0}\)</span> est une
+martingale, <span class="math inline">\(\mathbb{E}[X_N] =
+\mathbb{E}[X_0]\)</span>, donc <span
+class="math display">\[P\left(\max_{0 \leq n \leq N} X_n \geq a\right)
+\leq \frac{\mathbb{E}[X_N]}{a}.\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+corollaires</h1>
+<p>L’inégalité de Doob a plusieurs conséquences importantes, que nous
+énumérons ci-dessous.</p>
+<ol>
+<li><p>Pour toute martingale positive <span
+class="math inline">\((X_n)_{n \geq 0}\)</span> et pour tout <span
+class="math inline">\(p &gt; 1\)</span>, on a <span
+class="math display">\[\mathbb{E}\left[\left(\max_{0 \leq n \leq N}
+X_n\right)^p\right] \leq \left(\frac{p}{p-1}\right)^p
+\mathbb{E}[X_N^p].\]</span> Cette inégalité est une généralisation de
+l’inégalité de Doob et permet de contrôler les moments supérieurs du
+maximum de la martingale.</p></li>
+<li><p>L’inégalité de Doob peut être étendue aux sous-martingales et
+sur-martingales. Par exemple, pour une sous-martingale positive <span
+class="math inline">\((X_n)_{n \geq 0}\)</span>, on a <span
+class="math display">\[P\left(\max_{0 \leq n \leq N} X_n \geq a\right)
+\leq \frac{\mathbb{E}[X_N]}{a}.\]</span> La preuve suit les mêmes étapes
+que pour le cas des martingales.</p></li>
+<li><p>L’inégalité de Doob est également valable pour les martingales à
+valeurs dans un espace de Banach. Dans ce cas, la borne dépend de la
+norme de l’espace de Banach.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’inégalité de Doob est un outil puissant et polyvalent dans la
+théorie des martingales. Elle permet de contrôler les excès des
+martingales et a des applications dans divers domaines des mathématiques
+appliquées. Sa preuve, bien que technique, repose sur des concepts
+fondamentaux de la théorie des probabilités et illustre la beauté et
+l’élégance de cette branche des mathématiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

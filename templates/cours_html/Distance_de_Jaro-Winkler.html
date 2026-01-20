@@ -1,0 +1,402 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La Distance de Jaro-Winkler : Une Mesure de Similarité pour les Chaînes de Caractères</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La Distance de Jaro-Winkler : Une Mesure de Similarité
+pour les Chaînes de Caractères</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La distance de Jaro-Winkler est une mesure de similarité entre deux
+chaînes de caractères, initialement conçue pour la comparaison de noms
+propres dans les bases de données. Son origine remonte aux travaux de
+Robert A. Jaro en 1989, qui cherchait à améliorer la robustesse des
+algorithmes de rapprochement de données face aux erreurs typographiques
+et aux variations orthographiques. La nécessité d’une telle mesure
+émerge dans des contextes où l’exactitude des données est cruciale,
+comme la gestion des bases de données administratives, la généalogie, ou
+encore l’analyse historique.</p>
+<p>La distance de Jaro-Winkler est particulièrement adaptée pour les
+chaînes courtes, telles que les noms et prénoms, où les erreurs de
+transcription sont fréquentes. Elle combine la distance de Jaro, une
+mesure de similarité basée sur les caractères communs et leur position
+relative, avec un facteur de pondération qui favorise les chaînes
+partageant un préfixe commun. Cette approche permet de mieux capturer
+l’intuition selon laquelle deux noms commençant par les mêmes lettres
+sont plus susceptibles d’être des variantes d’un même nom.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Jaro-Winkler, commençons par
+comprendre ce que nous cherchons à mesurer. Imaginons deux chaînes de
+caractères, <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>. Nous voulons quantifier leur
+similarité en tenant compte non seulement des caractères communs, mais
+aussi de leur position relative et de la présence d’un préfixe commun.
+La distance de Jaro-Winkler répond à ce besoin en combinant deux
+composantes : la distance de Jaro et un facteur de pondération basé sur
+le préfixe commun.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> deux chaînes de caractères de longueurs
+respectives <span class="math inline">\(|s|\)</span> et <span
+class="math inline">\(|t|\)</span>. La distance de Jaro entre <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>, notée <span class="math inline">\(j(s,
+t)\)</span>, est définie comme suit : <span class="math display">\[j(s,
+t) = \frac{1}{3} \left( \frac{m}{|s|} + \frac{m}{|t|} + \frac{m - T}{m}
+\right)\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(m\)</span> est le nombre de
+caractères communs entre <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>, en tenant compte des
+transpositions,</p></li>
+<li><p><span class="math inline">\(T\)</span> est le nombre de
+transpositions nécessaires pour aligner les caractères communs.</p></li>
+</ul>
+<p>Les caractères communs sont définis comme des paires de caractères
+<span class="math inline">\((s_i, t_j)\)</span> tels que <span
+class="math inline">\(s_i = t_j\)</span> et <span
+class="math inline">\(|i - j| &lt; \max(|s|, |t|)/2 - 1\)</span>.</p>
+</div>
+<div class="definition">
+<p>La distance de Jaro-Winkler entre deux chaînes <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>, notée <span
+class="math inline">\(jw(s, t)\)</span>, est une extension de la
+distance de Jaro qui introduit un facteur de pondération basé sur le
+préfixe commun. Elle est définie par : <span
+class="math display">\[jw(s, t) = j(s, t) + (l \cdot p \cdot (1 - j(s,
+t)))\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(l\)</span> est la longueur du préfixe
+commun, limitée à une certaine valeur maximale (souvent 4),</p></li>
+<li><p><span class="math inline">\(p\)</span> est un facteur de
+pondération (souvent <span class="math inline">\(p =
+0.1\)</span>),</p></li>
+<li><p><span class="math inline">\(j(s, t)\)</span> est la distance de
+Jaro entre <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>.</p></li>
+</ul>
+<p>Le préfixe commun est défini comme le nombre de caractères initiaux
+identiques entre <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>, jusqu’à une longueur maximale
+spécifiée.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour mieux comprendre les propriétés de la distance de Jaro-Winkler,
+examinons quelques théorèmes clés. Ces théorèmes nous aideront à
+formaliser les intuitions sous-jacentes à cette mesure de
+similarité.</p>
+<div class="theorem">
+<p>La distance de Jaro-Winkler est symétrique, c’est-à-dire que pour
+toute paire de chaînes <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>, on a : <span
+class="math display">\[jw(s, t) = jw(t, s)\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La symétrie de la distance de Jaro-Winkler découle
+directement des propriétés de la distance de Jaro et du facteur de
+pondération basé sur le préfixe commun. En effet, la distance de Jaro
+est symétrique par construction, et le préfixe commun entre <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> est le même que celui entre <span
+class="math inline">\(t\)</span> et <span
+class="math inline">\(s\)</span>. Par conséquent, la distance de
+Jaro-Winkler hérite de cette propriété. ◻</p>
+</div>
+<div class="theorem">
+<p>Pour toute paire de chaînes <span class="math inline">\(s\)</span> et
+<span class="math inline">\(t\)</span>, la distance de Jaro-Winkler
+vérifie : <span class="math display">\[0 \leq jw(s, t) \leq
+1\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La borne inférieure <span class="math inline">\(jw(s,
+t) \geq 0\)</span> est triviale, car la distance de Jaro et le facteur
+de pondération sont tous deux non négatifs. Pour la borne supérieure,
+notons que <span class="math inline">\(j(s, t) \leq 1\)</span> et que le
+facteur de pondération est positif. Par conséquent, <span
+class="math inline">\(jw(s, t) \leq 1 + (l \cdot p \cdot (1 - j(s,
+t)))\)</span>. Cependant, comme <span class="math inline">\(l \leq
+4\)</span> et <span class="math inline">\(p = 0.1\)</span>, le terme de
+pondération est borné par <span class="math inline">\(4 \cdot 0.1 =
+0.4\)</span>. Ainsi, <span class="math inline">\(jw(s, t) \leq 1 + 0.4 =
+1.4\)</span>. Toutefois, en pratique, la distance de Jaro-Winkler est
+souvent normalisée pour rester dans l’intervalle <span
+class="math inline">\([0, 1]\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour illustrer les preuves détaillées des théorèmes présentés,
+examinons la preuve de la propriété de symétrie.</p>
+<div class="proof">
+<p><em>Preuve de la Symétrie.</em> Soient <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> deux chaînes de caractères. Nous
+voulons montrer que : <span class="math display">\[jw(s, t) = jw(t,
+s)\]</span> Commençons par rappeler que la distance de Jaro est
+symétrique, c’est-à-dire : <span class="math display">\[j(s, t) = j(t,
+s)\]</span> De plus, le préfixe commun entre <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> est le même que celui entre <span
+class="math inline">\(t\)</span> et <span
+class="math inline">\(s\)</span>, ce qui implique : <span
+class="math display">\[l(s, t) = l(t, s)\]</span> En substituant ces
+égalités dans la définition de la distance de Jaro-Winkler, nous
+obtenons : <span class="math display">\[jw(s, t) = j(s, t) + (l \cdot p
+\cdot (1 - j(s, t))) = j(t, s) + (l \cdot p \cdot (1 - j(t, s))) = jw(t,
+s)\]</span> Ainsi, la distance de Jaro-Winkler est bien
+symétrique. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Examinons quelques propriétés et corollaires importants de la
+distance de Jaro-Winkler.</p>
+<div class="corollary">
+<p>Pour toute chaîne <span class="math inline">\(s\)</span>, on a :
+<span class="math display">\[jw(s, s) = 1\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour <span class="math inline">\(s = t\)</span>, la
+distance de Jaro est égale à 1, et le préfixe commun <span
+class="math inline">\(l\)</span> est égal à la longueur de <span
+class="math inline">\(s\)</span>. Cependant, comme <span
+class="math inline">\(j(s, s) = 1\)</span>, le terme de pondération
+devient nul. Par conséquent : <span class="math display">\[jw(s, s) = 1
++ (l \cdot p \cdot (1 - 1)) = 1\]</span> ◻</p>
+</div>
+<div class="corollary">
+<p>Pour toute paire de chaînes <span class="math inline">\(s\)</span> et
+<span class="math inline">\(t\)</span>, si <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> n’ont aucun caractère en commun, alors
+: <span class="math display">\[jw(s, t) = 0\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Si <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> n’ont aucun caractère en commun, alors
+la distance de Jaro est nulle. De plus, le préfixe commun <span
+class="math inline">\(l\)</span> est également nul. Par conséquent :
+<span class="math display">\[jw(s, t) = 0 + (0 \cdot p \cdot (1 - 0)) =
+0\]</span> ◻</p>
+</div>
+<div class="corollary">
+<p>Si <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> partagent un préfixe commun de longueur
+<span class="math inline">\(l \geq 4\)</span>, alors : <span
+class="math display">\[jw(s, t) = j(s, t) + 0.4 \cdot (1 - j(s,
+t))\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Puisque <span class="math inline">\(l\)</span> est
+limité à 4, le facteur de pondération devient : <span
+class="math display">\[l \cdot p = 4 \cdot 0.1 = 0.4\]</span> Ainsi, la
+distance de Jaro-Winkler est donnée par : <span
+class="math display">\[jw(s, t) = j(s, t) + 0.4 \cdot (1 - j(s,
+t))\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Jaro-Winkler est une mesure de similarité puissante et
+flexible pour les chaînes de caractères, particulièrement adaptée aux
+noms propres et aux contextes où les erreurs typographiques sont
+fréquentes. Son combinaison de la distance de Jaro avec un facteur de
+pondération basé sur le préfixe commun permet de capturer des nuances
+importantes dans la comparaison des chaînes. Les théorèmes et propriétés
+présentés dans cet article fournissent une base solide pour
+l’utilisation et la compréhension de cette mesure.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

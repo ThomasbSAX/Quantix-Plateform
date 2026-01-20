@@ -1,0 +1,326 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Entropie de Kolmogorov-Sinai : Mesure du Chaos dans les Systèmes Dynamiques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Entropie de Kolmogorov-Sinai : Mesure du Chaos dans
+les Systèmes Dynamiques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’entropie de Kolmogorov-Sinai émerge comme une notion fondamentale
+dans la théorie des systèmes dynamiques, offrant un outil quantitatif
+pour mesurer le degré de chaos ou d’imprévisibilité dans un système.
+Introduite par Kolmogorov en 1958 et formalisée par Sinai, cette
+entropie généralise l’entropie de Shannon en théorie de l’information
+pour capturer la complexité des systèmes dynamiques. Son importance
+réside dans sa capacité à distinguer entre les comportements réguliers
+et chaotiques, fournissant ainsi une base théorique pour l’étude des
+systèmes non linéaires.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’entropie de Kolmogorov-Sinai, commençons par
+définir les concepts préliminaires. Considérons un système dynamique
+donné par un espace de phase <span class="math inline">\((X,
+\mathcal{B}, \mu)\)</span>, où <span class="math inline">\(X\)</span>
+est l’espace des états, <span class="math inline">\(\mathcal{B}\)</span>
+une sigma-algèbre et <span class="math inline">\(\mu\)</span> une mesure
+de probabilité. Un système dynamique est défini par une transformation
+mesurable <span class="math inline">\(T: X \rightarrow X\)</span>
+préservant la mesure, c’est-à-dire que pour tout ensemble mesurable
+<span class="math inline">\(A \in \mathcal{B}\)</span>, on a <span
+class="math inline">\(\mu(T^{-1}(A)) = \mu(A)\)</span>.</p>
+<p>Nous cherchons à quantifier la perte d’information lorsque nous
+observons le système à travers une partition <span
+class="math inline">\(\mathcal{P} = \{P_1, P_2, \ldots, P_n\}\)</span>
+de <span class="math inline">\(X\)</span>. L’entropie d’une partition
+<span class="math inline">\(\mathcal{P}\)</span> est définie comme :</p>
+<p><span class="math display">\[H(\mathcal{P}) = -\sum_{i=1}^n \mu(P_i)
+\log \mu(P_i)\]</span></p>
+<p>Cette entropie mesure l’incertitude moyenne sur la position du
+système dans <span class="math inline">\(X\)</span> lorsque nous
+utilisons la partition <span
+class="math inline">\(\mathcal{P}\)</span>.</p>
+<p>L’entropie de Kolmogorov-Sinai est alors définie comme la limite
+supérieure des entropies de partitions lorsque la taille des éléments de
+la partition tend vers zéro. Formellement, pour une suite de partitions
+<span class="math inline">\(\mathcal{P}_n\)</span> de plus en plus
+fines, l’entropie de Kolmogorov-Sinai <span
+class="math inline">\(h(T)\)</span> est donnée par :</p>
+<p><span class="math display">\[h(T) = \sup_{\mathcal{P}} \lim_{n \to
+\infty} \frac{1}{n} H\left(\bigvee_{k=0}^{n-1}
+T^{-k}(\mathcal{P})\right)\]</span></p>
+<p>où <span class="math inline">\(\bigvee_{k=0}^{n-1}
+T^{-k}(\mathcal{P})\)</span> désigne la partition engendrée par les
+images inverses de <span class="math inline">\(\mathcal{P}\)</span> sous
+l’action de <span class="math inline">\(T\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème central en théorie des systèmes dynamiques est le
+théorème de Kolmogorov-Sinai, qui stipule que l’entropie de
+Kolmogorov-Sinai est invariante sous conjugaison mesurable. Plus
+précisément, si <span class="math inline">\(T: X \rightarrow X\)</span>
+et <span class="math inline">\(S: Y \rightarrow Y\)</span> sont deux
+systèmes dynamiques mesurables conjugués, c’est-à-dire qu’il existe une
+transformation mesurable <span class="math inline">\(\phi: X \rightarrow
+Y\)</span> telle que <span class="math inline">\(S \circ \phi = \phi
+\circ T\)</span>, alors :</p>
+<p><span class="math display">\[h(T) = h(S)\]</span></p>
+<p>Ce théorème montre que l’entropie de Kolmogorov-Sinai est une
+propriété intrinsèque du système dynamique, indépendante du choix de la
+représentation.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Kolmogorov-Sinai, nous devons montrer que
+l’entropie est invariante sous conjugaison. Considérons deux systèmes
+dynamiques <span class="math inline">\(T: X \rightarrow X\)</span> et
+<span class="math inline">\(S: Y \rightarrow Y\)</span> conjugués via
+une transformation mesurable <span class="math inline">\(\phi: X
+\rightarrow Y\)</span>. Nous devons montrer que <span
+class="math inline">\(h(T) = h(S)\)</span>.</p>
+<p>Commençons par une partition <span
+class="math inline">\(\mathcal{Q}\)</span> de <span
+class="math inline">\(Y\)</span>. Nous pouvons définir une partition
+<span class="math inline">\(\mathcal{P} =
+\phi^{-1}(\mathcal{Q})\)</span> de <span
+class="math inline">\(X\)</span>. Par la propriété de conjugaison, nous
+avons :</p>
+<p><span class="math display">\[H\left(\bigvee_{k=0}^{n-1}
+S^{-k}(\mathcal{Q})\right) = H\left(\bigvee_{k=0}^{n-1}
+T^{-k}(\mathcal{P})\right)\]</span></p>
+<p>En prenant la limite supérieure lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini, nous obtenons :</p>
+<p><span class="math display">\[\lim_{n \to \infty} \frac{1}{n}
+H\left(\bigvee_{k=0}^{n-1} S^{-k}(\mathcal{Q})\right) = \lim_{n \to
+\infty} \frac{1}{n} H\left(\bigvee_{k=0}^{n-1}
+T^{-k}(\mathcal{P})\right)\]</span></p>
+<p>En prenant le supremum sur toutes les partitions <span
+class="math inline">\(\mathcal{Q}\)</span> de <span
+class="math inline">\(Y\)</span>, nous obtenons :</p>
+<p><span class="math display">\[h(S) = h(T)\]</span></p>
+<p>Ainsi, l’entropie de Kolmogorov-Sinai est bien invariante sous
+conjugaison mesurable.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’entropie de Kolmogorov-Sinai possède plusieurs propriétés
+importantes :</p>
+<ol>
+<li><p>**Inégalité de subadditivité** : Pour deux systèmes dynamiques
+<span class="math inline">\(T\)</span> et <span
+class="math inline">\(S\)</span>, l’entropie de leur produit est
+inférieure ou égale à la somme des entropies individuelles : <span
+class="math display">\[h(T \times S) \leq h(T) + h(S)\]</span> Cette
+propriété découle de la subadditivité de l’entropie des
+partitions.</p></li>
+<li><p>**Inégalité de Pinsker** : Si <span
+class="math inline">\(T\)</span> est un système dynamique ergodique,
+alors pour toute partition <span
+class="math inline">\(\mathcal{P}\)</span>, l’entropie conditionnelle
+satisfait : <span
+class="math display">\[H(\mathcal{P}|T^{-1}(\mathcal{P})) \leq
+h(T)\]</span> Cette inégalité relie l’entropie conditionnelle à
+l’entropie de Kolmogorov-Sinai.</p></li>
+<li><p>**Entropie nulle pour les systèmes réguliers** : Si <span
+class="math inline">\(T\)</span> est un système dynamique régulier,
+c’est-à-dire qu’il possède une base de partitions mesurables avec
+entropie nulle, alors <span class="math inline">\(h(T) = 0\)</span>.
+Cela montre que les systèmes réguliers sont entièrement
+prévisibles.</p></li>
+</ol>
+<p>Ces propriétés illustrent la puissance de l’entropie de
+Kolmogorov-Sinai comme outil pour classer et comprendre les systèmes
+dynamiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

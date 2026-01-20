@@ -1,0 +1,323 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Circuits RLC : Modélisation et Analyse</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Circuits RLC : Modélisation et Analyse</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les circuits RLC constituent une pierre angulaire dans l’étude des
+systèmes dynamiques en électronique. Composés d’une résistance <span
+class="math inline">\(R\)</span>, d’une inductance <span
+class="math inline">\(L\)</span> et d’une capacité <span
+class="math inline">\(C\)</span>, ces circuits modélisent une grande
+variété de phénomènes physiques, allant des oscillations mécaniques aux
+systèmes de communication. Leur importance réside dans leur capacité à
+représenter des comportements oscillatoires, amortis ou critiques,
+essentiels pour la conception de filtres, d’oscillateurs et de nombreux
+autres dispositifs électroniques.</p>
+<p>L’étude des circuits RLC permet non seulement de comprendre les
+interactions entre les composants passifs, mais aussi d’explorer des
+concepts fondamentaux en théorie du contrôle et en traitement du signal.
+En effet, ces circuits sont souvent utilisés pour illustrer des
+principes tels que la résonance, l’amortissement et la stabilité des
+systèmes dynamiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans l’analyse des circuits RLC, il est crucial de
+définir les composants individuels et leurs propriétés.</p>
+<h2 id="résistance-r">Résistance <span
+class="math inline">\(R\)</span></h2>
+<p>La résistance est un composant qui dissipe de l’énergie sous forme de
+chaleur. Elle est caractérisée par la loi d’Ohm, qui stipule que la
+tension <span class="math inline">\(V\)</span> aux bornes de la
+résistance est proportionnelle au courant <span
+class="math inline">\(I\)</span> qui la traverse :</p>
+<p><span class="math display">\[V = R \cdot I\]</span></p>
+<p>où <span class="math inline">\(R\)</span> est la résistance mesurée
+en ohms (<span class="math inline">\(\Omega\)</span>).</p>
+<h2 id="inductance-l">Inductance <span
+class="math inline">\(L\)</span></h2>
+<p>L’inductance est un composant qui stocke de l’énergie dans un champ
+magnétique. La tension aux bornes d’une inductance est proportionnelle à
+la dérivée du courant :</p>
+<p><span class="math display">\[V = L \cdot \frac{dI}{dt}\]</span></p>
+<p>où <span class="math inline">\(L\)</span> est l’inductance mesurée en
+henrys (<span class="math inline">\(H\)</span>).</p>
+<h2 id="capacité-c">Capacité <span class="math inline">\(C\)</span></h2>
+<p>La capacité est un composant qui stocke de l’énergie dans un champ
+électrique. La tension aux bornes d’un condensateur est proportionnelle
+à la charge <span class="math inline">\(Q\)</span> qu’il stocke :</p>
+<p><span class="math display">\[V = \frac{Q}{C}\]</span></p>
+<p>où <span class="math inline">\(C\)</span> est la capacité mesurée en
+farads (<span class="math inline">\(F\)</span>).</p>
+<h1 id="équation-du-circuit-rlc">Équation du Circuit RLC</h1>
+<p>Le circuit RLC en série est un système dynamique de second ordre.
+Pour l’analyser, nous écrivons l’équation différentielle qui régit son
+comportement.</p>
+<h2 id="développement-de-léquation">Développement de l’Équation</h2>
+<p>Considérons un circuit RLC en série alimenté par une source de
+tension <span class="math inline">\(V(t)\)</span>. En appliquant la loi
+des mailles de Kirchhoff, nous obtenons :</p>
+<p><span class="math display">\[V(t) = V_R + V_L + V_C\]</span></p>
+<p>En substituant les expressions pour <span
+class="math inline">\(V_R\)</span>, <span
+class="math inline">\(V_L\)</span> et <span
+class="math inline">\(V_C\)</span>, nous avons :</p>
+<p><span class="math display">\[V(t) = R \cdot I + L \cdot \frac{dI}{dt}
++ \frac{1}{C} \int I \, dt\]</span></p>
+<p>Pour simplifier, nous dérivons cette équation par rapport au temps
+:</p>
+<p><span class="math display">\[\frac{dV(t)}{dt} = R \cdot \frac{dI}{dt}
++ L \cdot \frac{d^2I}{dt^2} + \frac{I}{C}\]</span></p>
+<p>En réarrangeant les termes, nous obtenons l’équation différentielle
+du circuit RLC :</p>
+<p><span class="math display">\[L \cdot \frac{d^2I}{dt^2} + R \cdot
+\frac{dI}{dt} + \frac{1}{C} \cdot I = \frac{dV(t)}{dt}\]</span></p>
+<h2 id="solution-de-léquation">Solution de l’Équation</h2>
+<p>La solution de cette équation différentielle dépend des valeurs
+relatives de <span class="math inline">\(R\)</span>, <span
+class="math inline">\(L\)</span> et <span
+class="math inline">\(C\)</span>. Nous distinguons trois cas principaux
+:</p>
+<ol>
+<li><p><strong>Cas non amorti</strong> (<span class="math inline">\(R =
+0\)</span>) : Le circuit oscille indéfiniment avec une fréquence propre
+<span class="math inline">\(\omega_0 =
+\frac{1}{\sqrt{LC}}\)</span>.</p></li>
+<li><p><strong>Cas critique</strong> (<span class="math inline">\(R =
+2\sqrt{\frac{L}{C}}\)</span>) : Le circuit atteint sa position
+d’équilibre en un temps fini sans osciller.</p></li>
+<li><p><strong>Cas amorti</strong> (<span class="math inline">\(R &gt;
+2\sqrt{\frac{L}{C}}\)</span>) : Le circuit retourne à sa position
+d’équilibre de manière exponentielle sans osciller.</p></li>
+</ol>
+<h1 id="analyse-en-régime-permanent">Analyse en Régime Permanent</h1>
+<p>En régime permanent, la tension d’entrée <span
+class="math inline">\(V(t)\)</span> est souvent une onde sinusoïdale.
+Nous pouvons alors utiliser l’analyse en régime permanent pour
+déterminer le comportement du circuit.</p>
+<h2 id="admittance-et-impédance">Admittance et Impédance</h2>
+<p>L’admittance <span class="math inline">\(Y\)</span> et l’impédance
+<span class="math inline">\(Z\)</span> sont des concepts clés pour
+analyser les circuits en régime permanent. L’impédance est la résistance
+totale du circuit à un courant alternatif, tandis que l’admittance est
+l’inverse de l’impédance.</p>
+<p>Pour un circuit RLC en série, l’impédance est donnée par :</p>
+<p><span class="math display">\[Z = R + j \left( \omega L -
+\frac{1}{\omega C} \right)\]</span></p>
+<p>où <span class="math inline">\(j\)</span> est l’unité imaginaire et
+<span class="math inline">\(\omega\)</span> est la fréquence
+angulaire.</p>
+<h2 id="résonance">Résonance</h2>
+<p>La résonance se produit lorsque l’impédance du circuit est minimale,
+ce qui correspond à une fréquence de résonance <span
+class="math inline">\(\omega_0\)</span> donnée par :</p>
+<p><span class="math display">\[\omega_0 =
+\frac{1}{\sqrt{LC}}\]</span></p>
+<p>À cette fréquence, le courant dans le circuit est maximal.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les circuits RLC sont des systèmes dynamiques riches et complexes qui
+offrent une compréhension profonde des phénomènes oscillatoires et
+amortis. Leur analyse permet de concevoir des dispositifs électroniques
+performants et de comprendre les principes fondamentaux de la théorie
+des systèmes. En explorant les différentes configurations et régimes de
+fonctionnement, nous pouvons apprécier la beauté et l’utilité de ces
+circuits dans divers domaines de l’ingénierie et des sciences
+appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

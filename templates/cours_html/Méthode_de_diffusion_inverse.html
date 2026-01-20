@@ -1,0 +1,299 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode de diffusion inverse : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode de diffusion inverse : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La méthode de diffusion inverse émerge comme un pilier fondamental
+dans l’analyse des phénomènes physiques où les données expérimentales
+sont incomplètes ou bruitées. Son origine remonte aux travaux pionniers
+en imagerie médicale et en traitement du signal, où la nécessité de
+reconstruire des images à partir de projections partielles a conduit au
+développement d’algorithmes sophistiqués. Cette méthode trouve son
+essence dans la résolution de problèmes mal posés, où les solutions ne
+dépendent pas continûment des données d’entrée.</p>
+<p>L’importance de la méthode de diffusion inverse réside dans sa
+capacité à restaurer des informations perdues ou corrompues, ce qui est
+crucial dans des domaines tels que la tomographie, l’astrophysique, et
+même la finance. Elle permet de reconstruire des structures internes à
+partir de mesures externes, offrant ainsi une compréhension plus
+profonde des systèmes étudiés.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la méthode de diffusion inverse, il est essentiel de
+définir certains concepts clés. Considérons un problème où l’on cherche
+à reconstruire une fonction <span class="math inline">\(f\)</span> à
+partir de mesures indirectes. Supposons que ces mesures soient données
+par une équation intégrale de la forme :</p>
+<p><span class="math display">\[g(x) = \int_{\Omega} K(x, y) f(y) \,
+dy\]</span></p>
+<p>où <span class="math inline">\(K(x, y)\)</span> est un noyau de
+diffusion connu et <span class="math inline">\(g(x)\)</span> sont les
+données mesurées. Notre objectif est de retrouver <span
+class="math inline">\(f\)</span> à partir de <span
+class="math inline">\(g\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(K(x, y)\)</span> un noyau de
+diffusion connu et <span class="math inline">\(g(x)\)</span> des données
+mesurées. Le problème de diffusion inverse consiste à trouver une
+fonction <span class="math inline">\(f\)</span> telle que : <span
+class="math display">\[g(x) = \int_{\Omega} K(x, y) f(y) \, dy \quad
+\forall x \in \Omega\]</span></p>
+</div>
+<p>Une formulation alternative utilise des opérateurs. Soit <span
+class="math inline">\(T\)</span> un opérateur linéaire défini par :
+<span class="math display">\[(Tf)(x) = \int_{\Omega} K(x, y) f(y) \,
+dy\]</span> Le problème de diffusion inverse peut alors s’écrire : <span
+class="math display">\[Tf = g\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental dans la méthode de diffusion inverse est le
+théorème de Tikhonov, qui fournit une solution régulière au problème mal
+posé.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(T\)</span> un opérateur linéaire
+compact et auto-adjoint, et <span class="math inline">\(g\)</span> une
+donnée mesurée. Il existe un unique minimiseur <span
+class="math inline">\(f_{\alpha}\)</span> de la fonctionnelle : <span
+class="math display">\[J(f) = \|Tf - g\|^2 + \alpha \|Lf\|^2\]</span> où
+<span class="math inline">\(L\)</span> est un opérateur de
+régularisation et <span class="math inline">\(\alpha &gt; 0\)</span> est
+un paramètre de régularisation.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Tikhonov, nous suivons les étapes
+suivantes :</p>
+<p>1. **Existence** : La fonctionnelle <span
+class="math inline">\(J(f)\)</span> est continue et coercive sur un
+espace de Hilbert approprié. Par le théorème du point fixe, il existe
+une solution <span class="math inline">\(f_{\alpha}\)</span> qui
+minimise <span class="math inline">\(J(f)\)</span>.</p>
+<p>2. **Unicité** : Supposons qu’il existe deux minimiseurs <span
+class="math inline">\(f_1\)</span> et <span
+class="math inline">\(f_2\)</span>. Alors : <span
+class="math display">\[J(f_1) = J(f_2)\]</span> Ce qui implique : <span
+class="math display">\[\|Tf_1 - g\|^2 + \alpha \|Lf_1\|^2 = \|Tf_2 -
+g\|^2 + \alpha \|Lf_2\|^2\]</span> En utilisant la linéarité de <span
+class="math inline">\(T\)</span> et <span
+class="math inline">\(L\)</span>, on montre que <span
+class="math inline">\(f_1 = f_2\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Plusieurs propriétés découlent du théorème de Tikhonov :</p>
+<ol>
+<li><p>**Stabilité** : La solution <span
+class="math inline">\(f_{\alpha}\)</span> dépend continûment des données
+<span class="math inline">\(g\)</span>, ce qui rend le problème bien
+posé.</p></li>
+<li><p>**Convergence** : Lorsque <span
+class="math inline">\(\alpha\)</span> tend vers zéro, <span
+class="math inline">\(f_{\alpha}\)</span> converge vers une solution du
+problème original <span class="math inline">\(Tf = g\)</span>.</p></li>
+<li><p>**Régularisation** : Le choix approprié de <span
+class="math inline">\(L\)</span> et <span
+class="math inline">\(\alpha\)</span> permet de contrôler la régularité
+de la solution.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La méthode de diffusion inverse est un outil puissant pour résoudre
+des problèmes mal posés dans divers domaines scientifiques. Grâce à des
+théorèmes tels que celui de Tikhonov, il est possible de trouver des
+solutions stables et régularisées, offrant ainsi une compréhension plus
+profonde des phénomènes étudiés.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

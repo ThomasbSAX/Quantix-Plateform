@@ -1,0 +1,340 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Conditionnement d’une matrice : Analyse et Implications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Conditionnement d’une matrice : Analyse et
+Implications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le conditionnement d’une matrice est une notion fondamentale en
+analyse numérique, particulièrement dans le contexte des systèmes
+linéaires et des approximations numériques. Historiquement, cette notion
+a émergé pour quantifier la sensibilité des solutions d’un système
+linéaire aux perturbations dans les coefficients de la matrice. En
+effet, certaines matrices peuvent amplifier considérablement les erreurs
+d’arrondi ou de mesure lors des calculs numériques, rendant certaines
+solutions peu fiables.</p>
+<p>Le conditionnement d’une matrice est donc indispensable pour évaluer
+la stabilité numérique des algorithmes et pour comprendre les limites de
+précision des calculs effectués sur ordinateur. Il permet également
+d’identifier les matrices bien conditionnées, pour lesquelles les
+solutions sont stables et fiables, des matrices mal conditionnées, pour
+lesquelles les solutions peuvent être très sensibles aux
+perturbations.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire le conditionnement d’une matrice, considérons un
+système linéaire <span class="math inline">\(A \mathbf{x} =
+\mathbf{b}\)</span>, où <span class="math inline">\(A\)</span> est une
+matrice carrée inversible, <span
+class="math inline">\(\mathbf{x}\)</span> est le vecteur solution et
+<span class="math inline">\(\mathbf{b}\)</span> est le vecteur des
+termes constants. Nous cherchons à quantifier comment une petite
+perturbation dans <span class="math inline">\(\mathbf{b}\)</span>
+affecte la solution <span class="math inline">\(\mathbf{x}\)</span>.</p>
+<p>Formellement, le conditionnement d’une matrice <span
+class="math inline">\(A\)</span> est défini comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée
+inversible de taille <span class="math inline">\(n \times n\)</span>. Le
+nombre de conditionnement de <span class="math inline">\(A\)</span> est
+défini par : <span class="math display">\[\text{cond}(A) = \|A\| \cdot
+\|A^{-1}\|\]</span> où <span class="math inline">\(\| \cdot \|\)</span>
+désigne une norme matricielle sous-multiplicative.</p>
+</div>
+<p>Une autre formulation équivalente est :</p>
+<div class="definition">
+<p>Le nombre de conditionnement de <span
+class="math inline">\(A\)</span> peut également être exprimé en termes
+des valeurs singulières de <span class="math inline">\(A\)</span>. Si
+<span class="math inline">\(\sigma_{\text{max}}\)</span> et <span
+class="math inline">\(\sigma_{\text{min}}\)</span> désignent
+respectivement la plus grande et la plus petite valeur singulière de
+<span class="math inline">\(A\)</span>, alors : <span
+class="math display">\[\text{cond}(A) =
+\frac{\sigma_{\text{max}}}{\sigma_{\text{min}}}\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre l’importance du conditionnement, considérons le
+théorème suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée
+inversible et <span class="math inline">\(\mathbf{x}\)</span> la
+solution exacte du système <span class="math inline">\(A \mathbf{x} =
+\mathbf{b}\)</span>. Soit <span
+class="math inline">\(\tilde{\mathbf{b}}\)</span> une perturbation de
+<span class="math inline">\(\mathbf{b}\)</span> et <span
+class="math inline">\(\tilde{\mathbf{x}}\)</span> la solution du système
+perturbé <span class="math inline">\(A \tilde{\mathbf{x}} =
+\tilde{\mathbf{b}}\)</span>. Alors, on a : <span
+class="math display">\[\frac{\|\mathbf{x} -
+\tilde{\mathbf{x}}\|}{\|\mathbf{x}\|} \leq \text{cond}(A) \cdot
+\frac{\|\mathbf{b} - \tilde{\mathbf{b}}\|}{\|\mathbf{b}\|}\]</span></p>
+</div>
+<p>Ce théorème montre que le rapport des erreurs relatives entre la
+solution et les termes constants est borné par le nombre de
+conditionnement de <span class="math inline">\(A\)</span>. Plus <span
+class="math inline">\(\text{cond}(A)\)</span> est grand, plus la
+solution est sensible aux perturbations dans <span
+class="math inline">\(\mathbf{b}\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème du conditionnement, nous utilisons les
+propriétés des normes matricielles et des valeurs singulières.</p>
+<div class="proof">
+<p><em>Proof.</em> Partons de l’équation <span class="math inline">\(A
+\mathbf{x} = \mathbf{b}\)</span> et considérons une perturbation <span
+class="math inline">\(\tilde{\mathbf{b}} = \mathbf{b} + \Delta
+\mathbf{b}\)</span>. La solution perturbée <span
+class="math inline">\(\tilde{\mathbf{x}}\)</span> satisfait : <span
+class="math display">\[A \tilde{\mathbf{x}} = \tilde{\mathbf{b}} =
+\mathbf{b} + \Delta \mathbf{b}\]</span> En soustrayant les deux
+équations, nous obtenons : <span class="math display">\[A
+(\tilde{\mathbf{x}} - \mathbf{x}) = \Delta \mathbf{b}\]</span> En
+multipliant par <span class="math inline">\(A^{-1}\)</span>, nous avons
+: <span class="math display">\[\tilde{\mathbf{x}} - \mathbf{x} = A^{-1}
+\Delta \mathbf{b}\]</span> En prenant la norme des deux côtés, nous
+obtenons : <span class="math display">\[\|\tilde{\mathbf{x}} -
+\mathbf{x}\| \leq \|A^{-1}\| \cdot \|\Delta \mathbf{b}\|\]</span> En
+divisant par <span class="math inline">\(\|\mathbf{x}\|\)</span> et en
+utilisant le fait que <span class="math inline">\(\|A\| \cdot \|A^{-1}\|
+= \text{cond}(A)\)</span>, nous arrivons à : <span
+class="math display">\[\frac{\|\mathbf{x} -
+\tilde{\mathbf{x}}\|}{\|\mathbf{x}\|} \leq \text{cond}(A) \cdot
+\frac{\|\Delta \mathbf{b}\|}{\|\mathbf{b}\|}\]</span> Ce qui achève la
+preuve. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le conditionnement d’une matrice possède plusieurs propriétés
+importantes :</p>
+<ol>
+<li><p><strong>Invariance par changement de base</strong> : Le
+conditionnement d’une matrice est invariant sous les transformations de
+similitude. Plus précisément, pour toute matrice inversible <span
+class="math inline">\(P\)</span>, on a : <span
+class="math display">\[\text{cond}(P^{-1} A P) =
+\text{cond}(A)\]</span></p></li>
+<li><p><strong>Conditionnement et déterminant</strong> : Le
+conditionnement d’une matrice est lié au déterminant de la matrice. En
+effet, pour une matrice <span class="math inline">\(A\)</span> avec
+valeurs singulières <span class="math inline">\(\sigma_1, \sigma_2,
+\ldots, \sigma_n\)</span>, on a : <span
+class="math display">\[\text{cond}(A) =
+\frac{\sigma_{\text{max}}}{\sigma_{\text{min}}}\]</span> et le
+déterminant de <span class="math inline">\(A\)</span> est donné par :
+<span class="math display">\[\det(A) = \sigma_1 \sigma_2 \cdots
+\sigma_n\]</span> Ainsi, un petit déterminant implique généralement un
+grand conditionnement.</p></li>
+<li><p><strong>Conditionnement et stabilité numérique</strong> : Une
+matrice est dite bien conditionnée si <span
+class="math inline">\(\text{cond}(A) \approx 1\)</span>, et mal
+conditionnée si <span class="math inline">\(\text{cond}(A) \gg
+1\)</span>. Les algorithmes numériques doivent prendre en compte le
+conditionnement des matrices pour garantir la stabilité et la précision
+des résultats.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le conditionnement d’une matrice est une notion clé en analyse
+numérique, permettant de quantifier la sensibilité des solutions des
+systèmes linéaires aux perturbations. Comprendre et calculer le
+conditionnement d’une matrice est essentiel pour développer des
+algorithmes numériques stables et précis. Les propriétés et théorèmes
+associés au conditionnement fournissent des outils puissants pour
+évaluer la fiabilité des calculs et pour améliorer les méthodes
+numériques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

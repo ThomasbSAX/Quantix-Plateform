@@ -1,0 +1,315 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Courbes ROC : Une Analyse Complète</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Courbes ROC : Une Analyse Complète</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les courbes ROC (Receiver Operating Characteristic) sont un outil
+fondamental dans le domaine de l’apprentissage automatique et de la
+statistique. Elles émergent du besoin crucial d’évaluer les performances
+des modèles de classification binaire, en particulier lorsqu’il s’agit
+de prendre en compte le compromis entre les faux positifs et les vrais
+positifs.</p>
+<p>L’origine des courbes ROC remonte à la Seconde Guerre mondiale, où
+elles étaient utilisées pour évaluer l’efficacité des systèmes de
+détection radar. Aujourd’hui, elles sont omniprésentes dans divers
+domaines tels que la médecine, la finance et l’informatique, où la prise
+de décision basée sur des modèles prédictifs est essentielle.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les courbes ROC, il est essentiel de définir quelques
+concepts clés.</p>
+<div class="definition">
+<p>Considérons un modèle de classification binaire qui prédit une classe
+parmi deux classes possibles, souvent notées comme positive (P) et
+négative (N). La matrice de confusion est un tableau qui permet de
+visualiser les performances du modèle. Elle est définie comme suit :</p>
+<p><span class="math display">\[\begin{array}{cc|c|c}
+        &amp; &amp; \text{Prédit Positif} &amp; \text{Prédit Négatif} \\
+        \hline
+        \text{Vrai Positif} &amp; TP &amp; FN \\
+        \text{Vrai Négatif} &amp; FP &amp; TN \\
+    \end{array}\]</span></p>
+<p>Où :</p>
+<ul>
+<li><p><span class="math inline">\(TP\)</span> (True Positives) : Nombre
+de vrais positifs correctement prédits.</p></li>
+<li><p><span class="math inline">\(FP\)</span> (False Positives) :
+Nombre de faux positifs incorrectement prédits.</p></li>
+<li><p><span class="math inline">\(TN\)</span> (True Negatives) : Nombre
+de vrais négatifs correctement prédits.</p></li>
+<li><p><span class="math inline">\(FN\)</span> (False Negatives) :
+Nombre de faux négatifs incorrectement prédits.</p></li>
+</ul>
+</div>
+<div class="definition">
+<p>Le taux de vrais positifs, également connu sous le nom de sensibilité
+ou rappel, est défini comme :</p>
+<p><span class="math display">\[TPR = \frac{TP}{TP + FN}\]</span></p>
+<p>Ce taux mesure la proportion de vrais positifs qui sont correctement
+identifiés par le modèle.</p>
+</div>
+<div class="definition">
+<p>Le taux de faux positifs, également connu sous le nom de taux de
+fausse alarme, est défini comme :</p>
+<p><span class="math display">\[FPR = \frac{FP}{FP + TN}\]</span></p>
+<p>Ce taux mesure la proportion de vrais négatifs qui sont
+incorrectement identifiés comme positifs par le modèle.</p>
+</div>
+<h1 id="courbe-roc">Courbe ROC</h1>
+<p>La courbe ROC est un graphique qui illustre le compromis entre le TPR
+et le FPR pour différents seuils de décision.</p>
+<div class="definition">
+<p>La courbe ROC est un graphe où l’axe des abscisses représente le taux
+de faux positifs (FPR) et l’axe des ordonnées représente le taux de
+vrais positifs (TPR). Pour chaque seuil de décision <span
+class="math inline">\(t\)</span>, on calcule le point <span
+class="math inline">\((FPR(t), TPR(t))\)</span> et on trace la courbe en
+reliant ces points.</p>
+</div>
+<h1 id="théorèmes-et-propriétés">Théorèmes et Propriétés</h1>
+<h2 id="théorème-de-laire-sous-la-courbe-roc-auc">Théorème de l’Aire
+Sous la Courbe ROC (AUC)</h2>
+<p>L’aire sous la courbe ROC (AUC) est une mesure importante de la
+performance globale du modèle.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(ROC\)</span> la courbe ROC d’un
+modèle de classification binaire. L’aire sous la courbe <span
+class="math inline">\(AUC\)</span> est définie comme :</p>
+<p><span class="math display">\[AUC = \int_{0}^{1} TPR(FPR^{-1}(x)) \,
+dx\]</span></p>
+<p>Où <span class="math inline">\(FPR^{-1}(x)\)</span> est la fonction
+inverse du taux de faux positifs.</p>
+</div>
+<h2 id="propriétés-de-lauc">Propriétés de l’AUC</h2>
+<div class="proposition">
+<ol>
+<li><p>L’AUC est comprise entre 0 et 1.</p></li>
+<li><p>Un modèle aléatoire a une AUC de 0.5.</p></li>
+<li><p>Plus l’AUC est proche de 1, meilleur est le modèle.</p></li>
+</ol>
+</div>
+<h1 id="preuves-et-démonstrations">Preuves et Démonstrations</h1>
+<h2 id="démonstration-du-théorème-de-lauc">Démonstration du Théorème de
+l’AUC</h2>
+<p>Pour démontrer le théorème de l’AUC, nous devons montrer que l’aire
+sous la courbe ROC est effectivement donnée par l’intégrale
+ci-dessus.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un seuil de décision <span
+class="math inline">\(t\)</span>. Pour chaque valeur de <span
+class="math inline">\(t\)</span>, nous avons un point <span
+class="math inline">\((FPR(t), TPR(t))\)</span> sur la courbe ROC.
+L’aire sous la courbe peut être calculée en intégrant le TPR par rapport
+au FPR.</p>
+<p><span class="math display">\[AUC = \int_{0}^{1} TPR(FPR^{-1}(x)) \,
+dx\]</span></p>
+<p>Cette intégrale représente l’aire sous la courbe ROC, car elle somme
+les contributions de chaque seuil de décision. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les courbes ROC et l’AUC sont des outils puissants pour évaluer les
+performances des modèles de classification binaire. Elles permettent de
+visualiser le compromis entre les faux positifs et les vrais positifs et
+de quantifier la performance globale du modèle.</p>
+<p>En conclusion, les courbes ROC sont indispensables pour toute analyse
+sérieuse de modèles prédictifs, offrant une vue d’ensemble claire et
+concise des performances du modèle.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

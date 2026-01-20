@@ -1,0 +1,341 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Coordonnées homogènes : Une généralisation élégante de l’espace euclidien</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Coordonnées homogènes : Une généralisation élégante de
+l’espace euclidien</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les coordonnées homogènes représentent une extension sophistiquée de
+notre compréhension traditionnelle des espaces géométriques. En
+introduisant une dimension supplémentaire, elles transcendent les
+limitations des systèmes de coordonnées classiques, offrant une élégance
+et une puissance inégalées dans la représentation des transformations
+géométriques.</p>
+<p>L’origine de cette notion remonte au 19ème siècle, où les
+mathématiciens cherchaient à unifier les différentes transformations
+géométriques sous un formalisme commun. Les coordonnées homogènes
+émergent comme une solution naturelle pour représenter les homothéties,
+les translations et les rotations dans un cadre cohérent. Elles sont
+indispensables en géométrie projective, où elles permettent de traiter
+les points à l’infini avec la même rigueur que les points
+ordinaires.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre les coordonnées homogènes, commençons par considérer
+un point dans l’espace euclidien <span
+class="math inline">\(\mathbb{R}^n\)</span>. Nous cherchons à
+représenter ce point de manière à inclure les transformations affines,
+telles que les translations, qui ne sont pas linéaires dans le cadre
+classique.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(P\)</span> un point de <span
+class="math inline">\(\mathbb{R}^n\)</span>. Les coordonnées homogènes
+de <span class="math inline">\(P\)</span> sont un vecteur <span
+class="math inline">\((x_1, x_2, \ldots, x_n, x_{n+1}) \in
+\mathbb{R}^{n+1}\)</span> tel que : <span class="math display">\[P =
+\left( \frac{x_1}{x_{n+1}}, \frac{x_2}{x_{n+1}}, \ldots,
+\frac{x_n}{x_{n+1}} \right)\]</span> avec <span
+class="math inline">\(x_{n+1} \neq 0\)</span>. Deux vecteurs <span
+class="math inline">\((x_1, \ldots, x_{n+1})\)</span> et <span
+class="math inline">\((y_1, \ldots, y_{n+1})\)</span> représentent le
+même point si et seulement s’il existe un <span
+class="math inline">\(\lambda \neq 0\)</span> tel que : <span
+class="math display">\[\forall i \in \{1, \ldots, n+1\}, y_i = \lambda
+x_i\]</span></p>
+</div>
+<p>En d’autres termes, les coordonnées homogènes permettent de
+représenter un point <span class="math inline">\(P\)</span> par un
+vecteur <span class="math inline">\((x_1, \ldots, x_{n+1})\)</span> où
+la dernière coordonnée <span class="math inline">\(x_{n+1}\)</span> joue
+le rôle d’un dénominateur commun. Cette représentation est unique à un
+facteur multiplicatif non nul près.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant les coordonnées homogènes
+est celui de la représentation des transformations affines.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(T\)</span> une transformation affine
+de <span class="math inline">\(\mathbb{R}^n\)</span> dans <span
+class="math inline">\(\mathbb{R}^n\)</span>, définie par : <span
+class="math display">\[T(P) = AP + b\]</span> où <span
+class="math inline">\(A\)</span> est une matrice <span
+class="math inline">\((n \times n)\)</span> et <span
+class="math inline">\(b\)</span> un vecteur de <span
+class="math inline">\(\mathbb{R}^n\)</span>. Alors, il existe une
+matrice <span class="math inline">\((n+1) \times (n+1)\)</span>, notée
+<span class="math inline">\(M_T\)</span>, telle que pour tout point
+<span class="math inline">\(P\)</span> de <span
+class="math inline">\(\mathbb{R}^n\)</span> représenté par ses
+coordonnées homogènes <span class="math inline">\((x_1, \ldots, x_n,
+1)\)</span>, on a : <span class="math display">\[M_T \begin{pmatrix} x_1
+\\ \vdots \\ x_n \\ 1 \end{pmatrix} = \begin{pmatrix} y_1 \\ \vdots \\
+y_n \\ 1 \end{pmatrix}\]</span> où <span class="math inline">\((y_1,
+\ldots, y_n)\)</span> sont les coordonnées homogènes de <span
+class="math inline">\(T(P)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, commençons par exprimer la transformation
+affine <span class="math inline">\(T\)</span> en coordonnées homogènes.
+Soit <span class="math inline">\(P\)</span> un point de <span
+class="math inline">\(\mathbb{R}^n\)</span> représenté par <span
+class="math inline">\((x_1, \ldots, x_n, 1)\)</span>. La transformation
+<span class="math inline">\(T\)</span> s’écrit : <span
+class="math display">\[T(P) = AP + b = \begin{pmatrix} a_{11} &amp;
+\cdots &amp; a_{1n} \\ \vdots &amp; \ddots &amp; \vdots \\ a_{n1} &amp;
+\cdots &amp; a_{nn} \end{pmatrix} \begin{pmatrix} x_1 \\ \vdots \\ x_n
+\end{pmatrix} + \begin{pmatrix} b_1 \\ \vdots \\ b_n
+\end{pmatrix}\]</span> Nous cherchons une matrice <span
+class="math inline">\(M_T\)</span> telle que : <span
+class="math display">\[M_T \begin{pmatrix} x_1 \\ \vdots \\ x_n \\ 1
+\end{pmatrix} = \begin{pmatrix} a_{11}x_1 + \cdots + a_{1n}x_n + b_1 \\
+\vdots \\ a_{n1}x_1 + \cdots + a_{nn}x_n + b_n \\ 1
+\end{pmatrix}\]</span> Il est clair que la matrice <span
+class="math inline">\(M_T\)</span> doit être de la forme : <span
+class="math display">\[M_T = \begin{pmatrix} a_{11} &amp; \cdots &amp;
+a_{1n} &amp; b_1 \\ \vdots &amp; \ddots &amp; \vdots &amp; \vdots \\
+a_{n1} &amp; \cdots &amp; a_{nn} &amp; b_n \\ 0 &amp; \cdots &amp; 0
+&amp; 1 \end{pmatrix}\]</span> Cette matrice représente effectivement la
+transformation affine <span class="math inline">\(T\)</span> en
+coordonnées homogènes.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les coordonnées homogènes possèdent plusieurs propriétés remarquables
+:</p>
+<ol>
+<li><p><strong>Invariance par homothétie</strong> : Si <span
+class="math inline">\((x_1, \ldots, x_{n+1})\)</span> sont les
+coordonnées homogènes d’un point <span class="math inline">\(P\)</span>,
+alors pour tout <span class="math inline">\(\lambda \neq 0\)</span>,
+<span class="math inline">\((\lambda x_1, \ldots, \lambda
+x_{n+1})\)</span> représentent le même point <span
+class="math inline">\(P\)</span>.</p></li>
+<li><p><strong>Représentation des points à l’infini</strong> : Les
+vecteurs dont la dernière coordonnée est nulle représentent les points à
+l’infini. Ces points sont utilisés en géométrie projective pour traiter
+les directions et les tangentes.</p></li>
+<li><p><strong>Simplification des transformations</strong> : Les
+coordonnées homogènes permettent de représenter les translations,
+rotations et homothéties par des matrices linéaires, simplifiant ainsi
+le calcul des transformations composées.</p></li>
+</ol>
+<p>Pour illustrer la propriété (iii), considérons une translation par un
+vecteur <span class="math inline">\(b\)</span> suivie d’une rotation par
+une matrice <span class="math inline">\(A\)</span>. En coordonnées
+homogènes, ces transformations sont représentées respectivement par les
+matrices : <span class="math display">\[M_{\text{translation}} =
+\begin{pmatrix} 1 &amp; \cdots &amp; 0 &amp; b_1 \\ \vdots &amp; \ddots
+&amp; \vdots &amp; \vdots \\ 0 &amp; \cdots &amp; 1 &amp; b_n \\ 0 &amp;
+\cdots &amp; 0 &amp; 1 \end{pmatrix}, \quad M_{\text{rotation}} =
+\begin{pmatrix} A &amp; 0 \\ 0^t &amp; 1 \end{pmatrix}\]</span> La
+composition de ces transformations est alors simplement le produit des
+matrices correspondantes : <span
+class="math display">\[M_{\text{composition}} = M_{\text{rotation}}
+\cdot M_{\text{translation}}\]</span> Cette propriété est
+particulièrement utile en infographie et en robotique, où les
+transformations géométriques complexes doivent être calculées
+efficacement.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les coordonnées homogènes offrent une généralisation puissante et
+élégante des systèmes de coordonnées classiques. En introduisant une
+dimension supplémentaire, elles unifient les transformations affines
+sous un formalisme linéaire cohérent. Leur utilisation est indispensable
+en géométrie projective et trouve des applications pratiques dans de
+nombreux domaines, de l’infographie à la robotique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

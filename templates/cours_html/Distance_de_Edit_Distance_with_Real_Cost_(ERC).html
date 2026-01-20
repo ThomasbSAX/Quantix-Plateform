@@ -1,0 +1,420 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Edit Distance with Real Cost (ERC)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Edit Distance with Real Cost (ERC)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’édition de texte est une tâche fondamentale dans le traitement
+automatique du langage naturel (TALN) et la bioinformatique. La distance
+d’édition, ou distance de Levenshtein, est une mesure bien connue pour
+quantifier le nombre d’opérations nécessaires pour transformer une
+chaîne de caractères en une autre. Cependant, dans de nombreuses
+applications, les coûts des opérations d’édition (insertion,
+suppression, substitution) ne sont pas uniformes. La distance de Edit
+Distance with Real Cost (ERC) généralise la distance d’édition en
+associant des coûts réels à chaque opération.</p>
+<p>L’ERC émerge comme une réponse aux limitations de la distance
+d’édition classique, où chaque opération a un coût fixe. En permettant
+des coûts variables, l’ERC offre une flexibilité accrue pour modéliser
+des scénarios complexes. Par exemple, dans la correction automatique de
+texte, certaines erreurs peuvent être plus coûteuses à corriger que
+d’autres. De même, en bioinformatique, les mutations génétiques peuvent
+avoir des coûts différents selon leur nature.</p>
+<p>L’ERC est indispensable dans les cadres où la précision du coût est
+cruciale. Elle permet de mieux capturer les nuances des transformations
+de texte et d’optimiser les processus d’édition en fonction des coûts
+réels associés à chaque opération.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir l’ERC, nous devons d’abord comprendre ce que nous
+cherchons à mesurer. Imaginons deux chaînes de caractères, <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>. Nous voulons quantifier le coût
+minimal pour transformer <span class="math inline">\(A\)</span> en <span
+class="math inline">\(B\)</span> en utilisant des opérations d’édition,
+où chaque opération a un coût réel.</p>
+<p>Formellement, la distance de Edit Distance with Real Cost (ERC) entre
+deux chaînes <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est définie comme suit:</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(A = a_1a_2 \ldots a_m\)</span> et
+<span class="math inline">\(B = b_1b_2 \ldots b_n\)</span> deux chaînes
+de caractères. Soit <span class="math inline">\(\text{cost}(a,
+b)\)</span> le coût de substitution du caractère <span
+class="math inline">\(a\)</span> par <span
+class="math inline">\(b\)</span>, <span
+class="math inline">\(\text{ins}(b)\)</span> le coût d’insertion du
+caractère <span class="math inline">\(b\)</span>, et <span
+class="math inline">\(\text{del}(a)\)</span> le coût de suppression du
+caractère <span class="math inline">\(a\)</span>. La distance ERC entre
+<span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est le coût minimal pour transformer
+<span class="math inline">\(A\)</span> en <span
+class="math inline">\(B\)</span> en utilisant des opérations d’édition,
+définie par:</p>
+<p><span class="math display">\[ERC(A, B) = \min_{\text{sequence
+d&#39;opérations}} \sum_{i=1}^{k} \text{cost}(o_i)\]</span></p>
+<p>où <span class="math inline">\(o_i\)</span> est la <span
+class="math inline">\(i\)</span>-ème opération dans la séquence
+d’opérations transformant <span class="math inline">\(A\)</span> en
+<span class="math inline">\(B\)</span>, et <span
+class="math inline">\(k\)</span> est le nombre total d’opérations.</p>
+</div>
+<p>Une autre formulation de l’ERC utilise une matrice de coût dynamique.
+Soit <span class="math inline">\(D\)</span> une matrice <span
+class="math inline">\((m+1) \times (n+1)\)</span>, où <span
+class="math inline">\(D[i][j]\)</span> représente le coût minimal pour
+transformer la sous-chaîne <span class="math inline">\(A[1..i]\)</span>
+en <span class="math inline">\(B[1..j]\)</span>. La matrice est remplie
+comme suit:</p>
+<p><span class="math display">\[D[i][0] = D[i-1][0] +
+\text{del}(a_i)\]</span> <span class="math display">\[D[0][j] =
+D[0][j-1] + \text{ins}(b_j)\]</span> <span
+class="math display">\[D[i][j] = \min \left( D[i-1][j-1] +
+\text{cost}(a_i, b_j), D[i-1][j] + \text{del}(a_i), D[i][j-1] +
+\text{ins}(b_j) \right)\]</span></p>
+<p>La distance ERC est alors donnée par <span
+class="math inline">\(D[m][n]\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre les propriétés de l’ERC, nous pouvons formuler un
+théorème fondamental qui relie l’ERC à la distance d’édition
+classique.</p>
+<div class="theoreme">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux chaînes de caractères, et
+supposons que les coûts des opérations d’édition sont constants,
+c’est-à-dire <span class="math inline">\(\text{cost}(a, b) = 1\)</span>,
+<span class="math inline">\(\text{ins}(b) = 1\)</span>, et <span
+class="math inline">\(\text{del}(a) = 1\)</span> pour tous les
+caractères <span class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span>. Alors, la distance ERC entre <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est égale à la distance d’édition
+classique entre <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>.</p>
+</div>
+<div class="preuve">
+<p>La preuve de ce théorème découle directement des définitions. La
+distance d’édition classique est définie comme le nombre minimal
+d’opérations nécessaires pour transformer <span
+class="math inline">\(A\)</span> en <span
+class="math inline">\(B\)</span>, où chaque opération a un coût fixe de
+1. Dans le cas de l’ERC, si tous les coûts sont égaux à 1, alors le coût
+minimal pour transformer <span class="math inline">\(A\)</span> en <span
+class="math inline">\(B\)</span> est simplement le nombre d’opérations,
+qui est la distance d’édition classique.</p>
+<p>En termes de matrice de coût dynamique, si <span
+class="math inline">\(\text{cost}(a, b) = 1\)</span>, <span
+class="math inline">\(\text{ins}(b) = 1\)</span>, et <span
+class="math inline">\(\text{del}(a) = 1\)</span> pour tous les
+caractères <span class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span>, alors la matrice <span
+class="math inline">\(D\)</span> devient identique à celle utilisée pour
+calculer la distance d’édition classique. Par conséquent, <span
+class="math inline">\(D[m][n]\)</span> est égal à la distance d’édition
+classique entre <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer les propriétés de l’ERC, nous devons justifier chaque
+étape de notre raisonnement. Considérons la matrice de coût dynamique
+<span class="math inline">\(D\)</span>. Chaque entrée <span
+class="math inline">\(D[i][j]\)</span> est calculée en fonction des
+entrées précédentes, ce qui garantit que le coût minimal est toujours
+trouvé.</p>
+<div class="preuve">
+<p>Pour montrer que <span class="math inline">\(D[i][j]\)</span>
+représente le coût minimal pour transformer la sous-chaîne <span
+class="math inline">\(A[1..i]\)</span> en <span
+class="math inline">\(B[1..j]\)</span>, nous procédons par
+induction.</p>
+<p><strong>Base de l’induction:</strong> Pour <span
+class="math inline">\(i = 0\)</span> ou <span class="math inline">\(j =
+0\)</span>, la transformation implique uniquement des insertions ou des
+suppressions. Par exemple, <span class="math inline">\(D[0][j]\)</span>
+est le coût d’insertion de tous les caractères de <span
+class="math inline">\(B[1..j]\)</span>, qui est calculé comme <span
+class="math inline">\(D[0][j-1] + \text{ins}(b_j)\)</span>. De même,
+<span class="math inline">\(D[i][0]\)</span> est le coût de suppression
+de tous les caractères de <span class="math inline">\(A[1..i]\)</span>,
+calculé comme <span class="math inline">\(D[i-1][0] +
+\text{del}(a_i)\)</span>.</p>
+<p><strong>Hypothèse d’induction:</strong> Supposons que pour tous <span
+class="math inline">\(k &lt; i\)</span> et <span class="math inline">\(l
+&lt; j\)</span>, <span class="math inline">\(D[k][l]\)</span> représente
+le coût minimal pour transformer la sous-chaîne <span
+class="math inline">\(A[1..k]\)</span> en <span
+class="math inline">\(B[1..l]\)</span>.</p>
+<p><strong>Étape d’induction:</strong> Pour <span
+class="math inline">\(D[i][j]\)</span>, nous avons trois
+possibilités:</p>
+<ul>
+<li><p>La dernière opération est une substitution de <span
+class="math inline">\(a_i\)</span> par <span
+class="math inline">\(b_j\)</span>, avec un coût de <span
+class="math inline">\(D[i-1][j-1] + \text{cost}(a_i,
+b_j)\)</span>.</p></li>
+<li><p>La dernière opération est une suppression de <span
+class="math inline">\(a_i\)</span>, avec un coût de <span
+class="math inline">\(D[i-1][j] + \text{del}(a_i)\)</span>.</p></li>
+<li><p>La dernière opération est une insertion de <span
+class="math inline">\(b_j\)</span>, avec un coût de <span
+class="math inline">\(D[i][j-1] + \text{ins}(b_j)\)</span>.</p></li>
+</ul>
+<p>Le coût minimal est donc le minimum de ces trois valeurs, ce qui
+prouve que <span class="math inline">\(D[i][j]\)</span> représente bien
+le coût minimal pour transformer la sous-chaîne <span
+class="math inline">\(A[1..i]\)</span> en <span
+class="math inline">\(B[1..j]\)</span>.</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’ERC possède plusieurs propriétés intéressantes, que nous allons
+énumérer et démontrer.</p>
+<div class="proposition">
+<p>L’ERC satisfait les propriétés suivantes:</p>
+<ul>
+<li><p>Symétrie: <span class="math inline">\(ERC(A, B) = ERC(B,
+A)\)</span>.</p></li>
+<li><p>Identité: <span class="math inline">\(ERC(A, A) =
+0\)</span>.</p></li>
+<li><p>Inégalité triangulaire: <span class="math inline">\(ERC(A, C)
+\leq ERC(A, B) + ERC(B, C)\)</span>.</p></li>
+</ul>
+</div>
+<div class="preuve">
+<p><strong>(i) Symétrie:</strong> La symétrie de l’ERC découle du fait
+que les coûts des opérations d’édition sont symétriques. Si <span
+class="math inline">\(\text{cost}(a, b) = \text{cost}(b, a)\)</span>,
+<span class="math inline">\(\text{ins}(a) = \text{del}(a)\)</span>, et
+<span class="math inline">\(\text{ins}(b) = \text{del}(b)\)</span>,
+alors la séquence d’opérations pour transformer <span
+class="math inline">\(A\)</span> en <span
+class="math inline">\(B\)</span> est symétrique à celle pour transformer
+<span class="math inline">\(B\)</span> en <span
+class="math inline">\(A\)</span>. Par conséquent, <span
+class="math inline">\(ERC(A, B) = ERC(B, A)\)</span>.</p>
+<p><strong>(ii) Identité:</strong> La distance ERC entre une chaîne et
+elle-même est nulle, car aucune opération n’est nécessaire pour
+transformer <span class="math inline">\(A\)</span> en <span
+class="math inline">\(A\)</span>. Ainsi, <span
+class="math inline">\(ERC(A, A) = 0\)</span>.</p>
+<p><strong>(iii) Inégalité triangulaire:</strong> Pour montrer
+l’inégalité triangulaire, considérons une séquence d’opérations pour
+transformer <span class="math inline">\(A\)</span> en <span
+class="math inline">\(B\)</span>, suivie d’une séquence d’opérations
+pour transformer <span class="math inline">\(B\)</span> en <span
+class="math inline">\(C\)</span>. La composition de ces deux séquences
+donne une séquence d’opérations pour transformer <span
+class="math inline">\(A\)</span> en <span
+class="math inline">\(C\)</span>. Le coût de cette séquence est la somme
+des coûts des deux séquences, ce qui implique que <span
+class="math inline">\(ERC(A, C) \leq ERC(A, B) + ERC(B, C)\)</span>.</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Edit Distance with Real Cost (ERC) est une
+généralisation puissante de la distance d’édition classique, permettant
+de modéliser des coûts variables pour les opérations d’édition. Ses
+propriétés fondamentales, telles que la symétrie, l’identité et
+l’inégalité triangulaire, en font un outil précieux pour les
+applications où la précision du coût est cruciale. Les démonstrations
+détaillées des théorèmes et propriétés de l’ERC offrent une
+compréhension approfondie de cette mesure et ouvrent la voie à des
+recherches futures dans ce domaine.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

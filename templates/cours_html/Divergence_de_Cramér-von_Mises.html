@@ -1,0 +1,290 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Cramér-von Mises</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Cramér-von Mises</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La divergence de Cramér-von Mises émerge dans le cadre des tests
+d’adéquation statistique, où l’objectif est de déterminer si un
+échantillon de données suit une distribution de probabilité spécifiée.
+Cette notion, introduite par les statisticiens Harald Cramér et Richard
+von Mises, est indispensable pour évaluer la qualité de l’ajustement
+d’un modèle probabiliste à des données observées.</p>
+<p>Historiquement, les tests d’adéquation ont été développés pour
+répondre à des besoins pratiques en biologie, ingénierie et sciences
+sociales. La divergence de Cramér-von Mises offre une mesure
+quantifiable de la différence entre la distribution empirique des
+données et la distribution théorique supposée. Son importance réside
+dans sa capacité à fournir une évaluation robuste et informative de
+l’adéquation des modèles, même en présence de petites déviations.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la divergence de Cramér-von Mises, considérons un
+échantillon de données <span class="math inline">\(X_1, X_2, \ldots,
+X_n\)</span> et une distribution de probabilité continue <span
+class="math inline">\(F\)</span>. Nous cherchons à mesurer la différence
+entre la fonction de répartition empirique <span
+class="math inline">\(F_n\)</span> de l’échantillon et la fonction de
+répartition théorique <span class="math inline">\(F\)</span>.</p>
+<p>La divergence de Cramér-von Mises est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(F\)</span> une fonction de
+répartition continue et <span class="math inline">\(F_n\)</span> la
+fonction de répartition empirique d’un échantillon <span
+class="math inline">\(X_1, X_2, \ldots, X_n\)</span>. La divergence de
+Cramér-von Mises est donnée par : <span class="math display">\[\omega^2
+= \int_{-\infty}^{\infty} (F_n(x) - F(x))^2 \, dF(x)\]</span></p>
+</div>
+<p>Une autre formulation équivalente est : <span
+class="math display">\[\omega^2 = \frac{1}{12n} + \sum_{i=1}^n \left(
+F(X_i) - \frac{2i - 1}{2n} \right)^2\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la divergence de Cramér-von Mises est
+le suivant :</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> un
+échantillon aléatoire indépendant et identiquement distribué selon une
+loi de probabilité continue <span class="math inline">\(F\)</span>.
+Alors, la statistique de Cramér-von Mises <span
+class="math inline">\(\omega^2\)</span> converge en distribution vers
+une loi connue lorsque <span class="math inline">\(n \to
+\infty\)</span>.</p>
+</div>
+<p>La preuve de ce théorème repose sur des résultats de la théorie des
+processus empiriques et des fonctions aléatoires. Elle utilise notamment
+le théorème central limite fonctionnel de Donsker.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Cramér-von Mises, nous suivons les étapes
+suivantes :</p>
+<p>1. **Définition du processus empirique** : <span
+class="math display">\[\mathbb{G}_n(x) = \sqrt{n} (F_n(x) -
+F(x))\]</span> où <span class="math inline">\(F_n(x)\)</span> est la
+fonction de répartition empirique.</p>
+<p>2. **Convergence en distribution** : Le processus empirique <span
+class="math inline">\(\mathbb{G}_n\)</span> converge faiblement vers un
+pont brownien <span class="math inline">\(\mathbb{B}\)</span> sur
+l’espace des fonctions continues.</p>
+<p>3. **Application du théorème central limite fonctionnel** : En
+utilisant le théorème de Donsker, nous obtenons : <span
+class="math display">\[\omega^2 = \int_{-\infty}^{\infty} (F_n(x) -
+F(x))^2 \, dF(x) \xrightarrow{d} \int_{-\infty}^{\infty} \mathbb{B}(x)^2
+\, dF(x)\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les propriétés suivantes découlent du théorème de Cramér-von Mises
+:</p>
+<ol>
+<li><p>**Consistance** : La statistique <span
+class="math inline">\(\omega^2\)</span> est consistante pour détecter
+des écarts entre la distribution empirique et la distribution
+théorique.</p></li>
+<li><p>**Distribution asymptotique** : Sous l’hypothèse nulle, <span
+class="math inline">\(\omega^2\)</span> suit une loi connue
+asymptotiquement.</p></li>
+<li><p>**Robustesse** : La statistique <span
+class="math inline">\(\omega^2\)</span> est robuste aux petites
+déviations de la distribution théorique.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La divergence de Cramér-von Mises est un outil puissant pour les
+tests d’adéquation statistique. Son utilisation permet de mesurer
+précisément la différence entre une distribution empirique et une
+distribution théorique, offrant ainsi une évaluation robuste de
+l’ajustement des modèles probabilistes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

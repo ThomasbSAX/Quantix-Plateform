@@ -1,0 +1,356 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Hausdorff Distance Loss: A Metric for Shape Analysis</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Hausdorff Distance Loss: A Metric for Shape
+Analysis</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des formes est une branche fondamentale de la géométrie
+computationnelle, avec des applications variées allant de la
+reconnaissance d’images à la modélisation 3D. Parmi les nombreuses
+métriques proposées pour évaluer la similitude entre des formes, la
+distance de Hausdorff s’est imposée comme un outil puissant et intuitif.
+Cette métrique, introduite par Felix Hausdorff au début du XXe siècle,
+mesure la dissimilarité entre deux ensembles en considérant le pire des
+cas de leurs distances minimales.</p>
+<p>L’émergence de la distance de Hausdorff répond à un besoin crucial :
+évaluer la similitude entre des formes de manière robuste face aux
+variations topologiques et géométriques. Contrairement à d’autres
+métriques comme la distance de Fréchet ou la distance de Wasserstein, la
+distance de Hausdorff est particulièrement adaptée pour comparer des
+ensembles discrets et continus, ce qui en fait un outil indispensable
+dans de nombreux domaines scientifiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de Hausdorff, commençons par définir ce
+que nous cherchons à mesurer. Imaginons deux ensembles de points dans un
+espace métrique, par exemple des nuages de points représentant des
+formes 3D. Nous voulons mesurer à quel point ces deux ensembles sont
+similaires, en tenant compte du pire des cas de leurs distances
+minimales.</p>
+<p>Formellement, soit <span class="math inline">\((X, d)\)</span> un
+espace métrique et <span class="math inline">\(A, B \subseteq X\)</span>
+deux sous-ensembles non vides de <span class="math inline">\(X\)</span>.
+La distance de Hausdorff entre <span class="math inline">\(A\)</span> et
+<span class="math inline">\(B\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>La distance de Hausdorff entre <span class="math inline">\(A\)</span>
+et <span class="math inline">\(B\)</span>, notée <span
+class="math inline">\(d_H(A, B)\)</span>, est définie par : <span
+class="math display">\[d_H(A, B) = \max \left\{ \sup_{a \in A} \inf_{b
+\in B} d(a, b), \sup_{b \in B} \inf_{a \in A} d(a, b) \right\}\]</span>
+où <span class="math inline">\(\sup\)</span> et <span
+class="math inline">\(\inf\)</span> représentent respectivement le
+supremum et l’infimum des distances entre les points des ensembles <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>.</p>
+</div>
+<p>Cette définition peut être réécrite de manière équivalente en
+utilisant les notions de distance minimale et maximale :</p>
+<p><span class="math display">\[d_H(A, B) = \max \left\{ \sup_{a \in A}
+d(a, B), \sup_{b \in B} d(b, A) \right\}\]</span></p>
+<p>où <span class="math inline">\(d(a, B) = \inf_{b \in B} d(a,
+b)\)</span> et <span class="math inline">\(d(b, A) = \inf_{a \in A} d(a,
+b)\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux liés à la distance de Hausdorff est le
+théorème de stabilité, qui montre que cette métrique est stable sous
+certaines conditions.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((X, d)\)</span> un espace métrique
+complet et soit <span class="math inline">\(A, B \subseteq X\)</span>
+deux sous-ensembles non vides. Si <span class="math inline">\(A\)</span>
+et <span class="math inline">\(B\)</span> sont des ensembles compacts,
+alors la distance de Hausdorff <span class="math inline">\(d_H(A,
+B)\)</span> est finie.</p>
+</div>
+<p>La preuve de ce théorème repose sur le fait que dans un espace
+métrique complet, tout ensemble borné est relativement compact. Ainsi,
+pour des ensembles compacts <span class="math inline">\(A\)</span> et
+<span class="math inline">\(B\)</span>, les distances <span
+class="math inline">\(\sup_{a \in A} d(a, B)\)</span> et <span
+class="math inline">\(\sup_{b \in B} d(b, A)\)</span> sont finies.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de stabilité, nous procédons comme suit
+:</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\((X, d)\)</span> un
+espace métrique complet et <span class="math inline">\(A, B \subseteq
+X\)</span> deux sous-ensembles non vides et compacts. Nous devons
+montrer que <span class="math inline">\(d_H(A, B)\)</span> est
+finie.</p>
+<p>Puisque <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> sont compacts, ils sont bornés. Par
+conséquent, il existe des points <span class="math inline">\(a_0 \in
+A\)</span> et <span class="math inline">\(b_0 \in B\)</span> tels que :
+<span class="math display">\[d(a_0, b_0) = \sup_{a \in A, b \in B} d(a,
+b)\]</span> Soit <span class="math inline">\(M = d(a_0, b_0)\)</span>.
+Nous allons montrer que <span class="math inline">\(\sup_{a \in A} d(a,
+B) \leq M\)</span> et <span class="math inline">\(\sup_{b \in B} d(b, A)
+\leq M\)</span>.</p>
+<p>Considérons un point arbitraire <span class="math inline">\(a \in
+A\)</span>. Puisque <span class="math inline">\(B\)</span> est compact,
+il existe un point <span class="math inline">\(b \in B\)</span> tel que
+: <span class="math display">\[d(a, b) = \inf_{b&#39; \in B} d(a,
+b&#39;)\]</span> Comme <span class="math inline">\(d(a, b) \leq
+M\)</span>, nous avons : <span class="math display">\[\sup_{a \in A}
+d(a, B) = \sup_{a \in A} \inf_{b \in B} d(a, b) \leq M\]</span> De
+manière similaire, pour tout <span class="math inline">\(b \in
+B\)</span>, il existe un point <span class="math inline">\(a \in
+A\)</span> tel que : <span class="math display">\[d(b, a) = \inf_{a&#39;
+\in A} d(b, a&#39;)\]</span> Comme <span class="math inline">\(d(b, a)
+\leq M\)</span>, nous avons : <span class="math display">\[\sup_{b \in
+B} d(b, A) = \sup_{b \in B} \inf_{a \in A} d(b, a) \leq M\]</span> Par
+conséquent, la distance de Hausdorff <span class="math inline">\(d_H(A,
+B)\)</span> est finie. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Hausdorff possède plusieurs propriétés intéressantes
+qui en font un outil puissant pour l’analyse des formes.</p>
+<div class="corollaire">
+<p>Soit <span class="math inline">\((X, d)\)</span> un espace métrique
+et <span class="math inline">\(A, B, C \subseteq X\)</span> trois
+sous-ensembles non vides. Les propriétés suivantes sont satisfaites
+:</p>
+<ol>
+<li><p>Symétrie : <span class="math inline">\(d_H(A, B) = d_H(B,
+A)\)</span></p></li>
+<li><p>Triangle inégalité : <span class="math inline">\(d_H(A, C) \leq
+d_H(A, B) + d_H(B, C)\)</span></p></li>
+<li><p>Identité : <span class="math inline">\(d_H(A, A) =
+0\)</span></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ul>
+<li><p>La symétrie découle directement de la définition de la distance
+de Hausdorff : <span class="math display">\[d_H(A, B) = \max \left\{
+\sup_{a \in A} d(a, B), \sup_{b \in B} d(b, A) \right\} = d_H(B,
+A)\]</span></p></li>
+<li><p>Pour montrer l’inégalité triangulaire, nous utilisons la
+définition de la distance de Hausdorff : <span
+class="math display">\[d_H(A, C) = \max \left\{ \sup_{a \in A} d(a, C),
+\sup_{c \in C} d(c, A) \right\}\]</span> Nous avons : <span
+class="math display">\[\sup_{a \in A} d(a, C) = \sup_{a \in A} \inf_{c
+\in C} d(a, c) \leq \sup_{a \in A} \inf_{b \in B} d(a, b) + \sup_{b \in
+B} \inf_{c \in C} d(b, c) = d_H(A, B) + d_H(B, C)\]</span> De manière
+similaire : <span class="math display">\[\sup_{c \in C} d(c, A) =
+\sup_{c \in C} \inf_{a \in A} d(c, a) \leq \sup_{c \in C} \inf_{b \in B}
+d(c, b) + \sup_{b \in B} \inf_{a \in A} d(b, a) = d_H(C, B) + d_H(B, A)
+= 2d_H(B, C)\]</span> Par conséquent : <span
+class="math display">\[d_H(A, C) \leq d_H(A, B) + d_H(B,
+C)\]</span></p></li>
+<li><p>L’identité est immédiate : <span class="math display">\[d_H(A, A)
+= \max \left\{ \sup_{a \in A} d(a, A), \sup_{a \in A} d(a, A) \right\} =
+0\]</span></p></li>
+</ul>
+<p> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Hausdorff est un outil puissant et intuitif pour
+l’analyse des formes, avec des applications variées dans de nombreux
+domaines scientifiques. Sa capacité à mesurer la similitude entre des
+ensembles discrets et continus en faisant abstraction des détails locaux
+en fait un outil indispensable pour la comparaison de formes. Les
+propriétés et théorèmes associés à cette métrique en font un sujet de
+recherche riche et passionnant, ouvrant la voie à de nombreuses
+applications futures.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

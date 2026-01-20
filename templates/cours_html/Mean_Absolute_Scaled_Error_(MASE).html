@@ -1,0 +1,322 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Mean Absolute Scaled Error (MASE)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Mean Absolute Scaled Error (MASE)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le Mean Absolute Scaled Error (MASE) est une mesure de l’erreur de
+prévision qui a gagné en popularité ces dernières années grâce à sa
+capacité à comparer les erreurs de prévision entre différentes séries
+temporelles et différents modèles. Introduit par Hyndman et Koehler
+(2006), le MASE offre une solution élégante aux problèmes posés par les
+mesures d’erreur traditionnelles, telles que l’Erreur Quadratique
+Moyenne (EQM) ou l’Erreur Absolue Moyenne (EAM), qui ne sont pas
+toujours comparables d’une série à l’autre.</p>
+<p>L’émergence du MASE est motivée par le besoin de standardiser les
+erreurs de prévision, permettant ainsi une comparaison équitable entre
+différents modèles et différentes séries temporelles. En effet, les
+mesures d’erreur traditionnelles sont souvent biaisées par l’échelle et
+la variance des séries temporelles, rendant les comparaisons directes
+inefficaces. Le MASE résout ce problème en mettant à l’échelle les
+erreurs de prévision par rapport à une ligne de base naïve, ce qui
+permet une comparaison plus juste et significative.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre le MASE, il est essentiel de définir d’abord la
+notion de ligne de base naïve. Considérons une série temporelle <span
+class="math inline">\(\{y_t\}\)</span> et un modèle de prévision <span
+class="math inline">\(\{\hat{y}_t\}\)</span>. La ligne de base naïve est
+une méthode simple de prévision où la valeur future est égale à la
+dernière observation disponible. Formellement, pour un horizon de
+prévision <span class="math inline">\(h\)</span>, la ligne de base naïve
+est définie comme :</p>
+<p><span class="math display">\[\hat{y}_{t+h|t} = y_t\]</span></p>
+<p>où <span class="math inline">\(\hat{y}_{t+h|t}\)</span> représente la
+prévision de <span class="math inline">\(y_{t+h}\)</span> à l’instant
+<span class="math inline">\(t\)</span>.</p>
+<p>Le MASE est ensuite défini comme la moyenne des erreurs absolues
+mises à l’échelle par rapport à la ligne de base naïve. Plus
+précisément, pour une série temporelle <span
+class="math inline">\(\{y_t\}_{t=1}^T\)</span> et un modèle de prévision
+<span class="math inline">\(\{\hat{y}_t\}_{t=1}^T\)</span>, le MASE est
+donné par :</p>
+<p><span class="math display">\[\text{MASE} = \frac{\frac{1}{T-h}
+\sum_{t=h+1}^T |y_t - \hat{y}_t|}{\frac{1}{T-1} \sum_{t=2}^T |y_t -
+y_{t-1}|}\]</span></p>
+<p>où <span class="math inline">\(T\)</span> est la longueur de la série
+temporelle et <span class="math inline">\(h\)</span> est l’horizon de
+prévision.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour mieux comprendre les propriétés du MASE, considérons le théorème
+suivant :</p>
+<div class="theorem">
+<p>Le MASE est une mesure d’erreur de prévision mise à l’échelle qui
+permet une comparaison équitable entre différents modèles et différentes
+séries temporelles.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous devons montrer que
+le MASE est indépendant de l’échelle et de la variance des séries
+temporelles. Considérons une série temporelle <span
+class="math inline">\(\{y_t\}\)</span> et un modèle de prévision <span
+class="math inline">\(\{\hat{y}_t\}\)</span>. Le MASE est défini comme
+le rapport entre la moyenne des erreurs absolues du modèle et la moyenne
+des erreurs absolues de la ligne de base naïve.</p>
+<p><span class="math display">\[\text{MASE} =
+\frac{\text{EAM}}{\text{EAM}_{\text{naïve}}}\]</span></p>
+<p>où <span class="math inline">\(\text{EAM}\)</span> est l’Erreur
+Absolue Moyenne du modèle et <span
+class="math inline">\(\text{EAM}_{\text{naïve}}\)</span> est l’Erreur
+Absolue Moyenne de la ligne de base naïve.</p>
+<p>Puisque le MASE est un rapport, il est indépendant de l’échelle et de
+la variance des séries temporelles. En effet, si nous multiplions chaque
+observation <span class="math inline">\(y_t\)</span> par une constante
+<span class="math inline">\(c\)</span>, le MASE reste inchangé :</p>
+<p><span class="math display">\[\text{MASE} = \frac{\frac{1}{T-h}
+\sum_{t=h+1}^T |c y_t - c \hat{y}_t|}{\frac{1}{T-1} \sum_{t=2}^T |c y_t
+- c y_{t-1}|} = \frac{c \cdot \frac{1}{T-h} \sum_{t=h+1}^T |y_t -
+\hat{y}_t|}{c \cdot \frac{1}{T-1} \sum_{t=2}^T |y_t - y_{t-1}|} =
+\text{MASE}\]</span></p>
+<p>Ainsi, le MASE permet une comparaison équitable entre différents
+modèles et différentes séries temporelles. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le MASE possède plusieurs propriétés intéressantes qui en font une
+mesure d’erreur de prévision robuste et fiable. Voici quelques-unes de
+ces propriétés :</p>
+<ol>
+<li><p>Le MASE est toujours positif ou nul. En effet, les erreurs
+absolues sont toujours positives ou nulles, et le rapport de deux
+quantités positives est également positif ou nul.</p>
+<p><span class="math display">\[\text{MASE} = \frac{\frac{1}{T-h}
+\sum_{t=h+1}^T |y_t - \hat{y}_t|}{\frac{1}{T-1} \sum_{t=2}^T |y_t -
+y_{t-1}|} \geq 0\]</span></p></li>
+<li><p>Le MASE est égal à 1 lorsque le modèle de prévision est aussi bon
+que la ligne de base naïve. Cela signifie que si le MASE est inférieur à
+1, le modèle de prévision est meilleur que la ligne de base naïve, et
+s’il est supérieur à 1, le modèle est moins bon.</p>
+<p><span class="math display">\[\text{MASE} = 1 \iff \frac{1}{T-h}
+\sum_{t=h+1}^T |y_t - \hat{y}_t| = \frac{1}{T-1} \sum_{t=2}^T |y_t -
+y_{t-1}|\]</span></p></li>
+<li><p>Le MASE est invariant sous les transformations linéaires de la
+série temporelle. Cela signifie que si nous multiplions chaque
+observation <span class="math inline">\(y_t\)</span> par une constante
+<span class="math inline">\(c\)</span> ou si nous ajoutons une constante
+<span class="math inline">\(d\)</span>, le MASE reste inchangé.</p>
+<p><span class="math display">\[\text{MASE} = \frac{\frac{1}{T-h}
+\sum_{t=h+1}^T |c y_t + d - (c \hat{y}_t + d)|}{\frac{1}{T-1}
+\sum_{t=2}^T |c y_t + d - (c y_{t-1} + d)|} = \frac{c \cdot
+\frac{1}{T-h} \sum_{t=h+1}^T |y_t - \hat{y}_t|}{c \cdot \frac{1}{T-1}
+\sum_{t=2}^T |y_t - y_{t-1}|} = \text{MASE}\]</span></p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Mean Absolute Scaled Error (MASE) est une mesure d’erreur de
+prévision puissante et flexible qui permet une comparaison équitable
+entre différents modèles et différentes séries temporelles. En mettant à
+l’échelle les erreurs de prévision par rapport à une ligne de base
+naïve, le MASE offre une solution élégante aux problèmes posés par les
+mesures d’erreur traditionnelles. Ses propriétés intéressantes, telles
+que son invariance sous les transformations linéaires et sa capacité à
+comparer des modèles sur différentes échelles, en font un outil précieux
+pour les praticiens et les chercheurs dans le domaine de la
+prévision.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

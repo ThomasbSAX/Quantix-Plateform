@@ -1,0 +1,344 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>The Jaccard Distance: A Measure of Set Similarity</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The Jaccard Distance: A Measure of Set Similarity</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-and-motivations">Introduction
+and Motivations</h1>
+<p>The Jaccard Distance, a fundamental concept in the realm of set
+theory and data analysis, emerges from the need to quantify the
+dissimilarity between finite sample sets. Originating from the work of
+Paul Jaccard in 1901, this metric has found its way into various fields
+such as ecology, information retrieval, and machine learning. The
+Jaccard Distance is indispensable in scenarios where the similarity or
+dissimilarity between sets needs to be measured, providing a robust and
+intuitive measure that is both computationally efficient and
+theoretically sound.</p>
+<h1 class="unnumbered" id="definitions">Definitions</h1>
+<p>To understand the Jaccard Distance, let us first consider what we aim
+to achieve. Suppose we have two sets, <span
+class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span>, and we want to measure how different
+they are. Intuitively, the more elements they share, the more similar
+they are. Conversely, the fewer elements they share, the more dissimilar
+they are.</p>
+<p>Formally, the Jaccard Distance between two sets <span
+class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span> is defined as:</p>
+<p><span class="math display">\[J(A, B) = 1 - J_{\text{similarity}}(A,
+B)\]</span></p>
+<p>where <span class="math inline">\(J_{\text{similarity}}(A,
+B)\)</span> is the Jaccard Similarity coefficient. The Jaccard
+Similarity coefficient is defined as:</p>
+<p><span class="math display">\[J_{\text{similarity}}(A, B) = \frac{|A
+\cap B|}{|A \cup B|}\]</span></p>
+<p>Here, <span class="math inline">\(|A \cap B|\)</span> denotes the
+number of elements common to both sets <span
+class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span>, and <span class="math inline">\(|A
+\cup B|\)</span> denotes the total number of unique elements in either
+set.</p>
+<p>Alternatively, the Jaccard Distance can be expressed directly as:</p>
+<p><span class="math display">\[J(A, B) = \frac{|A \cup B| - |A \cap
+B|}{|A \cup B|}\]</span></p>
+<p>This formulation highlights the ratio of the number of elements not
+shared by both sets to the total number of unique elements.</p>
+<h1 class="unnumbered" id="theorems">Theorems</h1>
+<p>One of the key theorems related to the Jaccard Distance is its metric
+properties. Specifically, the Jaccard Distance satisfies the following
+conditions for any sets <span class="math inline">\(A\)</span>, <span
+class="math inline">\(B\)</span>, and <span
+class="math inline">\(C\)</span>:</p>
+<div class="theorem">
+<p>The Jaccard Distance <span class="math inline">\(J\)</span> satisfies
+the following properties:</p>
+<ol>
+<li><p>Non-negativity: <span class="math inline">\(J(A, B) \geq
+0\)</span></p></li>
+<li><p>Identity of indiscernibles: <span class="math inline">\(J(A, B) =
+0\)</span> if and only if <span class="math inline">\(A =
+B\)</span></p></li>
+<li><p>Symmetry: <span class="math inline">\(J(A, B) = J(B,
+A)\)</span></p></li>
+<li><p>Triangle inequality: <span class="math inline">\(J(A, C) \leq
+J(A, B) + J(B, C)\)</span></p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="proofs">Proofs</h1>
+<p>Let us now prove the metric properties of the Jaccard Distance.</p>
+<div class="proof">
+<p><em>Proof of Non-negativity.</em> Since <span
+class="math inline">\(|A \cap B| \leq |A \cup B|\)</span>, it follows
+that <span class="math inline">\(J(A, B) = 1 - \frac{|A \cap B|}{|A \cup
+B|} \geq 0\)</span>. ◻</p>
+</div>
+<div class="proof">
+<p><em>Proof of Identity of Indiscernibles.</em> If <span
+class="math inline">\(A = B\)</span>, then <span
+class="math inline">\(|A \cap B| = |A \cup B|\)</span>, and thus <span
+class="math inline">\(J(A, B) = 0\)</span>. Conversely, if <span
+class="math inline">\(J(A, B) = 0\)</span>, then <span
+class="math inline">\(|A \cap B| = |A \cup B|\)</span>, which implies
+<span class="math inline">\(A = B\)</span>. ◻</p>
+</div>
+<div class="proof">
+<p><em>Proof of Symmetry.</em> The Jaccard Distance is symmetric by
+definition, as <span class="math inline">\(|A \cap B| = |B \cap
+A|\)</span> and <span class="math inline">\(|A \cup B| = |B \cup
+A|\)</span>. ◻</p>
+</div>
+<div class="proof">
+<p><em>Proof of Triangle Inequality.</em> To prove the triangle
+inequality, we need to show that <span class="math inline">\(J(A, C)
+\leq J(A, B) + J(B, C)\)</span>. This can be done by leveraging the
+properties of set operations and inequalities. However, a detailed proof
+is beyond the scope of this article. ◻</p>
+</div>
+<h1 class="unnumbered" id="properties-and-corollaries">Properties and
+Corollaries</h1>
+<p>The Jaccard Distance has several important properties and corollaries
+that further elucidate its behavior and applications.</p>
+<ol>
+<li><p>The Jaccard Distance is bounded between 0 and 1, inclusive. This
+means <span class="math inline">\(0 \leq J(A, B) \leq 1\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> The lower bound is proven by the non-negativity
+property. The upper bound follows from the fact that <span
+class="math inline">\(|A \cap B| \leq |A \cup B|\)</span>, which implies
+<span class="math inline">\(J(A, B) \leq 1\)</span>. ◻</p>
+</div></li>
+<li><p>The Jaccard Distance is invariant under the addition or removal
+of elements that are not in either set. That is, if <span
+class="math inline">\(D\)</span> is a set disjoint from both <span
+class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span>, then <span class="math inline">\(J(A,
+B) = J(A \cup D, B \cup D)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Since <span class="math inline">\(D\)</span> is
+disjoint from both <span class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span>, we have <span
+class="math inline">\(|(A \cup D) \cap (B \cup D)| = |A \cap B|\)</span>
+and <span class="math inline">\(|(A \cup D) \cup (B \cup D)| = |A \cup
+B| + |D|\)</span>. However, the Jaccard Distance simplifies to <span
+class="math inline">\(J(A, B)\)</span> because the additional elements
+in <span class="math inline">\(D\)</span> do not affect the intersection
+or union of <span class="math inline">\(A\)</span> and <span
+class="math inline">\(B\)</span>. ◻</p>
+</div></li>
+<li><p>The Jaccard Distance can be used to define a dissimilarity
+measure between probability distributions. Specifically, for two
+probability distributions <span class="math inline">\(P\)</span> and
+<span class="math inline">\(Q\)</span>, the Jaccard Distance can be
+defined as:</p>
+<p><span class="math display">\[J(P, Q) = 1 - \sum_{x} \min(P(x),
+Q(x))\]</span></p>
+<p>This measure is particularly useful in the context of comparing
+discrete probability distributions.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>The Jaccard Distance is a powerful and versatile metric for measuring
+the dissimilarity between sets. Its intuitive definition, combined with
+its robust mathematical properties, makes it an essential tool in
+various fields ranging from ecology to machine learning. By
+understanding and applying the Jaccard Distance, researchers and
+practitioners can gain valuable insights into the relationships between
+different sets of data.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

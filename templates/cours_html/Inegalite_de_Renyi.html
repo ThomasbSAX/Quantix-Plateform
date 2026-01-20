@@ -1,0 +1,464 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’inégalité de Rényi : Un outil fondamental en théorie de l’information</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’inégalité de Rényi : Un outil fondamental en théorie
+de l’information</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’inégalité de Rényi émerge comme une pierre angulaire dans le
+domaine de la théorie de l’information, offrant des insights profonds
+sur les limites fondamentales des systèmes de communication. Introduite
+par le mathématicien hongrois Alfréd Rényi en 1961, cette inégalité
+généralise les concepts classiques d’entropie et de divergence de
+Kullback-Leibler, permettant ainsi une analyse plus fine des
+incertitudes et des informations dans les systèmes stochastiques.</p>
+<p>L’importance de cette inégalité réside dans sa capacité à fournir des
+bornes strictes sur les performances des codes de canal et des systèmes
+de compression, rendant ainsi indispensable son étude dans le cadre de
+la conception et de l’optimisation des systèmes de communication
+modernes. En outre, elle joue un rôle crucial dans la compréhension des
+limites fondamentales de la cryptographie et de l’apprentissage
+automatique, où la gestion de l’information est primordiale.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour aborder l’inégalité de Rényi, il est essentiel de comprendre les
+concepts d’entropie et de divergence de Kullback-Leibler, qui sont au
+cœur de cette théorie.</p>
+<h2 class="unnumbered" id="entropie-de-rényi">Entropie de Rényi</h2>
+<p>L’entropie de Rényi généralise l’entropie de Shannon en introduisant
+un paramètre <span class="math inline">\(\alpha\)</span> qui permet de
+pondérer l’importance des événements rares par rapport aux événements
+fréquents. Pour une variable aléatoire discrète <span
+class="math inline">\(X\)</span> prenant ses valeurs dans un ensemble
+<span class="math inline">\(\mathcal{X}\)</span> avec une distribution
+de probabilité <span class="math inline">\(P_X\)</span>, l’entropie de
+Rényi d’ordre <span class="math inline">\(\alpha\)</span> est définie
+comme suit :</p>
+<p>Nous cherchons à mesurer l’incertitude d’une variable aléatoire en
+tenant compte de la rareté des événements. Plus précisément, nous
+voulons une mesure qui, pour <span class="math inline">\(\alpha &gt;
+1\)</span>, donne plus de poids aux événements fréquents, et pour <span
+class="math inline">\(0 &lt; \alpha &lt; 1\)</span>, donne plus de poids
+aux événements rares.</p>
+<p>Formellement, l’entropie de Rényi d’ordre <span
+class="math inline">\(\alpha\)</span> est donnée par :</p>
+<p><span class="math display">\[H_{\alpha}(X) =
+\begin{cases}
+\frac{1}{1 - \alpha} \log \left( \sum_{x \in \mathcal{X}}
+P_X(x)^{\alpha} \right) &amp; \text{si } \alpha \neq 1, \\
+-\sum_{x \in \mathcal{X}} P_X(x) \log P_X(x) &amp; \text{si } \alpha =
+1.
+\end{cases}\]</span></p>
+<h2 class="unnumbered" id="divergence-de-rényi">Divergence de Rényi</h2>
+<p>La divergence de Rényi généralise la divergence de Kullback-Leibler
+en introduisant également un paramètre <span
+class="math inline">\(\alpha\)</span>. Pour deux distributions de
+probabilité <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> définies sur un ensemble <span
+class="math inline">\(\mathcal{X}\)</span>, la divergence de Rényi
+d’ordre <span class="math inline">\(\alpha\)</span> est définie comme
+suit :</p>
+<p>Nous cherchons à mesurer la distance entre deux distributions de
+probabilité, en tenant compte de la rareté des événements. Plus
+précisément, nous voulons une mesure qui, pour <span
+class="math inline">\(\alpha &gt; 1\)</span>, donne plus de poids aux
+différences dans les événements fréquents, et pour <span
+class="math inline">\(0 &lt; \alpha &lt; 1\)</span>, donne plus de poids
+aux différences dans les événements rares.</p>
+<p>Formellement, la divergence de Rényi d’ordre <span
+class="math inline">\(\alpha\)</span> est donnée par :</p>
+<p><span class="math display">\[D_{\alpha}(P \| Q) =
+\begin{cases}
+\frac{1}{\alpha - 1} \log \left( \sum_{x \in \mathcal{X}} P(x)^{\alpha}
+Q(x)^{1 - \alpha} \right) &amp; \text{si } \alpha \neq 1, \\
+\sum_{x \in \mathcal{X}} P(x) \log \frac{P(x)}{Q(x)} &amp; \text{si }
+\alpha = 1.
+\end{cases}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="inégalité-de-rényi">Inégalité de Rényi</h2>
+<p>L’inégalité de Rényi établit une relation fondamentale entre
+l’entropie de Rényi et la divergence de Rényi. Cette inégalité est
+cruciale pour comprendre les limites des systèmes de communication et de
+compression.</p>
+<p>Nous cherchons à établir une borne supérieure sur l’entropie de Rényi
+en fonction de la divergence de Rényi. Plus précisément, nous voulons
+montrer que l’entropie de Rényi est majorée par une fonction de la
+divergence de Rényi.</p>
+<p>Formellement, l’inégalité de Rényi s’énonce comme suit :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité
+définies sur un ensemble <span
+class="math inline">\(\mathcal{X}\)</span>, et soit <span
+class="math inline">\(\alpha &gt; 1\)</span>. Alors, l’entropie de Rényi
+d’ordre <span class="math inline">\(\alpha\)</span> de <span
+class="math inline">\(P\)</span> est majorée par la divergence de Rényi
+d’ordre <span class="math inline">\(\alpha\)</span> de <span
+class="math inline">\(P\)</span> par rapport à <span
+class="math inline">\(Q\)</span>, multipliée par un facteur dépendant de
+<span class="math inline">\(\alpha\)</span>.</p>
+<p><span class="math display">\[H_{\alpha}(P) \leq D_{\alpha}(P \| Q) +
+H_{\alpha}(Q)\]</span></p>
+<p>De manière équivalente, on peut écrire :</p>
+<p><span class="math display">\[\sum_{x \in \mathcal{X}} P(x)^{\alpha}
+\leq \left( \sum_{x \in \mathcal{X}} Q(x)^{1 - \alpha} \right)^{\alpha -
+1} \sum_{x \in \mathcal{X}} P(x)^{\alpha} Q(x)^{1 - \alpha}\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered" id="preuve-de-linégalité-de-rényi">Preuve de
+l’inégalité de Rényi</h2>
+<p>Pour prouver l’inégalité de Rényi, nous allons utiliser les
+propriétés des fonctions convexes et les inégalités de Hölder.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la fonction <span
+class="math inline">\(f(x) = x^{\alpha}\)</span> pour <span
+class="math inline">\(\alpha &gt; 1\)</span>. Cette fonction est
+convexe, et par conséquent, nous pouvons appliquer l’inégalité de
+Jensen. L’inégalité de Jensen stipule que pour une fonction convexe
+<span class="math inline">\(f\)</span>, nous avons :</p>
+<p><span class="math display">\[f\left( \sum_{i=1}^{n} \lambda_i x_i
+\right) \leq \sum_{i=1}^{n} \lambda_i f(x_i)\]</span></p>
+<p>où <span class="math inline">\(\lambda_i \geq 0\)</span> et <span
+class="math inline">\(\sum_{i=1}^{n} \lambda_i = 1\)</span>.</p>
+<p>En appliquant cette inégalité à notre fonction <span
+class="math inline">\(f\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\left( \sum_{x \in \mathcal{X}} P(x)
+Q(x)^{\frac{1 - \alpha}{\alpha}} \right)^{\alpha} \leq \sum_{x \in
+\mathcal{X}} P(x)^{\alpha} Q(x)^{1 - \alpha}\]</span></p>
+<p>En prenant le logarithme des deux côtés et en utilisant les
+propriétés des logarithmes, nous obtenons :</p>
+<p><span class="math display">\[\alpha \log \left( \sum_{x \in
+\mathcal{X}} P(x) Q(x)^{\frac{1 - \alpha}{\alpha}} \right) \leq \log
+\left( \sum_{x \in \mathcal{X}} P(x)^{\alpha} Q(x)^{1 - \alpha}
+\right)\]</span></p>
+<p>En divisant par <span class="math inline">\(\alpha - 1\)</span> et en
+réarrangeant les termes, nous obtenons l’inégalité de Rényi :</p>
+<p><span class="math display">\[H_{\alpha}(P) \leq D_{\alpha}(P \| Q) +
+H_{\alpha}(Q)\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriétés-de-lentropie-de-rényi">Propriétés
+de l’entropie de Rényi</h2>
+<ol>
+<li><p><strong>Monotonicité</strong> : Pour une distribution de
+probabilité fixe <span class="math inline">\(P\)</span>, l’entropie de
+Rényi <span class="math inline">\(H_{\alpha}(P)\)</span> est une
+fonction décroissante de <span class="math inline">\(\alpha\)</span>
+pour <span class="math inline">\(\alpha \in (0, 1]\)</span> et
+croissante pour <span class="math inline">\(\alpha \geq 1\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux ordres <span
+class="math inline">\(\alpha_1\)</span> et <span
+class="math inline">\(\alpha_2\)</span> tels que <span
+class="math inline">\(0 &lt; \alpha_1 &lt; \alpha_2 \leq 1\)</span>.
+Nous voulons montrer que <span class="math inline">\(H_{\alpha_1}(P)
+\geq H_{\alpha_2}(P)\)</span>.</p>
+<p>En utilisant la définition de l’entropie de Rényi, nous avons :</p>
+<p><span class="math display">\[H_{\alpha_1}(P) = \frac{1}{1 - \alpha_1}
+\log \left( \sum_{x \in \mathcal{X}} P(x)^{\alpha_1}
+\right)\]</span></p>
+<p><span class="math display">\[H_{\alpha_2}(P) = \frac{1}{1 - \alpha_2}
+\log \left( \sum_{x \in \mathcal{X}} P(x)^{\alpha_2}
+\right)\]</span></p>
+<p>En utilisant l’inégalité de Hölder, nous pouvons montrer que :</p>
+<p><span class="math display">\[\sum_{x \in \mathcal{X}} P(x)^{\alpha_1}
+\geq \left( \sum_{x \in \mathcal{X}} P(x)^{\alpha_2}
+\right)^{\frac{\alpha_1}{\alpha_2}}\]</span></p>
+<p>En prenant le logarithme des deux côtés et en réarrangeant les
+termes, nous obtenons :</p>
+<p><span class="math display">\[H_{\alpha_1}(P) \geq
+H_{\alpha_2}(P)\]</span> ◻</p>
+</div></li>
+<li><p><strong>Limite</strong> : Lorsque <span
+class="math inline">\(\alpha\)</span> tend vers 1, l’entropie de Rényi
+<span class="math inline">\(H_{\alpha}(P)\)</span> converge vers
+l’entropie de Shannon <span class="math inline">\(H(P)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> En utilisant la définition de l’entropie de Rényi et
+en prenant la limite lorsque <span class="math inline">\(\alpha\)</span>
+tend vers 1, nous avons :</p>
+<p><span class="math display">\[\lim_{\alpha \to 1} H_{\alpha}(P) =
+-\sum_{x \in \mathcal{X}} P(x) \log P(x) = H(P)\]</span> ◻</p>
+</div></li>
+<li><p><strong>Inégalité de Fano</strong> : Pour une distribution de
+probabilité <span class="math inline">\(P\)</span> et un ensemble <span
+class="math inline">\(\mathcal{A} \subseteq \mathcal{X}\)</span>, nous
+avons :</p>
+<p><span class="math display">\[H_{\alpha}(P) \leq -\log P(\mathcal{A})
++ H_{\alpha}(P_{\mathcal{A}})\]</span></p>
+<p>où <span class="math inline">\(P_{\mathcal{A}}\)</span> est la
+distribution conditionnelle de <span class="math inline">\(P\)</span>
+restreinte à <span class="math inline">\(\mathcal{A}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> En utilisant la définition de l’entropie de Rényi et
+les propriétés des logarithmes, nous avons :</p>
+<p><span class="math display">\[H_{\alpha}(P) = \frac{1}{1 - \alpha}
+\log \left( \sum_{x \in \mathcal{X}} P(x)^{\alpha} \right) = \frac{1}{1
+- \alpha} \log \left( P(\mathcal{A})^{\alpha} + \sum_{x \in
+\mathcal{A}^c} P(x)^{\alpha} \right)\]</span></p>
+<p>En utilisant l’inégalité <span
+class="math inline">\(P(\mathcal{A})^{\alpha} \leq
+P(\mathcal{A})\)</span> et en réarrangeant les termes, nous obtenons
+:</p>
+<p><span class="math display">\[H_{\alpha}(P) \leq -\log P(\mathcal{A})
++ \frac{1}{1 - \alpha} \log \left( \sum_{x \in \mathcal{A}}
+P(x)^{\alpha} / P(\mathcal{A})^{\alpha} \right) = -\log P(\mathcal{A}) +
+H_{\alpha}(P_{\mathcal{A}})\]</span> ◻</p>
+</div></li>
+</ol>
+<h2 class="unnumbered"
+id="corollaires-de-linégalité-de-rényi">Corollaires de l’inégalité de
+Rényi</h2>
+<ol>
+<li><p><strong>Inégalité de Gibbs</strong> : Pour une distribution de
+probabilité <span class="math inline">\(P\)</span> et un ensemble <span
+class="math inline">\(\mathcal{A} \subseteq \mathcal{X}\)</span>, nous
+avons :</p>
+<p><span class="math display">\[P(\mathcal{A}) \leq e^{-H(P) +
+H(P_{\mathcal{A}})}\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> En utilisant l’inégalité de Fano et en prenant <span
+class="math inline">\(\alpha = 1\)</span>, nous avons :</p>
+<p><span class="math display">\[H(P) \leq -\log P(\mathcal{A}) +
+H(P_{\mathcal{A}})\]</span></p>
+<p>En réarrangeant les termes et en utilisant les propriétés des
+exponentielles, nous obtenons :</p>
+<p><span class="math display">\[P(\mathcal{A}) \leq e^{-H(P) +
+H(P_{\mathcal{A}})}\]</span> ◻</p>
+</div></li>
+<li><p><strong>Inégalité de Pinsker</strong> : Pour deux distributions
+de probabilité <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> définies sur un ensemble <span
+class="math inline">\(\mathcal{X}\)</span>, nous avons :</p>
+<p><span class="math display">\[D(P \| Q) \geq \frac{1}{2} \|P -
+Q\|_1^2\]</span></p>
+<p>où <span class="math inline">\(D(P \| Q)\)</span> est la divergence
+de Kullback-Leibler et <span class="math inline">\(\|P - Q\|_1\)</span>
+est la distance totale variationnelle.</p>
+<div class="proof">
+<p><em>Proof.</em> En utilisant l’inégalité de Rényi avec <span
+class="math inline">\(\alpha = 2\)</span> et en prenant la limite
+lorsque <span class="math inline">\(\alpha\)</span> tend vers 1, nous
+avons :</p>
+<p><span class="math display">\[D(P \| Q) \geq \frac{1}{2} \log \left( 2
+\sum_{x \in \mathcal{X}} P(x)^2 / Q(x) - 1 \right)\]</span></p>
+<p>En utilisant l’inégalité <span class="math inline">\((a + b)^2 \leq
+2(a^2 + b^2)\)</span>, nous pouvons montrer que :</p>
+<p><span class="math display">\[\sum_{x \in \mathcal{X}} P(x)^2 / Q(x)
+\geq \frac{1}{4} \|P - Q\|_1^2 + 1\]</span></p>
+<p>En substituant cette inégalité dans l’inégalité précédente et en
+utilisant les propriétés des logarithmes, nous obtenons :</p>
+<p><span class="math display">\[D(P \| Q) \geq \frac{1}{2} \|P -
+Q\|_1^2\]</span> ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’inégalité de Rényi est un outil fondamental en théorie de
+l’information, offrant des insights profonds sur les limites
+fondamentales des systèmes de communication et de compression. En
+généralisant les concepts classiques d’entropie et de divergence, elle
+permet une analyse plus fine des incertitudes et des informations dans
+les systèmes stochastiques. Les propriétés et corollaires de cette
+inégalité sont cruciaux pour la conception et l’optimisation des
+systèmes modernes, ainsi que pour la compréhension des limites
+fondamentales de la cryptographie et de l’apprentissage automatique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

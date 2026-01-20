@@ -1,0 +1,304 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Équation Logistique : Modélisation des Croissances Limitées</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Équation Logistique : Modélisation des Croissances
+Limitées</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’équation logistique émerge comme une réponse élégante aux limites
+des modèles exponentiels de croissance. Alors que ces derniers supposent
+une expansion infinie, la réalité biologique et écologique impose des
+contraintes. L’équation logistique, introduite par Pierre-François
+Verhulst en 1838, intègre une capacité de charge, reflétant les limites
+des ressources disponibles.</p>
+<p>Cette équation est fondamentale en écologie pour modéliser la
+dynamique des populations, mais elle transcende ce domaine. En économie,
+elle permet d’étudier la saturation des marchés ; en épidémiologie, elle
+modélise la propagation de maladies. Son universalité réside dans sa
+capacité à capturer l’essence des systèmes soumis à une croissance
+limitée.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Nous cherchons à modéliser la croissance d’une population <span
+class="math inline">\(P(t)\)</span> au cours du temps <span
+class="math inline">\(t\)</span>, où cette croissance est limitée par
+une capacité de charge <span class="math inline">\(K\)</span>.
+Intuitivement, lorsque la population est petite, elle croît rapidement ;
+à mesure qu’elle approche de <span class="math inline">\(K\)</span>, la
+croissance ralentit jusqu’à s’annuler.</p>
+<p>Formellement, l’équation logistique s’écrit :</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{dP}{dt} = r P \left(1 - \frac{P}{K}\right)
+\end{equation}\]</span></p>
+<p>où : - <span class="math inline">\(r\)</span> est le taux de
+croissance intrinsèque, - <span class="math inline">\(K\)</span> est la
+capacité de charge.</p>
+<p>Cette équation peut également s’exprimer sous une forme normalisée
+:</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{dp}{dt} = r p (1 - p)
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(p = \frac{P}{K}\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Nous cherchons à démontrer que la solution de l’équation logistique
+converge vers la capacité de charge <span
+class="math inline">\(K\)</span> pour des conditions initiales <span
+class="math inline">\(P(0) &gt; 0\)</span>.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(P(t)\)</span> la solution de
+l’équation différentielle <span class="math display">\[\frac{dP}{dt} = r
+P \left(1 - \frac{P}{K}\right), \quad P(0) = P_0 &gt; 0.\]</span> Alors,
+<span class="math inline">\(\lim_{t \to +\infty} P(t) = K\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer ce théorème, nous procédons par résolution de
+l’équation différentielle. Tout d’abord, séparons les variables :</p>
+<p><span class="math display">\[\int \frac{dP}{P(1 - P/K)} = \int r \,
+dt.\]</span></p>
+<p>En décomposant la fraction, nous obtenons :</p>
+<p><span class="math display">\[\int \left( \frac{1}{P} + \frac{1/K}{1 -
+P/K} \right) dP = rt + C.\]</span></p>
+<p>Après intégration, nous avons :</p>
+<p><span class="math display">\[\ln|P| - \ln|1 - P/K| = rt +
+C.\]</span></p>
+<p>En exponentiant, nous trouvons :</p>
+<p><span class="math display">\[\frac{P}{1 - P/K} =
+Ce^{rt}.\]</span></p>
+<p>En résolvant pour <span class="math inline">\(P\)</span>, nous
+obtenons la solution générale :</p>
+<p><span class="math display">\[P(t) = \frac{K}{1 + A
+e^{-rt}},\]</span></p>
+<p>où <span class="math inline">\(A\)</span> est une constante
+déterminée par les conditions initiales.</p>
+<p>Pour montrer la convergence vers <span
+class="math inline">\(K\)</span>, observons que lorsque <span
+class="math inline">\(t \to +\infty\)</span>, le terme exponentiel <span
+class="math inline">\(e^{-rt}\)</span> tend vers 0. Ainsi,</p>
+<p><span class="math display">\[\lim_{t \to +\infty} P(t) =
+K.\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<ol>
+<li><p><strong>Point d’équilibre</strong> : Les points <span
+class="math inline">\(P = 0\)</span> et <span class="math inline">\(P =
+K\)</span> sont des points d’équilibre de l’équation logistique. En
+effet, pour ces valeurs, <span class="math inline">\(\frac{dP}{dt} =
+0\)</span>.</p></li>
+<li><p><strong>Stabilité des points d’équilibre</strong> : Le point
+<span class="math inline">\(P = K\)</span> est stable, tandis que <span
+class="math inline">\(P = 0\)</span> est instable. Cela signifie que de
+petites perturbations autour de <span class="math inline">\(K\)</span>
+seront atténuées, tandis que celles autour de 0 seront
+amplifiées.</p></li>
+<li><p><strong>Temps de doublement</strong> : Le temps nécessaire pour
+que la population double, en partant d’une petite valeur initiale <span
+class="math inline">\(P_0\)</span>, est donné par : <span
+class="math display">\[t_d = \frac{\ln(2r - 1)}{r}.\]</span></p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’équation logistique offre une modélisation puissante et élégante
+des systèmes soumis à une croissance limitée. Son universalité en fait
+un outil indispensable en sciences naturelles, sociales et économiques.
+Les propriétés mathématiques de cette équation, telles que la
+convergence vers un point d’équilibre stable, fournissent des insights
+précieux pour comprendre les dynamiques complexes des populations et des
+systèmes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

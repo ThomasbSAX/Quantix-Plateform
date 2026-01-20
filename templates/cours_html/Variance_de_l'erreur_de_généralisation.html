@@ -1,0 +1,344 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance de l’erreur de généralisation : Fondements théoriques et implications pratiques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance de l’erreur de généralisation : Fondements
+théoriques et implications pratiques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’apprentissage statistique, pilier de l’intelligence artificielle
+moderne, repose sur la capacité à généraliser des modèles entraînés sur
+des données échantillonnées. La variance de l’erreur de généralisation
+émerge comme une mesure cruciale pour quantifier la stabilité et la
+fiabilité des prédictions d’un modèle. Cette notion, centrale en théorie
+de l’apprentissage statistique, trouve ses racines dans les travaux
+pionniers de Vapnik et Chervonenkis sur la théorie de la complexité de
+VC. Elle répond à une question fondamentale : comment évaluer la
+sensibilité d’un modèle aux fluctuations des données d’entraînement
+?</p>
+<p>Dans un contexte où les datasets deviennent de plus en plus
+volumineux et complexes, comprendre et maîtriser cette variance permet
+d’optimiser les performances des algorithmes tout en minimisant le
+risque de surapprentissage. Cette mesure devient indispensable pour
+comparer rigoureusement différentes architectures de modèles et choisir
+celui qui offre le meilleur compromis entre précision et robustesse.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour aborder la variance de l’erreur de généralisation, commençons
+par définir les concepts fondamentaux. Imaginons un modèle <span
+class="math inline">\(h\)</span> entraîné sur un échantillon de données
+<span class="math inline">\(S\)</span>. L’erreur empirique <span
+class="math inline">\(\hat{\epsilon}(h, S)\)</span> mesure la
+performance du modèle sur cet échantillon. Cependant, cette erreur peut
+varier significativement si l’échantillon change légèrement.</p>
+<p>Nous cherchons à capturer cette variabilité. Intuitivement, si le
+modèle est très sensible aux variations des données d’entraînement, sa
+performance sur de nouvelles données sera moins fiable. La variance de
+l’erreur de généralisation quantifie précisément cette sensibilité.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{D}\)</span>
+une distribution de probabilité sur un espace de données <span
+class="math inline">\(\mathcal{X} \times \mathcal{Y}\)</span>, et soit
+<span class="math inline">\(S\)</span> un échantillon aléatoire de
+taille <span class="math inline">\(n\)</span> tiré selon <span
+class="math inline">\(\mathcal{D}\)</span>. Pour un modèle <span
+class="math inline">\(h\)</span>, l’erreur de généralisation est définie
+comme :</p>
+<p><span class="math display">\[\epsilon(h) = \mathbb{E}_{(x,y) \sim
+\mathcal{D}} [\ell(h(x), y)]\]</span></p>
+<p>où <span class="math inline">\(\ell\)</span> est une fonction de
+perte. L’erreur empirique sur l’échantillon <span
+class="math inline">\(S\)</span> est :</p>
+<p><span class="math display">\[\hat{\epsilon}(h, S) = \frac{1}{|S|}
+\sum_{(x,y) \in S} \ell(h(x), y)\]</span></p>
+<p>La variance de l’erreur de généralisation est alors définie comme
+:</p>
+<p><span class="math display">\[\text{Var}(\hat{\epsilon}(h, S)) =
+\mathbb{E}_{S} \left[ \left( \hat{\epsilon}(h, S) - \mathbb{E}_{S&#39;}
+[\hat{\epsilon}(h, S&#39;)] \right)^2 \right]\]</span></p>
+<p>Cette expression capture la dispersion des erreurs empiriques autour
+de leur espérance, reflétant ainsi la sensibilité du modèle aux
+variations des données d’entraînement.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour analyser la variance de l’erreur de généralisation, plusieurs
+théorèmes fondamentaux offrent des bornes et des propriétés
+essentielles. Considérons d’abord le théorème de la loi des grands
+nombres, qui garantit que l’erreur empirique converge vers l’erreur de
+généralisation lorsque la taille de l’échantillon tend vers
+l’infini.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(h\)</span> un modèle fixe et <span
+class="math inline">\(S_n\)</span> un échantillon de taille <span
+class="math inline">\(n\)</span>. Alors,</p>
+<p><span class="math display">\[\lim_{n \to \infty} \mathbb{P} \left(
+\left| \hat{\epsilon}(h, S_n) - \epsilon(h) \right| &gt; \delta \right)
+= 0\]</span></p>
+<p>pour tout <span class="math inline">\(\delta &gt; 0\)</span>.</p>
+</div>
+<p>Ce théorème assure que l’erreur empirique est un bon estimateur de
+l’erreur de généralisation pour des échantillons suffisamment grands.
+Cependant, il ne fournit pas d’information sur la vitesse de convergence
+ni sur la variance de cette erreur.</p>
+<p>Un résultat plus précis est donné par le théorème de Hoeffding, qui
+fournit une borne exponentielle sur la déviation de l’erreur empirique
+par rapport à son espérance.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\ell(h(x), y) \in [0, 1]\)</span>
+pour tout <span class="math inline">\((x,y)\)</span>. Alors,</p>
+<p><span class="math display">\[\mathbb{P} \left( \left|
+\hat{\epsilon}(h, S) - \epsilon(h) \right| &gt; t \right) \leq 2 e^{-2 n
+t^2}\]</span></p>
+<p>pour tout <span class="math inline">\(t &gt; 0\)</span>.</p>
+</div>
+<p>Ce théorème implique que la variance de l’erreur empirique est bornée
+par <span class="math inline">\(\frac{1}{4n}\)</span>, ce qui montre que
+la variance diminue lorsque la taille de l’échantillon augmente.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Hoeffding, nous utilisons des
+techniques classiques de la théorie des probabilités. Considérons les
+variables aléatoires <span class="math inline">\(Z_i = \ell(h(x_i), y_i)
+- \epsilon(h)\)</span>, où <span class="math inline">\((x_i,
+y_i)\)</span> sont tirés indépendamment selon <span
+class="math inline">\(\mathcal{D}\)</span>. Chaque <span
+class="math inline">\(Z_i\)</span> est centrée, c’est-à-dire que <span
+class="math inline">\(\mathbb{E}[Z_i] = 0\)</span>, et bornée par <span
+class="math inline">\([-1, 1]\)</span>.</p>
+<p>L’erreur empirique peut alors s’écrire :</p>
+<p><span class="math display">\[\hat{\epsilon}(h, S) - \epsilon(h) =
+\frac{1}{n} \sum_{i=1}^n Z_i\]</span></p>
+<p>Nous voulons borner la probabilité que cette somme dépasse un certain
+seuil <span class="math inline">\(t\)</span>. En appliquant l’inégalité
+de Hoeffding, nous avons :</p>
+<p><span class="math display">\[\mathbb{P} \left( \frac{1}{n}
+\sum_{i=1}^n Z_i &gt; t \right) \leq e^{-2 n t^2}\]</span></p>
+<p>et de même,</p>
+<p><span class="math display">\[\mathbb{P} \left( \frac{1}{n}
+\sum_{i=1}^n Z_i &lt; -t \right) \leq e^{-2 n t^2}\]</span></p>
+<p>En combinant ces deux inégalités, nous obtenons le résultat
+souhaité.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La variance de l’erreur de généralisation possède plusieurs
+propriétés importantes, que nous énumérons et démontrons ci-dessous.</p>
+<ol>
+<li><p><strong>Monotonie en la taille de l’échantillon</strong> : La
+variance diminue lorsque la taille de l’échantillon <span
+class="math inline">\(n\)</span> augmente. Cela découle directement du
+théorème de Hoeffding, qui montre que la variance est bornée par <span
+class="math inline">\(\frac{1}{4n}\)</span>.</p></li>
+<li><p><strong>Dépendance à la complexité du modèle</strong> : Plus le
+modèle est complexe, plus sa variance tend à être élevée. Cela
+s’explique par le fait que les modèles complexes sont plus sensibles aux
+fluctuations des données d’entraînement. Cette propriété est quantifiée
+par la théorie de la complexité de VC.</p></li>
+<li><p><strong>Stabilité des algorithmes</strong> : Un algorithme est
+dit stable si de petites perturbations des données d’entraînement
+entraînent de petites variations dans le modèle appris. La variance de
+l’erreur de généralisation est une mesure directe de cette
+stabilité.</p></li>
+</ol>
+<p>Pour démontrer la propriété (ii), considérons deux modèles <span
+class="math inline">\(h_1\)</span> et <span
+class="math inline">\(h_2\)</span> avec des complexités différentes. La
+théorie de la complexité de VC montre que la variance de l’erreur
+empirique pour <span class="math inline">\(h_1\)</span> est bornée par
+une fonction de la dimension de VC de <span
+class="math inline">\(h_1\)</span>. Ainsi, si <span
+class="math inline">\(h_2\)</span> a une dimension de VC plus élevée que
+<span class="math inline">\(h_1\)</span>, sa variance sera également
+plus élevée.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

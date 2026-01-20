@@ -1,0 +1,371 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>FastText: Efficient Learning of Word Representations and Sentence Classification</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">FastText: Efficient Learning of Word Representations
+and Sentence Classification</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-and-motivations">Introduction
+and Motivations</h1>
+<p>The advent of word embeddings has revolutionized natural language
+processing (NLP) by enabling the representation of words in a continuous
+vector space. These embeddings capture semantic and syntactic
+relationships, allowing for more effective machine learning models in
+various NLP tasks. However, traditional methods like Word2Vec and GloVe
+often struggle with efficiency and scalability when dealing with large
+vocabularies or subword information.</p>
+<p>FastText, developed by Piotr Bojanowski, Edouard Grave, et al.,
+addresses these challenges by introducing a novel approach to word
+representation and sentence classification. FastText extends the
+skip-gram model with subword information, allowing it to handle rare
+words and morphologically rich languages effectively. Moreover, FastText
+provides a simple and efficient framework for sentence classification,
+making it a versatile tool for various NLP applications.</p>
+<h1 class="unnumbered" id="definitions">Definitions</h1>
+<p>To understand FastText, we first need to define some key concepts and
+notations.</p>
+<h2 class="unnumbered" id="word-representation">Word Representation</h2>
+<p>Consider a vocabulary <span class="math inline">\(V\)</span>
+consisting of <span class="math inline">\(|V|\)</span> words. Each word
+<span class="math inline">\(w \in V\)</span> can be represented as a
+vector in a <span class="math inline">\(d\)</span>-dimensional space,
+where <span class="math inline">\(d\)</span> is the embedding dimension.
+The goal is to learn a function <span class="math inline">\(f: V
+\rightarrow \mathbb{R}^d\)</span> that maps each word to its
+corresponding vector representation.</p>
+<h2 class="unnumbered" id="subword-information">Subword Information</h2>
+<p>FastText introduces the concept of subword information by
+representing each word as a bag of character <span
+class="math inline">\(n\)</span>-grams. For a given word <span
+class="math inline">\(w\)</span>, we define the set of its character
+<span class="math inline">\(n\)</span>-grams as follows:</p>
+<p><span class="math display">\[G(w) = \{ g_1, g_2, \ldots, g_m
+\}\]</span></p>
+<p>where <span class="math inline">\(m\)</span> is the number of
+character <span class="math inline">\(n\)</span>-grams in the word <span
+class="math inline">\(w\)</span>. For example, for the word "fast" and
+<span class="math inline">\(n = 3\)</span>, we have:</p>
+<p><span class="math display">\[G(\text{&quot;fast&quot;}) = \{
+\text{&quot;fas&quot;}, \text{&quot;ast&quot;}, \text{&quot;sta&quot;}
+\}\]</span></p>
+<h2 class="unnumbered" id="word-vector">Word Vector</h2>
+<p>The word vector <span class="math inline">\(\mathbf{w}\)</span> is
+computed as the sum of the vectors of its constituent character <span
+class="math inline">\(n\)</span>-grams:</p>
+<p><span class="math display">\[\mathbf{w} = \sum_{g \in G(w)}
+\mathbf{g}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{g}\)</span> is the vector
+representation of the character <span
+class="math inline">\(n\)</span>-gram <span
+class="math inline">\(g\)</span>.</p>
+<h1 class="unnumbered" id="the-fasttext-model">The FastText Model</h1>
+<p>FastText extends the skip-gram model by incorporating subword
+information. The objective is to maximize the log-probability of
+observing a target word <span class="math inline">\(w_t\)</span> given
+its context words <span
+class="math inline">\(\{w_c\}_{c=1}^C\)</span>:</p>
+<p><span class="math display">\[\frac{1}{C} \sum_{c=1}^C \log p(w_t |
+w_c)\]</span></p>
+<p>where <span class="math inline">\(C\)</span> is the number of context
+words, and <span class="math inline">\(p(w_t | w_c)\)</span> is the
+conditional probability of the target word given a context word.</p>
+<h2 class="unnumbered" id="conditional-probability">Conditional
+Probability</h2>
+<p>The conditional probability <span class="math inline">\(p(w_t |
+w_c)\)</span> is computed using the softmax function:</p>
+<p><span class="math display">\[p(w_t | w_c) = \frac{\exp(\mathbf{w}_t^T
+\mathbf{w}_c)}{\sum_{v \in V} \exp(\mathbf{w}_v^T
+\mathbf{w}_c)}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{w}_t\)</span> and <span
+class="math inline">\(\mathbf{w}_v\)</span> are the word vectors of the
+target word <span class="math inline">\(w_t\)</span> and vocabulary word
+<span class="math inline">\(v\)</span>, respectively.</p>
+<h1 class="unnumbered" id="theorems">Theorems</h1>
+<p>FastText relies on several key theorems and properties to ensure
+efficient learning and effective word representations.</p>
+<h2 class="unnumbered" id="theorem-1-subword-information">Theorem 1:
+Subword Information</h2>
+<p>The incorporation of subword information allows FastText to handle
+rare words and morphologically rich languages effectively. Formally, for
+any word <span class="math inline">\(w \in V\)</span>, the following
+holds:</p>
+<p><span class="math display">\[\mathbf{w} = \sum_{g \in G(w)}
+\mathbf{g}\]</span></p>
+<p>This theorem ensures that the word vector <span
+class="math inline">\(\mathbf{w}\)</span> captures subword information,
+enabling FastText to generalize to unseen words based on their
+constituent character <span class="math inline">\(n\)</span>-grams.</p>
+<h2 class="unnumbered" id="theorem-2-efficient-learning">Theorem 2:
+Efficient Learning</h2>
+<p>FastText employs negative sampling to efficiently learn word
+representations. The objective function is approximated as follows:</p>
+<p><span class="math display">\[\frac{1}{C} \sum_{c=1}^C \left[ \log
+\sigma(\mathbf{w}_t^T \mathbf{w}_c) + \sum_{i=1}^k \mathbb{E}_{w_i \sim
+P(w)} [\log \sigma(-\mathbf{w}_i^T \mathbf{w}_c)] \right]\]</span></p>
+<p>where <span class="math inline">\(\sigma\)</span> is the sigmoid
+function, and <span class="math inline">\(k\)</span> is the number of
+negative samples drawn from the noise distribution <span
+class="math inline">\(P(w)\)</span>.</p>
+<h1 class="unnumbered" id="proofs">Proofs</h1>
+<h2 class="unnumbered" id="proof-of-theorem-1-subword-information">Proof
+of Theorem 1: Subword Information</h2>
+<p>The proof follows from the definition of the word vector <span
+class="math inline">\(\mathbf{w}\)</span> as the sum of its constituent
+character <span class="math inline">\(n\)</span>-grams. For any word
+<span class="math inline">\(w \in V\)</span>, we have:</p>
+<p><span class="math display">\[\mathbf{w} = \sum_{g \in G(w)}
+\mathbf{g}\]</span></p>
+<p>This ensures that the word vector <span
+class="math inline">\(\mathbf{w}\)</span> captures subword information,
+allowing FastText to handle rare words and morphologically rich
+languages effectively.</p>
+<h2 class="unnumbered" id="proof-of-theorem-2-efficient-learning">Proof
+of Theorem 2: Efficient Learning</h2>
+<p>The proof relies on the negative sampling technique, which
+approximates the softmax function by drawing negative samples from a
+noise distribution <span class="math inline">\(P(w)\)</span>. The
+objective function is approximated as follows:</p>
+<p><span class="math display">\[\frac{1}{C} \sum_{c=1}^C \left[ \log
+\sigma(\mathbf{w}_t^T \mathbf{w}_c) + \sum_{i=1}^k \mathbb{E}_{w_i \sim
+P(w)} [\log \sigma(-\mathbf{w}_i^T \mathbf{w}_c)] \right]\]</span></p>
+<p>This approximation significantly reduces the computational complexity
+of learning word representations, making FastText efficient and
+scalable.</p>
+<h1 class="unnumbered" id="properties-and-corollaries">Properties and
+Corollaries</h1>
+<p>FastText exhibits several important properties and corollaries that
+contribute to its effectiveness and efficiency.</p>
+<h2 class="unnumbered" id="property-1-handling-rare-words">Property 1:
+Handling Rare Words</h2>
+<p>FastText can handle rare words by leveraging subword information. For
+a rare word <span class="math inline">\(w\)</span>, its vector
+representation is computed as the sum of the vectors of its constituent
+character <span class="math inline">\(n\)</span>-grams:</p>
+<p><span class="math display">\[\mathbf{w} = \sum_{g \in G(w)}
+\mathbf{g}\]</span></p>
+<p>This property ensures that FastText can generalize to unseen words
+based on their subword structure.</p>
+<h2 class="unnumbered" id="property-2-morphological-richness">Property
+2: Morphological Richness</h2>
+<p>FastText is particularly effective in morphologically rich languages,
+where words often share common prefixes or suffixes. By incorporating
+subword information, FastText can capture these morphological patterns
+and represent words more effectively.</p>
+<h2 class="unnumbered"
+id="property-3-efficient-sentence-classification">Property 3: Efficient
+Sentence Classification</h2>
+<p>FastText provides a simple and efficient framework for sentence
+classification. Given a sentence <span class="math inline">\(S = \{w_1,
+w_2, \ldots, w_n\}\)</span>, its representation is computed as the
+average of the word vectors:</p>
+<p><span class="math display">\[\mathbf{S} = \frac{1}{n} \sum_{i=1}^n
+\mathbf{w}_i\]</span></p>
+<p>This representation can then be used as input to a linear classifier
+for sentence classification tasks.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>FastText is a powerful and efficient framework for learning word
+representations and sentence classification. By incorporating subword
+information, FastText can handle rare words and morphologically rich
+languages effectively. Moreover, its efficient learning algorithm makes
+it scalable to large vocabularies and corpora. FastText has become a
+popular tool in the NLP community, enabling advancements in various
+applications such as text classification, machine translation, and
+question answering.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

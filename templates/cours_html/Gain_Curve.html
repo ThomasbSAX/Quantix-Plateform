@@ -1,0 +1,305 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Gain Curve: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Gain Curve: A Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-and-motivations">Introduction
+and Motivations</h1>
+<p>The concept of the gain curve is fundamental in various fields such
+as economics, engineering, and physics. It represents the relationship
+between input and output in a system, providing insights into
+efficiency, performance, and optimization. The gain curve emerges from
+the need to quantify how changes in input affect output, enabling better
+decision-making and system design. Historically, the study of gain
+curves has roots in control theory and signal processing, where
+understanding system response to inputs is crucial. In economics, gain
+curves are used to analyze production functions and marginal returns.
+This article aims to explore the mathematical foundations, definitions,
+theorems, and applications of gain curves.</p>
+<h1 class="unnumbered" id="definitions">Definitions</h1>
+<p>To understand the gain curve, consider a system where an input <span
+class="math inline">\(x\)</span> produces an output <span
+class="math inline">\(y\)</span>. The gain curve is the function that
+maps <span class="math inline">\(x\)</span> to <span
+class="math inline">\(y\)</span>. Formally, we define:</p>
+<div class="definition">
+<p>Let <span class="math inline">\(f: X \rightarrow Y\)</span> be a
+function where <span class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> are subsets of real numbers. The gain
+curve <span class="math inline">\(G\)</span> is defined as: <span
+class="math display">\[G(x) = f(x)\]</span> for all <span
+class="math inline">\(x \in X\)</span>.</p>
+</div>
+<p>Alternatively, using quantifiers: <span
+class="math display">\[\forall x \in X, \, G(x) = f(x)\]</span></p>
+<h1 class="unnumbered" id="theorems">Theorems</h1>
+<p>One of the fundamental theorems related to gain curves is the
+Marginal Gain Theorem, which states that the derivative of the gain
+curve at a point gives the marginal gain.</p>
+<div class="theorem">
+<p>If <span class="math inline">\(G: X \rightarrow Y\)</span> is
+differentiable at a point <span class="math inline">\(x_0 \in
+X\)</span>, then the marginal gain at <span
+class="math inline">\(x_0\)</span> is given by: <span
+class="math display">\[G&#39;(x_0) = \lim_{h \rightarrow 0} \frac{G(x_0
++ h) - G(x_0)}{h}\]</span></p>
+</div>
+<h1 class="unnumbered" id="proofs">Proofs</h1>
+<p>To prove the Marginal Gain Theorem, we start by recalling the
+definition of the derivative. The derivative of <span
+class="math inline">\(G\)</span> at <span
+class="math inline">\(x_0\)</span> is: <span
+class="math display">\[G&#39;(x_0) = \lim_{h \rightarrow 0} \frac{G(x_0
++ h) - G(x_0)}{h}\]</span></p>
+<p>This follows directly from the definition of the derivative. The
+marginal gain <span class="math inline">\(G&#39;(x_0)\)</span>
+represents the rate of change of the output with respect to the input at
+<span class="math inline">\(x_0\)</span>.</p>
+<h1 class="unnumbered" id="properties-and-corollaries">Properties and
+Corollaries</h1>
+<p>The gain curve has several important properties:</p>
+<ol>
+<li><p>Linearity: If <span class="math inline">\(G\)</span> is linear,
+then <span class="math inline">\(G(ax + b) = aG(x) + b\)</span> for
+constants <span class="math inline">\(a\)</span> and <span
+class="math inline">\(b\)</span>.</p></li>
+<li><p>Differentiability: If <span class="math inline">\(G\)</span> is
+differentiable, then it is continuous.</p></li>
+<li><p>Concavity/Convexity: The gain curve can be concave or convex,
+indicating diminishing or increasing returns, respectively.</p></li>
+</ol>
+<p>Let’s prove property (ii):</p>
+<div class="proof">
+<p><em>Proof.</em> Assume <span class="math inline">\(G\)</span> is
+differentiable at <span class="math inline">\(x_0\)</span>. By the
+definition of the derivative, for any <span class="math inline">\(h \neq
+0\)</span>, there exists a <span class="math inline">\(c\)</span>
+between <span class="math inline">\(x_0\)</span> and <span
+class="math inline">\(x_0 + h\)</span> such that: <span
+class="math display">\[G(x_0 + h) - G(x_0) = G&#39;(c)h\]</span></p>
+<p>Taking the limit as <span class="math inline">\(h \rightarrow
+0\)</span>, we have: <span class="math display">\[\lim_{h \rightarrow 0}
+[G(x_0 + h) - G(x_0)] = \lim_{h \rightarrow 0} G&#39;(c)h\]</span></p>
+<p>Since <span class="math inline">\(c \rightarrow x_0\)</span> as <span
+class="math inline">\(h \rightarrow 0\)</span>, and <span
+class="math inline">\(G&#39;\)</span> is continuous at <span
+class="math inline">\(x_0\)</span>, we get: <span
+class="math display">\[G(x_0 + h) - G(x_0) \rightarrow 0\]</span></p>
+<p>Thus, <span class="math inline">\(G\)</span> is continuous at <span
+class="math inline">\(x_0\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="applications">Applications</h1>
+<p>Gain curves are widely used in various fields:</p>
+<ul>
+<li><p>In economics, gain curves help analyze production functions and
+marginal returns.</p></li>
+<li><p>In engineering, they are used to design control systems and
+optimize performance.</p></li>
+<li><p>In physics, gain curves describe the response of systems to
+inputs, such as in signal processing.</p></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>The gain curve is a powerful tool for understanding the relationship
+between input and output in various systems. Its mathematical
+foundations, theorems, and properties provide valuable insights into
+system behavior and optimization. By studying gain curves, we can make
+informed decisions and design more efficient systems.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,326 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Principe Variationnel</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Principe Variationnel</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le principe variationnel est une approche fondamentale en physique
+mathématique qui permet de formuler les lois de la nature sous forme
+d’optimisation. Historiquement, cette idée remonte à Pierre Louis
+Maupertuis et à la formulation du principe de moindre action.
+Conceptuellement, le principe variationnel consiste à chercher des
+solutions qui minimisent ou maximisent une certaine quantité, souvent
+appelée action. Ce cadre est indispensable pour comprendre les équations
+d’Euler-Lagrange en mécanique classique, ainsi que les principes
+variationnels en théorie des champs et en relativité générale.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire le principe variationnel, commençons par comprendre
+ce que nous cherchons à optimiser. Supposons que nous ayons un système
+physique décrit par une fonction <span
+class="math inline">\(q(t)\)</span>, où <span
+class="math inline">\(t\)</span> représente le temps. Nous cherchons à
+trouver la trajectoire <span class="math inline">\(q(t)\)</span> qui
+minimise une certaine quantité, appelée action <span
+class="math inline">\(S\)</span>, définie comme l’intégrale d’une
+fonction Lagrangienne <span class="math inline">\(L\)</span> sur un
+intervalle de temps <span class="math inline">\([t_1, t_2]\)</span>
+:</p>
+<p><span class="math display">\[S[q] = \int_{t_1}^{t_2} L(q(t),
+\dot{q}(t), t) \, dt\]</span></p>
+<p>où <span class="math inline">\(\dot{q}(t)\)</span> représente la
+dérivée de <span class="math inline">\(q(t)\)</span> par rapport au
+temps. La fonction Lagrangienne <span class="math inline">\(L\)</span>
+est une quantité qui dépend de la position, de la vitesse et
+éventuellement du temps.</p>
+<p>Formellement, le principe variationnel s’énonce comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(L : \mathbb{R}^n \times \mathbb{R}^n
+\times \mathbb{R} \rightarrow \mathbb{R}\)</span> une fonction
+différentiable. Le principe variationnel stipule que la trajectoire
+réelle <span class="math inline">\(q(t)\)</span> du système est celle
+qui rend l’action <span class="math inline">\(S[q]\)</span>
+stationnaire, c’est-à-dire que pour toute variation <span
+class="math inline">\(\eta(t)\)</span> de <span
+class="math inline">\(q(t)\)</span> telle que <span
+class="math inline">\(\eta(t_1) = \eta(t_2) = 0\)</span>, on a :</p>
+<p><span class="math display">\[\delta S[q] = \int_{t_1}^{t_2} \left(
+\frac{\partial L}{\partial q} \delta q + \frac{\partial L}{\partial
+\dot{q}} \delta \dot{q} \right) \, dt = 0\]</span></p>
+<p>où <span class="math inline">\(\delta q\)</span> est la variation de
+<span class="math inline">\(q(t)\)</span>, définie par <span
+class="math inline">\(\delta q = \eta(t)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre les implications du principe variationnel,
+introduisons le théorème d’Euler-Lagrange. Ce théorème donne les
+équations différentielles que doit satisfaire la trajectoire <span
+class="math inline">\(q(t)\)</span> pour rendre l’action
+stationnaire.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(L\)</span> une fonction Lagrangienne
+et supposons que la trajectoire <span
+class="math inline">\(q(t)\)</span> rend l’action stationnaire. Alors,
+pour toute variation <span class="math inline">\(\eta(t)\)</span>, on a
+:</p>
+<p><span class="math display">\[\int_{t_1}^{t_2} \left( \frac{\partial
+L}{\partial q} - \frac{d}{dt} \frac{\partial L}{\partial \dot{q}}
+\right) \eta(t) \, dt = 0\]</span></p>
+<p>Comme cette égalité doit être vraie pour toute fonction de variation
+<span class="math inline">\(\eta(t)\)</span>, il en résulte que :</p>
+<p><span class="math display">\[\frac{\partial L}{\partial q} -
+\frac{d}{dt} \frac{\partial L}{\partial \dot{q}} = 0\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème d’Euler-Lagrange, commençons par développer
+l’expression pour la variation de l’action :</p>
+<p><span class="math display">\[\delta S[q] = \int_{t_1}^{t_2} \left(
+\frac{\partial L}{\partial q} \delta q + \frac{\partial L}{\partial
+\dot{q}} \delta \dot{q} \right) \, dt\]</span></p>
+<p>En utilisant l’intégration par parties pour le terme <span
+class="math inline">\(\frac{\partial L}{\partial \dot{q}} \delta
+\dot{q}\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\int_{t_1}^{t_2} \frac{\partial
+L}{\partial \dot{q}} \delta \dot{q} \, dt = \left. \frac{\partial
+L}{\partial \dot{q}} \delta q \right|_{t_1}^{t_2} - \int_{t_1}^{t_2}
+\frac{d}{dt} \left( \frac{\partial L}{\partial \dot{q}} \right) \delta q
+\, dt\]</span></p>
+<p>Comme <span class="math inline">\(\delta q(t_1) = \delta q(t_2) =
+0\)</span>, le premier terme s’annule. Par conséquent, l’expression pour
+<span class="math inline">\(\delta S[q]\)</span> devient :</p>
+<p><span class="math display">\[\delta S[q] = \int_{t_1}^{t_2} \left(
+\frac{\partial L}{\partial q} - \frac{d}{dt} \frac{\partial L}{\partial
+\dot{q}} \right) \delta q \, dt\]</span></p>
+<p>Pour que cette intégrale soit nulle pour toute variation <span
+class="math inline">\(\eta(t)\)</span>, il faut que :</p>
+<p><span class="math display">\[\frac{\partial L}{\partial q} -
+\frac{d}{dt} \frac{\partial L}{\partial \dot{q}} = 0\]</span></p>
+<p>Ce qui est précisément le théorème d’Euler-Lagrange.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le principe variationnel et le théorème d’Euler-Lagrange ont de
+nombreuses propriétés et corollaires importants. En voici quelques-uns
+:</p>
+<ol>
+<li><p><strong>Conservation de l’énergie</strong> : Si la Lagrangienne
+<span class="math inline">\(L\)</span> ne dépend pas explicitement du
+temps, alors l’énergie totale <span class="math inline">\(E = \dot{q}
+\frac{\partial L}{\partial \dot{q}} - L\)</span> est conservée.</p></li>
+<li><p><strong>Symétries et lois de conservation</strong> : Selon le
+théorème de Noether, toute symétrie continue du système physique
+correspond à une loi de conservation.</p></li>
+<li><p><strong>Formulation Hamiltonienne</strong> : Le principe
+variationnel peut également être formulé en termes de la fonction
+Hamiltonienne <span class="math inline">\(H\)</span>, conduisant aux
+équations de Hamilton.</p></li>
+</ol>
+<p>Pour prouver la conservation de l’énergie, supposons que <span
+class="math inline">\(L\)</span> ne dépend pas explicitement du temps.
+Alors, la dérivée de l’énergie par rapport au temps est :</p>
+<p><span class="math display">\[\frac{dE}{dt} = \frac{d}{dt} \left(
+\dot{q} \frac{\partial L}{\partial \dot{q}} - L \right) = \ddot{q}
+\frac{\partial L}{\partial \dot{q}} + \dot{q} \frac{d}{dt} \left(
+\frac{\partial L}{\partial \dot{q}} \right) - \frac{dL}{dt}\]</span></p>
+<p>En utilisant le théorème d’Euler-Lagrange et l’absence de dépendance
+explicite en temps, on montre que <span
+class="math inline">\(\frac{dE}{dt} = 0\)</span>, ce qui implique que
+l’énergie est conservée.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

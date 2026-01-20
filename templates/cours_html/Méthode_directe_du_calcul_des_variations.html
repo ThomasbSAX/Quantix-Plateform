@@ -1,0 +1,312 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode directe du calcul des variations</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode directe du calcul des variations</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le calcul des variations est une branche des mathématiques qui étudie
+les problèmes d’optimisation où l’on cherche à minimiser ou maximiser
+une certaine quantité dépendant d’une fonction. La méthode directe du
+calcul des variations est une approche puissante pour résoudre ces
+problèmes en transformant les conditions de minimisation ou maximisation
+en équations différentielles.</p>
+<p>Cette méthode trouve ses origines dans les travaux de grands
+mathématiciens comme Euler et Lagrange au XVIIIe siècle. Elle est
+indispensable dans de nombreux domaines des mathématiques appliquées, de
+la physique théorique et de l’ingénierie. Par exemple, elle est utilisée
+pour déterminer les trajectoires optimales en mécanique classique ou
+pour résoudre des problèmes de minimisation d’énergie en physique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails techniques, comprenons ce que nous
+cherchons à accomplir. Supposons que nous ayons une fonctionnelle <span
+class="math inline">\(J[y]\)</span> qui dépend d’une fonction <span
+class="math inline">\(y\)</span>. Notre objectif est de trouver la
+fonction <span class="math inline">\(y\)</span> qui minimise (ou
+maximise) cette fonctionnelle parmi toutes les fonctions possibles.</p>
+<p>Formellement, nous cherchons à résoudre le problème suivant :</p>
+<p><span class="math display">\[\text{Trouver } y \in C^2[a, b] \text{
+tel que } J[y] = \int_a^b F(x, y(x), y&#39;(x)) \, dx\]</span></p>
+<p>est minimisé (ou maximisé) parmi toutes les fonctions <span
+class="math inline">\(y\)</span> vérifiant certaines conditions aux
+limites.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour résoudre ce problème, nous utilisons le principe du calcul des
+variations. Supposons que <span class="math inline">\(y\)</span> soit la
+fonction qui minimise <span class="math inline">\(J[y]\)</span>.
+Considérons une perturbation de <span class="math inline">\(y\)</span>
+donnée par <span class="math inline">\(y(x) + \epsilon \eta(x)\)</span>,
+où <span class="math inline">\(\epsilon\)</span> est un petit paramètre
+et <span class="math inline">\(\eta(x)\)</span> est une fonction de
+perturbation qui satisfait les conditions aux limites <span
+class="math inline">\(\eta(a) = \eta(b) = 0\)</span>.</p>
+<p>Le théorème fondamental du calcul des variations stipule que pour que
+<span class="math inline">\(y\)</span> soit un minimum, la dérivée
+première de <span class="math inline">\(J[y + \epsilon \eta]\)</span>
+par rapport à <span class="math inline">\(\epsilon\)</span> doit être
+nulle pour tout <span class="math inline">\(\epsilon\)</span>. Cela
+conduit à l’équation d’Euler-Lagrange :</p>
+<p><span class="math display">\[\frac{\partial F}{\partial y} -
+\frac{d}{dx} \left( \frac{\partial F}{\partial y&#39;} \right) =
+0\]</span></p>
+<p>Cette équation différentielle doit être satisfaite par toute fonction
+<span class="math inline">\(y\)</span> qui minimise (ou maximise) la
+fonctionnelle <span class="math inline">\(J[y]\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème d’Euler-Lagrange, commençons par considérer
+la fonctionnelle <span class="math inline">\(J[y + \epsilon
+\eta]\)</span> :</p>
+<p><span class="math display">\[J[y + \epsilon \eta] = \int_a^b F(x,
+y(x) + \epsilon \eta(x), y&#39;(x) + \epsilon \eta&#39;(x)) \,
+dx\]</span></p>
+<p>Calculons la dérivée de <span class="math inline">\(J[y + \epsilon
+\eta]\)</span> par rapport à <span
+class="math inline">\(\epsilon\)</span> :</p>
+<p><span class="math display">\[\frac{dJ}{d\epsilon} = \int_a^b \left(
+\frac{\partial F}{\partial y} \eta(x) + \frac{\partial F}{\partial
+y&#39;} \eta&#39;(x) \right) \, dx\]</span></p>
+<p>En utilisant l’intégration par parties, nous obtenons :</p>
+<p><span class="math display">\[\frac{dJ}{d\epsilon} = \int_a^b \left(
+\frac{\partial F}{\partial y} - \frac{d}{dx} \left( \frac{\partial
+F}{\partial y&#39;} \right) \right) \eta(x) \, dx + \left.
+\frac{\partial F}{\partial y&#39;} \eta(x) \right|_a^b\]</span></p>
+<p>Puisque <span class="math inline">\(\eta(a) = \eta(b) = 0\)</span>,
+le terme de bord s’annule. Pour que <span
+class="math inline">\(y\)</span> soit un minimum, la dérivée première
+doit être nulle pour tout <span class="math inline">\(\epsilon\)</span>,
+ce qui implique que :</p>
+<p><span class="math display">\[\int_a^b \left( \frac{\partial
+F}{\partial y} - \frac{d}{dx} \left( \frac{\partial F}{\partial y&#39;}
+\right) \right) \eta(x) \, dx = 0\]</span></p>
+<p>Puisque cette intégrale doit être nulle pour toute fonction <span
+class="math inline">\(\eta(x)\)</span>, le terme entre parenthèses doit
+être nul :</p>
+<p><span class="math display">\[\frac{\partial F}{\partial y} -
+\frac{d}{dx} \left( \frac{\partial F}{\partial y&#39;} \right) =
+0\]</span></p>
+<p>Ceci est l’équation d’Euler-Lagrange.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous avons maintenant l’équation d’Euler-Lagrange, mais il est
+important de comprendre ses implications et ses propriétés.</p>
+<p>(i) **Conditions aux limites** : Les conditions aux limites <span
+class="math inline">\(\eta(a) = \eta(b) = 0\)</span> sont cruciales pour
+dériver l’équation d’Euler-Lagrange. Elles garantissent que les termes
+de bord s’annulent lors de l’intégration par parties.</p>
+<p>(ii) **Cas particuliers** : Dans certains cas, la fonction <span
+class="math inline">\(F\)</span> ne dépend pas explicitement de <span
+class="math inline">\(y&#39;\)</span>. Dans ce cas, l’équation
+d’Euler-Lagrange se simplifie en :</p>
+<p><span class="math display">\[\frac{\partial F}{\partial y} =
+0\]</span></p>
+<p>(iii) **Multiplicateurs de Lagrange** : Si la minimisation doit se
+faire sous une contrainte <span class="math inline">\(G(x, y, y&#39;) =
+0\)</span>, on utilise la méthode des multiplicateurs de Lagrange pour
+incorporer cette contrainte dans l’équation d’Euler-Lagrange.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La méthode directe du calcul des variations est un outil puissant
+pour résoudre les problèmes d’optimisation fonctionnelle. En
+transformant le problème de minimisation en une équation différentielle,
+nous pouvons utiliser les techniques classiques de l’analyse pour
+trouver des solutions. Les applications de cette méthode sont vastes et
+incluent la physique théorique, l’ingénierie et les mathématiques
+appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

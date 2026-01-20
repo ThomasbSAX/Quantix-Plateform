@@ -1,0 +1,332 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Analyse en Composantes Principales (PCA)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Analyse en Composantes Principales
+(PCA)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’Analyse en Composantes Principales (PCA) est une technique
+statistique multivariée qui vise à réduire la dimensionnalité d’un
+ensemble de données tout en préservant autant que possible la variance
+des données originales. Introduite par Karl Pearson en 1901 et
+développée plus tard par Harold Hotelling dans les années 1930, la PCA
+est aujourd’hui largement utilisée en statistiques, en apprentissage
+automatique et dans de nombreuses autres disciplines scientifiques.</p>
+<p>L’émergence de la PCA est motivée par le besoin de traiter des
+données complexes et multidimensionnelles, souvent caractérisées par une
+forte corrélation entre les variables. En projetant ces données sur un
+espace de dimension inférieure, la PCA permet non seulement de
+simplifier l’analyse, mais aussi d’identifier les structures
+sous-jacentes et les relations entre les variables.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir formellement la PCA, considérons un ensemble de
+données <span class="math inline">\(\mathbf{X} = \{\mathbf{x}_1,
+\mathbf{x}_2, \ldots, \mathbf{x}_n\}\)</span> où chaque <span
+class="math inline">\(\mathbf{x}_i\)</span> est un vecteur de dimension
+<span class="math inline">\(p\)</span>. Notre objectif est de trouver
+une représentation de ces données dans un espace de dimension <span
+class="math inline">\(k &lt; p\)</span> qui capture au mieux leur
+variance.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathbf{A}\)</span> une matrice
+carrée. Un vecteur propre <span
+class="math inline">\(\mathbf{v}\)</span> de <span
+class="math inline">\(\mathbf{A}\)</span> est un vecteur non nul tel que
+: <span class="math display">\[\mathbf{A}\mathbf{v} = \lambda
+\mathbf{v}\]</span> où <span class="math inline">\(\lambda\)</span> est
+une valeur propre associée à <span
+class="math inline">\(\mathbf{v}\)</span>.</p>
+</div>
+<div class="definition">
+<p>La matrice de covariance <span
+class="math inline">\(\mathbf{C}\)</span> d’un ensemble de données <span
+class="math inline">\(\mathbf{X}\)</span> est définie par : <span
+class="math display">\[\mathbf{C} = \frac{1}{n-1} \sum_{i=1}^n
+(\mathbf{x}_i - \bar{\mathbf{x}})(\mathbf{x}_i -
+\bar{\mathbf{x}})^T\]</span> où <span
+class="math inline">\(\bar{\mathbf{x}}\)</span> est le vecteur moyen des
+données.</p>
+</div>
+<div class="definition">
+<p>L’Analyse en Composantes Principales est une technique qui consiste à
+projeter les données <span class="math inline">\(\mathbf{X}\)</span> sur
+un sous-espace engendré par les <span class="math inline">\(k\)</span>
+premiers vecteurs propres de la matrice de covariance <span
+class="math inline">\(\mathbf{C}\)</span>, ordonnés par valeurs propres
+décroissantes.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{X}\)</span> un ensemble de
+données centrées et <span class="math inline">\(\mathbf{C}\)</span> sa
+matrice de covariance. Les <span class="math inline">\(k\)</span>
+premières composantes principales maximisent la variance des données
+projetées dans un sous-espace de dimension <span
+class="math inline">\(k\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous devons montrer que
+les <span class="math inline">\(k\)</span> premières composantes
+principales <span class="math inline">\(\mathbf{u}_1, \mathbf{u}_2,
+\ldots, \mathbf{u}_k\)</span> maximisent la variance des données
+projetées.</p>
+<p>1. La variance des données projetées sur un vecteur <span
+class="math inline">\(\mathbf{u}\)</span> est donnée par : <span
+class="math display">\[\text{Var}(\mathbf{X}\mathbf{u}) = \mathbf{u}^T
+\mathbf{C} \mathbf{u}\]</span></p>
+<p>2. Les vecteurs propres <span
+class="math inline">\(\mathbf{u}_i\)</span> de la matrice de covariance
+<span class="math inline">\(\mathbf{C}\)</span> satisfont : <span
+class="math display">\[\mathbf{C} \mathbf{u}_i = \lambda_i
+\mathbf{u}_i\]</span> où <span class="math inline">\(\lambda_i\)</span>
+sont les valeurs propres de <span
+class="math inline">\(\mathbf{C}\)</span>.</p>
+<p>3. En substituant dans l’expression de la variance, nous obtenons :
+<span class="math display">\[\text{Var}(\mathbf{X}\mathbf{u}_i) =
+\lambda_i\]</span></p>
+<p>4. Puisque les valeurs propres sont ordonnées par ordre décroissant
+(<span class="math inline">\(\lambda_1 \geq \lambda_2 \geq \ldots \geq
+\lambda_p\)</span>), les <span class="math inline">\(k\)</span>
+premières composantes principales maximisent la variance des données
+projetées. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<div class="corollary">
+<p>Les composantes principales sont orthogonales entre elles. Cela
+signifie que pour tout <span class="math inline">\(i \neq j\)</span>,
+nous avons : <span class="math display">\[\mathbf{u}_i^T \mathbf{u}_j =
+0\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Puisque les vecteurs propres d’une matrice symétrique
+sont orthogonaux, il suit que les composantes principales <span
+class="math inline">\(\mathbf{u}_i\)</span> et <span
+class="math inline">\(\mathbf{u}_j\)</span> sont orthogonales pour <span
+class="math inline">\(i \neq j\)</span>. ◻</p>
+</div>
+<div class="corollary">
+<p>La matrice de covariance <span
+class="math inline">\(\mathbf{C}\)</span> peut être décomposée en :
+<span class="math display">\[\mathbf{C} = \mathbf{U} \Lambda
+\mathbf{U}^T\]</span> où <span class="math inline">\(\mathbf{U}\)</span>
+est la matrice des vecteurs propres et <span
+class="math inline">\(\Lambda\)</span> est la matrice diagonale des
+valeurs propres.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cette décomposition résulte directement du théorème
+spectral pour les matrices symétriques. Chaque vecteur propre <span
+class="math inline">\(\mathbf{u}_i\)</span> est un vecteur colonne de
+<span class="math inline">\(\mathbf{U}\)</span> et chaque valeur propre
+<span class="math inline">\(\lambda_i\)</span> est un élément diagonal
+de <span class="math inline">\(\Lambda\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’Analyse en Composantes Principales est une technique puissante pour
+la réduction de dimension et l’exploration des données. En projetant les
+données sur un sous-espace engendré par les vecteurs propres de la
+matrice de covariance, la PCA permet de capturer la majeure partie de la
+variance des données tout en simplifiant leur représentation. Les
+propriétés et théorèmes associés à la PCA en font un outil indispensable
+dans de nombreuses applications scientifiques et industrielles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,360 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Gaussian Negative Log-Likelihood (GNLL)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Gaussian Negative Log-Likelihood (GNLL)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’émergence de la notion de Gaussian Negative Log-Likelihood (GNLL)
+trouve ses racines dans le besoin croissant d’optimiser des modèles
+statistiques complexes. Historiquement, l’utilisation de la
+log-vraisemblance comme fonction objective dans les modèles gaussiens
+remonte aux travaux pionniers de Ronald Fisher sur la théorie de
+l’estimation. La minimisation de cette fonction permet d’obtenir des
+estimateurs efficaces et sans biais, une propriété fondamentale en
+statistique inférentielle.</p>
+<p>Le GNLL émerge comme une réponse naturelle aux défis posés par les
+modèles linéaires généralisés (GLM) et les réseaux de neurones. Dans ces
+contextes, la minimisation directe de la log-vraisemblance gaussienne
+permet d’ajuster les paramètres du modèle aux données observées de
+manière optimale. La formulation négative de cette log-vraisemblance
+facilite l’utilisation d’algorithmes d’optimisation classiques, tels que
+la descente de gradient ou les méthodes quasi-Newton.</p>
+<p>Le cadre dans lequel le GNLL est indispensable s’étend des modèles de
+régression linéaire aux réseaux de neurones profonds. Dans ces domaines,
+la capacité à minimiser efficacement le GNLL permet d’améliorer la
+précision des prédictions et de mieux comprendre les relations
+sous-jacentes dans les données.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la notion de Gaussian Negative Log-Likelihood (GNLL),
+commençons par comprendre ce que nous cherchons à minimiser. Supposons
+que nous avons un ensemble de données <span class="math inline">\(D =
+\{(x_i, y_i)\}_{i=1}^n\)</span>, où <span
+class="math inline">\(x_i\)</span> représente les variables explicatives
+et <span class="math inline">\(y_i\)</span> la variable réponse. Nous
+cherchons à modéliser la relation entre <span
+class="math inline">\(x_i\)</span> et <span
+class="math inline">\(y_i\)</span> en supposant que les erreurs de
+prédiction suivent une distribution gaussienne.</p>
+<p>La densité de probabilité d’une variable aléatoire gaussienne <span
+class="math inline">\(Y\)</span> est donnée par : <span
+class="math display">\[p(y|\mu, \sigma^2) =
+\frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(y -
+\mu)^2}{2\sigma^2}\right)\]</span> où <span
+class="math inline">\(\mu\)</span> est la moyenne et <span
+class="math inline">\(\sigma^2\)</span> la variance.</p>
+<p>La log-vraisemblance pour un échantillon de taille <span
+class="math inline">\(n\)</span> est alors : <span
+class="math display">\[\mathcal{L}(\mu, \sigma^2) = \sum_{i=1}^n \log
+p(y_i|\mu, \sigma^2)\]</span></p>
+<p>Le Gaussian Negative Log-Likelihood (GNLL) est défini comme l’opposé
+de cette log-vraisemblance : <span
+class="math display">\[\text{GNLL}(\mu, \sigma^2) = -\mathcal{L}(\mu,
+\sigma^2)\]</span></p>
+<p>Formellement, nous avons : <span
+class="math display">\[\text{GNLL}(\mu, \sigma^2) = -\sum_{i=1}^n \log
+p(y_i|\mu, \sigma^2) = -\sum_{i=1}^n \left( -\frac{1}{2}
+\log(2\pi\sigma^2) - \frac{(y_i - \mu)^2}{2\sigma^2} \right)\]</span>
+<span class="math display">\[= \frac{n}{2} \log(2\pi\sigma^2) +
+\frac{1}{2\sigma^2} \sum_{i=1}^n (y_i - \mu)^2\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour étudier les propriétés du GNLL, nous introduisons le théorème
+suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(D = \{(x_i, y_i)\}_{i=1}^n\)</span>
+un ensemble de données et <span class="math inline">\(\mu =
+X\beta\)</span>, où <span class="math inline">\(X\)</span> est la
+matrice des variables explicatives et <span
+class="math inline">\(\beta\)</span> le vecteur de paramètres. Alors, le
+GNLL est minimisé lorsque <span class="math inline">\(\beta\)</span> est
+l’estimateur des moindres carrés.</p>
+</div>
+<p>Pour démontrer ce théorème, nous commençons par exprimer le GNLL en
+fonction de <span class="math inline">\(\beta\)</span> : <span
+class="math display">\[\text{GNLL}(\beta) = \frac{n}{2}
+\log(2\pi\sigma^2) + \frac{1}{2\sigma^2} \|y - X\beta\|^2\]</span></p>
+<p>La minimisation de <span
+class="math inline">\(\text{GNLL}(\beta)\)</span> revient à minimiser la
+somme des carrés des résidus : <span class="math display">\[\min_{\beta}
+\|y - X\beta\|^2\]</span></p>
+<p>Cette minimisation est atteinte lorsque <span
+class="math inline">\(\beta\)</span> satisfait l’équation normale :
+<span class="math display">\[X^T X \beta = X^T y\]</span></p>
+<p>La solution de cette équation est donnée par : <span
+class="math display">\[\beta = (X^T X)^{-1} X^T y\]</span></p>
+<p>Cette solution est connue sous le nom d’estimateur des moindres
+carrés et possède de nombreuses propriétés optimales, telles que
+l’efficacité et la normalité asymptotique.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de minimisation du GNLL, nous avons besoin
+des propriétés suivantes :</p>
+<div class="lemma">
+<p>Soit <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction convexe et différentiable. Alors, <span
+class="math inline">\(f\)</span> atteint son minimum en un point <span
+class="math inline">\(\beta^*\)</span> si et seulement si le gradient de
+<span class="math inline">\(f\)</span> en <span
+class="math inline">\(\beta^*\)</span> est nul.</p>
+</div>
+<p>En appliquant ce lemme au GNLL, nous avons : <span
+class="math display">\[\nabla_{\beta} \text{GNLL}(\beta) =
+-\frac{1}{\sigma^2} X^T (y - X\beta)\]</span></p>
+<p>En posant <span class="math inline">\(\nabla_{\beta}
+\text{GNLL}(\beta) = 0\)</span>, nous obtenons l’équation normale :
+<span class="math display">\[X^T X \beta = X^T y\]</span></p>
+<p>La solution de cette équation est donnée par : <span
+class="math display">\[\beta = (X^T X)^{-1} X^T y\]</span></p>
+<p>Cette solution minimise le GNLL, ce qui achève la preuve.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes du GNLL :</p>
+<ol>
+<li><p>Le GNLL est une fonction convexe en <span
+class="math inline">\(\beta\)</span> lorsque <span
+class="math inline">\(\sigma^2\)</span> est fixe. Cette propriété
+garantit que la minimisation du GNLL conduit à une solution unique.</p>
+<div class="proof">
+<p><em>Proof.</em> La convexité de <span class="math inline">\(f(\beta)
+= \|y - X\beta\|^2\)</span> peut être montrée en examinant sa matrice
+hessienne : <span class="math display">\[H = 2X^T X\]</span> La matrice
+<span class="math inline">\(H\)</span> est semi-définie positive, ce qui
+prouve la convexité de <span class="math inline">\(f\)</span>. ◻</p>
+</div></li>
+<li><p>Le GNLL est invariant par translation des données. Cela signifie
+que l’ajout d’une constante à toutes les observations <span
+class="math inline">\(y_i\)</span> ne change pas le résultat de la
+minimisation.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(y&#39; = y +
+c\)</span>, où <span class="math inline">\(c\)</span> est une constante.
+Alors, <span class="math display">\[\text{GNLL}(\beta) = \frac{n}{2}
+\log(2\pi\sigma^2) + \frac{1}{2\sigma^2} \|y&#39; - X\beta\|^2 =
+\frac{n}{2} \log(2\pi\sigma^2) + \frac{1}{2\sigma^2} \|y -
+X\beta\|^2\]</span> La minimisation de <span
+class="math inline">\(\text{GNLL}(\beta)\)</span> est donc
+inchangée. ◻</p>
+</div></li>
+<li><p>Le GNLL est invariant par multiplication des données par une
+constante non nulle. Cela signifie que la multiplication de toutes les
+observations <span class="math inline">\(y_i\)</span> par une constante
+positive ne change pas le résultat de la minimisation.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(y&#39; = a
+y\)</span>, où <span class="math inline">\(a\)</span> est une constante
+positive. Alors, <span class="math display">\[\text{GNLL}(\beta) =
+\frac{n}{2} \log(2\pi\sigma^2) + \frac{1}{2\sigma^2} \|y&#39; -
+X\beta\|^2 = \frac{n}{2} \log(2\pi a^2 \sigma^2) + \frac{1}{2a^2
+\sigma^2} \|y - X\beta/a\|^2\]</span> En posant <span
+class="math inline">\(\beta&#39; = \beta / a\)</span>, nous avons :
+<span class="math display">\[\text{GNLL}(\beta&#39;) = \frac{n}{2}
+\log(2\pi a^2 \sigma^2) + \frac{1}{2a^2 \sigma^2} \|y -
+X\beta&#39;\|^2\]</span> La minimisation de <span
+class="math inline">\(\text{GNLL}(\beta&#39;)\)</span> est donc
+équivalente à celle de <span
+class="math inline">\(\text{GNLL}(\beta)\)</span>. ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le Gaussian Negative Log-Likelihood (GNLL) est une notion centrale en
+statistique et en apprentissage automatique. Sa minimisation permet
+d’obtenir des estimateurs efficaces et sans biais, une propriété
+fondamentale pour l’ajustement de modèles statistiques complexes. Les
+propriétés du GNLL, telles que sa convexité et ses invariances, en font
+un outil puissant pour l’analyse des données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

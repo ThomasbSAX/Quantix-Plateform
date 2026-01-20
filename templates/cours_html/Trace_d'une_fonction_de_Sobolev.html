@@ -1,0 +1,363 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Trace d’une fonction de Sobolev</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Trace d’une fonction de Sobolev</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’étude des espaces de Sobolev est fondamentale en analyse
+mathématique, particulièrement dans la théorie des équations aux
+dérivées partielles (EDP). Ces espaces permettent de donner un sens à
+des fonctions qui ne sont pas nécessairement continues, mais dont les
+dérivées faibles appartiennent à des espaces <span
+class="math inline">\(L^p\)</span>. Une question naturelle qui se pose
+est de savoir comment ces fonctions se comportent sur le bord d’un
+domaine. La notion de trace d’une fonction de Sobolev répond précisément
+à cette question.</p>
+<p>La théorie des traces permet de définir la restriction d’une fonction
+de Sobolev sur le bord d’un ouvert. Cette notion est cruciale pour
+formuler des conditions aux limites dans les EDP, et elle joue un rôle
+central dans de nombreuses applications en physique, ingénierie et
+sciences des matériaux. L’objectif de cet article est d’explorer les
+définitions, théorèmes et propriétés associés aux traces des fonctions
+de Sobolev.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la notion de trace, commençons par rappeler quelques
+définitions préliminaires. Soit <span
+class="math inline">\(\Omega\)</span> un ouvert borné de <span
+class="math inline">\(\mathbb{R}^n\)</span> avec une frontière
+suffisamment régulière, par exemple de classe <span
+class="math inline">\(C^1\)</span>.</p>
+<h2 id="dérivées-faibles">Dérivées faibles</h2>
+<p>Une fonction <span class="math inline">\(u \in
+L^1_{\text{loc}}(\Omega)\)</span> admet une dérivée faible dans la
+direction <span class="math inline">\(e_i\)</span> (où <span
+class="math inline">\(e_i\)</span> est le <span
+class="math inline">\(i\)</span>-ème vecteur de la base canonique) si et
+seulement s’il existe une fonction <span class="math inline">\(v_i \in
+L^1_{\text{loc}}(\Omega)\)</span> telle que pour toute fonction test
+<span class="math inline">\(\phi \in C_c^\infty(\Omega)\)</span>, on
+a:</p>
+<p><span class="math display">\[\int_\Omega u \frac{\partial
+\phi}{\partial x_i} \, dx = - \int_\Omega v_i \phi \, dx\]</span></p>
+<p>Dans ce cas, on note <span class="math inline">\(\frac{\partial
+u}{\partial x_i} = v_i\)</span>.</p>
+<h2 id="espace-de-sobolev-w1pomega">Espace de Sobolev <span
+class="math inline">\(W^{1,p}(\Omega)\)</span></h2>
+<p>L’espace de Sobolev <span
+class="math inline">\(W^{1,p}(\Omega)\)</span>, où <span
+class="math inline">\(1 \leq p &lt; +\infty\)</span>, est défini comme
+l’ensemble des fonctions <span class="math inline">\(u \in
+L^p(\Omega)\)</span> dont les dérivées faibles <span
+class="math inline">\(\frac{\partial u}{\partial x_i}\)</span>
+appartiennent à <span class="math inline">\(L^p(\Omega)\)</span>. Cet
+espace est muni de la norme:</p>
+<p><span class="math display">\[\|u\|_{W^{1,p}(\Omega)} = \left(
+\int_\Omega |u|^p + \sum_{i=1}^n \left| \frac{\partial u}{\partial x_i}
+\right|^p \, dx \right)^{1/p}\]</span></p>
+<h2 id="trace-dune-fonction-de-sobolev">Trace d’une fonction de
+Sobolev</h2>
+<p>Pour définir la trace, nous avons besoin de quelques notations
+supplémentaires. Soit <span class="math inline">\(\Gamma\)</span> le
+bord de <span class="math inline">\(\Omega\)</span>, et soit <span
+class="math inline">\(n\)</span> la normale unitaire extérieure à <span
+class="math inline">\(\Gamma\)</span>. Nous supposons que <span
+class="math inline">\(\Omega\)</span> est suffisamment régulier pour que
+la normale <span class="math inline">\(n\)</span> soit bien définie
+presque partout sur <span class="math inline">\(\Gamma\)</span>.</p>
+<p>La trace d’une fonction <span class="math inline">\(u \in
+W^{1,p}(\Omega)\)</span> est une application qui associe à <span
+class="math inline">\(u\)</span> sa restriction sur <span
+class="math inline">\(\Gamma\)</span>. Formellement, la trace de <span
+class="math inline">\(u\)</span>, notée <span
+class="math inline">\(\gamma(u)\)</span>, est définie par:</p>
+<p><span class="math display">\[\gamma(u) = \lim_{t \to 0^+} u(x + t
+n(x)) \quad \text{pour presque tout } x \in \Gamma\]</span></p>
+<p>où <span class="math inline">\(n(x)\)</span> est la normale unitaire
+extérieure en <span class="math inline">\(x \in \Gamma\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-la-trace">Théorème de la trace</h2>
+<p>Le théorème fondamental concernant les traces des fonctions de
+Sobolev est le suivant:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\Omega\)</span> un ouvert borné de
+<span class="math inline">\(\mathbb{R}^n\)</span> avec une frontière de
+classe <span class="math inline">\(C^1\)</span>. Alors, il existe une
+application linéaire continue <span class="math inline">\(\gamma :
+W^{1,p}(\Omega) \to L^p(\Gamma)\)</span> telle que pour toute fonction
+<span class="math inline">\(u \in W^{1,p}(\Omega)\)</span>, <span
+class="math inline">\(\gamma(u)\)</span> est la trace de <span
+class="math inline">\(u\)</span> sur <span
+class="math inline">\(\Gamma\)</span>. De plus, il existe une constante
+<span class="math inline">\(C &gt; 0\)</span> telle que pour toute
+fonction <span class="math inline">\(u \in W^{1,p}(\Omega)\)</span>:</p>
+<p><span class="math display">\[\|\gamma(u)\|_{L^p(\Gamma)} \leq C
+\|u\|_{W^{1,p}(\Omega)}\]</span></p>
+</div>
+<h2 id="démonstration-du-théorème-de-la-trace">Démonstration du théorème
+de la trace</h2>
+<p>La démonstration du théorème de la trace repose sur plusieurs étapes
+clés. Nous allons les détailler ci-dessous.</p>
+<h3 id="étape-1-construction-de-la-trace">Étape 1: Construction de la
+trace</h3>
+<p>Pour toute fonction <span class="math inline">\(u \in
+W^{1,p}(\Omega)\)</span>, nous définissons <span
+class="math inline">\(\gamma(u)\)</span> comme la limite:</p>
+<p><span class="math display">\[\gamma(u)(x) = \lim_{t \to 0^+} u(x + t
+n(x)) \quad \text{pour presque tout } x \in \Gamma\]</span></p>
+<p>Nous devons montrer que cette limite existe et appartient à <span
+class="math inline">\(L^p(\Gamma)\)</span>.</p>
+<h3 id="étape-2-continuité-de-la-trace">Étape 2: Continuité de la
+trace</h3>
+<p>Nous devons montrer que <span class="math inline">\(\gamma\)</span>
+est une application linéaire continue de <span
+class="math inline">\(W^{1,p}(\Omega)\)</span> dans <span
+class="math inline">\(L^p(\Gamma)\)</span>. Pour cela, nous utilisons le
+fait que <span class="math inline">\(\Omega\)</span> a une frontière de
+classe <span class="math inline">\(C^1\)</span>, ce qui permet de
+paramétrer localement <span class="math inline">\(\Gamma\)</span> et
+d’utiliser des estimations classiques en analyse.</p>
+<h3 id="étape-3-estimation-de-la-norme">Étape 3: Estimation de la
+norme</h3>
+<p>Enfin, nous devons établir l’inégalité:</p>
+<p><span class="math display">\[\|\gamma(u)\|_{L^p(\Gamma)} \leq C
+\|u\|_{W^{1,p}(\Omega)}\]</span></p>
+<p>Cette estimation découle des propriétés de régularité de <span
+class="math inline">\(\Gamma\)</span> et des inégalités de Sobolev.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-1-linéarité-de-la-trace">Propriété 1: Linéarité de la
+trace</h2>
+<p>La trace est une application linéaire. Plus précisément, pour toutes
+fonctions <span class="math inline">\(u, v \in W^{1,p}(\Omega)\)</span>
+et tout scalaire <span class="math inline">\(\lambda \in
+\mathbb{R}\)</span>, on a:</p>
+<p><span class="math display">\[\gamma(u + v) = \gamma(u) +
+\gamma(v)\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\gamma(\lambda u) = \lambda
+\gamma(u)\]</span></p>
+<h2 id="propriété-2-continuité-de-la-trace">Propriété 2: Continuité de
+la trace</h2>
+<p>La trace est une application continue de <span
+class="math inline">\(W^{1,p}(\Omega)\)</span> dans <span
+class="math inline">\(L^p(\Gamma)\)</span>. Cela signifie que pour toute
+suite <span class="math inline">\((u_n)_{n \in \mathbb{N}}\)</span> dans
+<span class="math inline">\(W^{1,p}(\Omega)\)</span> qui converge vers
+<span class="math inline">\(u\)</span> dans <span
+class="math inline">\(W^{1,p}(\Omega)\)</span>, on a:</p>
+<p><span class="math display">\[\gamma(u_n) \to \gamma(u) \quad
+\text{dans } L^p(\Gamma)\]</span></p>
+<h2 id="propriété-3-formule-de-green">Propriété 3: Formule de Green</h2>
+<p>La trace permet de formuler des conditions aux limites pour les EDP.
+Par exemple, la formule de Green s’écrit:</p>
+<p><span class="math display">\[\int_\Omega \nabla u \cdot \nabla v \,
+dx + \int_\Omega u v \, dx = \int_\Gamma \gamma(u) \frac{\partial
+v}{\partial n} \, d\sigma + \int_\Omega u v \, dx\]</span></p>
+<p>pour toutes fonctions <span class="math inline">\(u, v \in
+W^{1,p}(\Omega)\)</span>.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La notion de trace d’une fonction de Sobolev est essentielle pour
+l’étude des EDP et des problèmes aux limites. Elle permet de définir la
+restriction d’une fonction sur le bord d’un domaine et joue un rôle
+crucial dans la formulation des conditions aux limites. Les théorèmes et
+propriétés présentés dans cet article montrent la richesse et la
+puissance de cette notion, qui trouve des applications dans de nombreux
+domaines des mathématiques appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

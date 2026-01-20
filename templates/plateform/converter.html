@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantix Convertor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #ffffff; color: #212121; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+        .main-content { min-height: 100vh; padding: 120px 20px 80px; }
+        .conv-container { max-width: 1000px; margin: 0 auto; }
+        
+        .conv-header { text-align: center; margin-bottom: 48px; }
+        .conv-header h1 { font-size: 2.5rem; font-weight: 300; opacity: 0; margin-bottom: 12px; }
+        .conv-header p { font-size: 1.1rem; color: #565869; margin: 0; }
+
+        /* Section Upload */
+        .upload-section { 
+            background: #fafafa; 
+            border: 2px dashed #e5e5e5; 
+            border-radius: 8px; 
+            padding: 48px 32px; 
+            text-align: center; 
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-section:hover { border-color: #1da2ff; background: #f7f9ff; }
+        .upload-section.drag-over { border-color: #1da2ff; background: #f0f7ff; }
+        
+        .upload-icon { font-size: 3rem; color: #8e8ea0; margin-bottom: 20px; }
+        .upload-text { font-size: 1.2rem; color: #212121; margin-bottom: 8px; font-weight: 500; }
+        .upload-hint { font-size: 0.95rem; color: #8e8ea0; }
+        #file-input { display: none; }
+
+        /* Section Info Fichier */
+        .file-info-section { 
+            display: none; 
+            background: #ffffff; 
+            border: 1px solid #e5e5e5; 
+            border-radius: 8px; 
+            padding: 24px; 
+            margin-top: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        
+        .file-meta-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        #file-name { font-size: 1.1rem; font-weight: 600; color: #212121; }
+        .file-meta { color: #8e8ea0; font-size: 0.9rem; }
+
+        /* Configuration */
+        .config { 
+            display: flex; 
+            gap: 16px; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap;
+        }
+        .config label { font-weight: 500; color: #565869; min-width: 100px; }
+        .config select, .config button { 
+            padding: 12px 16px; 
+            border: 1px solid #e5e5e5; 
+            border-radius: 6px; 
+            background: #fff; 
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .config select:focus { outline: none; border-color: #1da2ff; }
+        .config select { min-width: 160px; }
+        
+        .convert-button { 
+            background: #1da2ff; 
+            color: #fff; 
+            border: none; 
+            font-weight: 600;
+            padding: 12px 24px;
+        }
+        .convert-button:hover:not(:disabled) { background: #0d8ce8; }
+        .convert-button:disabled { background: #e5e5e5; color: #8e8ea0; cursor: not-allowed; }
+        
+        /* Action Section */
+        .action-section {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+            text-align: center;
+        }
+        
+        .convert-download-button {
+            background: linear-gradient(135deg, #1da2ff 0%, #0d8ce8 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(29, 162, 255, 0.3);
+            min-width: 220px;
+            justify-content: center;
+        }
+        
+        .convert-download-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0d8ce8 0%, #0b7acc 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(29, 162, 255, 0.4);
+        }
+        
+        .convert-download-button:disabled {
+            background: #e5e5e5;
+            color: #8e8ea0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Section Formats Supportés */
+        .supported-formats {
+            background: #f7f7f8;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        .supported-formats h4 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #212121;
+        }
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        .format-category {
+            font-size: 13px;
+            color: #565869;
+        }
+        .format-category strong {
+            color: #212121;
+            font-weight: 600;
+        }
+
+        /* Section Processing */
+        .processing-section { 
+            display: none; 
+            text-align: center; 
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 32px 24px; 
+            margin-top: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .spinner { 
+            border: 3px solid #f0f0f0; 
+            border-top: 3px solid #1da2ff; 
+            border-radius: 50%; 
+            width: 40px; 
+            height: 40px; 
+            animation: spin 1s linear infinite; 
+            margin: 0 auto 16px; 
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .processing-text { font-size: 1.1rem; font-weight: 500; color: #212121; margin-bottom: 8px; }
+        .progress-details { color: #8e8ea0; font-size: 0.9rem; }
+
+        /* Section Résultats */
+        .results-section { 
+            display: none; 
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 24px;
+            margin-top: 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .result-success {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+        }
+        .result-text { 
+            font-size: 1.1rem; 
+            font-weight: 500; 
+            color: #059669; 
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .download-button { 
+            background: #1da2ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 14px 28px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .download-button:hover { 
+            background: #0d8ce8; 
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(29, 162, 255, 0.3);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .conv-container { max-width: 100%; padding: 0 16px; }
+            .config { flex-direction: column; align-items: stretch; }
+            .config label { min-width: auto; }
+            .format-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+    <main class="main-content">
+        <div class="conv-container">
+            <div class="conv-header">
+                <h1>Quantix Convertor</h1>
+                <p>Convertissez un fichier vers un autre format (selon les conversions réellement disponibles).</p>
+            </div>
+
+            <div id="upload-zone" class="upload-section">
+                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="upload-text">Sélectionner ou déposer un fichier</div>
+                <div class="upload-hint">Formats supportés : selon les conversions disponibles sur ce serveur</div>
+                <input type="file" id="file-input" />
+            </div>
+
+            <div id="file-info" class="file-info-section">
+                <div class="file-meta-row">
+                    <strong id="file-name"></strong>
+                    <div class="file-meta" id="file-size"></div>
+                </div>
+
+                <div class="config">
+                    <label for="target-format">Format de sortie</label>
+                    <select id="target-format">
+                        <option value="">Sélectionnez un fichier d'abord</option>
+                    </select>
+                    <div id="conversion-hint" class="file-meta" style="min-width: 240px;"></div>
+                </div>
+                
+                <div class="action-section">
+                    <button class="convert-download-button" id="convert-btn">
+                        <i class="fas fa-magic"></i>
+                        Convertir et Télécharger
+                    </button>
+                </div>
+
+                <div class="supported-formats" id="supported-formats" style="display:none;">
+                    <h4>Conversions disponibles (vérifiées côté serveur)</h4>
+                    <div class="format-grid" id="supported-formats-grid"></div>
+                </div>
+            </div>
+
+            <div id="processing" class="processing-section">
+                <div class="spinner"></div>
+                <div class="processing-text">Conversion en cours</div>
+                <div class="progress-details" id="progress-details">Traitement du fichier...</div>
+            </div>
+
+            <div id="results" class="results-section">
+                <div class="result-text">
+                    <i class="fas fa-check-circle"></i>
+                    Conversion terminée avec succès
+                </div>
+                <button class="download-button" id="download-btn" style="display:none;">
+                    <i class="fas fa-download"></i>
+                    Télécharger le fichier
+                </button>
+            </div>
+        </div>
+    </main>
+    {% include 'footer.html' %}
+
+    <script>
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileInfo = document.getElementById('file-info');
+        const processing = document.getElementById('processing');
+        const results = document.getElementById('results');
+        const convertBtn = document.getElementById('convert-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const conversionHint = document.getElementById('conversion-hint');
+        const supportedFormatsBox = document.getElementById('supported-formats');
+        const supportedFormatsGrid = document.getElementById('supported-formats-grid');
+
+        let currentFile = null;
+        let outputPath = null;
+        let downloadUrl = null;
+
+        let capabilities = null;
+        let conversions = null;
+        let aliases = null;
+        let currentSourceFormat = null;
+
+        // Par défaut: tant qu'on ne connaît pas les conversions
+        convertBtn.disabled = true;
+
+        const fileIcons = { 'pdf': 'fa-file-pdf', 'docx':'fa-file-word', 'txt':'fa-file-alt', 'csv':'fa-file-csv', 'xlsx':'fa-file-excel', 'jpg':'fa-file-image', 'png':'fa-file-image' };
+
+        uploadZone.addEventListener('click', () => fileInput.click());
+        uploadZone.addEventListener('dragover', (e) => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+        uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+        uploadZone.addEventListener('drop', (e) => { e.preventDefault(); uploadZone.classList.remove('drag-over'); const f = e.dataTransfer.files[0]; if (f) handleFile(f); });
+        fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+        async function loadCapabilities() {
+            try {
+                const resp = await fetch('/api/convert/capabilities');
+                const data = await resp.json();
+                if (!resp.ok || !data.success) throw new Error(data.error || 'Impossible de charger les conversions');
+                capabilities = data;
+                conversions = data.conversions || {};
+                aliases = data.aliases || {};
+
+                // Affichage liste complète (optionnel)
+                const items = Object.entries(conversions)
+                    .sort((a, b) => a[0].localeCompare(b[0]))
+                    .map(([src, dsts]) => {
+                        const list = (dsts || []).map(prettyFormat).join(', ');
+                        return `<div class="format-category"><strong>${prettyFormat(src)} :</strong> ${list}</div>`;
+                    });
+                if (items.length) {
+                    supportedFormatsGrid.innerHTML = items.join('');
+                    supportedFormatsBox.style.display = 'block';
+                }
+
+                // Si un fichier est déjà sélectionné, rafraîchir la liste des sorties
+                if (currentFile) {
+                    const parts = String(currentFile.name || '').split('.');
+                    const ext = parts.length > 1 ? parts.pop() : '';
+                    updateTargetsForSource(normalizeFormat(ext));
+                }
+            } catch (e) {
+                console.error(e);
+                conversionHint.textContent = "Impossible de charger la liste des conversions.";
+            }
+        }
+
+        function normalizeFormat(fmt) {
+            const s = String(fmt || '').trim().toLowerCase().replace(/^\./, '');
+            if (!s) return null;
+            return aliases?.[s] || s;
+        }
+
+        function prettyFormat(fmt) {
+            const f = String(fmt || '').toLowerCase();
+            const labels = {
+                csv: 'CSV',
+                tsv: 'TSV',
+                xlsx: 'Excel (XLSX)',
+                json: 'JSON',
+                pdf: 'PDF',
+                docx: 'DOCX',
+                txt: 'TXT',
+                markdown: 'Markdown',
+                latex: 'LaTeX',
+                pptx: 'PPTX',
+                png: 'PNG',
+                jpg: 'JPG',
+                image: 'Images (ZIP)'
+            };
+            return labels[f] || f.toUpperCase();
+        }
+
+        function updateTargetsForSource(sourceFmt) {
+            currentSourceFormat = sourceFmt;
+            const list = (conversions && sourceFmt && conversions[sourceFmt]) ? conversions[sourceFmt] : [];
+
+            const select = document.getElementById('target-format');
+            select.innerHTML = '';
+
+            if (!sourceFmt) {
+                select.innerHTML = '<option value="">Sélectionnez un fichier d\'abord</option>';
+                convertBtn.disabled = true;
+                conversionHint.textContent = '';
+                return;
+            }
+
+            if (!list.length) {
+                select.innerHTML = '<option value="">Aucune conversion disponible</option>';
+                convertBtn.disabled = true;
+                conversionHint.textContent = `Aucune conversion disponible pour ${prettyFormat(sourceFmt)}.`;
+                return;
+            }
+
+            select.innerHTML = '<option value="">Choisir un format</option>' + list.map(fmt => `<option value="${fmt}">${prettyFormat(fmt)}</option>`).join('');
+            convertBtn.disabled = false;
+            conversionHint.textContent = `Entrée: ${prettyFormat(sourceFmt)} • ${list.length} sortie(s) possible(s).`;
+        }
+
+        function handleFile(file) {
+            currentFile = file;
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatFileSize(file.size);
+            uploadZone.style.display = 'none';
+            fileInfo.style.display = 'block';
+            results.style.display = 'none';
+
+            // Déduire format source depuis l'extension
+            const parts = String(file.name || '').split('.');
+            const ext = parts.length > 1 ? parts.pop() : '';
+            const srcFmt = normalizeFormat(ext);
+            updateTargetsForSource(srcFmt);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B','KB','MB','GB'];
+            const i = Math.floor(Math.log(bytes)/Math.log(k));
+            return Math.round(bytes/Math.pow(k,i)*100)/100 + ' ' + sizes[i];
+        }
+
+        convertBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+            const target = document.getElementById('target-format').value;
+            if (!target) {
+                results.style.display = 'block';
+                results.classList.remove('result-success');
+                document.querySelector('.result-text').innerHTML = `
+                    <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+                    Choisissez un format de sortie
+                `;
+                document.querySelector('.result-text').style.color = '#ef4444';
+                downloadBtn.style.display = 'none';
+                return;
+            }
+
+            // Sécurité UI: ne jamais proposer/envoyer un couple non supporté
+            const allowed = conversions?.[currentSourceFormat] || [];
+            if (!allowed.includes(target)) {
+                results.style.display = 'block';
+                results.classList.remove('result-success');
+                document.querySelector('.result-text').innerHTML = `
+                    <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+                    Conversion non disponible: ${prettyFormat(currentSourceFormat)} → ${prettyFormat(target)}
+                `;
+                document.querySelector('.result-text').style.color = '#ef4444';
+                downloadBtn.style.display = 'none';
+                return;
+            }
+            const fd = new FormData();
+            fd.append('file', currentFile);
+            fd.append('target_format', target);
+
+            // Reset état résultat
+            outputPath = null;
+            downloadUrl = null;
+            downloadBtn.disabled = true;
+            downloadBtn.style.display = 'none';
+
+            fileInfo.style.display = 'none';
+            processing.style.display = 'block';
+            results.style.display = 'none';
+            
+            // Mise à jour du statut
+            document.getElementById('progress-details').textContent = `Conversion vers ${target.toUpperCase()}...`;
+
+            try {
+                const resp = await fetch('/api/convert', { method: 'POST', body: fd });
+                const data = await resp.json();
+                
+                processing.style.display = 'none';
+                
+                if (resp.ok && data.success) {
+                    // /api/convert renvoie: output_file + download_url
+                    outputPath = data.output_file || data.output_path || null;
+                    downloadUrl = data.download_url || (outputPath ? `/download/${encodeURIComponent(outputPath)}` : null);
+                    results.style.display = 'block';
+                    results.classList.add('result-success');
+                    document.querySelector('.result-text').style.color = '#059669';
+
+                    downloadBtn.disabled = !downloadUrl;
+                    downloadBtn.style.display = downloadUrl ? 'inline-flex' : 'none';
+                    
+                    // Mise à jour du message de succès
+                    document.querySelector('.result-text').innerHTML = `
+                        <i class="fas fa-check-circle"></i>
+                        Fichier converti avec succès en ${prettyFormat(target)}
+                    `;
+                } else {
+                    // Gestion des erreurs avec style approprié
+                    results.style.display = 'block';
+                    results.classList.remove('result-success');
+                    document.querySelector('.result-text').innerHTML = `
+                        <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+                        Erreur : ${data.error || 'Conversion échouée'}
+                    `;
+                    document.querySelector('.result-text').style.color = '#ef4444';
+
+                    outputPath = null;
+                    downloadUrl = null;
+                    downloadBtn.disabled = true;
+                    downloadBtn.style.display = 'none';
+                }
+            } catch (e) {
+                console.error(e);
+                processing.style.display = 'none';
+                results.style.display = 'block';
+                results.classList.remove('result-success');
+                document.querySelector('.result-text').innerHTML = `
+                    <i class="fas fa-exclamation-circle" style="color: #ef4444;"></i>
+                    Erreur de connexion
+                `;
+                document.querySelector('.result-text').style.color = '#ef4444';
+
+                outputPath = null;
+                downloadUrl = null;
+                downloadBtn.disabled = true;
+                downloadBtn.style.display = 'none';
+            }
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            if (downloadUrl) {
+                window.location.href = downloadUrl;
+                return;
+            }
+            // Fallback ancien comportement (au cas où)
+            if (outputPath) window.location.href = `/download/${encodeURIComponent(outputPath)}`;
+        });
+
+        // Typewriter
+        function typeWriter(element, text, speed) {
+            let i = 0; element.textContent = ''; element.style.opacity = '1';
+            function type(){ if (i < text.length) { element.textContent += text.charAt(i++); setTimeout(type, speed); } }
+            type();
+        }
+        document.addEventListener('DOMContentLoaded', ()=>{ const h = document.querySelector('.conv-header h1'); if(h) typeWriter(h, 'Quantix Convertor', 80); });
+        document.addEventListener('DOMContentLoaded', loadCapabilities);
+    </script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>

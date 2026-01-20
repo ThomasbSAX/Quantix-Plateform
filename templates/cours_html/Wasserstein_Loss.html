@@ -1,0 +1,472 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Wasserstein Loss: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Wasserstein Loss: A Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>The concept of Wasserstein loss emerges from the need to measure
+distances between probability distributions in a meaningful and
+computationally tractable way. Historically, this notion finds its roots
+in the works of Leonid Kantorovich and his solution to a linear
+programming problem, which later became known as the
+Kantorovich-Rubinstein duality. The Wasserstein distance, or Earth
+Mover’s Distance (EMD), provides a metric that captures the minimal
+"work" required to transform one distribution into another, making it
+particularly useful in various fields such as optimal transport theory,
+economics, and machine learning.</p>
+<p>In the realm of generative models, particularly Generative
+Adversarial Networks (GANs), the Wasserstein loss has gained significant
+attention. Traditional GANs use the Jensen-Shannon divergence to measure
+the difference between the generated and real data distributions.
+However, this metric can suffer from instability and mode collapse
+issues. The Wasserstein loss addresses these problems by providing a
+more stable and theoretically grounded metric, leading to improved
+training dynamics and better convergence properties.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>To understand the Wasserstein loss, we first need to define the
+Wasserstein distance. Consider two probability measures <span
+class="math inline">\(\mu\)</span> and <span
+class="math inline">\(\nu\)</span> on a Polish space <span
+class="math inline">\(\mathcal{X}\)</span> (a complete, separable metric
+space). The goal is to quantify the distance between these two
+measures.</p>
+<h2 class="unnumbered" id="wasserstein-distance">Wasserstein
+Distance</h2>
+<p>Intuitively, we want to find the minimal amount of "work" required to
+transform <span class="math inline">\(\mu\)</span> into <span
+class="math inline">\(\nu\)</span>. This can be thought of as moving
+"mass" from one distribution to another, where the cost is proportional
+to the distance moved.</p>
+<p>Formally, for a given cost function <span class="math inline">\(c:
+\mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}^+\)</span>, the
+Wasserstein distance of order <span class="math inline">\(p\)</span> is
+defined as:</p>
+<p><span class="math display">\[W_p(\mu, \nu) = \left( \inf_{\gamma \in
+\Gamma(\mu, \nu)} \int_{\mathcal{X} \times \mathcal{X}} c(x, y) \,
+d\gamma(x, y) \right)^{1/p}\]</span></p>
+<p>where <span class="math inline">\(\Gamma(\mu, \nu)\)</span> is the
+set of all joint measures <span class="math inline">\(\gamma\)</span> on
+<span class="math inline">\(\mathcal{X} \times \mathcal{X}\)</span> with
+marginals <span class="math inline">\(\mu\)</span> and <span
+class="math inline">\(\nu\)</span>, i.e.,</p>
+<p><span class="math display">\[\Gamma(\mu, \nu) = \{ \gamma \in
+\mathcal{P}(\mathcal{X} \times \mathcal{X}) : \pi_{\#1}\gamma = \mu,
+\pi_{\#2}\gamma = \nu \}\]</span></p>
+<p>Here, <span class="math inline">\(\pi_{\#1}\)</span> and <span
+class="math inline">\(\pi_{\#2}\)</span> are the projection maps onto
+the first and second coordinates, respectively.</p>
+<p>For <span class="math inline">\(p = 1\)</span> and with the cost
+function <span class="math inline">\(c(x, y) = \|x - y\|\)</span>, we
+obtain the Wasserstein-1 distance:</p>
+<p><span class="math display">\[W_1(\mu, \nu) = \inf_{\gamma \in
+\Gamma(\mu, \nu)} \int_{\mathcal{X} \times \mathcal{X}} \|x - y\| \,
+d\gamma(x, y)\]</span></p>
+<h2 class="unnumbered"
+id="kantorovich-rubinstein-duality">Kantorovich-Rubinstein Duality</h2>
+<p>The Kantorovich-Rubinstein duality provides an alternative
+characterization of the Wasserstein-1 distance. Let <span
+class="math inline">\(\mathcal{L}\)</span> be the set of all 1-Lipschitz
+functions <span class="math inline">\(f: \mathcal{X} \rightarrow
+\mathbb{R}\)</span>, i.e.,</p>
+<p><span class="math display">\[\mathcal{L} = \{ f: \mathcal{X}
+\rightarrow \mathbb{R} : |f(x) - f(y)| \leq \|x - y\| \text{ for all }
+x, y \in \mathcal{X} \}\]</span></p>
+<p>Then, the Wasserstein-1 distance can be expressed as:</p>
+<p><span class="math display">\[W_1(\mu, \nu) = \sup_{f \in \mathcal{L}}
+\left( \int_{\mathcal{X}} f \, d\mu - \int_{\mathcal{X}} f \, d\nu
+\right)\]</span></p>
+<p>This dual formulation is particularly useful in practice, as it
+allows us to compute the Wasserstein distance by optimizing over a set
+of Lipschitz functions.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered"
+id="theorem-1-kantorovich-rubinstein-duality">Theorem 1
+(Kantorovich-Rubinstein Duality)</h2>
+<p>The Wasserstein-1 distance between two probability measures <span
+class="math inline">\(\mu\)</span> and <span
+class="math inline">\(\nu\)</span> can be expressed as:</p>
+<p><span class="math display">\[W_1(\mu, \nu) = \sup_{f \in \mathcal{L}}
+\left( \int_{\mathcal{X}} f \, d\mu - \int_{\mathcal{X}} f \, d\nu
+\right)\]</span></p>
+<p>where <span class="math inline">\(\mathcal{L}\)</span> is the set of
+all 1-Lipschitz functions.</p>
+<div class="proof">
+<p><em>Proof.</em> We start by noting that the primal problem is to
+minimize the integral of the cost function <span
+class="math inline">\(c(x, y) = \|x - y\|\)</span> over all joint
+measures <span class="math inline">\(\gamma \in \Gamma(\mu,
+\nu)\)</span>. By the Kantorovich duality theorem (Theorem 2.1 in
+Villani’s "Optimal Transport"), this primal problem is equivalent to the
+dual problem of maximizing the difference in expectations of a Lipschitz
+function <span class="math inline">\(f\)</span> under <span
+class="math inline">\(\mu\)</span> and <span
+class="math inline">\(\nu\)</span>.</p>
+<p>To see this, consider the following steps:</p>
+<p>1. For any <span class="math inline">\(f \in \mathcal{L}\)</span>, we
+have:</p>
+<p><span class="math display">\[\int_{\mathcal{X} \times \mathcal{X}}
+\|x - y\| \, d\gamma(x, y) \geq \int_{\mathcal{X} \times \mathcal{X}}
+(f(x) - f(y)) \, d\gamma(x, y)\]</span></p>
+<p>This follows from the fact that <span
+class="math inline">\(f\)</span> is 1-Lipschitz and the definition of
+<span class="math inline">\(\gamma\)</span>.</p>
+<p>2. Taking the infimum over all <span class="math inline">\(\gamma \in
+\Gamma(\mu, \nu)\)</span>, we obtain:</p>
+<p><span class="math display">\[W_1(\mu, \nu) \geq \sup_{f \in
+\mathcal{L}} \left( \int_{\mathcal{X}} f \, d\mu - \int_{\mathcal{X}} f
+\, d\nu \right)\]</span></p>
+<p>3. To show the reverse inequality, we use the fact that for any <span
+class="math inline">\(\epsilon &gt; 0\)</span>, there exists a function
+<span class="math inline">\(f_\epsilon \in \mathcal{L}\)</span> such
+that:</p>
+<p><span class="math display">\[\int_{\mathcal{X}} f_\epsilon \, d\mu -
+\int_{\mathcal{X}} f_\epsilon \, d\nu \geq W_1(\mu, \nu) -
+\epsilon\]</span></p>
+<p>This follows from the density of Lipschitz functions in the space of
+bounded functions and the definition of the supremum.</p>
+<p>4. Taking <span class="math inline">\(\epsilon \rightarrow
+0\)</span>, we conclude that:</p>
+<p><span class="math display">\[W_1(\mu, \nu) = \sup_{f \in \mathcal{L}}
+\left( \int_{\mathcal{X}} f \, d\mu - \int_{\mathcal{X}} f \, d\nu
+\right)\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered"
+id="proof-of-the-kantorovich-rubinstein-duality">Proof of the
+Kantorovich-Rubinstein Duality</h2>
+<p>The proof of the Kantorovich-Rubinstein duality relies on several key
+steps and properties:</p>
+<p>1. **Primal Problem**: The primal problem is to minimize the integral
+of the cost function <span class="math inline">\(c(x, y) = \|x -
+y\|\)</span> over all joint measures <span class="math inline">\(\gamma
+\in \Gamma(\mu, \nu)\)</span>. This can be written as:</p>
+<p><span class="math display">\[\inf_{\gamma \in \Gamma(\mu, \nu)}
+\int_{\mathcal{X} \times \mathcal{X}} \|x - y\| \, d\gamma(x,
+y)\]</span></p>
+<p>2. **Dual Problem**: The dual problem is to maximize the difference
+in expectations of a Lipschitz function <span
+class="math inline">\(f\)</span> under <span
+class="math inline">\(\mu\)</span> and <span
+class="math inline">\(\nu\)</span>. This can be written as:</p>
+<p><span class="math display">\[\sup_{f \in \mathcal{L}} \left(
+\int_{\mathcal{X}} f \, d\mu - \int_{\mathcal{X}} f \, d\nu
+\right)\]</span></p>
+<p>3. **Equivalence of Primal and Dual Problems**: By the Kantorovich
+duality theorem, these two problems are equivalent. This means that the
+infimum in the primal problem is equal to the supremum in the dual
+problem.</p>
+<p>4. **Existence of Optimal Transport Plan**: For any <span
+class="math inline">\(\epsilon &gt; 0\)</span>, there exists a joint
+measure <span class="math inline">\(\gamma_\epsilon \in \Gamma(\mu,
+\nu)\)</span> such that:</p>
+<p><span class="math display">\[\int_{\mathcal{X} \times \mathcal{X}}
+\|x - y\| \, d\gamma_\epsilon(x, y) \leq W_1(\mu, \nu) +
+\epsilon\]</span></p>
+<p>5. **Construction of Lipschitz Function**: Using the optimal
+transport plan <span class="math inline">\(\gamma_\epsilon\)</span>, we
+can construct a function <span class="math inline">\(f_\epsilon\)</span>
+that is 1-Lipschitz and satisfies:</p>
+<p><span class="math display">\[\int_{\mathcal{X}} f_\epsilon \, d\mu -
+\int_{\mathcal{X}} f_\epsilon \, d\nu \geq W_1(\mu, \nu) -
+\epsilon\]</span></p>
+<p>6. **Conclusion**: Taking <span class="math inline">\(\epsilon
+\rightarrow 0\)</span>, we obtain the desired equality:</p>
+<p><span class="math display">\[W_1(\mu, \nu) = \sup_{f \in \mathcal{L}}
+\left( \int_{\mathcal{X}} f \, d\mu - \int_{\mathcal{X}} f \, d\nu
+\right)\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="properties-of-the-wasserstein-distance">Properties of the
+Wasserstein Distance</h2>
+<ol>
+<li><p>**Metric Property**: The Wasserstein distance <span
+class="math inline">\(W_p\)</span> is a metric on the space of
+probability measures with finite <span
+class="math inline">\(p\)</span>-th moment. That is, for any <span
+class="math inline">\(\mu, \nu, \rho \in
+\mathcal{P}_p(\mathcal{X})\)</span>, we have:</p>
+<ul>
+<li><p><span class="math inline">\(W_p(\mu, \nu) = 0\)</span> if and
+only if <span class="math inline">\(\mu = \nu\)</span>,</p></li>
+<li><p><span class="math inline">\(W_p(\mu, \nu) = W_p(\nu,
+\mu)\)</span>,</p></li>
+<li><p><span class="math inline">\(W_p(\mu, \rho) \leq W_p(\mu, \nu) +
+W_p(\nu, \rho)\)</span>.</p></li>
+</ul>
+<div class="proof">
+<p><em>Proof.</em> The metric properties follow directly from the
+definition of <span class="math inline">\(W_p\)</span> and the
+properties of the cost function <span
+class="math inline">\(c\)</span>. ◻</p>
+</div></li>
+<li><p>**Continuity**: The Wasserstein distance <span
+class="math inline">\(W_p\)</span> is continuous with respect to weak
+convergence of probability measures. That is, if <span
+class="math inline">\(\mu_n \rightarrow \mu\)</span> and <span
+class="math inline">\(\nu_n \rightarrow \nu\)</span> weakly as <span
+class="math inline">\(n \rightarrow \infty\)</span>, then:</p>
+<p><span class="math display">\[W_p(\mu_n, \nu_n) \rightarrow W_p(\mu,
+\nu)\]</span></p>
+<p>as <span class="math inline">\(n \rightarrow \infty\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> This follows from the definition of weak convergence
+and the continuity of the cost function <span
+class="math inline">\(c\)</span>. ◻</p>
+</div></li>
+<li><p>**Compactness**: The space of probability measures with finite
+<span class="math inline">\(p\)</span>-th moment <span
+class="math inline">\(\mathcal{P}_p(\mathcal{X})\)</span> is compact
+with respect to the Wasserstein distance <span
+class="math inline">\(W_p\)</span>. That is, any sequence <span
+class="math inline">\(\{\mu_n\}_{n \in \mathbb{N}}\)</span> in <span
+class="math inline">\(\mathcal{P}_p(\mathcal{X})\)</span> has a
+convergent subsequence.</p>
+<div class="proof">
+<p><em>Proof.</em> This follows from the Prokhorov’s theorem and the
+fact that <span class="math inline">\(\mathcal{X}\)</span> is a Polish
+space. ◻</p>
+</div></li>
+</ol>
+<h2 class="unnumbered"
+id="corollaries-of-the-kantorovich-rubinstein-duality">Corollaries of
+the Kantorovich-Rubinstein Duality</h2>
+<ol>
+<li><p>**Lipschitz Extension Theorem**: For any <span
+class="math inline">\(f: \mathcal{X} \rightarrow \mathbb{R}\)</span> and
+<span class="math inline">\(\mu, \nu \in
+\mathcal{P}(\mathcal{X})\)</span>, the following holds:</p>
+<p><span class="math display">\[\left| \int_{\mathcal{X}} f \, d\mu -
+\int_{\mathcal{X}} f \, d\nu \right| \leq L(f) W_1(\mu,
+\nu)\]</span></p>
+<p>where <span class="math inline">\(L(f)\)</span> is the Lipschitz
+constant of <span class="math inline">\(f\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> This follows from the definition of the Wasserstein
+distance and the properties of Lipschitz functions. ◻</p>
+</div></li>
+<li><p>**Duality for Higher Orders**: The Kantorovich-Rubinstein duality
+can be extended to higher orders <span class="math inline">\(p &gt;
+1\)</span>. For any <span class="math inline">\(\mu, \nu \in
+\mathcal{P}_p(\mathcal{X})\)</span>, we have:</p>
+<p><span class="math display">\[W_p(\mu, \nu)^p = \sup_{f \in
+\mathcal{L}_p} \left( \int_{\mathcal{X}} f \, d\mu - \int_{\mathcal{X}}
+f \, d\nu \right)\]</span></p>
+<p>where <span class="math inline">\(\mathcal{L}_p\)</span> is the set
+of all <span class="math inline">\(p\)</span>-Lipschitz functions.</p>
+<div class="proof">
+<p><em>Proof.</em> This follows from the generalization of the
+Kantorovich duality theorem to higher orders. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>The Wasserstein loss, based on the Wasserstein distance or Earth
+Mover’s Distance, provides a powerful and theoretically grounded metric
+for measuring the difference between probability distributions. Its
+applications in optimal transport theory, economics, and machine
+learning are vast and continue to grow. The Kantorovich-Rubinstein
+duality offers a practical way to compute the Wasserstein distance by
+optimizing over Lipschitz functions, making it particularly useful in
+computational settings. The properties and corollaries of the
+Wasserstein distance further highlight its importance and versatility in
+various fields.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

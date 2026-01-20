@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Test de Fligner-Killeen: Une Approche Non-Paramétrique pour la Comparaison des Médianes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Test de Fligner-Killeen: Une Approche
+Non-Paramétrique pour la Comparaison des Médianes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>En statistique, la comparaison des médianes de plusieurs échantillons
+indépendants est une tâche fondamentale. Cependant, les méthodes
+classiques comme le test de Kruskal-Wallis supposent souvent que les
+distributions sous-jacentes ont des formes similaires. Le test de
+Fligner-Killeen, développé par Fligner et Killeen en 1976, offre une
+alternative non-paramétrique robuste à cette hypothèse restrictive.</p>
+<p>L’intérêt pour ce test émerge naturellement lorsque l’on considère
+des données issues de distributions asymétriques ou multiformes. Par
+exemple, en biologie, les temps de survie peuvent suivre une
+distribution exponentielle, tandis que les concentrations de substances
+chimiques peuvent être log-normales. Dans de tels cas, les méthodes
+paramétriques traditionnelles peuvent conduire à des conclusions
+erronées.</p>
+<p>Le test de Fligner-Killeen est particulièrement utile lorsqu’on
+souhaite comparer les médianes de plusieurs groupes tout en tenant
+compte des différences potentielles dans la forme des distributions. Il
+est basé sur une transformation des données qui permet de rendre les
+distributions plus symétriques, facilitant ainsi la comparaison des
+médianes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de présenter le test de Fligner-Killeen, il est essentiel de
+comprendre quelques concepts prérequis.</p>
+<h2 id="transformation-de-rang">Transformation de Rang</h2>
+<p>Considérons un échantillon de données <span
+class="math inline">\(X_1, X_2, \ldots, X_n\)</span>. La transformation
+de rang consiste à remplacer chaque observation <span
+class="math inline">\(X_i\)</span> par son rang dans l’échantillon
+ordonné. Formellement, pour chaque <span
+class="math inline">\(i\)</span>, on définit le rang <span
+class="math inline">\(R_i\)</span> comme suit :</p>
+<p><span class="math display">\[R_i = \sum_{j=1}^n \mathbb{I}(X_j \leq
+X_i)\]</span></p>
+<p>où <span class="math inline">\(\mathbb{I}\)</span> est l’indicatrice
+qui vaut 1 si la condition est vraie et 0 sinon.</p>
+<h2 id="test-de-fligner-killeen">Test de Fligner-Killeen</h2>
+<p>Le test de Fligner-Killeen est une extension du test de
+Kruskal-Wallis qui prend en compte les différences dans la forme des
+distributions. Il est basé sur une statistique de test <span
+class="math inline">\(T\)</span> définie comme suit :</p>
+<p><span class="math display">\[T = \sum_{i=1}^k \frac{n_i}{n} \left(
+\frac{R_i - \mu_i}{\sigma_i} \right)^2\]</span></p>
+<p>où : - <span class="math inline">\(k\)</span> est le nombre de
+groupes, - <span class="math inline">\(n_i\)</span> est la taille de
+l’échantillon du groupe <span class="math inline">\(i\)</span>, - <span
+class="math inline">\(n\)</span> est la taille totale de l’échantillon,
+- <span class="math inline">\(R_i\)</span> est la somme des rangs pour
+le groupe <span class="math inline">\(i\)</span>, - <span
+class="math inline">\(\mu_i\)</span> et <span
+class="math inline">\(\sigma_i\)</span> sont la moyenne et l’écart-type
+des rangs pour le groupe <span class="math inline">\(i\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-fligner-killeen">Théorème de Fligner-Killeen</h2>
+<p>Le théorème central du test de Fligner-Killeen stipule que sous
+l’hypothèse nulle d’égalité des médianes, la statistique de test <span
+class="math inline">\(T\)</span> suit une distribution du chi-deux à
+<span class="math inline">\(k-1\)</span> degrés de liberté.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X_{11}, \ldots, X_{1n_1}, \ldots,
+X_{k1}, \ldots, X_{kn_k}\)</span> des échantillons indépendants issus de
+distributions avec des médianes <span class="math inline">\(m_1, \ldots,
+m_k\)</span>. Sous l’hypothèse nulle <span class="math inline">\(H_0:
+m_1 = \ldots = m_k\)</span>, la statistique de test</p>
+<p><span class="math display">\[T = \sum_{i=1}^k \frac{n_i}{n} \left(
+\frac{R_i - \mu_i}{\sigma_i} \right)^2\]</span></p>
+<p>suit une loi du chi-deux à <span class="math inline">\(k-1\)</span>
+degrés de liberté, où <span class="math inline">\(R_i\)</span>, <span
+class="math inline">\(\mu_i\)</span> et <span
+class="math inline">\(\sigma_i\)</span> sont définis comme
+précédemment.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-fligner-killeen">Preuve du Théorème de
+Fligner-Killeen</h2>
+<p>La preuve du théorème de Fligner-Killeen repose sur plusieurs étapes
+clés.</p>
+<div class="proof">
+<p><em>Proof.</em> 1. **Transformation des Données** : Tout d’abord,
+nous transformons les données en utilisant la transformation de rang.
+Cela permet de rendre les distributions plus symétriques et facilite la
+comparaison des médianes.</p>
+<p>2. **Calcul des Rangs** : Pour chaque groupe <span
+class="math inline">\(i\)</span>, nous calculons la somme des rangs
+<span class="math inline">\(R_i\)</span>. Cette étape est cruciale car
+elle permet de prendre en compte les différences dans la forme des
+distributions.</p>
+<p>3. **Normalisation** : Nous normalisons les sommes de rangs en
+soustrayant la moyenne <span class="math inline">\(\mu_i\)</span> et en
+divisant par l’écart-type <span class="math inline">\(\sigma_i\)</span>.
+Cela permet de rendre les statistiques comparables entre les
+groupes.</p>
+<p>4. **Statistique de Test** : Nous calculons la statistique de test
+<span class="math inline">\(T\)</span> en utilisant la formule donnée
+dans le théorème. Sous l’hypothèse nulle, cette statistique suit une
+distribution du chi-deux à <span class="math inline">\(k-1\)</span>
+degrés de liberté.</p>
+<p>5. **Conclusion** : En comparant la valeur calculée de <span
+class="math inline">\(T\)</span> à la distribution du chi-deux, nous
+pouvons rejeter ou ne pas rejeter l’hypothèse nulle d’égalité des
+médianes. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriétés-du-test-de-fligner-killeen">Propriétés du Test de
+Fligner-Killeen</h2>
+<p>Le test de Fligner-Killeen possède plusieurs propriétés importantes
+:</p>
+<ol>
+<li><p>**Robustesse** : Le test est robuste aux différences dans la
+forme des distributions, ce qui le rend particulièrement utile pour les
+données asymétriques ou multiformes.</p></li>
+<li><p>**Non-Paramétrique** : Le test ne suppose pas de forme
+particulière pour les distributions sous-jacentes, ce qui le rend
+applicable à une large gamme de données.</p></li>
+<li><p>**Puissance** : Le test est puissant pour détecter les
+différences dans les médianes, même lorsque les distributions sont
+asymétriques.</p></li>
+</ol>
+<h2 id="corollaires">Corollaires</h2>
+<p>Le test de Fligner-Killeen peut être utilisé pour dériver plusieurs
+corollaires intéressants. Par exemple, il peut être utilisé pour
+comparer les médianes de plus de deux groupes, ce qui est une extension
+directe du test de Kruskal-Wallis.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le test de Fligner-Killeen est une méthode non-paramétrique puissante
+pour la comparaison des médianes de plusieurs échantillons indépendants.
+Il offre une alternative robuste aux méthodes traditionnelles comme le
+test de Kruskal-Wallis, en tenant compte des différences potentielles
+dans la forme des distributions. Son utilisation est particulièrement
+recommandée lorsque les données sont asymétriques ou multiformes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

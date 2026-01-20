@@ -1,0 +1,340 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Consistance au sens de Fisher : Une analyse rigoureuse</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Consistance au sens de Fisher : Une analyse
+rigoureuse</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse statistique repose sur des fondements théoriques robustes,
+parmi lesquels la notion de consistance occupe une place centrale.
+Introduite par Ronald Aylmer Fisher, un des pères de la statistique
+moderne, cette notion permet d’évaluer la fiabilité des estimateurs dans
+le cadre asymptotique. La consistance au sens de Fisher émerge comme une
+réponse aux défis posés par l’estimation des paramètres dans des modèles
+complexes, où les données sont souvent limitées et bruitées. Elle est
+indispensable pour garantir que les conclusions tirées des analyses
+statistiques restent valables lorsque la taille de l’échantillon tend
+vers l’infini. Ce chapitre explore les concepts fondamentaux, les
+théorèmes clés et les applications pratiques de la consistance au sens
+de Fisher.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la consistance au sens de Fisher, il est essentiel de
+définir préalablement quelques concepts clés. Supposons que nous avons
+un échantillon aléatoire <span class="math inline">\(X_1, X_2, \ldots,
+X_n\)</span> de taille <span class="math inline">\(n\)</span> issu d’une
+distribution <span class="math inline">\(P_\theta\)</span>, où <span
+class="math inline">\(\theta\)</span> est un paramètre inconnu que nous
+cherchons à estimer. Un estimateur <span
+class="math inline">\(\hat{\theta}_n\)</span> est une fonction mesurable
+de l’échantillon <span class="math inline">\(X_1, X_2, \ldots,
+X_n\)</span> qui fournit une valeur approchée de <span
+class="math inline">\(\theta\)</span>.</p>
+<div class="definition">
+<p>On dit que la suite d’estimateurs <span
+class="math inline">\(\hat{\theta}_n\)</span> converge en probabilité
+vers <span class="math inline">\(\theta\)</span>, noté <span
+class="math inline">\(\hat{\theta}_n \xrightarrow{P} \theta\)</span>, si
+pour tout <span class="math inline">\(\epsilon &gt; 0\)</span>, <span
+class="math display">\[\lim_{n \to \infty} P(|\hat{\theta}_n - \theta|
+&gt; \epsilon) = 0.\]</span></p>
+</div>
+<p>La convergence en probabilité est une notion fondamentale en
+statistique, car elle permet de quantifier la précision d’un estimateur
+lorsque la taille de l’échantillon augmente. Elle est souvent utilisée
+pour définir la consistance d’un estimateur.</p>
+<div class="definition">
+<p>Un estimateur <span class="math inline">\(\hat{\theta}_n\)</span> est
+dit consistent au sens de Fisher si pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, <span
+class="math display">\[\lim_{n \to \infty} P(|\hat{\theta}_n - \theta|
+&gt; \epsilon) = 0.\]</span> En d’autres termes, <span
+class="math inline">\(\hat{\theta}_n\)</span> converge en probabilité
+vers le vrai paramètre <span class="math inline">\(\theta\)</span>.</p>
+</div>
+<p>Cette définition capture l’idée intuitive que, lorsque la taille de
+l’échantillon devient suffisamment grande, l’estimateur <span
+class="math inline">\(\hat{\theta}_n\)</span> se rapproche du vrai
+paramètre <span class="math inline">\(\theta\)</span> avec une
+probabilité arbitrairement proche de 1.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour établir la consistance d’un estimateur, plusieurs théorèmes et
+résultats fondamentaux sont disponibles. L’un des plus célèbres est le
+théorème de la loi des grands nombres, qui joue un rôle crucial dans
+l’analyse de la consistance.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> une
+suite de variables aléatoires indépendantes et identiquement distribuées
+(i.i.d.) avec espérance <span class="math inline">\(\mu\)</span>. Alors,
+la moyenne empirique <span class="math display">\[\bar{X}_n =
+\frac{1}{n} \sum_{i=1}^n X_i\]</span> converge presque sûrement vers
+<span class="math inline">\(\mu\)</span> lorsque <span
+class="math inline">\(n \to \infty\)</span>.</p>
+</div>
+<p>Ce théorème est souvent utilisé pour prouver la consistance des
+estimateurs de type moyenne. Par exemple, l’estimateur de la moyenne
+d’un échantillon est consistent au sens de Fisher, car il converge en
+probabilité vers la vraie moyenne de la distribution sous-jacente.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour illustrer comment ces concepts sont appliqués, considérons un
+exemple simple. Supposons que nous avons un échantillon <span
+class="math inline">\(X_1, X_2, \ldots, X_n\)</span> issu d’une
+distribution normale <span class="math inline">\(N(\mu,
+\sigma^2)\)</span>, où <span class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\sigma^2\)</span> sont inconnus. Nous cherchons à
+estimer le paramètre <span class="math inline">\(\mu\)</span>.</p>
+<div class="proof">
+<p><em>Consistance de l’estimateur de la moyenne.</em> L’estimateur
+naturel pour <span class="math inline">\(\mu\)</span> est la moyenne
+empirique <span class="math display">\[\hat{\mu}_n = \frac{1}{n}
+\sum_{i=1}^n X_i.\]</span> Selon le théorème de la loi des grands
+nombres, <span class="math inline">\(\hat{\mu}_n\)</span> converge
+presque sûrement vers <span class="math inline">\(\mu\)</span>. Par
+conséquent, <span class="math inline">\(\hat{\mu}_n\)</span> converge
+également en probabilité vers <span class="math inline">\(\mu\)</span>,
+ce qui implique que <span class="math inline">\(\hat{\mu}_n\)</span> est
+consistent au sens de Fisher. ◻</p>
+</div>
+<p>Cette preuve montre que l’estimateur de la moyenne est consistent, ce
+qui est un résultat fondamental en statistique. La consistance garantit
+que les conclusions tirées de l’analyse des données restent valables
+lorsque la taille de l’échantillon augmente.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La consistance au sens de Fisher possède plusieurs propriétés
+importantes qui en font un outil puissant pour l’analyse statistique.
+Voici quelques-unes des propriétés les plus remarquables :</p>
+<ol>
+<li><p>Si <span class="math inline">\(\hat{\theta}_n\)</span> est un
+estimateur consistent de <span class="math inline">\(\theta\)</span>,
+alors toute fonction continue <span class="math inline">\(g\)</span> de
+<span class="math inline">\(\theta\)</span> peut être estimée par <span
+class="math inline">\(g(\hat{\theta}_n)\)</span>, et cet estimateur est
+également consistent.</p></li>
+<li><p>La consistance implique la convergence en loi, mais la réciproque
+n’est pas vraie. C’est-à-dire que si <span
+class="math inline">\(\hat{\theta}_n\)</span> converge en loi vers une
+distribution dégénérée en <span class="math inline">\(\theta\)</span>,
+alors <span class="math inline">\(\hat{\theta}_n\)</span> est
+consistent, mais la convergence en loi ne garantit pas nécessairement la
+consistance.</p></li>
+<li><p>La consistance est une propriété asymptotique. Elle ne dit rien
+sur la performance de l’estimateur pour des tailles d’échantillon
+finies, mais elle fournit une garantie importante lorsque <span
+class="math inline">\(n\)</span> devient grand.</p></li>
+</ol>
+<p>Ces propriétés montrent que la consistance est un concept fondamental
+pour l’évaluation des estimateurs statistiques. Elle permet de garantir
+que les conclusions tirées des analyses restent valables dans le cadre
+asymptotique, ce qui est essentiel pour la fiabilité des résultats
+statistiques.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La consistance au sens de Fisher est un concept clé en statistique,
+permettant d’évaluer la fiabilité des estimateurs dans le cadre
+asymptotique. À travers les définitions, théorèmes et preuves présentés
+dans ce chapitre, nous avons exploré les fondements théoriques de la
+consistance et ses implications pratiques. La consistance garantit que
+les estimateurs se rapprochent du vrai paramètre lorsque la taille de
+l’échantillon augmente, ce qui est essentiel pour la validité des
+analyses statistiques. En comprenant ces concepts, les chercheurs et
+praticiens peuvent mieux évaluer la qualité de leurs estimateurs et
+tirer des conclusions plus fiables de leurs données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

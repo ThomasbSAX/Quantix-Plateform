@@ -1,0 +1,421 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode du Point Intérieur</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode du Point Intérieur</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La méthode du point intérieur est une approche fondamentale en
+optimisation mathématique, particulièrement adaptée à la résolution des
+problèmes de programmation linéaire et non linéaire. Son origine remonte
+aux travaux pionniers de Narasimhan (1959) et de Frisch (1957), mais
+c’est avec les contributions de Karmarkar (1984) que cette méthode a
+gagné en popularité, notamment pour son efficacité dans la résolution
+des grands problèmes linéaires.</p>
+<p>L’émergence de cette méthode répond à un besoin crucial : fournir des
+algorithmes capables de traiter des problèmes d’optimisation de grande
+dimension avec une complexité algorithmique réduite. Les méthodes
+classiques, comme la méthode du simplexe, peuvent rencontrer des
+difficultés avec des problèmes de grande taille en raison de leur
+complexité exponentielle. La méthode du point intérieur, en revanche,
+offre une alternative prometteuse avec une complexité polynomiale.</p>
+<p>Dans ce chapitre, nous explorerons les fondements théoriques de la
+méthode du point intérieur, ses définitions clés, ses théorèmes majeurs,
+et ses applications pratiques. Nous mettrons l’accent sur les preuves
+détaillées et les démonstrations rigoureuses pour illustrer la puissance
+et l’efficacité de cette approche.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la méthode du point intérieur, il est essentiel de
+définir quelques concepts clés. Nous commencerons par expliquer ce que
+nous cherchons à atteindre, puis nous formulerons les définitions de
+manière formelle.</p>
+<h2 id="problème-doptimisation">Problème d’Optimisation</h2>
+<p>Considérons un problème d’optimisation générale de la forme : <span
+class="math display">\[\min_{x \in \mathbb{R}^n} f(x)\]</span> sous les
+contraintes : <span class="math display">\[g_i(x) \leq 0, \quad i = 1,
+\ldots, m\]</span> <span class="math display">\[h_j(x) = 0, \quad j = 1,
+\ldots, p\]</span></p>
+<p>Notre objectif est de trouver un point <span
+class="math inline">\(x^* \in \mathbb{R}^n\)</span> qui minimise la
+fonction <span class="math inline">\(f\)</span> tout en satisfaisant les
+contraintes <span class="math inline">\(g_i\)</span> et <span
+class="math inline">\(h_j\)</span>.</p>
+<h2 id="point-intérieur">Point Intérieur</h2>
+<p>Un point intérieur est un point <span
+class="math inline">\(x\)</span> qui satisfait toutes les contraintes
+d’inégalité de manière stricte. Formellement, un point <span
+class="math inline">\(x\)</span> est un point intérieur si : <span
+class="math display">\[g_i(x) &lt; 0, \quad \forall i = 1, \ldots,
+m\]</span></p>
+<h2 id="fonction-barrière">Fonction Barrière</h2>
+<p>Une fonction barrière est une fonction <span class="math inline">\(B:
+\mathbb{R}^n \rightarrow \mathbb{R}\)</span> qui tend vers l’infini
+lorsque le point <span class="math inline">\(x\)</span> approche de la
+frontière des contraintes. Formellement, une fonction barrière pour un
+problème d’optimisation est définie comme : <span
+class="math display">\[B(x) = \sum_{i=1}^m -\log(-g_i(x))\]</span></p>
+<h2 id="problème-doptimisation-avec-fonction-barrière">Problème
+d’Optimisation avec Fonction Barrière</h2>
+<p>Le problème d’optimisation avec fonction barrière est une
+reformulation du problème original qui introduit la fonction barrière
+dans l’objectif. Ce problème est défini comme : <span
+class="math display">\[\min_{x \in \mathbb{R}^n} f(x) + \mu
+B(x)\]</span> sous les contraintes : <span class="math display">\[h_j(x)
+= 0, \quad j = 1, \ldots, p\]</span> où <span class="math inline">\(\mu
+&gt; 0\)</span> est un paramètre de barrière.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présenterons les théorèmes majeurs associés
+à la méthode du point intérieur. Nous commencerons par expliquer ce que
+nous cherchons à démontrer, puis nous formulerons les théorèmes de
+manière formelle.</p>
+<h2 id="théorème-de-convergence">Théorème de Convergence</h2>
+<p>Le théorème de convergence est un résultat fondamental qui garantit
+que la méthode du point intérieur converge vers une solution optimale
+sous certaines conditions. Nous commençons par expliquer ce que nous
+cherchons à démontrer.</p>
+<p>Supposons que nous avons un problème d’optimisation convexe avec des
+contraintes d’inégalité et d’égalité. Nous voulons montrer que, en
+utilisant la méthode du point intérieur avec une suite de paramètres de
+barrière décroissants, nous pouvons obtenir une suite de points qui
+converge vers un point optimal.</p>
+<p>Formellement, le théorème de convergence peut être énoncé comme suit
+:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\{x^\mu\}\)</span> une suite de
+points obtenus en résolvant le problème d’optimisation avec fonction
+barrière pour une suite de paramètres <span
+class="math inline">\(\mu_k\)</span> telle que <span
+class="math inline">\(\mu_k \rightarrow 0\)</span> lorsque <span
+class="math inline">\(k \rightarrow \infty\)</span>. Si la suite <span
+class="math inline">\(\{x^\mu\}\)</span> est bornée, alors toute valeur
+d’adhérence de cette suite est un point optimal pour le problème
+d’optimisation original.</p>
+</div>
+<h2 id="démonstration-du-théorème-de-convergence">Démonstration du
+Théorème de Convergence</h2>
+<p>Pour démontrer le théorème de convergence, nous devons montrer que
+toute valeur d’adhérence de la suite <span
+class="math inline">\(\{x^\mu\}\)</span> est un point optimal. Nous
+procédons comme suit :</p>
+<p>1. **Bornitude de la Suite** : Supposons que la suite <span
+class="math inline">\(\{x^\mu\}\)</span> est bornée. Cela signifie qu’il
+existe une boule fermée <span class="math inline">\(S\)</span> telle que
+<span class="math inline">\(x^\mu \in S\)</span> pour tout <span
+class="math inline">\(\mu\)</span>.</p>
+<p>2. **Compacité de l’Espace** : L’espace <span
+class="math inline">\(S\)</span> est compact car il est fermé et borné.
+Par le théorème de Bolzano-Weierstrass, toute suite dans <span
+class="math inline">\(S\)</span> admet une sous-suite convergente.</p>
+<p>3. **Valeurs d’Adhérence** : Soit <span
+class="math inline">\(x^*\)</span> une valeur d’adhérence de la suite
+<span class="math inline">\(\{x^\mu\}\)</span>. Cela signifie qu’il
+existe une sous-suite <span class="math inline">\(\{x^{\mu_k}\}\)</span>
+telle que <span class="math inline">\(x^{\mu_k} \rightarrow
+x^*\)</span>.</p>
+<p>4. **Convergence de la Fonction Barrière** : Puisque <span
+class="math inline">\(\mu_k \rightarrow 0\)</span>, la fonction barrière
+<span class="math inline">\(B(x^{\mu_k})\)</span> tend vers l’infini si
+<span class="math inline">\(x^{\mu_k}\)</span> ne satisfait pas les
+contraintes d’inégalité. Cependant, comme <span
+class="math inline">\(x^{\mu_k}\)</span> est un point intérieur, nous
+avons <span class="math inline">\(g_i(x^{\mu_k}) &lt; 0\)</span>, ce qui
+garantit que <span class="math inline">\(B(x^{\mu_k})\)</span> reste
+borné.</p>
+<p>5. **Optimalité de <span class="math inline">\(x^*\)</span>** : En
+utilisant la continuité des fonctions <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g_i\)</span>, nous pouvons montrer que <span
+class="math inline">\(x^*\)</span> satisfait les conditions de KKT pour
+le problème d’optimisation original. Cela implique que <span
+class="math inline">\(x^*\)</span> est un point optimal.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Dans cette section, nous fournirons des preuves détaillées pour les
+théorèmes présentés précédemment. Nous justifierons chaque étape et
+mentionnerons les propriétés et théorèmes utilisés.</p>
+<h2 id="preuve-du-théorème-de-convergence">Preuve du Théorème de
+Convergence</h2>
+<p>Pour prouver le théorème de convergence, nous devons montrer que
+toute valeur d’adhérence de la suite <span
+class="math inline">\(\{x^\mu\}\)</span> est un point optimal. Nous
+procédons comme suit :</p>
+<p>1. **Bornitude de la Suite** : Supposons que la suite <span
+class="math inline">\(\{x^\mu\}\)</span> est bornée. Cela signifie qu’il
+existe une boule fermée <span class="math inline">\(S\)</span> telle que
+<span class="math inline">\(x^\mu \in S\)</span> pour tout <span
+class="math inline">\(\mu\)</span>.</p>
+<p>2. **Compacité de l’Espace** : L’espace <span
+class="math inline">\(S\)</span> est compact car il est fermé et borné.
+Par le théorème de Bolzano-Weierstrass, toute suite dans <span
+class="math inline">\(S\)</span> admet une sous-suite convergente.</p>
+<p>3. **Valeurs d’Adhérence** : Soit <span
+class="math inline">\(x^*\)</span> une valeur d’adhérence de la suite
+<span class="math inline">\(\{x^\mu\}\)</span>. Cela signifie qu’il
+existe une sous-suite <span class="math inline">\(\{x^{\mu_k}\}\)</span>
+telle que <span class="math inline">\(x^{\mu_k} \rightarrow
+x^*\)</span>.</p>
+<p>4. **Convergence de la Fonction Barrière** : Puisque <span
+class="math inline">\(\mu_k \rightarrow 0\)</span>, la fonction barrière
+<span class="math inline">\(B(x^{\mu_k})\)</span> tend vers l’infini si
+<span class="math inline">\(x^{\mu_k}\)</span> ne satisfait pas les
+contraintes d’inégalité. Cependant, comme <span
+class="math inline">\(x^{\mu_k}\)</span> est un point intérieur, nous
+avons <span class="math inline">\(g_i(x^{\mu_k}) &lt; 0\)</span>, ce qui
+garantit que <span class="math inline">\(B(x^{\mu_k})\)</span> reste
+borné.</p>
+<p>5. **Optimalité de <span class="math inline">\(x^*\)</span>** : En
+utilisant la continuité des fonctions <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g_i\)</span>, nous pouvons montrer que <span
+class="math inline">\(x^*\)</span> satisfait les conditions de KKT pour
+le problème d’optimisation original. Cela implique que <span
+class="math inline">\(x^*\)</span> est un point optimal.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Dans cette section, nous énumérerons les propriétés et corollaires
+associés à la méthode du point intérieur. Nous développerons chaque
+propriété ou corollaire avec des preuves détaillées.</p>
+<h2 id="propriété-de-convergence">Propriété de Convergence</h2>
+<ol>
+<li><p>La suite <span class="math inline">\(\{x^\mu\}\)</span> converge
+vers un point optimal si la suite des paramètres de barrière <span
+class="math inline">\(\{\mu_k\}\)</span> tend vers zéro et si la suite
+<span class="math inline">\(\{x^\mu\}\)</span> est bornée.</p></li>
+<li><p>Si le problème d’optimisation original a une solution unique,
+alors la suite <span class="math inline">\(\{x^\mu\}\)</span> converge
+vers cette solution unique.</p></li>
+</ol>
+<h2 id="preuve-de-la-propriété-de-convergence">Preuve de la Propriété de
+Convergence</h2>
+<p>Pour prouver la propriété de convergence, nous procédons comme suit
+:</p>
+<p>1. **Convergence vers un Point Optimal** : Si la suite <span
+class="math inline">\(\{x^\mu\}\)</span> est bornée et que <span
+class="math inline">\(\mu_k \rightarrow 0\)</span>, alors toute valeur
+d’adhérence de la suite est un point optimal, comme démontré dans le
+théorème de convergence.</p>
+<p>2. **Solution Unique** : Si le problème d’optimisation original a une
+solution unique <span class="math inline">\(x^*\)</span>, alors toutes
+les valeurs d’adhérence de la suite <span
+class="math inline">\(\{x^\mu\}\)</span> doivent être égales à <span
+class="math inline">\(x^*\)</span>. Cela implique que la suite <span
+class="math inline">\(\{x^\mu\}\)</span> converge vers <span
+class="math inline">\(x^*\)</span>.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La méthode du point intérieur est une approche puissante et efficace
+pour la résolution des problèmes d’optimisation. Ses fondements
+théoriques solides, ses théorèmes majeurs, et ses propriétés
+remarquables en font un outil indispensable dans le domaine de
+l’optimisation mathématique. En comprenant les définitions clés, les
+théorèmes fondamentaux, et les preuves détaillées, nous avons pu
+apprécier la profondeur et l’utilité de cette méthode.</p>
+<p>Dans les sections précédentes, nous avons exploré les concepts de
+base de la méthode du point intérieur, présenté les théorèmes majeurs,
+et fourni des preuves rigoureuses. Nous avons également discuté des
+propriétés et corollaires associés à cette méthode. Ces résultats
+montrent la puissance de la méthode du point intérieur et son potentiel
+pour résoudre des problèmes d’optimisation complexes.</p>
+<p>En conclusion, la méthode du point intérieur reste un sujet de
+recherche actif et prometteur. Ses applications pratiques dans divers
+domaines, tels que l’ingénierie, la finance, et les sciences de la
+décision, continuent de stimuler l’intérêt des chercheurs et des
+praticiens. En approfondissant notre compréhension de cette méthode,
+nous pouvons espérer développer de nouvelles techniques et algorithmes
+pour résoudre des problèmes d’optimisation encore plus complexes et
+variés.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

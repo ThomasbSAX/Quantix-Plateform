@@ -1,0 +1,347 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Multiplicateurs de Lagrange : Optimisation sous contraintes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Multiplicateurs de Lagrange : Optimisation sous
+contraintes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’optimisation sous contraintes est un problème fondamental en
+mathématiques appliquées, en physique et en économie. Les
+multiplicateurs de Lagrange fournissent un outil puissant pour résoudre
+ce type de problèmes. Introduits par le mathématicien français
+Joseph-Louis Lagrange au XVIIIème siècle, ces multiplicateurs permettent
+de transformer un problème d’optimisation contraint en un problème non
+contraint, facilitant ainsi sa résolution.</p>
+<p>Considérons par exemple un système physique où l’énergie doit être
+minimisée sous certaines contraintes géométriques. Les multiplicateurs
+de Lagrange permettent d’incorporer ces contraintes dans le formalisme
+mathématique, rendant le problème plus tractable. De même, en économie,
+les multiplicateurs de Lagrange sont utilisés pour maximiser le profit
+sous des contraintes de ressources limitées.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Nous cherchons à minimiser ou maximiser une fonction <span
+class="math inline">\(f : \mathbb{R}^n \rightarrow \mathbb{R}\)</span>
+sous des contraintes données par <span class="math inline">\(g_1(x) = 0,
+\ldots, g_k(x) = 0\)</span>. Intuitivement, les multiplicateurs de
+Lagrange nous permettent d’ajouter ces contraintes à la fonction
+objective <span class="math inline">\(f\)</span> en introduisant des
+variables supplémentaires, appelées multiplicateurs.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction différentiable et <span
+class="math inline">\(g_1, \ldots, g_k : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> des fonctions différentiables. Les multiplicateurs
+de Lagrange sont définis comme suit :</p>
+<p>Pour tout <span class="math inline">\(x \in \mathbb{R}^n\)</span> tel
+que <span class="math inline">\(g_i(x) = 0\)</span> pour tout <span
+class="math inline">\(i \in \{1, \ldots, k\}\)</span>, il existe des
+scalaires <span class="math inline">\(\lambda_1, \ldots, \lambda_k \in
+\mathbb{R}\)</span> tels que <span class="math display">\[\nabla f(x) =
+\sum_{i=1}^k \lambda_i \nabla g_i(x).\]</span></p>
+</div>
+<p>Cette définition peut être reformulée en utilisant le gradient de la
+fonction Lagrangienne associée.</p>
+<div class="definition">
+<p>La fonction Lagrangienne <span class="math inline">\(\mathcal{L} :
+\mathbb{R}^n \times \mathbb{R}^k \rightarrow \mathbb{R}\)</span> est
+définie par <span class="math display">\[\mathcal{L}(x, \lambda) = f(x)
+- \sum_{i=1}^k \lambda_i g_i(x).\]</span> Les multiplicateurs de
+Lagrange <span class="math inline">\(\lambda_1, \ldots,
+\lambda_k\)</span> sont les solutions du système <span
+class="math display">\[\nabla_x \mathcal{L}(x, \lambda) = 0 \quad
+\text{et} \quad g_i(x) = 0 \quad \forall i \in \{1, \ldots,
+k\}.\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le théorème fondamental des multiplicateurs de Lagrange donne une
+condition nécessaire pour qu’un point soit un extremum local sous
+contraintes.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction différentiable et <span
+class="math inline">\(g_1, \ldots, g_k : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> des fonctions différentiables. Supposons que <span
+class="math inline">\(x^* \in \mathbb{R}^n\)</span> soit un point tel
+que <span class="math inline">\(g_i(x^*) = 0\)</span> pour tout <span
+class="math inline">\(i \in \{1, \ldots, k\}\)</span>, et que les
+gradients <span class="math inline">\(\nabla g_i(x^*)\)</span> pour
+<span class="math inline">\(i \in \{1, \ldots, k\}\)</span> soient
+linéairement indépendants.</p>
+<p>Si <span class="math inline">\(x^*\)</span> est un extremum local de
+<span class="math inline">\(f\)</span> sous les contraintes <span
+class="math inline">\(g_i(x) = 0\)</span>, alors il existe des scalaires
+<span class="math inline">\(\lambda_1^*, \ldots, \lambda_k^* \in
+\mathbb{R}\)</span> tels que <span class="math display">\[\nabla f(x^*)
+= \sum_{i=1}^k \lambda_i^* \nabla g_i(x^*).\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème des multiplicateurs de Lagrange, nous
+utilisons le théorème des fonctions implicites et la théorie des extrema
+liés.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons le système d’équations <span
+class="math inline">\(g_i(x) = 0\)</span> pour <span
+class="math inline">\(i \in \{1, \ldots, k\}\)</span>. Par hypothèse,
+les gradients <span class="math inline">\(\nabla g_i(x^*)\)</span> sont
+linéairement indépendants. Le théorème des fonctions implicites nous
+permet de paramétrer localement les contraintes autour de <span
+class="math inline">\(x^*\)</span>.</p>
+<p>Ensuite, nous appliquons le théorème des extrema liés. Soit <span
+class="math inline">\(U\)</span> un voisinage de <span
+class="math inline">\(x^*\)</span> tel que pour tout <span
+class="math inline">\(x \in U\)</span>, les contraintes <span
+class="math inline">\(g_i(x) = 0\)</span> définissent un sous-espace de
+dimension <span class="math inline">\(n - k\)</span>. Nous pouvons alors
+paramétrer ce sous-espace par <span class="math inline">\(k\)</span>
+variables indépendantes.</p>
+<p>La condition nécessaire pour que <span
+class="math inline">\(x^*\)</span> soit un extremum local de <span
+class="math inline">\(f\)</span> sous les contraintes est que le
+gradient de <span class="math inline">\(f\)</span> soit orthogonal au
+sous-espace défini par les contraintes. Cela se traduit par l’existence
+de multiplicateurs <span class="math inline">\(\lambda_i^*\)</span> tels
+que <span class="math display">\[\nabla f(x^*) = \sum_{i=1}^k
+\lambda_i^* \nabla g_i(x^*).\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les multiplicateurs de Lagrange possèdent plusieurs propriétés
+intéressantes.</p>
+<ol>
+<li><p>Les multiplicateurs <span
+class="math inline">\(\lambda_i\)</span> peuvent être interprétés comme
+les variations de la fonction objective <span
+class="math inline">\(f\)</span> par rapport aux contraintes <span
+class="math inline">\(g_i\)</span>. Plus précisément, si les contraintes
+sont légèrement modifiées, la valeur optimale de <span
+class="math inline">\(f\)</span> change proportionnellement aux
+multiplicateurs.</p></li>
+<li><p>Si les contraintes sont inégales <span
+class="math inline">\(g_i(x) \leq 0\)</span>, la méthode des
+multiplicateurs de Lagrange peut être étendue en introduisant des
+multiplicateurs non négatifs <span class="math inline">\(\lambda_i \geq
+0\)</span>.</p></li>
+<li><p>Les multiplicateurs de Lagrange sont utilisés en économie pour
+déterminer les prix ombres, c’est-à-dire le coût marginal des ressources
+lorsque celles-ci sont limitées.</p></li>
+</ol>
+<p>Pour illustrer ces propriétés, considérons un exemple simple.</p>
+<div class="example">
+<p>Minimisons la fonction <span class="math inline">\(f(x, y) = x^2 +
+y^2\)</span> sous la contrainte <span class="math inline">\(g(x, y) = x
++ y - 1 = 0\)</span>.</p>
+<p>La fonction Lagrangienne est <span
+class="math display">\[\mathcal{L}(x, y, \lambda) = x^2 + y^2 - \lambda
+(x + y - 1).\]</span> Les conditions nécessaires sont <span
+class="math display">\[\frac{\partial \mathcal{L}}{\partial x} = 2x -
+\lambda = 0, \quad \frac{\partial \mathcal{L}}{\partial y} = 2y -
+\lambda = 0, \quad x + y - 1 = 0.\]</span> En résolvant ce système, nous
+trouvons <span class="math inline">\(x = y = \frac{1}{2}\)</span> et
+<span class="math inline">\(\lambda = 1\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les multiplicateurs de Lagrange sont un outil essentiel pour
+l’optimisation sous contraintes. Ils permettent de transformer des
+problèmes complexes en problèmes plus simples et tractables. Leur
+utilisation s’étend à de nombreux domaines, de la physique à l’économie,
+en passant par l’ingénierie et les sciences sociales.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

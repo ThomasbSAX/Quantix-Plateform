@@ -1,0 +1,318 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Extraction de Caractéristiques Audio : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Extraction de Caractéristiques Audio :
+Fondements et Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des signaux audio est un domaine de recherche riche et
+complexe, où l’extraction de caractéristiques joue un rôle central.
+L’objectif principal de cette technique est de transformer des signaux
+audio bruts en représentations numériques compactes et informatives. Ces
+représentations permettent ensuite d’effectuer diverses tâches telles
+que la classification, l’indexation ou la reconnaissance de motifs.</p>
+<p>L’émergence des méthodes d’extraction de caractéristiques audio est
+motivée par le besoin croissant de traiter efficacement de grandes
+quantités de données audio. Que ce soit pour les applications médicales,
+la reconnaissance vocale ou l’analyse musicale, ces techniques offrent
+des outils puissants pour extraire des informations pertinentes à partir
+de signaux complexes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails techniques, il est essentiel de
+comprendre ce que nous cherchons à accomplir. Imaginez un signal audio
+comme une onde continue dans le temps, représentant des variations de
+pression acoustique. Notre objectif est de capturer les propriétés
+essentielles de cette onde, telles que la fréquence, l’amplitude et le
+timbre, sous forme de caractéristiques numériques.</p>
+<p>Pour formaliser cette idée, nous introduisons la notion d’extraction
+de caractéristiques. Soit <span class="math inline">\(x(t)\)</span> un
+signal audio continu, où <span class="math inline">\(t\)</span>
+représente le temps. Nous cherchons à définir une fonction <span
+class="math inline">\(f\)</span> qui mappe ce signal vers un vecteur de
+caractéristiques <span class="math inline">\(C\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(x(t)\)</span> un signal audio
+continu défini sur un intervalle <span class="math inline">\([a,
+b]\)</span>. Une extraction de caractéristiques est une application
+<span class="math inline">\(f\)</span> telle que : <span
+class="math display">\[f: x(t) \mapsto C = (c_1, c_2, \ldots,
+c_n)\]</span> où <span class="math inline">\(C\)</span> est un vecteur
+de caractéristiques numériques.</p>
+</div>
+<p>Une autre manière de formuler cette définition est la suivante :
+<span class="math display">\[\forall t \in [a, b], \exists C = (c_1,
+c_2, \ldots, c_n) \text{ tel que } C = f(x(t))\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre les propriétés des caractéristiques extraites, nous
+devons examiner certains théorèmes fondamentaux. L’un des plus
+importants est le théorème de Nyquist-Shannon, qui établit les
+conditions nécessaires pour échantillonner un signal sans perte
+d’information.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(x(t)\)</span> un signal audio de
+bande passante limitée à <span class="math inline">\(B\)</span> Hz. Si
+ce signal est échantillonné à une fréquence <span
+class="math inline">\(f_s &gt; 2B\)</span>, alors il peut être
+parfaitement reconstruit à partir de ses échantillons.</p>
+</div>
+<p>Pour formaliser ce théorème, nous introduisons la fréquence de
+Nyquist <span class="math inline">\(f_N\)</span>, définie comme : <span
+class="math display">\[f_N = 2B\]</span> Le théorème peut alors être
+réécrit comme : <span class="math display">\[f_s &gt; f_N \implies x(t)
+\text{ peut être parfaitement reconstruit}\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<p>La preuve du théorème de Nyquist-Shannon repose sur l’analyse de
+Fourier et les propriétés des fonctions sinc. Nous commençons par
+décomposer le signal <span class="math inline">\(x(t)\)</span> en ses
+composantes fréquentielles à l’aide de la transformée de Fourier.</p>
+<p>La transformée de Fourier <span class="math inline">\(X(f)\)</span>
+du signal <span class="math inline">\(x(t)\)</span> est définie comme :
+<span class="math display">\[X(f) = \int_{-\infty}^{\infty} x(t)
+e^{-j2\pi ft} dt\]</span> La transformée inverse est donnée par : <span
+class="math display">\[x(t) = \int_{-\infty}^{\infty} X(f) e^{j2\pi ft}
+df\]</span></p>
+<p>En échantillonnant le signal à une fréquence <span
+class="math inline">\(f_s\)</span>, nous obtenons un signal discret
+<span class="math inline">\(x[n]\)</span>, où : <span
+class="math display">\[x[n] = x\left(\frac{n}{f_s}\right)\]</span> La
+transformée de Fourier discrète <span class="math inline">\(X_k\)</span>
+est alors définie comme : <span class="math display">\[X_k =
+\sum_{n=0}^{N-1} x[n] e^{-j2\pi kn/N}\]</span></p>
+<p>Pour reconstruire le signal original, nous utilisons la fonction sinc
+: <span class="math display">\[\text{sinc}(t) = \frac{\sin(\pi t)}{\pi
+t}\]</span> Le signal reconstruit <span
+class="math inline">\(\hat{x}(t)\)</span> est donné par : <span
+class="math display">\[\hat{x}(t) = \sum_{n=-\infty}^{\infty} x[n]
+\text{sinc}(f_s t - n)\]</span></p>
+<p>En supposant que <span class="math inline">\(f_s &gt; 2B\)</span>,
+nous pouvons montrer que : <span class="math display">\[\hat{x}(t) =
+x(t)\]</span> ce qui prouve le théorème de Nyquist-Shannon.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes des
+caractéristiques extraites, ainsi que leurs corollaires.</p>
+<ol>
+<li><p><strong>Invariance par Translation Temporelle</strong> : Les
+caractéristiques extraites doivent être invariantes par translation
+temporelle. Cela signifie que si nous décalons le signal dans le temps,
+les caractéristiques doivent rester les mêmes.</p></li>
+<li><p><strong>Invariance par Échelle</strong> : Les caractéristiques
+doivent également être invariantes par changement d’échelle. Cela
+signifie que si nous comprimons ou étirons le signal dans le temps, les
+caractéristiques doivent rester les mêmes.</p></li>
+<li><p><strong>Robustesse au Bruit</strong> : Les caractéristiques
+extraites doivent être robustes au bruit. Cela signifie que de petites
+perturbations du signal ne doivent pas affecter significativement les
+caractéristiques.</p></li>
+</ol>
+<p>Pour prouver la première propriété, nous considérons un signal <span
+class="math inline">\(x(t)\)</span> et son décalage temporel <span
+class="math inline">\(x(t - \tau)\)</span>. Nous devons montrer que :
+<span class="math display">\[f(x(t)) = f(x(t - \tau))\]</span></p>
+<p>En utilisant la définition de l’extraction de caractéristiques, nous
+avons : <span class="math display">\[f(x(t)) = C \quad \text{et} \quad
+f(x(t - \tau)) = C&#39;\]</span> Nous devons montrer que <span
+class="math inline">\(C = C&#39;\)</span>.</p>
+<p>Pour ce faire, nous utilisons le fait que les caractéristiques sont
+calculées à partir de propriétés intrinsèques du signal, telles que la
+fréquence et l’amplitude, qui sont indépendantes du décalage temporel.
+Par conséquent, <span class="math inline">\(C = C&#39;\)</span>, ce qui
+prouve la propriété d’invariance par translation temporelle.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

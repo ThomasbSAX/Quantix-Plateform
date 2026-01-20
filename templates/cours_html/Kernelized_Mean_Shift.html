@@ -1,0 +1,320 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized Mean Shift: Une Approche Non-Paramétrique pour l’Estimation de Densité et le Clustering</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized Mean Shift: Une Approche Non-Paramétrique
+pour l’Estimation de Densité et le Clustering</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’algorithme de Mean Shift, introduit par Fukunaga et Hostetler en
+1975, est une méthode non-paramétrique pour l’estimation de densité et
+le clustering. Il repose sur l’idée d’itérer une procédure de lissage
+par noyau pour trouver les modes d’une distribution de probabilité.
+L’extension kernelized de Mean Shift, proposée par Comaniciu et Meer en
+2002, a permis d’améliorer la robustesse et l’efficacité de l’algorithme
+original.</p>
+<p>Le Mean Shift est particulièrement utile dans les domaines où les
+données sont complexes et où les méthodes paramétriques traditionnelles
+échouent. Par exemple, en vision par ordinateur, le Mean Shift est
+utilisé pour la segmentation d’images et le suivi d’objets. En
+bioinformatique, il est appliqué pour l’analyse de données
+génomiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir le Mean Shift kernelized, il est essentiel de
+comprendre quelques concepts fondamentaux.</p>
+<h2 id="estimation-de-densité-par-noyau">Estimation de Densité par
+Noyau</h2>
+<p>L’estimation de densité par noyau est une méthode non-paramétrique
+pour estimer la fonction de densité de probabilité d’un échantillon de
+données. Soit <span class="math inline">\(X = \{x_1, x_2, \dots,
+x_n\}\)</span> un ensemble de <span class="math inline">\(n\)</span>
+échantillons indépendants et identiquement distribués (i.i.d.) dans un
+espace <span class="math inline">\(\mathbb{R}^d\)</span>. L’estimation
+de densité par noyau est donnée par :</p>
+<p><span class="math display">\[\hat{f}(x) = \frac{1}{n} \sum_{i=1}^n
+K_h(x - x_i)\]</span></p>
+<p>où <span class="math inline">\(K_h(x) = \frac{1}{h^d}
+K\left(\frac{x}{h}\right)\)</span> est une fonction noyau et <span
+class="math inline">\(h &gt; 0\)</span> est le paramètre de lissage,
+souvent appelé bande passante.</p>
+<h2 id="fonction-noyau">Fonction Noyau</h2>
+<p>Une fonction noyau <span class="math inline">\(K: \mathbb{R}^d
+\rightarrow \mathbb{R}\)</span> est une fonction symétrique et positive
+définie, qui satisfait les conditions suivantes :</p>
+<p><span class="math display">\[\int_{\mathbb{R}^d} K(x) \, dx = 1 \quad
+\text{et} \quad K(x) \geq 0 \quad \forall x \in
+\mathbb{R}^d\]</span></p>
+<p>Les noyaux les plus couramment utilisés sont le noyau gaussien et le
+noyau à épaulement (Epanechnikov).</p>
+<h2 id="mean-shift">Mean Shift</h2>
+<p>Le Mean Shift est un algorithme itératif qui déplace un point de
+données dans la direction de la plus grande augmentation de la densité
+estimée. Soit <span class="math inline">\(x\)</span> un point de données
+et <span class="math inline">\(h\)</span> une bande passante fixe. Le
+vecteur de Mean Shift est défini comme :</p>
+<p><span class="math display">\[M_h(x) = \frac{\sum_{i=1}^n x_i K_h(x -
+x_i)}{\sum_{i=1}^n K_h(x - x_i)} - x\]</span></p>
+<p>Le Mean Shift est alors obtenu en itérant la procédure suivante :</p>
+<p><span class="math display">\[x_{k+1} = x_k + M_h(x_k)\]</span></p>
+<p>jusqu’à convergence.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="convergence-du-mean-shift">Convergence du Mean Shift</h2>
+<p>Le théorème suivant établit la convergence de l’algorithme de Mean
+Shift.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(K\)</span> un noyau symétrique et
+<span class="math inline">\(h &gt; 0\)</span>. Alors, pour tout point de
+départ <span class="math inline">\(x_0\)</span>, la suite définie par
+:</p>
+<p><span class="math display">\[x_{k+1} = x_k + M_h(x_k)\]</span></p>
+<p>converge vers un point critique de <span
+class="math inline">\(\hat{f}\)</span>, c’est-à-dire un point où le
+gradient de <span class="math inline">\(\hat{f}\)</span> est nul.</p>
+</div>
+<h2 id="démonstration-du-théorème-de-convergence">Démonstration du
+Théorème de Convergence</h2>
+<p>La démonstration repose sur le fait que le Mean Shift est une méthode
+de gradient ascendante discrète. En effet, on peut montrer que :</p>
+<p><span class="math display">\[M_h(x) = \frac{\nabla
+\hat{f}(x)}{\hat{f}(x)}\]</span></p>
+<p>où <span class="math inline">\(\nabla \hat{f}(x)\)</span> est le
+gradient de l’estimation de densité par noyau. Ainsi, chaque itération
+du Mean Shift augmente la valeur de <span
+class="math inline">\(\hat{f}\)</span> jusqu’à ce qu’un point critique
+soit atteint.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-convergence-locale">Propriété de Convergence
+Locale</h2>
+<div class="corollary">
+<p>Si <span class="math inline">\(K\)</span> est un noyau symétrique et
+<span class="math inline">\(h &gt; 0\)</span>, alors pour tout point de
+départ <span class="math inline">\(x_0\)</span> dans un voisinage
+suffisamment petit d’un mode de <span
+class="math inline">\(\hat{f}\)</span>, la suite définie par :</p>
+<p><span class="math display">\[x_{k+1} = x_k + M_h(x_k)\]</span></p>
+<p>converge vers ce mode.</p>
+</div>
+<h2 id="démonstration-de-la-convergence-locale">Démonstration de la
+Convergence Locale</h2>
+<p>La démonstration repose sur le fait que, dans un voisinage
+suffisamment petit d’un mode, le gradient de <span
+class="math inline">\(\hat{f}\)</span> pointe vers le mode. Par
+conséquent, chaque itération du Mean Shift rapproche <span
+class="math inline">\(x_k\)</span> du mode jusqu’à convergence.</p>
+<h2 id="propriété-de-robustesse">Propriété de Robustesse</h2>
+<div class="corollary">
+<p>Le Mean Shift est robuste aux valeurs aberrantes et aux bruits, car
+il repose sur une estimation de densité non-paramétrique.</p>
+</div>
+<h2 id="démonstration-de-la-robustesse">Démonstration de la
+Robustesse</h2>
+<p>La démonstration repose sur le fait que l’estimation de densité par
+noyau est une méthode non-paramétrique qui ne suppose aucune forme
+particulière pour la distribution sous-jacente. Par conséquent, le Mean
+Shift est capable de capturer des structures complexes dans les
+données.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le Mean Shift kernelized est une méthode puissante pour l’estimation
+de densité et le clustering. Son efficacité et sa robustesse en font un
+outil précieux dans de nombreux domaines, notamment la vision par
+ordinateur et la bioinformatique. Les théorèmes et propriétés présentés
+dans cet article fournissent une base solide pour comprendre et
+appliquer cette méthode.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

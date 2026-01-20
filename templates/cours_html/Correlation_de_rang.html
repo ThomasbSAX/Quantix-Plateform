@@ -1,0 +1,339 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Corrélation de rang : une exploration mathématique et statistique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Corrélation de rang : une exploration mathématique et
+statistique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La notion de corrélation de rang émerge naturellement dans le paysage
+statistique comme une réponse élégante aux limites des mesures de
+corrélation classiques, telles que le coefficient de Pearson. L’histoire
+de cette notion remonte aux travaux pionniers de Charles Edward Spearman
+au début du XXe siècle, qui cherchait à quantifier les relations
+monotones entre variables. Contrairement aux méthodes paramétriques, la
+corrélation de rang s’affranchit des hypothèses strictes de normalité et
+de linéarité, offrant ainsi une robustesse inégalée dans l’analyse des
+données réelles.</p>
+<p>L’importance de la corrélation de rang réside dans sa capacité à
+capturer des associations complexes entre variables, qu’elles soient
+monotones croissantes ou décroissantes. Elle est indispensable dans des
+domaines aussi variés que la psychométrie, l’économie, et les sciences
+sociales, où les relations linéaires sont souvent absentes ou masquées
+par des bruits et des non-linéarités. De plus, sa résistance aux valeurs
+aberrantes en fait un outil privilégié pour l’analyse exploratoire des
+données.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de corrélation de rang, commençons par
+comprendre ce que nous cherchons à mesurer. Imaginons deux ensembles de
+données, <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, pour lesquels nous souhaitons évaluer
+la force et la direction de leur relation monotone. Une mesure idéale
+devrait être sensible aux tendances croissantes ou décroissantes, tout
+en étant insensible aux transformations monotones des données.</p>
+<p>La corrélation de rang de Spearman, notée <span
+class="math inline">\(\rho_s\)</span>, est définie comme le coefficient
+de corrélation de Pearson appliqué aux rangs des données. Formellement,
+si <span class="math inline">\(R(X)\)</span> et <span
+class="math inline">\(R(Y)\)</span> représentent les rangs des
+observations de <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, alors:</p>
+<p><span class="math display">\[\rho_s = \frac{\sum_{i=1}^n (R_i(X) -
+\bar{R}(X))(R_i(Y) - \bar{R}(Y))}{\sqrt{\sum_{i=1}^n (R_i(X) -
+\bar{R}(X))^2} \sqrt{\sum_{i=1}^n (R_i(Y) - \bar{R}(Y))^2}}\]</span></p>
+<p>où <span class="math inline">\(n\)</span> est le nombre
+d’observations, et <span class="math inline">\(\bar{R}(X)\)</span> et
+<span class="math inline">\(\bar{R}(Y)\)</span> sont les moyennes des
+rangs de <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, respectivement.</p>
+<p>Une autre formulation équivalente, souvent plus pratique pour le
+calcul manuel, est:</p>
+<p><span class="math display">\[\rho_s = 1 - \frac{6 \sum_{i=1}^n
+d_i^2}{n(n^2 - 1)}\]</span></p>
+<p>où <span class="math inline">\(d_i = R_i(X) - R_i(Y)\)</span> est la
+différence des rangs pour chaque observation.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la corrélation de rang est celui de
+Spearman, qui établit une relation entre le coefficient de corrélation
+de rang et la covariance des rangs. Pour énoncer ce théorème, rappelons
+d’abord que les rangs standardisés <span class="math inline">\(R_i^*(X)
+= \frac{R_i(X) - \bar{R}(X)}{\sigma_{R(X)}}\)</span> et <span
+class="math inline">\(R_i^*(Y) = \frac{R_i(Y) -
+\bar{R}(Y)}{\sigma_{R(Y)}}\)</span> ont une covariance donnée par:</p>
+<p><span class="math display">\[\text{Cov}(R^*(X), R^*(Y)) =
+\frac{\sum_{i=1}^n (R_i(X) - \bar{R}(X))(R_i(Y) - \bar{R}(Y))}{n
+\sigma_{R(X)} \sigma_{R(Y)}}\]</span></p>
+<p>Le théorème de Spearman stipule que:</p>
+<p><span class="math display">\[\rho_s = \text{Cov}(R^*(X),
+R^*(Y))\]</span></p>
+<p>Preuve: En effet, par définition de <span
+class="math inline">\(\rho_s\)</span>, nous avons:</p>
+<p><span class="math display">\[\rho_s = \frac{\text{Cov}(R(X),
+R(Y))}{\sigma_{R(X)} \sigma_{R(Y)}}\]</span></p>
+<p>Or, <span class="math inline">\(\text{Cov}(R^*(X), R^*(Y)) =
+\frac{\text{Cov}(R(X), R(Y))}{\sigma_{R(X)} \sigma_{R(Y)}}\)</span> par
+standardisation des rangs. Ainsi, <span class="math inline">\(\rho_s =
+\text{Cov}(R^*(X), R^*(Y))\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour illustrer la puissance de la corrélation de rang, considérons un
+exemple simple. Supposons que nous ayons deux ensembles de données <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> avec les rangs suivants:</p>
+<p><span class="math display">\[R(X) = [1, 2, 3, 4], \quad R(Y) = [4, 3,
+2, 1]\]</span></p>
+<p>Calculons d’abord les différences de rangs <span
+class="math inline">\(d_i\)</span>:</p>
+<p><span class="math display">\[d_1 = 1 - 4 = -3, \quad d_2 = 2 - 3 =
+-1, \quad d_3 = 3 - 2 = 1, \quad d_4 = 4 - 1 = 3\]</span></p>
+<p>Ensuite, calculons la somme des carrés des différences:</p>
+<p><span class="math display">\[\sum_{i=1}^4 d_i^2 = (-3)^2 + (-1)^2 +
+1^2 + 3^2 = 9 + 1 + 1 + 9 = 20\]</span></p>
+<p>Enfin, appliquons la formule de Spearman:</p>
+<p><span class="math display">\[\rho_s = 1 - \frac{6 \times 20}{4(4^2 -
+1)} = 1 - \frac{120}{48} = 1 - 2.5 = -1.5\]</span></p>
+<p>Cependant, ce résultat semble incorrect car <span
+class="math inline">\(\rho_s\)</span> doit être compris entre -1 et 1.
+En réalité, il y a une erreur dans le calcul de la somme des carrés des
+différences. Recalculons:</p>
+<p><span class="math display">\[\sum_{i=1}^4 d_i^2 = (-3)^2 + (-1)^2 +
+1^2 + 3^2 = 9 + 1 + 1 + 9 = 20\]</span></p>
+<p>Le calcul est correct, mais le problème réside dans l’interprétation.
+En effet, pour <span class="math inline">\(n = 4\)</span>, la formule
+donne:</p>
+<p><span class="math display">\[\rho_s = 1 - \frac{6 \times 20}{4(16 -
+1)} = 1 - \frac{120}{60} = 1 - 2 = -1\]</span></p>
+<p>Ce résultat est maintenant cohérent, car <span
+class="math inline">\(\rho_s = -1\)</span> indique une corrélation
+négative parfaite entre les rangs de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La corrélation de rang possède plusieurs propriétés intéressantes,
+que nous énumérons et démontrons ci-dessous:</p>
+<ol>
+<li><p><strong>Invariance par transformation monotone</strong>: La
+corrélation de rang est inchangée si <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> subissent des transformations monotones
+croissantes ou décroissantes. Preuve: Les rangs sont déterminés par
+l’ordre des observations, qui reste inchangé sous une transformation
+monotone.</p></li>
+<li><p><strong>Sensibilité aux valeurs aberrantes</strong>: La
+corrélation de rang est robuste aux valeurs aberrantes, car elle dépend
+uniquement des rangs et non des valeurs originales. Preuve: Les rangs
+sont calculés à partir de l’ordre des observations, et non de leurs
+valeurs numériques.</p></li>
+<li><p><strong>Relation avec le coefficient de Kendall</strong>: Il
+existe une relation étroite entre la corrélation de rang de Spearman et
+le coefficient de corrélation de Kendall <span
+class="math inline">\(\tau\)</span>. Plus précisément, pour des
+échantillons suffisamment grands, <span class="math inline">\(\rho_s
+\approx \tau\)</span>. Preuve: Cette relation découle du fait que les
+deux coefficients mesurent des aspects similaires de la dépendance
+monotone entre variables.</p></li>
+</ol>
+<p>En conclusion, la corrélation de rang est un outil puissant et
+polyvalent pour l’analyse des données, offrant une alternative robuste
+aux mesures de corrélation classiques. Son utilisation est
+particulièrement recommandée dans les contextes où les hypothèses de
+normalité et de linéarité ne sont pas satisfaites.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

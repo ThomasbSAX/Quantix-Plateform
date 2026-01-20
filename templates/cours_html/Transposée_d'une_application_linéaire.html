@@ -1,0 +1,339 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Transposée d’une application linéaire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Transposée d’une application linéaire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des applications linéaires est au cœur de l’algèbre linéaire.
+Parmi les concepts fondamentaux, la transposée d’une application
+linéaire joue un rôle crucial dans de nombreuses applications, allant
+des équations différentielles aux systèmes dynamiques. L’idée intuitive
+derrière la transposée est de "renverser" l’action d’une application
+linéaire, ce qui permet de résoudre des problèmes duals ou adjoints.</p>
+<p>Historiquement, la notion de transposée est apparue avec le
+développement des espaces vectoriels et des formes bilinéaires. Elle a
+été formalisée pour répondre à des besoins en physique, notamment dans
+la théorie des matrices et des opérateurs. Aujourd’hui, la transposée
+est indispensable dans l’analyse fonctionnelle, les équations aux
+dérivées partielles et même en machine learning.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la transposée d’une application linéaire, commençons par
+comprendre ce que nous cherchons à obtenir. Supposons que nous ayons une
+application linéaire <span class="math inline">\(f : E \rightarrow
+F\)</span> entre deux espaces vectoriels. Nous voulons une application
+qui, d’une certaine manière, "inverse" l’effet de <span
+class="math inline">\(f\)</span> sur les formes linéaires.</p>
+<p>Formellement, la transposée de <span
+class="math inline">\(f\)</span>, notée <span class="math inline">\(^t
+f\)</span> ou parfois <span class="math inline">\(f^*\)</span>, est
+définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(E\)</span> et <span
+class="math inline">\(F\)</span> deux espaces vectoriels sur un corps
+<span class="math inline">\(K\)</span>, et soit <span
+class="math inline">\(f : E \rightarrow F\)</span> une application
+linéaire. La transposée de <span class="math inline">\(f\)</span>, notée
+<span class="math inline">\(^t f : F^* \rightarrow E^*\)</span>, est
+l’application linéaire définie par : <span
+class="math display">\[\forall \varphi \in F^*, \forall x \in E, \quad
+^t f(\varphi)(x) = \varphi(f(x))\]</span></p>
+</div>
+<p>En d’autres termes, la transposée de <span
+class="math inline">\(f\)</span> prend une forme linéaire sur <span
+class="math inline">\(F\)</span> et la "ramène" en une forme linéaire
+sur <span class="math inline">\(E\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la transposée d’une application
+linéaire est le suivant :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(E, F\)</span> et <span
+class="math inline">\(G\)</span> des espaces vectoriels sur un corps
+<span class="math inline">\(K\)</span>, et soient <span
+class="math inline">\(f : E \rightarrow F\)</span> et <span
+class="math inline">\(g : F \rightarrow G\)</span> des applications
+linéaires. Alors :</p>
+<ol>
+<li><p>La transposée de <span class="math inline">\(f\)</span> est
+linéaire.</p></li>
+<li><p>Si <span class="math inline">\(h = g \circ f\)</span>, alors
+<span class="math inline">\(^t h = ^t f \circ ^t g\)</span>.</p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Commençons par prouver que la transposée de <span
+class="math inline">\(f\)</span> est linéaire.</p>
+<div class="proof">
+<p><em>Proof.</em> Soient <span class="math inline">\(\varphi, \psi \in
+F^*\)</span> et <span class="math inline">\(\lambda \in K\)</span>. Nous
+devons montrer que : <span class="math display">\[^t f(\varphi + \lambda
+\psi) = ^t f(\varphi) + \lambda ^t f(\psi)\]</span> Pour tout <span
+class="math inline">\(x \in E\)</span>, nous avons : <span
+class="math display">\[^t f(\varphi + \lambda \psi)(x) = (\varphi +
+\lambda \psi)(f(x)) = \varphi(f(x)) + \lambda \psi(f(x)) = ^t
+f(\varphi)(x) + \lambda ^t f(\psi)(x)\]</span> Ce qui prouve la
+linéarité de <span class="math inline">\(^t f\)</span>. ◻</p>
+</div>
+<p>Maintenant, prouvons la seconde propriété du théorème.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(x \in E\)</span>.
+Nous devons montrer que : <span class="math display">\[^t h(\varphi)(x)
+= ^t f(^t g(\varphi))(x)\]</span> Pour tout <span
+class="math inline">\(\varphi \in G^*\)</span>, nous avons : <span
+class="math display">\[^t h(\varphi)(x) = \varphi(h(x)) =
+\varphi(g(f(x))) = ^t g(\varphi)(f(x)) = ^t f(^t g(\varphi))(x)\]</span>
+Ce qui prouve que <span class="math inline">\(^t h = ^t f \circ ^t
+g\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons quelques propriétés importantes de la transposée d’une
+application linéaire :</p>
+<ol>
+<li><p>Si <span class="math inline">\(f : E \rightarrow F\)</span> est
+injective, alors sa transposée <span class="math inline">\(^t f : F^*
+\rightarrow E^*\)</span> est surjective.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span class="math inline">\(f\)</span>
+soit injective. Nous devons montrer que pour toute forme linéaire <span
+class="math inline">\(\varphi \in E^*\)</span>, il existe une forme
+linéaire <span class="math inline">\(\psi \in F^*\)</span> telle que
+<span class="math inline">\(^t f(\psi) = \varphi\)</span>.</p>
+<p>Puisque <span class="math inline">\(f\)</span> est injective, nous
+pouvons définir <span class="math inline">\(\psi\)</span> sur l’image de
+<span class="math inline">\(f\)</span> par <span
+class="math inline">\(\psi(f(x)) = \varphi(x)\)</span>. Ensuite, nous
+étendons <span class="math inline">\(\psi\)</span> linéairement à tout
+<span class="math inline">\(F\)</span>. ◻</p>
+</div></li>
+<li><p>Si <span class="math inline">\(f : E \rightarrow F\)</span> est
+surjective, alors sa transposée <span class="math inline">\(^t f : F^*
+\rightarrow E^*\)</span> est injective.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span class="math inline">\(f\)</span>
+soit surjective. Nous devons montrer que si <span
+class="math inline">\(^t f(\varphi) = 0\)</span>, alors <span
+class="math inline">\(\varphi = 0\)</span>.</p>
+<p>Si <span class="math inline">\(^t f(\varphi) = 0\)</span>, alors pour
+tout <span class="math inline">\(x \in E\)</span>, nous avons <span
+class="math inline">\(\varphi(f(x)) = 0\)</span>. Puisque <span
+class="math inline">\(f\)</span> est surjective, cela implique que <span
+class="math inline">\(\varphi = 0\)</span>. ◻</p>
+</div></li>
+<li><p>Si <span class="math inline">\(f : E \rightarrow F\)</span> est
+un isomorphisme, alors sa transposée <span class="math inline">\(^t f :
+F^* \rightarrow E^*\)</span> est également un isomorphisme.</p>
+<div class="proof">
+<p><em>Proof.</em> Puisque <span class="math inline">\(f\)</span> est un
+isomorphisme, il est à la fois injectif et surjectif. Par les propriétés
+précédentes, <span class="math inline">\(^t f\)</span> est donc à la
+fois injective et surjective, ce qui en fait un isomorphisme. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La transposée d’une application linéaire est un concept puissant et
+polyvalent en algèbre linéaire. Elle permet de résoudre des problèmes
+duals, de comprendre les structures des espaces vectoriels et de
+généraliser des notions fondamentales. Les propriétés et théorèmes
+associés à la transposée sont essentiels pour une compréhension
+approfondie des applications linéaires et de leurs rôles dans divers
+domaines mathématiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

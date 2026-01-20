@@ -1,0 +1,291 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Taux de faux positifs (False Positive Rate)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Taux de faux positifs (False Positive Rate)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le taux de faux positifs, ou False Positive Rate (FPR), est une
+notion fondamentale en statistique et en apprentissage automatique. Il
+émerge dans le cadre de la classification binaire, où l’objectif est de
+distinguer deux classes distinctes. Le FPR mesure la proportion de cas
+négatifs qui sont incorrectement classés comme positifs.</p>
+<p>Ce concept est indispensable dans de nombreux domaines, tels que la
+médecine, où un faux positif peut entraîner des diagnostics erronés et
+des traitements inutiles. Il est également crucial en sécurité
+informatique, où un faux positif peut déclencher des alertes inutiles et
+perturber les opérations.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir le taux de faux positifs, commençons par comprendre ce
+que nous cherchons à mesurer. Supposons que nous avons un test de
+classification binaire qui prédit si une instance appartient à la classe
+positive ou négative. Nous voulons mesurer la proportion de cas négatifs
+qui sont incorrectement classés comme positifs.</p>
+<p>Formellement, soit <span class="math inline">\(P\)</span> l’ensemble
+des instances positives et <span class="math inline">\(N\)</span>
+l’ensemble des instances négatives. Soit <span
+class="math inline">\(TP\)</span> le nombre de vrais positifs, <span
+class="math inline">\(FP\)</span> le nombre de faux positifs, <span
+class="math inline">\(TN\)</span> le nombre de vrais négatifs et <span
+class="math inline">\(FN\)</span> le nombre de faux négatifs.</p>
+<p>Le taux de faux positifs est défini comme suit :</p>
+<p><span class="math display">\[FPR = \frac{FP}{FP + TN}\]</span></p>
+<p>Autrement dit, le FPR est la proportion de faux positifs parmi toutes
+les instances négatives.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié au taux de faux positifs est le théorème de
+Bayes, qui relie les probabilités conditionnelles. Ce théorème est
+souvent utilisé pour calculer le FPR dans des contextes
+probabilistes.</p>
+<p>Supposons que nous avons un test de classification binaire avec une
+probabilité <span class="math inline">\(P(P)\)</span> d’appartenir à la
+classe positive et <span class="math inline">\(P(N)\)</span>
+d’appartenir à la classe négative. Supposons également que nous avons
+une probabilité <span class="math inline">\(P(T^+|P)\)</span> de tester
+positif si l’instance est positive et <span
+class="math inline">\(P(T^-|N)\)</span> de tester négatif si l’instance
+est négative.</p>
+<p>Le théorème de Bayes nous permet de calculer la probabilité
+d’appartenir à la classe positive étant donné un test positif :</p>
+<p><span class="math display">\[P(P|T^+) = \frac{P(T^+|P)
+P(P)}{P(T^+)}\]</span></p>
+<p>où <span class="math inline">\(P(T^+) = P(T^+|P) P(P) + P(T^+|N)
+P(N)\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver que le FPR est bien défini par la formule donnée, nous
+devons montrer que cette définition est cohérente avec les concepts de
+vrais positifs et faux négatifs.</p>
+<p>Considérons un ensemble de données avec <span
+class="math inline">\(n\)</span> instances, dont <span
+class="math inline">\(n_P\)</span> sont positives et <span
+class="math inline">\(n_N\)</span> sont négatives. Supposons que notre
+test de classification binaire classe correctement <span
+class="math inline">\(TP\)</span> instances positives et <span
+class="math inline">\(TN\)</span> instances négatives, tout en classant
+incorrectement <span class="math inline">\(FP\)</span> instances
+négatives comme positives et <span class="math inline">\(FN\)</span>
+instances positives comme négatives.</p>
+<p>Nous avons donc :</p>
+<p><span class="math display">\[TP + FN = n_P \quad \text{et} \quad FP +
+TN = n_N\]</span></p>
+<p>Le taux de faux positifs est alors :</p>
+<p><span class="math display">\[FPR = \frac{FP}{FP + TN} =
+\frac{FP}{n_N}\]</span></p>
+<p>Cette formule montre que le FPR est bien la proportion de faux
+positifs parmi toutes les instances négatives.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le taux de faux positifs présente plusieurs propriétés intéressantes
+:</p>
+<ul>
+<li><p>Le FPR est toujours compris entre 0 et 1, car il s’agit d’une
+proportion.</p></li>
+<li><p>Un FPR élevé indique que le test de classification a tendance à
+classer incorrectement les instances négatives comme positives.</p></li>
+<li><p>Le FPR est inversement lié au taux de vrais négatifs (True
+Negative Rate, TNR), qui est défini comme <span
+class="math inline">\(TNR = \frac{TN}{FP + TN}\)</span>.</p></li>
+</ul>
+<p>Pour prouver la propriété (iii), nous avons :</p>
+<p><span class="math display">\[FPR + TNR = \frac{FP}{FP + TN} +
+\frac{TN}{FP + TN} = 1\]</span></p>
+<p>Cette relation montre que le FPR et le TNR sont complémentaires.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

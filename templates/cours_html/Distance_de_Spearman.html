@@ -1,0 +1,420 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Spearman : une mesure non paramétrique de corrélation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Spearman : une mesure non paramétrique
+de corrélation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des relations entre variables quantitatives est un enjeu
+fondamental en statistique. La corrélation de Pearson, bien que
+largement utilisée, suppose des hypothèses fortes : linéarité et
+normalité des distributions. La distance de Spearman émerge comme une
+alternative robuste, ne nécessitant aucune hypothèse distributive.
+Introduite par Charles Spearman en 1904, cette mesure repose sur les
+rangs des observations plutôt que sur leurs valeurs brutes. Elle est
+particulièrement adaptée aux données ordinales ou lorsque les relations
+non linéaires sont suspectées.</p>
+<p>Cette approche est indispensable dans des domaines variés :
+psychométrie, biostatistique, ou économétrie. Par exemple, l’étude des
+préférences des consommateurs ou l’analyse de la relation entre deux
+variables biologiques avec des distributions asymétriques. La distance
+de Spearman offre une robustesse et une interprétation simple, faisant
+d’elle un outil incontournable en analyse exploratoire.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Spearman, considérons deux échantillons
+de taille <span class="math inline">\(n\)</span>, notés <span
+class="math inline">\(X = (X_1, \dots, X_n)\)</span> et <span
+class="math inline">\(Y = (Y_1, \dots, Y_n)\)</span>. L’idée est de
+capturer la relation monotone entre <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+<p>Avant d’annoncer formellement la définition, imaginons que nous
+voulions mesurer à quel point l’ordre des <span
+class="math inline">\(X_i\)</span> est similaire à celui des <span
+class="math inline">\(Y_i\)</span>. Si les deux échantillons sont
+parfaitement corrélés positivement, leurs rangs respectifs seront
+identiques. Si la corrélation est négative, les rangs seront
+inversés.</p>
+<p>Formellement, la distance de Spearman <span
+class="math inline">\(d_S(X, Y)\)</span> est définie comme suit :</p>
+<p><span class="math display">\[d_S(X, Y) = 1 - r_S(X, Y)\]</span></p>
+<p>où <span class="math inline">\(r_S(X, Y)\)</span> est le coefficient
+de corrélation de Spearman entre <span class="math inline">\(X\)</span>
+et <span class="math inline">\(Y\)</span>. Ce coefficient est donné par
+:</p>
+<p><span class="math display">\[r_S(X, Y) = 1 - \frac{6 \sum_{i=1}^n
+(R(X_i) - R(Y_i))^2}{n(n^2 - 1)}\]</span></p>
+<p>où <span class="math inline">\(R(X_i)\)</span> et <span
+class="math inline">\(R(Y_i)\)</span> désignent les rangs des
+observations <span class="math inline">\(X_i\)</span> et <span
+class="math inline">\(Y_i\)</span> dans leurs échantillons
+respectifs.</p>
+<p>Une autre formulation équivalente est :</p>
+<p><span class="math display">\[d_S(X, Y) = \frac{\sum_{i &lt; j}
+|R(X_i) - R(Y_i)| + |R(X_j) - R(Y_j)|}{n(n-1)}\]</span></p>
+<p>Cette distance mesure la dissimilarité entre les rangs des deux
+échantillons, en normalisant par le nombre total de paires
+possibles.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Spearman est celui de la
+consistance. Ce théorème garantit que si deux variables sont
+indépendantes, leur distance de Spearman converge vers 1 lorsque la
+taille de l’échantillon tend vers l’infini.</p>
+<p>Pour énoncer ce théorème, introduisons quelques notations. Soient
+<span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables aléatoires
+indépendantes. Notons <span class="math inline">\(r_S^n(X, Y)\)</span>
+le coefficient de Spearman calculé sur un échantillon de taille <span
+class="math inline">\(n\)</span>.</p>
+<div class="theorem">
+<p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendantes, alors :</p>
+<p><span class="math display">\[\lim_{n \to \infty} r_S^n(X, Y) = 0
+\quad \text{en probabilité}\]</span></p>
+<p>De plus,</p>
+<p><span class="math display">\[\lim_{n \to \infty} d_S^n(X, Y) = 1
+\quad \text{en probabilité}\]</span></p>
+<p>où <span class="math inline">\(d_S^n(X, Y) = 1 - r_S^n(X,
+Y)\)</span>.</p>
+</div>
+<p>La preuve de ce théorème repose sur le théorème central limite et les
+propriétés des rangs. En effet, sous l’hypothèse d’indépendance, les
+rangs de <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont asymptotiquement non corrélés.
+Ainsi, la somme des carrés des différences de rangs est distribuée comme
+une somme de variables aléatoires indépendantes, ce qui permet
+d’appliquer le théorème central limite.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver la consistance de la distance de Spearman, commençons
+par rappeler quelques propriétés des rangs. Soit <span
+class="math inline">\(R(X_i)\)</span> le rang de l’observation <span
+class="math inline">\(X_i\)</span>. On a :</p>
+<p><span class="math display">\[\mathbb{E}[R(X_i)] = \frac{n +
+1}{2}\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\text{Var}(R(X_i)) = \frac{n^2 -
+1}{12}\]</span></p>
+<p>De plus, pour <span class="math inline">\(i \neq j\)</span>, les
+rangs <span class="math inline">\(R(X_i)\)</span> et <span
+class="math inline">\(R(X_j)\)</span> sont négativement corrélés, avec
+:</p>
+<p><span class="math display">\[\text{Cov}(R(X_i), R(X_j)) = -\frac{n +
+1}{6(n - 1)}\]</span></p>
+<p>Sous l’hypothèse d’indépendance entre <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, les rangs <span
+class="math inline">\(R(X_i)\)</span> et <span
+class="math inline">\(R(Y_i)\)</span> sont indépendants. Ainsi, la
+covariance entre <span class="math inline">\(R(X_i)\)</span> et <span
+class="math inline">\(R(Y_i)\)</span> est nulle.</p>
+<p>Considérons maintenant la somme des carrés des différences de rangs
+:</p>
+<p><span class="math display">\[S_n = \sum_{i=1}^n (R(X_i) -
+R(Y_i))^2\]</span></p>
+<p>En développant cette expression, on obtient :</p>
+<p><span class="math display">\[S_n = \sum_{i=1}^n R(X_i)^2 +
+\sum_{i=1}^n R(Y_i)^2 - 2 \sum_{i=1}^n R(X_i)R(Y_i)\]</span></p>
+<p>En utilisant les propriétés des rangs, on peut montrer que :</p>
+<p><span class="math display">\[\mathbb{E}[S_n] = 2n \cdot \frac{n^2 -
+1}{12} + n \left( \frac{n + 1}{2} \right)^2 - 2n \cdot \frac{(n +
+1)^2}{4}\]</span></p>
+<p>Simplifiant cette expression, on trouve :</p>
+<p><span class="math display">\[\mathbb{E}[S_n] = \frac{n(n^2 -
+1)}{6}\]</span></p>
+<p>Ainsi, le coefficient de Spearman peut s’écrire :</p>
+<p><span class="math display">\[r_S^n(X, Y) = 1 - \frac{6S_n}{n(n^2 -
+1)} = 1 - \frac{6 \sum_{i=1}^n (R(X_i) - R(Y_i))^2}{n(n^2 -
+1)}\]</span></p>
+<p>En utilisant le théorème central limite, on peut montrer que :</p>
+<p><span class="math display">\[\frac{S_n -
+\mathbb{E}[S_n]}{\sqrt{\text{Var}(S_n)}} \xrightarrow{d} \mathcal{N}(0,
+1)\]</span></p>
+<p>où <span class="math inline">\(\text{Var}(S_n)\)</span> est la
+variance de <span class="math inline">\(S_n\)</span>. En utilisant les
+propriétés des rangs, on peut calculer cette variance et montrer que
+:</p>
+<p><span class="math display">\[\text{Var}(S_n) = \frac{n(n^2 - 1)(n +
+1)}{36}\]</span></p>
+<p>Ainsi, on a :</p>
+<p><span class="math display">\[\frac{6S_n}{n(n^2 - 1)} - 1
+\xrightarrow{d} \mathcal{N}\left(0, \frac{n + 1}{n(n -
+1)}\right)\]</span></p>
+<p>En multipliant par <span class="math inline">\(-1\)</span> et en
+ajoutant 1, on obtient :</p>
+<p><span class="math display">\[1 - \frac{6S_n}{n(n^2 - 1)}
+\xrightarrow{d} \mathcal{N}\left(0, \frac{n + 1}{n(n -
+1)}\right)\]</span></p>
+<p>Enfin, en utilisant le fait que <span class="math inline">\(\frac{n +
+1}{n(n - 1)} \to 0\)</span> lorsque <span class="math inline">\(n \to
+\infty\)</span>, on conclut que :</p>
+<p><span class="math display">\[r_S^n(X, Y) \xrightarrow{p}
+0\]</span></p>
+<p>et donc</p>
+<p><span class="math display">\[d_S^n(X, Y) = 1 - r_S^n(X, Y)
+\xrightarrow{p} 1\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Spearman possède plusieurs propriétés intéressantes,
+que nous énumérons ci-dessous :</p>
+<ol>
+<li><p><strong>Invariance par transformation monotone</strong> : La
+distance de Spearman est invariante par toute transformation monotone
+des variables. C’est-à-dire que pour toute fonction strictement monotone
+<span class="math inline">\(\phi\)</span>, on a :</p>
+<p><span class="math display">\[d_S(X, Y) = d_S(\phi(X),
+\psi(Y))\]</span></p>
+<p>où <span class="math inline">\(\psi\)</span> est une autre fonction
+strictement monotone.</p></li>
+<li><p><strong>Normalisation</strong> : La distance de Spearman est
+normalisée entre 0 et 1. Plus précisément, on a :</p>
+<p><span class="math display">\[0 \leq d_S(X, Y) \leq 1\]</span></p>
+<p>La valeur 0 est atteinte lorsque les deux échantillons sont
+parfaitement corrélés positivement ou négativement, tandis que la valeur
+1 est atteinte lorsque les deux échantillons sont indépendants.</p></li>
+<li><p><strong>Symétrie</strong> : La distance de Spearman est
+symétrique, c’est-à-dire que :</p>
+<p><span class="math display">\[d_S(X, Y) = d_S(Y, X)\]</span></p></li>
+<li><p><strong>Consistance</strong> : Comme nous l’avons vu dans la
+section précédente, la distance de Spearman est consistante.
+C’est-à-dire que si deux variables sont indépendantes, leur distance de
+Spearman converge vers 1 lorsque la taille de l’échantillon tend vers
+l’infini.</p></li>
+</ol>
+<p>Pour prouver la propriété (i), considérons une transformation
+monotone <span class="math inline">\(\phi\)</span> appliquée à <span
+class="math inline">\(X\)</span>. Les rangs des observations <span
+class="math inline">\(\phi(X_i)\)</span> sont les mêmes que ceux de
+<span class="math inline">\(X_i\)</span>, car une transformation
+monotone préserve l’ordre des observations. Ainsi, on a :</p>
+<p><span class="math display">\[R(\phi(X_i)) = R(X_i)\]</span></p>
+<p>De même, pour une transformation monotone <span
+class="math inline">\(\psi\)</span> appliquée à <span
+class="math inline">\(Y\)</span>, on a :</p>
+<p><span class="math display">\[R(\psi(Y_i)) = R(Y_i)\]</span></p>
+<p>Ainsi, la distance de Spearman entre <span
+class="math inline">\(\phi(X)\)</span> et <span
+class="math inline">\(\psi(Y)\)</span> est :</p>
+<p><span class="math display">\[d_S(\phi(X), \psi(Y)) = 1 - r_S(\phi(X),
+\psi(Y)) = 1 - \frac{6 \sum_{i=1}^n (R(\phi(X_i)) -
+R(\psi(Y_i)))^2}{n(n^2 - 1)} = d_S(X, Y)\]</span></p>
+<p>Pour prouver la propriété (ii), considérons d’abord le cas où <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont parfaitement corrélés
+positivement. Dans ce cas, on a <span class="math inline">\(R(X_i) =
+R(Y_i)\)</span> pour tout <span class="math inline">\(i\)</span>, et
+donc :</p>
+<p><span class="math display">\[d_S(X, Y) = 1 - r_S(X, Y) = 1 - 1 =
+0\]</span></p>
+<p>De même, si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont parfaitement corrélés
+négativement, on a <span class="math inline">\(R(X_i) = n + 1 -
+R(Y_i)\)</span>, et donc :</p>
+<p><span class="math display">\[d_S(X, Y) = 1 - r_S(X, Y) = 1 - (-1) =
+0\]</span></p>
+<p>Enfin, si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendants, on a vu dans la
+section précédente que <span class="math inline">\(d_S(X, Y) \to
+1\)</span> lorsque <span class="math inline">\(n \to
+\infty\)</span>.</p>
+<p>Pour prouver la propriété (iii), il suffit de remarquer que :</p>
+<p><span class="math display">\[d_S(X, Y) = 1 - r_S(X, Y) = 1 - \left(1
+- \frac{6 \sum_{i=1}^n (R(X_i) - R(Y_i))^2}{n(n^2 - 1)}\right) = d_S(Y,
+X)\]</span></p>
+</body>
+</html>
+{% include "footer.html" %}
+

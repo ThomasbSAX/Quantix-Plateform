@@ -1,0 +1,395 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Loi normale a posteriori</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Loi normale a posteriori</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La loi normale a posteriori émerge dans le cadre de l’inférence
+bayésienne, une approche statistique qui permet d’incorporer des
+informations a priori dans l’estimation de paramètres. Cette notion est
+indispensable lorsqu’on souhaite combiner des données observées avec des
+croyances préalables sur les paramètres d’un modèle. L’origine de cette
+loi remonte aux travaux de Thomas Bayes au XVIIIe siècle, mais c’est
+avec le développement des méthodes computationnelles modernes qu’elle a
+trouvé ses applications les plus fructueuses.</p>
+<p>L’inférence bayésienne est particulièrement utile dans des contextes
+où les données sont rares ou coûteuses à obtenir. En intégrant une
+information a priori, on peut réduire l’incertitude sur les paramètres
+et obtenir des estimations plus robustes. La loi normale a posteriori
+est un cas particulier important, car elle permet de tirer parti des
+propriétés analytiques bien comprises de la distribution normale.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre ce qu’est une loi normale a posteriori, commençons
+par rappeler quelques concepts fondamentaux. Supposons que nous avons un
+paramètre <span class="math inline">\(\theta\)</span> que nous
+souhaitons estimer, et que nous disposons de données <span
+class="math inline">\(X_1, X_2, \dots, X_n\)</span> qui dépendent de
+<span class="math inline">\(\theta\)</span>. En inférence bayésienne,
+nous considérons que <span class="math inline">\(\theta\)</span> est une
+variable aléatoire et nous cherchons à déterminer sa distribution a
+posteriori, c’est-à-dire la distribution de <span
+class="math inline">\(\theta\)</span> conditionnellement aux données
+observées.</p>
+<p>La loi normale a posteriori est une distribution normale qui apparaît
+lorsque la distribution a priori de <span
+class="math inline">\(\theta\)</span> et la vraisemblance des données
+sont toutes deux normales. Formellement, nous avons les hypothèses
+suivantes :</p>
+<ul>
+<li><p>La distribution a priori de <span
+class="math inline">\(\theta\)</span> est normale : <span
+class="math inline">\(\theta \sim \mathcal{N}(\mu_0,
+\sigma_0^2)\)</span>.</p></li>
+<li><p>La vraisemblance des données est normale : <span
+class="math inline">\(X_i \sim \mathcal{N}(\theta, \sigma^2)\)</span>
+pour tout <span class="math inline">\(i = 1, \dots, n\)</span>.</p></li>
+</ul>
+<p>Sous ces hypothèses, la distribution a posteriori de <span
+class="math inline">\(\theta\)</span> est également normale. Nous
+pouvons l’exprimer de plusieurs manières :</p>
+<p><span class="math display">\[\begin{equation}
+    \theta | X_1, \dots, X_n \sim
+\mathcal{N}\left(\frac{\frac{n\bar{X}}{\sigma^2} +
+\frac{\mu_0}{\sigma_0^2}}{\frac{n}{\sigma^2} + \frac{1}{\sigma_0^2}},
+\left(\frac{n}{\sigma^2} + \frac{1}{\sigma_0^2}\right)^{-1}\right)
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(\bar{X} = \frac{1}{n}\sum_{i=1}^n
+X_i\)</span> est la moyenne empirique des données.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en inférence bayésienne est le théorème de
+Bayes, qui relie la distribution a posteriori à la distribution a priori
+et à la vraisemblance. Nous allons l’énoncer formellement dans le
+contexte de la loi normale a posteriori.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\theta\)</span> un paramètre
+aléatoire avec une distribution a priori <span
+class="math inline">\(p(\theta)\)</span>, et soit <span
+class="math inline">\(X_1, \dots, X_n\)</span> des données observées
+avec une vraisemblance <span class="math inline">\(p(X_1, \dots, X_n |
+\theta)\)</span>. La distribution a posteriori de <span
+class="math inline">\(\theta\)</span> est donnée par :</p>
+<p><span class="math display">\[\begin{equation}
+        p(\theta | X_1, \dots, X_n) = \frac{p(X_1, \dots, X_n | \theta)
+p(\theta)}{p(X_1, \dots, X_n)}
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(p(X_1, \dots, X_n) = \int p(X_1,
+\dots, X_n | \theta) p(\theta) d\theta\)</span> est la probabilité
+marginale des données.</p>
+</div>
+<p>Dans le cas où <span class="math inline">\(\theta \sim
+\mathcal{N}(\mu_0, \sigma_0^2)\)</span> et <span
+class="math inline">\(X_i \sim \mathcal{N}(\theta, \sigma^2)\)</span>,
+nous pouvons appliquer le théorème de Bayes pour obtenir la distribution
+a posteriori de <span class="math inline">\(\theta\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver que la distribution a posteriori est normale, nous
+allons utiliser le théorème de Bayes et les propriétés des distributions
+normales. Commençons par exprimer la vraisemblance des données :</p>
+<p><span class="math display">\[\begin{equation}
+    p(X_1, \dots, X_n | \theta) = \prod_{i=1}^n
+\frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(X_i -
+\theta)^2}{2\sigma^2}\right)
+\end{equation}\]</span></p>
+<p>En prenant le logarithme, nous obtenons :</p>
+<p><span class="math display">\[\begin{equation}
+    \log p(X_1, \dots, X_n | \theta) = -\frac{n}{2}\log(2\pi\sigma^2) -
+\frac{1}{2\sigma^2} \sum_{i=1}^n (X_i - \theta)^2
+\end{equation}\]</span></p>
+<p>En développant le carré, nous avons :</p>
+<p><span class="math display">\[\begin{equation}
+    \sum_{i=1}^n (X_i - \theta)^2 = n\bar{X}^2 - 2n\bar{X}\theta +
+n\theta^2
+\end{equation}\]</span></p>
+<p>En substituant cette expression dans la vraisemblance, nous obtenons
+:</p>
+<p><span class="math display">\[\begin{equation}
+    \log p(X_1, \dots, X_n | \theta) = -\frac{n}{2}\log(2\pi\sigma^2) -
+\frac{n\bar{X}^2}{2\sigma^2} + \frac{n\bar{X}\theta}{\sigma^2} -
+\frac{n\theta^2}{2\sigma^2}
+\end{equation}\]</span></p>
+<p>En exponentiant, nous retrouvons la vraisemblance originale.
+Maintenant, nous pouvons appliquer le théorème de Bayes pour obtenir la
+distribution a posteriori :</p>
+<p><span class="math display">\[\begin{equation}
+    p(\theta | X_1, \dots, X_n) \propto p(X_1, \dots, X_n | \theta)
+p(\theta)
+\end{equation}\]</span></p>
+<p>En substituant les expressions de la vraisemblance et de la
+distribution a priori, nous avons :</p>
+<p><span class="math display">\[\begin{equation}
+    p(\theta | X_1, \dots, X_n) \propto
+\exp\left(-\frac{n\bar{X}^2}{2\sigma^2} +
+\frac{n\bar{X}\theta}{\sigma^2} - \frac{n\theta^2}{2\sigma^2}\right)
+\exp\left(-\frac{(\theta - \mu_0)^2}{2\sigma_0^2}\right)
+\end{equation}\]</span></p>
+<p>En combinant les exponentielles, nous obtenons :</p>
+<p><span class="math display">\[\begin{equation}
+    p(\theta | X_1, \dots, X_n) \propto
+\exp\left(-\frac{n\bar{X}^2}{2\sigma^2} +
+\frac{n\bar{X}\theta}{\sigma^2} - \frac{n\theta^2}{2\sigma^2} -
+\frac{(\theta - \mu_0)^2}{2\sigma_0^2}\right)
+\end{equation}\]</span></p>
+<p>En développant les carrés et en combinant les termes, nous obtenons
+finalement :</p>
+<p><span class="math display">\[\begin{equation}
+    p(\theta | X_1, \dots, X_n) \propto
+\exp\left(-\frac{1}{2}\left(\frac{n}{\sigma^2} +
+\frac{1}{\sigma_0^2}\right)\theta^2 + \left(\frac{n\bar{X}}{\sigma^2} +
+\frac{\mu_0}{\sigma_0^2}\right)\theta\right)
+\end{equation}\]</span></p>
+<p>Cette expression est proportionnelle à la densité d’une distribution
+normale avec une variance <span
+class="math inline">\(\left(\frac{n}{\sigma^2} +
+\frac{1}{\sigma_0^2}\right)^{-1}\)</span> et une moyenne <span
+class="math inline">\(\frac{\frac{n\bar{X}}{\sigma^2} +
+\frac{\mu_0}{\sigma_0^2}}{\frac{n}{\sigma^2} +
+\frac{1}{\sigma_0^2}}\)</span>. Ainsi, nous avons prouvé que la
+distribution a posteriori est normale.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant énoncer quelques propriétés importantes de la
+loi normale a posteriori.</p>
+<ul>
+<li><p>La moyenne a posteriori est une combinaison convexe de la moyenne
+a priori et de la moyenne empirique des données. Plus précisément, nous
+avons :</p>
+<p><span class="math display">\[\begin{equation}
+        \mathbb{E}[\theta | X_1, \dots, X_n] =
+\frac{\frac{n\bar{X}}{\sigma^2} +
+\frac{\mu_0}{\sigma_0^2}}{\frac{n}{\sigma^2} + \frac{1}{\sigma_0^2}}
+\end{equation}\]</span></p>
+<p>Cette propriété montre que la distribution a posteriori est un
+compromis entre l’information a priori et les données
+observées.</p></li>
+<li><p>La variance a posteriori est toujours plus petite que la variance
+a priori. Plus précisément, nous avons :</p>
+<p><span class="math display">\[\begin{equation}
+        \text{Var}(\theta | X_1, \dots, X_n) = \left(\frac{n}{\sigma^2}
++ \frac{1}{\sigma_0^2}\right)^{-1} \leq \sigma_0^2
+\end{equation}\]</span></p>
+<p>Cette propriété montre que l’incertitude sur <span
+class="math inline">\(\theta\)</span> diminue lorsque nous observons des
+données.</p></li>
+<li><p>Si la variance a priori tend vers l’infini, c’est-à-dire si nous
+n’avons aucune information a priori sur <span
+class="math inline">\(\theta\)</span>, alors la distribution a
+posteriori tend vers une distribution normale centrée en <span
+class="math inline">\(\bar{X}\)</span> avec une variance <span
+class="math inline">\(\sigma^2/n\)</span>. Plus précisément, nous avons
+:</p>
+<p><span class="math display">\[\begin{equation}
+        \lim_{\sigma_0^2 \to \infty} p(\theta | X_1, \dots, X_n) =
+\mathcal{N}\left(\bar{X}, \frac{\sigma^2}{n}\right)
+\end{equation}\]</span></p>
+<p>Cette propriété montre que l’inférence bayésienne réduit à
+l’inférence fréquentiste lorsque nous n’avons aucune information a
+priori.</p></li>
+</ul>
+<h1 id="conclusion">Conclusion</h1>
+<p>La loi normale a posteriori est un outil puissant en inférence
+bayésienne, permettant de combiner des informations a priori et des
+données observées pour estimer les paramètres d’un modèle. Nous avons vu
+que sous des hypothèses normales, la distribution a posteriori est
+également normale, ce qui permet de tirer parti des propriétés
+analytiques bien comprises de la distribution normale. Les propriétés de
+la loi normale a posteriori montrent qu’elle est un compromis entre
+l’information a priori et les données observées, et que l’incertitude
+sur les paramètres diminue lorsque nous observons des données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

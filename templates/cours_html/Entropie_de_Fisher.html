@@ -1,0 +1,333 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Entropie de Fisher : Une Mesure de l’Information Géométrique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Entropie de Fisher : Une Mesure de l’Information
+Géométrique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’entropie de Fisher émerge comme une notion fondamentale dans le
+domaine de l’information géométrique, unissant les concepts de la
+théorie de l’information et de la géométrie différentielle. Son origine
+remonte aux travaux pionniers de Ronald Aylmer Fisher, un statisticien
+britannique du début du XXe siècle. L’entropie de Fisher est
+indispensable dans l’analyse des distributions de probabilité,
+fournissant une mesure de la dispersion ou de l’incertitude intrinsèque
+d’une distribution.</p>
+<p>Cette notion est particulièrement utile dans les domaines où la
+compréhension de la structure sous-jacente des données est cruciale,
+comme l’apprentissage automatique, la théorie des statistiques et même
+en physique statistique. L’entropie de Fisher permet de quantifier
+l’information contenue dans une distribution de probabilité, offrant
+ainsi des outils puissants pour l’optimisation et la modélisation.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’entropie de Fisher, commençons par explorer ce que
+nous cherchons à mesurer. Imaginons une distribution de probabilité
+<span class="math inline">\(p(x)\)</span> définie sur un espace <span
+class="math inline">\(\mathcal{X}\)</span>. Nous voulons capturer la
+manière dont cette distribution se comporte localement, c’est-à-dire
+comment elle varie autour de chaque point <span
+class="math inline">\(x\)</span>. L’entropie de Fisher quantifie cette
+variation, mesurant en quelque sorte la "rugosité" ou l’incertitude
+locale de la distribution.</p>
+<p>Formellement, l’entropie de Fisher <span
+class="math inline">\(J(p)\)</span> d’une distribution de probabilité
+<span class="math inline">\(p(x)\)</span> est définie comme suit :</p>
+<p><span class="math display">\[J(p) = \int_{\mathcal{X}} p(x) \left\|
+\nabla \log p(x) \right\|^2 \, dx\]</span></p>
+<p>où <span class="math inline">\(\nabla\)</span> représente le gradient
+par rapport à <span class="math inline">\(x\)</span>. Cette intégrale
+mesure la dispersion moyenne du logarithme de la densité de probabilité,
+pondérée par la densité elle-même.</p>
+<p>Une autre manière d’exprimer cette définition est :</p>
+<p><span class="math display">\[J(p) = \mathbb{E}_p \left[ \left\|
+\nabla \log p(X) \right\|^2 \right]\]</span></p>
+<p>où <span class="math inline">\(\mathbb{E}_p\)</span> désigne
+l’espérance prise selon la distribution <span
+class="math inline">\(p\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’entropie de Fisher est liée à plusieurs théorèmes importants en
+théorie de l’information et en géométrie différentielle. Un des
+résultats les plus notables est le théorème de Cramér-Rao, qui établit
+une borne inférieure sur la variance d’un estimateur non biaisé en
+fonction de l’entropie de Fisher.</p>
+<p>Pour formuler ce théorème, considérons un paramètre <span
+class="math inline">\(\theta\)</span> que nous voulons estimer à partir
+d’un échantillon de données. Supposons que la densité de probabilité
+<span class="math inline">\(p(x|\theta)\)</span> dépend de ce paramètre.
+Le théorème de Cramér-Rao stipule que pour tout estimateur non biaisé
+<span class="math inline">\(\hat{\theta}\)</span>, la variance de
+l’estimateur est bornée inférieurement par :</p>
+<p><span class="math display">\[\text{Var}(\hat{\theta}) \geq
+\frac{1}{J(\theta)}\]</span></p>
+<p>où <span class="math inline">\(J(\theta)\)</span> est l’entropie de
+Fisher par rapport au paramètre <span
+class="math inline">\(\theta\)</span>, définie comme :</p>
+<p><span class="math display">\[J(\theta) = \mathbb{E}_\theta \left[
+\left( \frac{\partial}{\partial \theta} \log p(X|\theta) \right)^2
+\right]\]</span></p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Cramér-Rao, nous commençons par
+considérer la fonction de score <span
+class="math inline">\(\ell_\theta(x) = \frac{\partial}{\partial \theta}
+\log p(x|\theta)\)</span>. Par définition de l’espérance, nous avons
+:</p>
+<p><span class="math display">\[\mathbb{E}_\theta [\ell_\theta(X)] =
+\int_{\mathcal{X}} \frac{\partial}{\partial \theta} p(x|\theta) \, dx =
+\frac{\partial}{\partial \theta} \int_{\mathcal{X}} p(x|\theta) \, dx =
+0\]</span></p>
+<p>où nous avons utilisé le fait que la dérivée et l’intégrale peuvent
+être permutées. Cela montre que <span
+class="math inline">\(\ell_\theta(X)\)</span> est un estimateur non
+biaisé de zéro.</p>
+<p>Considérons maintenant la covariance entre <span
+class="math inline">\(\ell_\theta(X)\)</span> et un estimateur non
+biaisé <span class="math inline">\(\hat{\theta}\)</span>. Nous avons
+:</p>
+<p><span class="math display">\[\text{Cov}(\ell_\theta(X), \hat{\theta})
+= \mathbb{E}_\theta [\ell_\theta(X)(\hat{\theta} - \theta)] =
+1\]</span></p>
+<p>En utilisant l’inégalité de Cauchy-Schwarz, nous obtenons :</p>
+<p><span class="math display">\[1 = \text{Cov}(\ell_\theta(X),
+\hat{\theta})^2 \leq \mathbb{E}_\theta [\ell_\theta(X)^2] \,
+\text{Var}(\hat{\theta})\]</span></p>
+<p>Ce qui implique :</p>
+<p><span class="math display">\[\text{Var}(\hat{\theta}) \geq
+\frac{1}{\mathbb{E}_\theta [\ell_\theta(X)^2]} =
+\frac{1}{J(\theta)}\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’entropie de Fisher possède plusieurs propriétés intéressantes qui
+en font un outil puissant dans l’analyse des distributions de
+probabilité. Voici quelques-unes de ces propriétés :</p>
+<ol>
+<li><p><strong>Invariance par transformation</strong> : L’entropie de
+Fisher est invariante sous les transformations affines. Plus
+précisément, si <span class="math inline">\(p(x)\)</span> est une
+densité de probabilité et <span class="math inline">\(y = a x +
+b\)</span> avec <span class="math inline">\(a &gt; 0\)</span>, alors
+:</p>
+<p><span class="math display">\[J(p_y) = J(p_x)\]</span></p>
+<p>où <span class="math inline">\(p_y\)</span> est la densité de
+probabilité transformée.</p></li>
+<li><p><strong>Additivité</strong> : Pour des distributions
+indépendantes, l’entropie de Fisher est additive. Si <span
+class="math inline">\(p(x,y) = p_x(x) p_y(y)\)</span>, alors :</p>
+<p><span class="math display">\[J(p_{x,y}) = J(p_x) +
+J(p_y)\]</span></p></li>
+<li><p><strong>Convexité</strong> : L’entropie de Fisher est une
+fonction convexe des densités de probabilité. Cela signifie que pour
+toute combinaison convexe <span class="math inline">\(\lambda p_1 + (1 -
+\lambda) p_2\)</span>, nous avons :</p>
+<p><span class="math display">\[J(\lambda p_1 + (1 - \lambda) p_2) \leq
+\lambda J(p_1) + (1 - \lambda) J(p_2)\]</span></p>
+<p>pour <span class="math inline">\(0 \leq \lambda \leq
+1\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’entropie de Fisher est une mesure fondamentale de l’information
+géométrique, offrant des insights précieux sur la structure des
+distributions de probabilité. Ses applications vont de l’estimation
+statistique à l’apprentissage automatique, en passant par la physique
+statistique. En comprenant et en utilisant l’entropie de Fisher, nous
+pouvons mieux capturer la complexité et l’incertitude des données,
+ouvrant ainsi de nouvelles voies pour l’analyse et la modélisation.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

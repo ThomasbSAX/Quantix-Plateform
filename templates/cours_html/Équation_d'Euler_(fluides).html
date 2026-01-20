@@ -1,0 +1,339 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Équation d’Euler pour les fluides incompressibles</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Équation d’Euler pour les fluides incompressibles</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des fluides est un domaine fondamental en physique et en
+ingénierie. Les équations d’Euler, nommées d’après le mathématicien
+suisse Leonhard Euler, constituent un modèle essentiel pour décrire le
+mouvement des fluides incompressibles et parfaits. Ces équations
+émergent naturellement lorsque l’on cherche à modéliser les forces
+agissant sur un fluide en mouvement, en négligeant les effets de
+viscosité.</p>
+<p>Les équations d’Euler sont indispensables dans divers domaines tels
+que l’aérodynamique, l’hydraulique et la météorologie. Elles permettent
+de comprendre les phénomènes complexes comme les tourbillons, les ondes
+de choc et les écoulements turbulents. Dans cet article, nous
+explorerons en détail ces équations, leurs définitions, leurs théorèmes
+associés et leurs preuves.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de formuler les équations d’Euler, il est crucial de comprendre
+les concepts fondamentaux impliqués. Nous cherchons à décrire le
+mouvement d’un fluide incompressible et parfait, c’est-à-dire un fluide
+dont la densité est constante et qui ne présente pas de viscosité.</p>
+<p>Considérons un domaine <span class="math inline">\(\Omega \subset
+\mathbb{R}^3\)</span> représentant l’espace occupé par le fluide. Soit
+<span class="math inline">\(\mathbf{u} : \Omega \times [0, T]
+\rightarrow \mathbb{R}^3\)</span> le champ de vitesse du fluide et <span
+class="math inline">\(p : \Omega \times [0, T] \rightarrow
+\mathbb{R}\)</span> la pression. La densité du fluide est notée <span
+class="math inline">\(\rho\)</span>, une constante positive.</p>
+<p>Nous cherchons à exprimer les lois de conservation de la masse et de
+la quantité de mouvement pour le fluide. La loi de conservation de la
+masse s’écrit :</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{\partial \rho}{\partial t} + \nabla \cdot (\rho \mathbf{u}) =
+0
+\end{equation}\]</span></p>
+<p>Comme le fluide est incompressible, <span
+class="math inline">\(\rho\)</span> est constant, ce qui simplifie
+l’équation à :</p>
+<p><span class="math display">\[\begin{equation}
+    \nabla \cdot \mathbf{u} = 0
+\end{equation}\]</span></p>
+<p>La loi de conservation de la quantité de mouvement s’écrit :</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{\partial (\rho \mathbf{u})}{\partial t} + \nabla \cdot (\rho
+\mathbf{u} \otimes \mathbf{u}) = -\nabla p + \rho \mathbf{f}
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(\mathbf{f}\)</span> représente les
+forces extérieures agissant sur le fluide. En utilisant à nouveau
+l’incompressibilité, nous obtenons :</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{\partial \mathbf{u}}{\partial t} + (\mathbf{u} \cdot \nabla)
+\mathbf{u} = -\frac{1}{\rho} \nabla p + \mathbf{f}
+\end{equation}\]</span></p>
+<p>Cette équation est connue sous le nom d’équation d’Euler pour les
+fluides incompressibles.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié aux équations d’Euler est le théorème de
+Kelvin-Helmholtz, qui décrit la conservation du tourbillon dans un
+fluide parfait. Le tourbillon est défini comme le rotationnel du champ
+de vitesse :</p>
+<p><span class="math display">\[\begin{equation}
+    \boldsymbol{\omega} = \nabla \times \mathbf{u}
+\end{equation}\]</span></p>
+<p>Le théorème de Kelvin-Helmholtz stipule que pour un fluide parfait et
+incompressible, le tourbillon est conservé le long des lignes de
+courant. Formellement, cela s’exprime par :</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{D \boldsymbol{\omega}}{D t} = (\boldsymbol{\omega} \cdot
+\nabla) \mathbf{u}
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(\frac{D}{D t}\)</span> représente la
+dérivée matérielle, c’est-à-dire la dérivée suivant le mouvement du
+fluide.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Kelvin-Helmholtz, nous commençons par
+prendre le rotationnel de l’équation d’Euler :</p>
+<p><span class="math display">\[\begin{equation}
+    \nabla \times \left( \frac{\partial \mathbf{u}}{\partial t} +
+(\mathbf{u} \cdot \nabla) \mathbf{u} \right) = \nabla \times \left(
+-\frac{1}{\rho} \nabla p + \mathbf{f} \right)
+\end{equation}\]</span></p>
+<p>En utilisant les propriétés du rotationnel et du gradient, nous
+obtenons :</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{\partial \boldsymbol{\omega}}{\partial t} + \nabla \times
+((\mathbf{u} \cdot \nabla) \mathbf{u}) = \nabla \times \mathbf{f}
+\end{equation}\]</span></p>
+<p>Le terme <span class="math inline">\(\nabla \times ((\mathbf{u} \cdot
+\nabla) \mathbf{u})\)</span> peut être simplifié en utilisant l’identité
+vectorielle suivante :</p>
+<p><span class="math display">\[\begin{equation}
+    \nabla \times ((\mathbf{u} \cdot \nabla) \mathbf{u}) =
+(\boldsymbol{\omega} \cdot \nabla) \mathbf{u} - \boldsymbol{\omega}
+(\nabla \cdot \mathbf{u})
+\end{equation}\]</span></p>
+<p>Comme le fluide est incompressible, <span
+class="math inline">\(\nabla \cdot \mathbf{u} = 0\)</span>, ce qui
+simplifie l’équation à :</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{\partial \boldsymbol{\omega}}{\partial t} +
+(\boldsymbol{\omega} \cdot \nabla) \mathbf{u} = \nabla \times \mathbf{f}
+\end{equation}\]</span></p>
+<p>En supposant que les forces extérieures <span
+class="math inline">\(\mathbf{f}\)</span> sont conservatives,
+c’est-à-dire <span class="math inline">\(\nabla \times \mathbf{f} =
+0\)</span>, nous obtenons finalement :</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{D \boldsymbol{\omega}}{D t} = (\boldsymbol{\omega} \cdot
+\nabla) \mathbf{u}
+\end{equation}\]</span></p>
+<p>Ce qui prouve le théorème de Kelvin-Helmholtz.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les équations d’Euler possèdent plusieurs propriétés importantes
+:</p>
+<ol>
+<li><p>**Conservation de l’énergie** : Pour un fluide parfait et
+incompressible, l’énergie totale est conservée. Cela se traduit par
+:</p>
+<p><span class="math display">\[\begin{equation}
+        \frac{d}{dt} \int_{\Omega} \left( \frac{1}{2} \rho
+|\mathbf{u}|^2 + p \right) d\mathbf{x} = 0
+\end{equation}\]</span></p></li>
+<li><p>**Existence et unicité des solutions** : Sous certaines
+conditions initiales et de bord, les équations d’Euler admettent une
+solution unique. Cependant, l’existence globale en temps des solutions
+reste un problème ouvert dans le cas général.</p></li>
+<li><p>**Stabilité des tourbillons** : Les équations d’Euler permettent
+de décrire la stabilité des structures tourbillonnaires dans les
+fluides. Cela est crucial pour comprendre les phénomènes de
+turbulence.</p></li>
+</ol>
+<p>En conclusion, les équations d’Euler constituent un outil puissant
+pour l’étude des fluides incompressibles et parfaits. Elles permettent
+de modéliser une large gamme de phénomènes physiques et offrent des
+insights précieux pour la compréhension des écoulements fluides.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

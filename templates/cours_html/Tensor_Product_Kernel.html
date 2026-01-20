@@ -1,0 +1,348 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Tensor Product Kernel: A Mathematical Exploration</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Tensor Product Kernel: A Mathematical Exploration</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>The concept of the tensor product kernel emerges from the
+intersection of functional analysis, machine learning, and algebraic
+topology. At its core, it represents a powerful tool for constructing
+complex kernels from simpler ones, enabling the modeling of intricate
+data structures. The tensor product kernel’s origin can be traced back
+to the study of Hilbert spaces and operator theory, where it was
+recognized that tensor products provide a natural framework for
+combining linear operators.</p>
+<p>In the realm of machine learning, kernels play a pivotal role in
+algorithms such as Support Vector Machines (SVMs) and kernel principal
+component analysis. The tensor product kernel extends these capabilities
+by allowing the combination of multiple kernels, thereby capturing
+higher-order interactions between data points. This is particularly
+indispensable in scenarios where data exhibits multi-modal
+characteristics or when dealing with structured inputs.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To understand the tensor product kernel, we first need to grasp the
+notion of a kernel in the context of Hilbert spaces. A kernel is a
+function that measures the similarity between pairs of data points.</p>
+<div class="definition">
+<p>Let <span class="math inline">\(\mathcal{X}\)</span> be a non-empty
+set. A kernel on <span class="math inline">\(\mathcal{X}\)</span> is a
+function <span class="math inline">\(k: \mathcal{X} \times \mathcal{X}
+\rightarrow \mathbb{R}\)</span> such that for any finite subset <span
+class="math inline">\(\{x_1, x_2, \ldots, x_n\} \subseteq
+\mathcal{X}\)</span>, the Gram matrix <span
+class="math inline">\(K\)</span> defined by <span
+class="math display">\[K_{ij} = k(x_i, x_j)\]</span> is positive
+semi-definite.</p>
+</div>
+<p>Now, consider two kernels <span class="math inline">\(k_1\)</span>
+and <span class="math inline">\(k_2\)</span> defined on sets <span
+class="math inline">\(\mathcal{X}_1\)</span> and <span
+class="math inline">\(\mathcal{X}_2\)</span>, respectively. The tensor
+product kernel combines these two kernels to form a new kernel on the
+Cartesian product <span class="math inline">\(\mathcal{X}_1 \times
+\mathcal{X}_2\)</span>.</p>
+<div class="definition">
+<p>Let <span class="math inline">\(k_1: \mathcal{X}_1 \times
+\mathcal{X}_1 \rightarrow \mathbb{R}\)</span> and <span
+class="math inline">\(k_2: \mathcal{X}_2 \times \mathcal{X}_2
+\rightarrow \mathbb{R}\)</span> be two kernels. The tensor product
+kernel <span class="math inline">\(k: (\mathcal{X}_1 \times
+\mathcal{X}_2) \times (\mathcal{X}_1 \times \mathcal{X}_2) \rightarrow
+\mathbb{R}\)</span> is defined as: <span class="math display">\[k((x_1,
+x_2), (x&#39;_1, x&#39;_2)) = k_1(x_1, x&#39;_1) \cdot k_2(x_2,
+x&#39;_2)\]</span> for all <span class="math inline">\((x_1, x_2),
+(x&#39;_1, x&#39;_2) \in \mathcal{X}_1 \times
+\mathcal{X}_2\)</span>.</p>
+</div>
+<h1 id="theorems">Theorems</h1>
+<p>One of the fundamental properties of the tensor product kernel is
+that it preserves the positive semi-definiteness of the constituent
+kernels. This is formalized in the following theorem.</p>
+<div class="theorem">
+<p>Let <span class="math inline">\(k_1\)</span> and <span
+class="math inline">\(k_2\)</span> be positive semi-definite kernels on
+sets <span class="math inline">\(\mathcal{X}_1\)</span> and <span
+class="math inline">\(\mathcal{X}_2\)</span>, respectively. Then the
+tensor product kernel <span class="math inline">\(k\)</span> defined by:
+<span class="math display">\[k((x_1, x_2), (x&#39;_1, x&#39;_2)) =
+k_1(x_1, x&#39;_1) \cdot k_2(x_2, x&#39;_2)\]</span> is also positive
+semi-definite.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> To prove that <span class="math inline">\(k\)</span>
+is positive semi-definite, we need to show that for any finite subset
+<span class="math inline">\(\{ (x_1^i, x_2^i) \}_{i=1}^n \subseteq
+\mathcal{X}_1 \times \mathcal{X}_2\)</span> and any vector <span
+class="math inline">\(c = (c_1, c_2, \ldots, c_n) \in
+\mathbb{R}^n\)</span>, the following holds: <span
+class="math display">\[\sum_{i,j=1}^n c_i c_j k((x_1^i, x_2^i), (x_1^j,
+x_2^j)) \geq 0\]</span> Substituting the definition of <span
+class="math inline">\(k\)</span>, we get: <span
+class="math display">\[\sum_{i,j=1}^n c_i c_j k_1(x_1^i, x_1^j) \cdot
+k_2(x_2^i, x_2^j)\]</span> This can be rewritten as: <span
+class="math display">\[\left( \sum_{i=1}^n c_i k_2(x_2^i, x_2^j)
+\right)^T \left( \sum_{j=1}^n c_j k_1(x_1^i, x_1^j) \right)\]</span>
+Since <span class="math inline">\(k_1\)</span> and <span
+class="math inline">\(k_2\)</span> are positive semi-definite, the
+matrices <span class="math inline">\((k_1(x_1^i, x_1^j))\)</span> and
+<span class="math inline">\((k_2(x_2^i, x_2^j))\)</span> are positive
+semi-definite. Therefore, the product of these matrices is also positive
+semi-definite, and the inequality holds. ◻</p>
+</div>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<p>The tensor product kernel exhibits several important properties that
+make it a versatile tool in various applications.</p>
+<div class="corollary">
+<p>Let <span class="math inline">\(k_1, k_2, \ldots, k_m\)</span> be
+positive semi-definite kernels on sets <span
+class="math inline">\(\mathcal{X}_1, \mathcal{X}_2, \ldots,
+\mathcal{X}_m\)</span>, respectively. The tensor product kernel <span
+class="math inline">\(k\)</span> defined on <span
+class="math inline">\(\mathcal{X}_1 \times \mathcal{X}_2 \times \ldots
+\times \mathcal{X}_m\)</span> by: <span class="math display">\[k((x_1,
+x_2, \ldots, x_m), (x&#39;_1, x&#39;_2, \ldots, x&#39;_m)) =
+\prod_{i=1}^m k_i(x_i, x&#39;_i)\]</span> is also positive
+semi-definite.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The proof follows by induction on the number of
+kernels. The base case for <span class="math inline">\(m=2\)</span> is
+given by the theorem above. Assume that the tensor product of <span
+class="math inline">\(m-1\)</span> kernels is positive semi-definite.
+Then, the tensor product with an additional kernel <span
+class="math inline">\(k_m\)</span> can be shown to preserve positive
+semi-definiteness by a similar argument as in the proof of the
+theorem. ◻</p>
+</div>
+<div class="corollary">
+<p>Let <span class="math inline">\(\phi_1: \mathcal{X}_1 \rightarrow
+\mathcal{H}_1\)</span> and <span class="math inline">\(\phi_2:
+\mathcal{X}_2 \rightarrow \mathcal{H}_2\)</span> be feature maps
+corresponding to kernels <span class="math inline">\(k_1\)</span> and
+<span class="math inline">\(k_2\)</span>, respectively. The tensor
+product kernel <span class="math inline">\(k\)</span> corresponds to the
+feature map <span class="math inline">\(\phi: \mathcal{X}_1 \times
+\mathcal{X}_2 \rightarrow \mathcal{H}_1 \otimes \mathcal{H}_2\)</span>
+defined by: <span class="math display">\[\phi(x_1, x_2) = \phi_1(x_1)
+\otimes \phi_2(x_2)\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The feature map <span
+class="math inline">\(\phi\)</span> is well-defined because the tensor
+product of Hilbert spaces is a Hilbert space. The kernel <span
+class="math inline">\(k\)</span> associated with <span
+class="math inline">\(\phi\)</span> is given by: <span
+class="math display">\[k((x_1, x_2), (x&#39;_1, x&#39;_2)) = \langle
+\phi(x_1) \otimes \phi(x_2), \phi(x&#39;_1) \otimes \phi(x&#39;_2)
+\rangle = \langle \phi_1(x_1), \phi_1(x&#39;_1) \rangle \cdot \langle
+\phi_2(x_2), \phi_2(x&#39;_2) \rangle = k_1(x_1, x&#39;_1) \cdot
+k_2(x_2, x&#39;_2)\]</span> which is the definition of the tensor
+product kernel. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>The tensor product kernel represents a powerful and versatile tool
+for combining multiple kernels in a manner that preserves their positive
+semi-definiteness. Its applications span various fields, including
+machine learning, signal processing, and algebraic topology. By
+understanding the mathematical foundations of the tensor product kernel,
+we can leverage its properties to model complex data structures and
+extract meaningful insights from high-dimensional data.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

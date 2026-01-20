@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La variance pooled (combinée) : Une analyse approfondie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La variance pooled (combinée) : Une analyse
+approfondie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La variance pooled, ou variance combinée, émerge naturellement dans
+le cadre de l’analyse statistique lorsque plusieurs échantillons sont
+disponibles pour estimer une variance commune. Cette notion est
+particulièrement cruciale en statistique inférentielle, notamment dans
+le contexte des tests d’hypothèses et de l’estimation par intervalles.
+L’idée sous-jacente est de combiner les informations provenant de
+plusieurs échantillons pour obtenir une estimation plus précise et
+robuste de la variance sous-jacente.</p>
+<p>Historiquement, l’utilisation de la variance pooled remonte aux
+travaux pionniers en statistique mathématique au début du XXe siècle.
+Elle trouve ses racines dans les méthodes de combinaison d’échantillons
+pour améliorer la précision des estimations. La variance pooled est
+indispensable dans les situations où l’hypothèse de variances égales
+(homoscédasticité) est raisonnable, permettant ainsi une utilisation
+optimale des données disponibles.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la notion de variance pooled, considérons d’abord le
+contexte. Supposons que nous ayons <span
+class="math inline">\(k\)</span> échantillons indépendants, chacun de
+taille <span class="math inline">\(n_i\)</span>, avec des variances
+respectives <span class="math inline">\(\sigma_i^2\)</span>. Notre
+objectif est d’estimer une variance commune <span
+class="math inline">\(\sigma^2\)</span> sous l’hypothèse que toutes les
+variances échantillonnées sont égales, c’est-à-dire <span
+class="math inline">\(\sigma_1^2 = \sigma_2^2 = \dots = \sigma_k^2 =
+\sigma^2\)</span>.</p>
+<p>La variance pooled est définie comme une moyenne pondérée des
+variances échantillonnées, où les poids sont les degrés de liberté de
+chaque échantillon. Formellement, nous avons :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(k\)</span> échantillons
+indépendants de tailles respectives <span class="math inline">\(n_1,
+n_2, \dots, n_k\)</span>, avec des variances échantillonnées <span
+class="math inline">\(s_1^2, s_2^2, \dots, s_k^2\)</span>. La variance
+pooled est définie par :</p>
+<p><span class="math display">\[s_p^2 = \frac{\sum_{i=1}^k (n_i - 1)
+s_i^2}{\sum_{i=1}^k (n_i - 1)}\]</span></p>
+<p>où <span class="math inline">\(s_i^2 = \frac{1}{n_i - 1}
+\sum_{j=1}^{n_i} (x_{ij} - \bar{x}_i)^2\)</span> est la variance
+échantillonnée du <span class="math inline">\(i\)</span>-ème
+échantillon, et <span class="math inline">\(\bar{x}_i\)</span> est la
+moyenne échantillonnée du <span class="math inline">\(i\)</span>-ème
+échantillon.</p>
+</div>
+<p>Cette définition peut également être formulée en termes de sommes de
+carrés :</p>
+<p><span class="math display">\[s_p^2 = \frac{\sum_{i=1}^k
+\sum_{j=1}^{n_i} (x_{ij} - \bar{x}_i)^2}{\sum_{i=1}^k (n_i -
+1)}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la variance pooled est le théorème de
+Cochran, qui établit une relation entre les sommes de carrés et la
+variance pooled. Ce théorème est particulièrement utile dans le contexte
+des modèles linéaires généralisés.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(k\)</span> échantillons
+indépendants de tailles respectives <span class="math inline">\(n_1,
+n_2, \dots, n_k\)</span>, avec des variances communes <span
+class="math inline">\(\sigma^2\)</span>. Supposons que les sommes de
+carrés totales <span class="math inline">\(SS_T\)</span> et les sommes
+de carrés entre groupes <span class="math inline">\(SS_B\)</span> sont
+définies comme suit :</p>
+<p><span class="math display">\[SS_T = \sum_{i=1}^k \sum_{j=1}^{n_i}
+(x_{ij} - \bar{x})^2, \quad SS_B = \sum_{i=1}^k n_i (\bar{x}_i -
+\bar{x})^2\]</span></p>
+<p>où <span class="math inline">\(\bar{x}\)</span> est la moyenne
+globale. Alors, nous avons :</p>
+<p><span class="math display">\[SS_T = SS_B + SS_W\]</span></p>
+<p>où <span class="math inline">\(SS_W\)</span> est la somme des carrés
+résiduels, définie par :</p>
+<p><span class="math display">\[SS_W = \sum_{i=1}^k \sum_{j=1}^{n_i}
+(x_{ij} - \bar{x}_i)^2\]</span></p>
+<p>De plus, la variance pooled peut être exprimée comme :</p>
+<p><span class="math display">\[s_p^2 = \frac{SS_W}{N - k}\]</span></p>
+<p>où <span class="math inline">\(N = \sum_{i=1}^k n_i\)</span> est la
+taille totale de l’échantillon.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Cochran, nous commençons par décomposer
+la somme des carrés totales <span class="math inline">\(SS_T\)</span>
+:</p>
+<p><span class="math display">\[SS_T = \sum_{i=1}^k \sum_{j=1}^{n_i}
+(x_{ij} - \bar{x})^2 = \sum_{i=1}^k \sum_{j=1}^{n_i} \left( (x_{ij} -
+\bar{x}_i) + (\bar{x}_i - \bar{x}) \right)^2\]</span></p>
+<p>En développant cette expression, nous obtenons :</p>
+<p><span class="math display">\[SS_T = \sum_{i=1}^k \sum_{j=1}^{n_i}
+(x_{ij} - \bar{x}_i)^2 + 2 \sum_{i=1}^k \sum_{j=1}^{n_i} (x_{ij} -
+\bar{x}_i)(\bar{x}_i - \bar{x}) + \sum_{i=1}^k \sum_{j=1}^{n_i}
+(\bar{x}_i - \bar{x})^2\]</span></p>
+<p>Le terme central est nul car <span
+class="math inline">\(\sum_{j=1}^{n_i} (x_{ij} - \bar{x}_i) = 0\)</span>
+pour chaque <span class="math inline">\(i\)</span>. Par conséquent, nous
+avons :</p>
+<p><span class="math display">\[SS_T = \sum_{i=1}^k \sum_{j=1}^{n_i}
+(x_{ij} - \bar{x}_i)^2 + \sum_{i=1}^k n_i (\bar{x}_i - \bar{x})^2 = SS_W
++ SS_B\]</span></p>
+<p>Cela prouve la première partie du théorème. Pour la deuxième partie,
+nous utilisons la définition de la variance pooled :</p>
+<p><span class="math display">\[s_p^2 = \frac{\sum_{i=1}^k (n_i - 1)
+s_i^2}{\sum_{i=1}^k (n_i - 1)} = \frac{SS_W}{N - k}\]</span></p>
+<p>où <span class="math inline">\(N - k = \sum_{i=1}^k (n_i -
+1)\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La variance pooled possède plusieurs propriétés importantes qui en
+font un outil puissant dans l’analyse statistique.</p>
+<ol>
+<li><p><strong>Consistance</strong> : Sous l’hypothèse de variances
+égales, la variance pooled est un estimateur consistant de la variance
+commune <span class="math inline">\(\sigma^2\)</span>. Cela signifie que
+lorsque la taille des échantillons tend vers l’infini, la variance
+pooled converge vers <span
+class="math inline">\(\sigma^2\)</span>.</p></li>
+<li><p><strong>Efficacité</strong> : La variance pooled est un
+estimateur efficace dans le sens où elle minimise la variance de
+l’estimateur parmi les estimateurs linéaires non biaisés.</p></li>
+<li><p><strong>Robustesse</strong> : La variance pooled est robuste aux
+petites violations de l’hypothèse de variances égales, ce qui en fait un
+outil fiable dans de nombreuses applications pratiques.</p></li>
+</ol>
+<p>Pour prouver la propriété (i), nous utilisons le fait que chaque
+variance échantillonnée <span class="math inline">\(s_i^2\)</span> est
+un estimateur non biaisé de <span
+class="math inline">\(\sigma^2\)</span>. Par conséquent, la variance
+pooled, qui est une moyenne pondérée des <span
+class="math inline">\(s_i^2\)</span>, est également un estimateur non
+biaisé de <span class="math inline">\(\sigma^2\)</span>. La consistance
+découle alors du théorème central limite et des propriétés des moyennes
+pondérées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

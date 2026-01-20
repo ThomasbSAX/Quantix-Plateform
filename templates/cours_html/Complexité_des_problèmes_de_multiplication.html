@@ -1,0 +1,376 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de multiplication : une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de multiplication : une
+exploration mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<p>Voici un article scientifique complet en LaTeX sur le sujet
+"Complexité des problèmes de multiplication" :</p>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Depuis les premiers calculs numériques réalisés par l’homme, la
+multiplication s’est imposée comme une opération fondamentale en
+mathématiques. Son importance transcende les frontières des disciplines,
+allant de l’arithmétique élémentaire à la cryptographie moderne.
+Cependant, comprendre sa complexité computationnelle reste un défi
+captivant et crucial pour l’informatique théorique.</p>
+<p>L’étude de la complexité des problèmes de multiplication émerge
+naturellement avec le développement des ordinateurs. En effet, optimiser
+les algorithmes de multiplication est essentiel pour améliorer les
+performances des systèmes informatiques. Cette notion devient
+indispensable dans le cadre du calcul scientifique, où des opérations de
+multiplication massives sont courantes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour aborder la complexité des problèmes de multiplication,
+commençons par définir ce que nous entendons par "problème de
+multiplication". Imaginons que nous cherchions à effectuer une opération
+de multiplication entre deux nombres. Quelles sont les étapes
+nécessaires ? Combien d’opérations élémentaires devons-nous effectuer
+?</p>
+<p>Nous cherchons à quantifier le nombre d’opérations nécessaires pour
+multiplier deux nombres. Cela nous amène naturellement à la définition
+suivante :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(n\)</span> un entier positif. Le
+problème de multiplication pour des entiers de taille <span
+class="math inline">\(n\)</span> consiste à calculer le produit de deux
+nombres entiers <span class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span>, où <span class="math inline">\(|a|,
+|b| &lt; 2^n\)</span>.</p>
+<p>Formellement, nous cherchons à déterminer <span
+class="math inline">\(a \times b\)</span> pour tout <span
+class="math inline">\(a, b \in \mathbb{Z}\)</span> tels que <span
+class="math inline">\(|a|, |b| &lt; 2^n\)</span>.</p>
+</div>
+<p>Pour généraliser cette notion, considérons des nombres représentés en
+base <span class="math inline">\(b\)</span>. Nous cherchons alors à
+multiplier deux nombres <span class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> ayant chacun <span
+class="math inline">\(n\)</span> chiffres en base <span
+class="math inline">\(b\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(n\)</span> un entier positif et
+<span class="math inline">\(b\)</span> une base d’écriture. Le problème
+de multiplication en base <span class="math inline">\(b\)</span> pour
+des nombres à <span class="math inline">\(n\)</span> chiffres consiste à
+calculer le produit de deux nombres <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span>, où <span class="math inline">\(a, b
+&lt; b^n\)</span>.</p>
+<p>Formellement, nous cherchons à déterminer <span
+class="math inline">\(a \times b\)</span> pour tout <span
+class="math inline">\(a, b \in \mathbb{N}\)</span> tels que <span
+class="math inline">\(a, b &lt; b^n\)</span>.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre la complexité de la multiplication, examinons d’abord
+l’algorithme classique d’école. Cet algorithme repose sur des additions
+et des multiplications de chiffres individuels.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(n\)</span> le nombre de chiffres des
+nombres à multiplier. L’algorithme classique de multiplication a une
+complexité temporelle de <span
+class="math inline">\(O(n^2)\)</span>.</p>
+<p><strong>Preuve :</strong></p>
+<ol>
+<li><p>L’algorithme classique effectue <span
+class="math inline">\(n\)</span> multiplications de chiffres pour chaque
+chiffre du premier nombre.</p></li>
+<li><p>Pour chaque multiplication de chiffres, il effectue <span
+class="math inline">\(n\)</span> additions de chiffres.</p></li>
+<li><p>Ainsi, le nombre total d’opérations est proportionnel à <span
+class="math inline">\(n^2\)</span>.</p></li>
+</ol>
+</div>
+<p>Un progrès significatif a été réalisé avec l’algorithme de Karatsuba,
+qui réduit la complexité de la multiplication.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(n\)</span> le nombre de chiffres des
+nombres à multiplier. L’algorithme de Karatsuba a une complexité
+temporelle de <span class="math inline">\(O(n^{\log_2 3}) \approx
+O(n^{1.585})\)</span>.</p>
+<p><strong>Preuve :</strong></p>
+<ol>
+<li><p>L’algorithme de Karatsuba divise le problème de multiplication en
+trois sous-problèmes de taille <span
+class="math inline">\(n/2\)</span>.</p></li>
+<li><p>Soit <span class="math inline">\(T(n)\)</span> le nombre
+d’opérations nécessaires pour multiplier deux nombres de taille <span
+class="math inline">\(n\)</span>.</p></li>
+<li><p>Nous avons la relation de récurrence : <span
+class="math inline">\(T(n) = 3T(n/2) + O(n)\)</span>.</p></li>
+<li><p>En résolvant cette récurrence, nous obtenons <span
+class="math inline">\(T(n) = O(n^{\log_2 3})\)</span>.</p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer la preuve du théorème de Karatsuba, développons les
+étapes en détail.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux nombres <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> de taille <span
+class="math inline">\(n\)</span>. Nous pouvons les écrire sous la forme
+: <span class="math display">\[x = x_1 \cdot b^{n/2} + x_0\]</span>
+<span class="math display">\[y = y_1 \cdot b^{n/2} + y_0\]</span></p>
+<p>Le produit <span class="math inline">\(x \times y\)</span> peut être
+exprimé comme : <span class="math display">\[x \times y = (x_1 b^{n/2} +
+x_0)(y_1 b^{n/2} + y_0)\]</span> <span class="math display">\[= x_1 y_1
+b^n + (x_1 y_0 + x_0 y_1) b^{n/2} + x_0 y_0\]</span></p>
+<p>L’algorithme de Karatsuba utilise la propriété suivante pour réduire
+le nombre de multiplications : <span class="math display">\[x_1 y_0 +
+x_0 y_1 = (x_1 + x_0)(y_1 + y_0) - x_1 y_1 - x_0 y_0\]</span></p>
+<p>Ainsi, le produit peut être calculé en effectuant trois
+multiplications de nombres de taille <span
+class="math inline">\(n/2\)</span> : 1. <span class="math inline">\(x_1
+y_1\)</span> 2. <span class="math inline">\(x_0 y_0\)</span> 3. <span
+class="math inline">\((x_1 + x_0)(y_1 + y_0)\)</span></p>
+<p>Ensuite, des additions et des décalages sont nécessaires pour
+combiner ces résultats. La complexité totale est donc dominée par les
+trois multiplications de taille <span
+class="math inline">\(n/2\)</span>, ce qui conduit à la relation de
+récurrence mentionnée. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Examinons quelques propriétés intéressantes découlant des théorèmes
+précédents.</p>
+<div class="corollaire">
+<p>L’algorithme de Karatsuba est plus efficace que l’algorithme
+classique pour <span class="math inline">\(n\)</span> suffisamment
+grand.</p>
+<p><strong>Preuve :</strong></p>
+<ol>
+<li><p>Pour <span class="math inline">\(n\)</span> grand, <span
+class="math inline">\(n^{1.585} &lt; n^2\)</span>.</p></li>
+<li><p>Ainsi, la complexité de Karatsuba est asymptotiquement meilleure
+que celle de l’algorithme classique.</p></li>
+</ol>
+</div>
+<div class="corollaire">
+<p>L’algorithme de Karatsuba peut être généralisé à des bases
+différentes.</p>
+<p><strong>Preuve :</strong></p>
+<ol>
+<li><p>La preuve de Karatsuba ne dépend pas de la base utilisée pour
+représenter les nombres.</p></li>
+<li><p>Ainsi, l’algorithme peut être appliqué à n’importe quelle base
+<span class="math inline">\(b\)</span>.</p></li>
+</ol>
+</div>
+<div class="corollaire">
+<p>L’algorithme de Karatsuba peut être amélioré en utilisant des
+techniques de multiplication rapide.</p>
+<p><strong>Preuve :</strong></p>
+<ol>
+<li><p>Des algorithmes plus avancés, comme l’algorithme de Toom-Cook ou
+l’algorithme de Schönhage-Strassen, peuvent être utilisés pour effectuer
+les multiplications intermédiaires.</p></li>
+<li><p>Ces algorithmes ont une complexité encore meilleure que Karatsuba
+pour <span class="math inline">\(n\)</span> très grand.</p></li>
+</ol>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’étude de la complexité des problèmes de multiplication révèle une
+richesse algorithmique fascinante. Des progrès significatifs ont été
+réalisés, passant de l’algorithme classique à des méthodes plus
+sophistiquées comme Karatsuba. Cependant, la quête d’algorithmes de
+multiplication encore plus efficaces continue de motiver les chercheurs
+en informatique théorique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

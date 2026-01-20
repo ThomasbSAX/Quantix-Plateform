@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized Locally Linear Embedding: Une Approche Géométrique pour la Réduction de Dimension</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized Locally Linear Embedding: Une Approche
+Géométrique pour la Réduction de Dimension</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La réduction de dimension est une problématique centrale en
+apprentissage automatique et en analyse de données. Parmi les nombreuses
+méthodes proposées, le Locally Linear Embedding (LLE) s’est imposé comme
+une technique puissante pour la visualisation et l’analyse de structures
+non linéaires. Cependant, son efficacité est limitée par sa dépendance à
+la linéarité locale des données.</p>
+<p>L’idée de kerneliser le LLE émerge naturellement pour pallier cette
+limitation. En intégrant des fonctions noyaux, nous pouvons capturer des
+relations non linéaires complexes tout en conservant l’esprit local du
+LLE. Cette approche, appelée Kernelized Locally Linear Embedding (KLLE),
+ouvre des perspectives prometteuses pour l’analyse de données de haute
+dimension et la découverte de motifs non linéaires.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre le KLLE, commençons par rappeler les concepts
+fondamentaux du LLE classique. Le LLE cherche à représenter chaque point
+de données comme une combinaison linéaire de ses voisins locaux.
+Formellement, pour un ensemble de points <span class="math inline">\(X =
+\{x_1, x_2, \dots, x_n\} \in \mathbb{R}^d\)</span>, nous cherchons des
+coefficients <span class="math inline">\(W_{ij}\)</span> tels que :</p>
+<p><span class="math display">\[x_i \approx \sum_{j=1}^n W_{ij}
+x_j\]</span></p>
+<p>où <span class="math inline">\(W_{ij}\)</span> est non nul seulement
+si <span class="math inline">\(x_j\)</span> est un voisin de <span
+class="math inline">\(x_i\)</span>. Les coefficients <span
+class="math inline">\(W_{ij}\)</span> sont déterminés en minimisant
+l’erreur de reconstruction locale :</p>
+<p><span class="math display">\[\min_{W} \sum_{i=1}^n \|x_i -
+\sum_{j=1}^n W_{ij} x_j\|^2\]</span></p>
+<p>sous les contraintes <span class="math inline">\(\sum_{j=1}^n W_{ij}
+= 1\)</span> pour chaque <span class="math inline">\(i\)</span>.</p>
+<p>Le KLLE étend cette idée en introduisant une fonction noyau <span
+class="math inline">\(\kappa(x_i, x_j)\)</span>, qui mesure la
+similarité entre les points <span class="math inline">\(x_i\)</span> et
+<span class="math inline">\(x_j\)</span>. La représentation kernelisée
+de chaque point devient :</p>
+<p><span class="math display">\[\kappa(x_i, y) \approx \sum_{j=1}^n
+W_{ij} \kappa(x_j, y)\]</span></p>
+<p>où <span class="math inline">\(y\)</span> est un point dans l’espace
+de sortie. Les coefficients <span class="math inline">\(W_{ij}\)</span>
+sont déterminés de manière similaire au LLE classique, mais en utilisant
+la matrice de Gram <span class="math inline">\(K\)</span> définie par
+:</p>
+<p><span class="math display">\[K_{ij} = \kappa(x_i, x_j)\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème central en KLLE est la généralisation du théorème de
+reconstruction locale au cas kernelisé. Ce théorème stipule que, sous
+certaines conditions sur la fonction noyau et les données, la
+représentation kernelisée préserve les relations locales.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X = \{x_1, x_2, \dots,
+x_n\}\)</span> un ensemble de points dans <span
+class="math inline">\(\mathbb{R}^d\)</span>, et <span
+class="math inline">\(\kappa\)</span> une fonction noyau positive
+définie. Supposons que pour chaque point <span
+class="math inline">\(x_i\)</span>, il existe un voisinage local <span
+class="math inline">\(N(i)\)</span> tel que :</p>
+<p><span class="math display">\[x_i = \sum_{j \in N(i)} W_{ij}
+x_j\]</span></p>
+<p>avec <span class="math inline">\(\sum_{j \in N(i)} W_{ij} =
+1\)</span>. Alors, dans l’espace kernelisé, nous avons :</p>
+<p><span class="math display">\[\kappa(x_i, y) = \sum_{j \in N(i)}
+W_{ij} \kappa(x_j, y)\]</span></p>
+<p>pour tout <span class="math inline">\(y \in
+\mathbb{R}^d\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve du théorème de reconstruction locale kernelisée repose sur
+les propriétés des fonctions noyaux et la théorie de l’approximation
+linéaire locale. Voici une démonstration détaillée :</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un point <span
+class="math inline">\(y\)</span> dans l’espace de sortie. Nous voulons
+montrer que :</p>
+<p><span class="math display">\[\kappa(x_i, y) = \sum_{j \in N(i)}
+W_{ij} \kappa(x_j, y)\]</span></p>
+<p>En utilisant la définition de la fonction noyau <span
+class="math inline">\(\kappa\)</span>, nous pouvons écrire :</p>
+<p><span class="math display">\[\kappa(x_i, y) = \langle \phi(x_i),
+\phi(y) \rangle\]</span></p>
+<p>où <span class="math inline">\(\phi\)</span> est le mappage implicite
+associé à la fonction noyau. De même, pour chaque <span
+class="math inline">\(j \in N(i)\)</span>, nous avons :</p>
+<p><span class="math display">\[\kappa(x_j, y) = \langle \phi(x_j),
+\phi(y) \rangle\]</span></p>
+<p>En utilisant la linéarité de l’espace kernelisé, nous pouvons écrire
+:</p>
+<p><span class="math display">\[\sum_{j \in N(i)} W_{ij} \kappa(x_j, y)
+= \sum_{j \in N(i)} W_{ij} \langle \phi(x_j), \phi(y) \rangle =
+\left\langle \sum_{j \in N(i)} W_{ij} \phi(x_j), \phi(y)
+\right\rangle\]</span></p>
+<p>En utilisant l’hypothèse de reconstruction locale dans l’espace
+d’entrée, nous savons que :</p>
+<p><span class="math display">\[\phi(x_i) = \sum_{j \in N(i)} W_{ij}
+\phi(x_j)\]</span></p>
+<p>En substituant cette égalité dans l’expression précédente, nous
+obtenons :</p>
+<p><span class="math display">\[\sum_{j \in N(i)} W_{ij} \kappa(x_j, y)
+= \langle \phi(x_i), \phi(y) \rangle = \kappa(x_i, y)\]</span></p>
+<p>Ce qui achève la preuve. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le KLLE possède plusieurs propriétés intéressantes qui en font une
+méthode puissante pour la réduction de dimension. Voici quelques-unes
+des propriétés les plus importantes :</p>
+<ol>
+<li><p>**Conservation des Relations Locales** : Le KLLE préserve les
+relations locales entre les points, ce qui permet de capturer des
+structures non linéaires complexes.</p></li>
+<li><p>**Invariance aux Transformations Affines** : Le KLLE est
+invariant aux transformations affines dans l’espace d’entrée, ce qui le
+rend robuste aux variations de scale et de rotation.</p></li>
+<li><p>**Généralisation du LLE** : Le KLLE généralise le LLE classique
+en introduisant une fonction noyau, ce qui permet de capturer des
+relations non linéaires.</p></li>
+</ol>
+<p>Chacune de ces propriétés peut être démontrée rigoureusement en
+utilisant les outils de l’analyse fonctionnelle et de la théorie des
+noyaux. Par exemple, la conservation des relations locales découle
+directement du théorème de reconstruction locale kernelisée.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Kernelized Locally Linear Embedding (KLLE) est une méthode
+puissante pour la réduction de dimension qui combine les avantages du
+LLE classique avec la flexibilité des fonctions noyaux. En capturant des
+relations non linéaires complexes tout en préservant les structures
+locales, le KLLE ouvre de nouvelles perspectives pour l’analyse de
+données de haute dimension.</p>
+<p>Les développements futurs pourraient inclure l’étude de nouvelles
+fonctions noyaux adaptées à des domaines spécifiques, ainsi que
+l’intégration du KLLE dans des frameworks d’apprentissage automatique
+plus larges.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

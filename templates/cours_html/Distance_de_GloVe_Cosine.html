@@ -1,0 +1,412 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de GloVe Cosine : Une Approche Géométrique pour les Représentations Lexicales</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de GloVe Cosine : Une Approche Géométrique
+pour les Représentations Lexicales</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’essor des données textuelles dans divers domaines tels que le
+traitement automatique du langage naturel (TALN), la recherche
+d’information et l’analyse des réseaux sociaux a conduit à un besoin
+croissant de représentations vectorielles efficaces pour les mots. Parmi
+les nombreuses approches proposées, les modèles de type <em>word
+embeddings</em> se sont révélés particulièrement prometteurs. Ces
+modèles, tels que Word2Vec et GloVe, permettent de capturer des
+relations sémantiques entre les mots en les projetant dans un espace
+vectoriel de dimension réduite.</p>
+<p>L’un des aspects cruciaux de ces modèles est la mesure de similarité
+entre les vecteurs de mots. La distance cosinus, une mesure bien établie
+en algèbre linéaire, s’est avérée particulièrement efficace pour évaluer
+la similarité entre les vecteurs. Dans ce chapitre, nous explorons en
+profondeur la notion de distance cosinus dans le contexte des
+représentations lexicales fournies par le modèle GloVe. Nous examinerons
+les fondements théoriques, les définitions formelles et les propriétés
+clés de cette mesure.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’aborder la distance cosinus, il est essentiel de comprendre
+ce que nous cherchons à capturer. Imaginons que nous avons deux mots,
+par exemple "chat" et "chien". Nous voulons quantifier à quel point ces
+deux mots sont similaires en termes de sens. Une approche intuitive
+consiste à considérer les contextes dans lesquels ces mots apparaissent.
+Si "chat" et "chien" apparaissent souvent dans des contextes similaires,
+nous pouvons en déduire qu’ils partagent une certaine similarité
+sémantique.</p>
+<p>Pour formaliser cette idée, nous utilisons des vecteurs pour
+représenter les mots. Chaque mot est associé à un vecteur dans un espace
+de dimension <span class="math inline">\(d\)</span>. La similarité entre
+deux mots peut alors être évaluée en comparant leurs vecteurs
+correspondants.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> deux vecteurs dans un espace
+euclidien de dimension <span class="math inline">\(d\)</span>. La
+distance cosinus entre <span class="math inline">\(\mathbf{u}\)</span>
+et <span class="math inline">\(\mathbf{v}\)</span> est définie comme :
+<span class="math display">\[\cos(\theta) = \frac{\mathbf{u} \cdot
+\mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|}\]</span> où <span
+class="math inline">\(\theta\)</span> est l’angle entre les vecteurs
+<span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span>, <span
+class="math inline">\(\mathbf{u} \cdot \mathbf{v}\)</span> est le
+produit scalaire des vecteurs, et <span
+class="math inline">\(\|\mathbf{u}\|\)</span> et <span
+class="math inline">\(\|\mathbf{v}\|\)</span> sont les normes
+euclidiennes des vecteurs.</p>
+</div>
+<p>Une autre formulation équivalente de la distance cosinus est : <span
+class="math display">\[\cos(\theta) = \frac{\sum_{i=1}^{d} u_i
+v_i}{\sqrt{\sum_{i=1}^{d} u_i^2} \sqrt{\sum_{i=1}^{d} v_i^2}}\]</span>
+où <span class="math inline">\(u_i\)</span> et <span
+class="math inline">\(v_i\)</span> sont les composantes des vecteurs
+<span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span>, respectivement.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour mieux comprendre les propriétés de la distance cosinus, nous
+introduisons quelques théorèmes clés. Supposons que nous avons deux
+vecteurs <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> dans un espace euclidien de
+dimension <span class="math inline">\(d\)</span>. Nous voulons montrer
+que la distance cosinus est une mesure de similarité valide.</p>
+<div class="theorem">
+<p>La distance cosinus satisfait les propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(\cos(\theta) \in [-1,
+1]\)</span></p></li>
+<li><p><span class="math inline">\(\cos(\theta) = 1\)</span> si et
+seulement si <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> sont colinéaires et de même
+sens.</p></li>
+<li><p><span class="math inline">\(\cos(\theta) = -1\)</span> si et
+seulement si <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> sont colinéaires et de sens
+opposés.</p></li>
+<li><p><span class="math inline">\(\cos(\theta) = 0\)</span> si et
+seulement si <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> sont orthogonaux.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ces propriétés, nous utilisons les
+définitions et les propriétés du produit scalaire et de la norme
+euclidienne.</p>
+<ol>
+<li><p>Par définition, le produit scalaire <span
+class="math inline">\(\mathbf{u} \cdot \mathbf{v}\)</span> est borné par
+: <span class="math display">\[|\mathbf{u} \cdot \mathbf{v}| \leq
+\|\mathbf{u}\| \|\mathbf{v}\|\]</span> En divisant par <span
+class="math inline">\(\|\mathbf{u}\| \|\mathbf{v}\|\)</span>, nous
+obtenons : <span class="math display">\[\left| \frac{\mathbf{u} \cdot
+\mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|} \right| \leq 1\]</span> Donc,
+<span class="math inline">\(\cos(\theta) \in [-1, 1]\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> sont colinéaires et de même
+sens, alors il existe un scalaire <span class="math inline">\(\alpha
+&gt; 0\)</span> tel que <span class="math inline">\(\mathbf{v} = \alpha
+\mathbf{u}\)</span>. En substituant dans la formule de la distance
+cosinus, nous obtenons : <span class="math display">\[\cos(\theta) =
+\frac{\mathbf{u} \cdot (\alpha \mathbf{u})}{\|\mathbf{u}\| \|\alpha
+\mathbf{u}\|} = \frac{\alpha \|\mathbf{u}\|^2}{\alpha \|\mathbf{u}\|^2}
+= 1\]</span> Réciproquement, si <span class="math inline">\(\cos(\theta)
+= 1\)</span>, alors <span class="math inline">\(\mathbf{u} \cdot
+\mathbf{v} = \|\mathbf{u}\| \|\mathbf{v}\|\)</span>, ce qui implique que
+<span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> sont colinéaires et de même
+sens.</p></li>
+<li><p>Si <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> sont colinéaires et de sens
+opposés, alors il existe un scalaire <span class="math inline">\(\alpha
+&lt; 0\)</span> tel que <span class="math inline">\(\mathbf{v} = \alpha
+\mathbf{u}\)</span>. En substituant dans la formule de la distance
+cosinus, nous obtenons : <span class="math display">\[\cos(\theta) =
+\frac{\mathbf{u} \cdot (\alpha \mathbf{u})}{\|\mathbf{u}\| \|\alpha
+\mathbf{u}\|} = \frac{\alpha \|\mathbf{u}\|^2}{-\alpha \|\mathbf{u}\|^2}
+= -1\]</span> Réciproquement, si <span
+class="math inline">\(\cos(\theta) = -1\)</span>, alors <span
+class="math inline">\(\mathbf{u} \cdot \mathbf{v} = -\|\mathbf{u}\|
+\|\mathbf{v}\|\)</span>, ce qui implique que <span
+class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> sont colinéaires et de sens
+opposés.</p></li>
+<li><p>Si <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> sont orthogonaux, alors <span
+class="math inline">\(\mathbf{u} \cdot \mathbf{v} = 0\)</span>. En
+substituant dans la formule de la distance cosinus, nous obtenons :
+<span class="math display">\[\cos(\theta) = \frac{0}{\|\mathbf{u}\|
+\|\mathbf{v}\|} = 0\]</span> Réciproquement, si <span
+class="math inline">\(\cos(\theta) = 0\)</span>, alors <span
+class="math inline">\(\mathbf{u} \cdot \mathbf{v} = 0\)</span>, ce qui
+implique que <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> sont orthogonaux.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer l’utilisation de la distance cosinus dans le contexte
+des représentations lexicales, considérons un exemple concret. Supposons
+que nous avons les vecteurs suivants pour les mots "chat" et "chien" :
+<span class="math display">\[\mathbf{u} = \begin{pmatrix}
+0.8 \\
+0.6 \\
+\end{pmatrix}, \quad
+\mathbf{v} = \begin{pmatrix}
+0.4 \\
+0.866 \\
+\end{pmatrix}\]</span></p>
+<p>Calculons la distance cosinus entre ces deux vecteurs.</p>
+<div class="proof">
+<p><em>Proof.</em> Tout d’abord, calculons le produit scalaire <span
+class="math inline">\(\mathbf{u} \cdot \mathbf{v}\)</span> : <span
+class="math display">\[\mathbf{u} \cdot \mathbf{v} = 0.8 \times 0.4 +
+0.6 \times 0.866 = 0.32 + 0.5196 = 0.8396\]</span></p>
+<p>Ensuite, calculons les normes euclidiennes des vecteurs <span
+class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> : <span
+class="math display">\[\|\mathbf{u}\| = \sqrt{0.8^2 + 0.6^2} =
+\sqrt{0.64 + 0.36} = \sqrt{1} = 1\]</span> <span
+class="math display">\[\|\mathbf{v}\| = \sqrt{0.4^2 + 0.866^2} =
+\sqrt{0.16 + 0.75} = \sqrt{0.91} \approx 0.9539\]</span></p>
+<p>Enfin, calculons la distance cosinus : <span
+class="math display">\[\cos(\theta) = \frac{0.8396}{1 \times 0.9539}
+\approx 0.88\]</span></p>
+<p>Cette valeur indique que les vecteurs "chat" et "chien" sont
+relativement similaires, ce qui est cohérent avec notre intuition
+sémantique. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance cosinus présente plusieurs propriétés intéressantes qui
+en font une mesure de similarité efficace pour les représentations
+lexicales.</p>
+<ol>
+<li><p><strong>Invariance par Translation</strong> : La distance cosinus
+est invariante par translation. Cela signifie que si nous ajoutons un
+même vecteur à deux vecteurs <span
+class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span>, la distance cosinus entre les
+nouveaux vecteurs reste inchangée. Formellement, pour tout vecteur <span
+class="math inline">\(\mathbf{w}\)</span>, nous avons : <span
+class="math display">\[\cos(\theta_{\mathbf{u}, \mathbf{v}}) =
+\cos(\theta_{\mathbf{u} + \mathbf{w}, \mathbf{v} +
+\mathbf{w}})\]</span></p></li>
+<li><p><strong>Invariance par Scaling</strong> : La distance cosinus est
+également invariante par scaling. Cela signifie que si nous multiplions
+deux vecteurs <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> par un même scalaire positif,
+la distance cosinus entre les nouveaux vecteurs reste inchangée.
+Formellement, pour tout scalaire <span class="math inline">\(\alpha &gt;
+0\)</span>, nous avons : <span
+class="math display">\[\cos(\theta_{\mathbf{u}, \mathbf{v}}) =
+\cos(\theta_{\alpha \mathbf{u}, \alpha \mathbf{v}})\]</span></p></li>
+<li><p><strong>Relation avec la Distance Euclidienne</strong> : La
+distance cosinus est liée à la distance euclidienne. Plus précisément,
+pour deux vecteurs <span class="math inline">\(\mathbf{u}\)</span> et
+<span class="math inline">\(\mathbf{v}\)</span>, nous avons : <span
+class="math display">\[\cos(\theta_{\mathbf{u}, \mathbf{v}}) = 1 -
+\frac{\|\mathbf{u} - \mathbf{v}\|^2}{2 \|\mathbf{u}\|
+\|\mathbf{v}\|}\]</span> Cette relation montre que la distance cosinus
+peut être interprétée en termes de distance euclidienne
+normalisée.</p></li>
+</ol>
+<p>En conclusion, la distance cosinus est une mesure de similarité
+puissante et flexible pour les représentations lexicales. Ses propriétés
+d’invariance par translation et scaling, ainsi que sa relation avec la
+distance euclidienne, en font un outil précieux pour l’analyse des
+données textuelles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

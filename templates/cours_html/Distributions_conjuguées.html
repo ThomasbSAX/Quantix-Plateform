@@ -1,0 +1,367 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Les Distributions Conjuguées en Statistique Bayésienne</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Les Distributions Conjuguées en Statistique
+Bayésienne</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse bayésienne offre un cadre cohérent pour l’inférence
+statistique, où les incertitudes sont quantifiées par des distributions
+de probabilité. Au cœur de cette approche se trouve le concept de
+<strong>distributions conjuguées</strong>, qui simplifie
+considérablement les calculs tout en préservant la structure
+probabiliste. L’émergence de ce concept est motivée par le besoin
+d’outils analytiques puissants pour traiter les problèmes complexes de
+modélisation statistique. Les distributions conjuguées permettent une
+mise à jour efficace des croyances a priori en croyances a posteriori,
+rendant l’inférence bayésienne accessible et computable.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire le concept de distributions conjuguées, considérons
+un modèle statistique où nous observons des données <span
+class="math inline">\(\mathbf{X} = (X_1, X_2, \ldots, X_n)\)</span>
+générées par un paramètre inconnu <span
+class="math inline">\(\theta\)</span>. En statistique bayésienne, nous
+modélisons notre incertitude sur <span
+class="math inline">\(\theta\)</span> par une distribution a priori
+<span class="math inline">\(p(\theta)\)</span>. Après avoir observé les
+données, notre incertitude est mise à jour via la distribution a
+posteriori <span class="math inline">\(p(\theta |
+\mathbf{X})\)</span>.</p>
+<p>Nous cherchons une famille de distributions a priori <span
+class="math inline">\(p(\theta)\)</span> telle que la distribution a
+posteriori <span class="math inline">\(p(\theta | \mathbf{X})\)</span>
+appartienne à la même famille. Cette propriété est formellement définie
+comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{P}\)</span> une famille de
+distributions paramétrées par <span class="math inline">\(\eta\)</span>.
+On dit que <span class="math inline">\(\mathcal{P}\)</span> est une
+famille de distributions conjuguées pour le modèle de vraisemblance
+<span class="math inline">\(p(\mathbf{X} | \theta)\)</span> si, pour
+toute distribution a priori <span class="math inline">\(p(\theta |
+\eta_0) \in \mathcal{P}\)</span>, la distribution a posteriori <span
+class="math inline">\(p(\theta | \mathbf{X}, \eta_0)\)</span> appartient
+également à <span class="math inline">\(\mathcal{P}\)</span>.</p>
+<p>En d’autres termes, il existe une fonction <span
+class="math inline">\(T\)</span> telle que : <span
+class="math display">\[p(\theta | \mathbf{X}, \eta_0) = p(\theta |
+T(\mathbf{X}, \eta_0))\]</span> où <span
+class="math inline">\(T(\mathbf{X}, \eta_0)\)</span> est le nouvel
+hyperparamètre mis à jour.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en statistique bayésienne est le suivant
+:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{P}\)</span> une famille de
+distributions conjuguées pour le modèle de vraisemblance <span
+class="math inline">\(p(\mathbf{X} | \theta)\)</span>. Alors, pour toute
+distribution a priori <span class="math inline">\(p(\theta | \eta_0) \in
+\mathcal{P}\)</span>, la distribution a posteriori <span
+class="math inline">\(p(\theta | \mathbf{X}, \eta_0)\)</span> est donnée
+par : <span class="math display">\[p(\theta | \mathbf{X}, \eta_0) =
+\frac{p(\mathbf{X} | \theta) p(\theta | \eta_0)}{\int p(\mathbf{X} |
+\theta) p(\theta | \eta_0) d\theta}\]</span> où <span
+class="math inline">\(p(\mathbf{X} | \theta)\)</span> est la
+vraisemblance des données, et <span class="math inline">\(p(\theta |
+\eta_0)\)</span> est la distribution a priori.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de conjugaison, nous suivons les étapes
+suivantes :</p>
+<div class="proof">
+<p><em>Proof.</em> 1. **Définition de la Distribution A Posteriori** :
+Par définition, la distribution a posteriori est proportionnelle au
+produit de la vraisemblance et de la distribution a priori : <span
+class="math display">\[p(\theta | \mathbf{X}, \eta_0) \propto
+p(\mathbf{X} | \theta) p(\theta | \eta_0)\]</span></p>
+<p>2. **Normalisation** : Pour obtenir une distribution de probabilité
+valide, nous devons normaliser cette expression : <span
+class="math display">\[p(\theta | \mathbf{X}, \eta_0) =
+\frac{p(\mathbf{X} | \theta) p(\theta | \eta_0)}{\int p(\mathbf{X} |
+\theta) p(\theta | \eta_0) d\theta}\]</span></p>
+<p>3. **Conjugaison** : Par hypothèse, <span
+class="math inline">\(\mathcal{P}\)</span> est une famille de
+distributions conjuguées. Cela signifie que la forme fonctionnelle de
+<span class="math inline">\(p(\theta | \eta_0)\)</span> est préservée
+après la mise à jour. Par conséquent, le dénominateur <span
+class="math inline">\(\int p(\mathbf{X} | \theta) p(\theta | \eta_0)
+d\theta\)</span> peut être exprimé en termes des hyperparamètres mis à
+jour <span class="math inline">\(T(\mathbf{X}, \eta_0)\)</span>.</p>
+<p>4. **Conclusion** : Ainsi, la distribution a posteriori <span
+class="math inline">\(p(\theta | \mathbf{X}, \eta_0)\)</span> appartient
+bien à la famille <span class="math inline">\(\mathcal{P}\)</span>, ce
+qui achève la preuve. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Plusieurs propriétés importantes découlent du concept de
+distributions conjuguées :</p>
+<ol>
+<li><p>**Propriété de Fermeture** : La famille des distributions
+conjuguées est fermée sous la mise à jour bayésienne. Cela signifie que
+si une distribution a priori appartient à cette famille, alors la
+distribution a posteriori appartiendra également à cette
+famille.</p></li>
+<li><p>**Simplicité Computationnelle** : Les distributions conjuguées
+simplifient considérablement les calculs bayésiens, car elles permettent
+une mise à jour analytique des hyperparamètres.</p></li>
+<li><p>**Flexibilité** : Il existe des familles de distributions
+conjuguées pour une large variété de modèles de vraisemblance, ce qui
+rend l’approche bayésienne applicable à de nombreux problèmes
+statistiques.</p></li>
+</ol>
+<h1 class="unnumbered" id="exemples">Exemples</h1>
+<p>Pour illustrer le concept de distributions conjuguées, considérons
+quelques exemples classiques :</p>
+<div class="example">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> des
+variables aléatoires indépendantes et identiquement distribuées (i.i.d.)
+suivant une loi Bernoulli de paramètre <span
+class="math inline">\(\theta\)</span>. La vraisemblance est donnée par :
+<span class="math display">\[p(\mathbf{X} | \theta) =
+\theta^{\sum_{i=1}^n X_i} (1 - \theta)^{n - \sum_{i=1}^n X_i}\]</span>
+Une famille de distributions conjuguées pour ce modèle est la
+distribution bêta, paramétrée par <span
+class="math inline">\(\alpha\)</span> et <span
+class="math inline">\(\beta\)</span> : <span
+class="math display">\[p(\theta | \alpha, \beta) = \frac{\theta^{\alpha
+- 1} (1 - \theta)^{\beta - 1}}{B(\alpha, \beta)}\]</span> où <span
+class="math inline">\(B(\alpha, \beta)\)</span> est la fonction bêta. La
+distribution a posteriori est alors : <span
+class="math display">\[p(\theta | \mathbf{X}, \alpha, \beta) =
+\frac{\theta^{\alpha + \sum_{i=1}^n X_i - 1} (1 - \theta)^{\beta + n -
+\sum_{i=1}^n X_i - 1}}{B(\alpha + \sum_{i=1}^n X_i, \beta + n -
+\sum_{i=1}^n X_i)}\]</span></p>
+</div>
+<div class="example">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> des
+variables aléatoires i.i.d. suivant une loi normale de moyenne <span
+class="math inline">\(\mu\)</span> et de variance connue <span
+class="math inline">\(\sigma^2\)</span>. La vraisemblance est donnée par
+: <span class="math display">\[p(\mathbf{X} | \mu) = \left(
+\frac{1}{\sqrt{2\pi\sigma^2}} \right)^n \exp\left( -\frac{1}{2\sigma^2}
+\sum_{i=1}^n (X_i - \mu)^2 \right)\]</span> Une famille de distributions
+conjuguées pour ce modèle est la distribution normale, paramétrée par
+<span class="math inline">\(\mu_0\)</span> et <span
+class="math inline">\(\tau^2\)</span> : <span
+class="math display">\[p(\mu | \mu_0, \tau^2) =
+\frac{1}{\sqrt{2\pi\tau^2}} \exp\left( -\frac{(\mu - \mu_0)^2}{2\tau^2}
+\right)\]</span> La distribution a posteriori est alors : <span
+class="math display">\[p(\mu | \mathbf{X}, \mu_0, \tau^2) =
+\frac{1}{\sqrt{2\pi\tau_n^2}} \exp\left( -\frac{(\mu -
+\mu_n)^2}{2\tau_n^2} \right)\]</span> où <span
+class="math inline">\(\tau_n^2 = \left( \frac{1}{\tau^2} +
+\frac{n}{\sigma^2} \right)^{-1}\)</span> et <span
+class="math inline">\(\mu_n = \tau_n^2 \left( \frac{\mu_0}{\tau^2} +
+\frac{n\bar{X}}{\sigma^2} \right)\)</span>, avec <span
+class="math inline">\(\bar{X} = \frac{1}{n} \sum_{i=1}^n
+X_i\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les distributions conjuguées jouent un rôle central en statistique
+bayésienne, offrant une méthode élégante et efficace pour l’inférence
+statistique. Leur utilisation simplifie les calculs tout en préservant
+la cohérence probabiliste, rendant l’approche bayésienne accessible et
+puissante. Les exemples classiques illustrent la flexibilité et
+l’applicabilité de ce concept à une variété de modèles statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

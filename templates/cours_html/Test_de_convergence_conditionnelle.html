@@ -1,0 +1,316 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Test de Convergence Conditionnelle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Test de Convergence Conditionnelle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des séries numériques est un pilier fondamental de
+l’analyse mathématique. Parmi les outils essentiels pour étudier la
+convergence des séries, le test de convergence conditionnelle occupe une
+place prépondérante. Ce test permet de déterminer si une série converge
+sous certaines conditions spécifiques, offrant ainsi des insights
+précieux sur le comportement asymptotique des suites et séries.</p>
+<p>L’origine historique du test de convergence conditionnelle remonte
+aux travaux pionniers de Cauchy, Abel et Dirichlet. Ces mathématiciens
+ont jeté les bases des critères de convergence, permettant une
+compréhension plus profonde des séries infinies. Le test de convergence
+conditionnelle émerge comme une réponse aux limites des tests
+classiques, tels que le critère de d’Alembert ou celui de Cauchy. Il est
+indispensable dans des domaines variés, allant de l’analyse complexe à
+la théorie des nombres, en passant par les équations
+différentielles.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour aborder le test de convergence conditionnelle, commençons par
+rappeler quelques notions fondamentales. Considérons une série numérique
+<span class="math inline">\(\sum_{n=1}^{\infty} a_n\)</span>. Nous
+cherchons à déterminer si cette série converge, c’est-à-dire si la suite
+des sommes partielles <span class="math inline">\(S_N = \sum_{n=1}^{N}
+a_n\)</span> admet une limite finie lorsque <span
+class="math inline">\(N\)</span> tend vers l’infini.</p>
+<p>Supposons que la série <span
+class="math inline">\(\sum_{n=1}^{\infty} a_n\)</span> soit absolument
+convergente, c’est-à-dire que <span
+class="math inline">\(\sum_{n=1}^{\infty} |a_n|\)</span> converge. Dans
+ce cas, la série <span class="math inline">\(\sum_{n=1}^{\infty}
+a_n\)</span> est également convergente. Cependant, il existe des séries
+qui convergent sans être absolument convergentes. Ces séries sont dites
+conditionnellement convergentes.</p>
+<div class="definition">
+<p>Une série <span class="math inline">\(\sum_{n=1}^{\infty}
+a_n\)</span> est dite <strong>conditionnellement convergente</strong> si
+elle converge, mais la série <span
+class="math inline">\(\sum_{n=1}^{\infty} |a_n|\)</span> diverge.</p>
+</div>
+<p>Formellement, cela signifie que : <span
+class="math display">\[\exists \lim_{N \to \infty} S_N = L \in
+\mathbb{R}, \quad \text{mais} \quad \sum_{n=1}^{\infty} |a_n| =
++\infty.\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le test de convergence conditionnelle repose sur plusieurs théorèmes
+fondamentaux. L’un des plus importants est le critère d’Abel, qui permet
+de déterminer la convergence conditionnelle d’une série.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((a_n)_{n \in \mathbb{N}}\)</span>
+une suite décroissante de termes positifs qui tend vers 0, et soit <span
+class="math inline">\((b_n)_{n \in \mathbb{N}}\)</span> une suite
+quelconque. Si la série <span class="math inline">\(\sum_{n=1}^{\infty}
+b_n\)</span> converge, alors la série <span
+class="math inline">\(\sum_{n=1}^{\infty} a_n b_n\)</span> converge.</p>
+</div>
+<p>Formellement, cela s’exprime comme suit : <span
+class="math display">\[\forall \epsilon &gt; 0, \exists N_1 \in
+\mathbb{N} \text{ tel que } \forall n \geq N_1, |a_n| &lt;
+\epsilon,\]</span> <span class="math display">\[\exists N_2 \in
+\mathbb{N} \text{ tel que } \forall n \geq N_2, \left| \sum_{k=1}^{n}
+b_k \right| &lt; 1,\]</span> <span class="math display">\[\Rightarrow
+\forall n \geq N_2, \left| \sum_{k=1}^{n} a_k b_k \right| &lt; 2
+\epsilon.\]</span></p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le critère d’Abel, nous procédons par sommation par
+parties. Considérons la somme partielle <span class="math inline">\(S_N
+= \sum_{n=1}^{N} a_n b_n\)</span>. Nous pouvons écrire : <span
+class="math display">\[S_N = a_N B_N + \sum_{n=1}^{N-1} (a_n - a_{n+1})
+B_n,\]</span> où <span class="math inline">\(B_N = \sum_{n=1}^{N}
+b_n\)</span>.</p>
+<p>Puisque <span class="math inline">\((a_n)\)</span> est décroissante
+et tend vers 0, nous avons : <span class="math display">\[|S_N| \leq
+|a_N B_N| + \sum_{n=1}^{N-1} |(a_n - a_{n+1}) B_n|.\]</span></p>
+<p>En utilisant les hypothèses du critère d’Abel, nous pouvons montrer
+que chaque terme de cette somme est borné, ce qui implique la
+convergence de <span class="math inline">\(S_N\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le critère d’Abel possède plusieurs propriétés intéressantes, que
+nous énumérons ci-dessous :</p>
+<ol>
+<li><p>Si <span class="math inline">\((a_n)\)</span> est une suite
+décroissante de termes positifs tendant vers 0 et si <span
+class="math inline">\(\sum_{n=1}^{\infty} b_n\)</span> converge, alors
+<span class="math inline">\(\sum_{n=1}^{\infty} a_n b_n\)</span>
+converge.</p></li>
+<li><p>Si <span class="math inline">\((a_n)\)</span> est une suite
+décroissante de termes positifs tendant vers 0 et si <span
+class="math inline">\(\sum_{n=1}^{\infty} b_n\)</span> diverge, alors
+<span class="math inline">\(\sum_{n=1}^{\infty} a_n b_n\)</span> peut
+converger ou diverger.</p></li>
+<li><p>Le critère d’Abel est particulièrement utile pour étudier les
+séries trigonométriques et les séries de Fourier.</p></li>
+</ol>
+<p>Pour illustrer ces propriétés, considérons l’exemple suivant :</p>
+<div class="example">
+<p>La série <span class="math inline">\(\sum_{n=1}^{\infty}
+\frac{(-1)^n}{n}\)</span> est conditionnellement convergente. En effet,
+elle converge par le critère d’Abel avec <span class="math inline">\(a_n
+= \frac{1}{n}\)</span> et <span class="math inline">\(b_n =
+(-1)^n\)</span>, mais <span class="math inline">\(\sum_{n=1}^{\infty}
+\frac{1}{n}\)</span> diverge.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le test de convergence conditionnelle, et en particulier le critère
+d’Abel, offre des outils puissants pour analyser la convergence des
+séries numériques. Ces concepts sont non seulement fondamentaux en
+analyse mathématique, mais trouvent également des applications pratiques
+dans divers domaines des mathématiques appliquées. Une compréhension
+approfondie de ces tests permet de mieux appréhender le comportement
+asymptotique des séries et d’en tirer des conclusions
+significatives.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

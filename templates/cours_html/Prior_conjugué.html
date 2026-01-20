@@ -1,0 +1,397 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Prior Conjugué : Une Approche Bayésienne Élégante</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Prior Conjugué : Une Approche Bayésienne Élégante</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’inférence bayésienne est un cadre probabiliste puissant pour
+l’apprentissage statistique et la prise de décision sous incertitude. Au
+cœur de cette approche se trouve le concept de prior conjugué, une
+notion qui allie élégance mathématique et efficacité
+computationnelle.</p>
+<p>L’idée de conjugaison émerge naturellement lorsque l’on cherche à
+simplifier les calculs impliqués dans la mise à jour des croyances
+bayésiennes. En effet, le processus de mise à jour de la distribution a
+priori en une distribution a posteriori peut devenir
+computationnellement intensif, surtout lorsque les modèles deviennent
+complexes.</p>
+<p>Les priors conjugués offrent une solution élégante à ce problème. Ils
+permettent de garantir que la distribution a posteriori appartient à la
+même famille de distributions que la distribution a priori. Cela
+simplifie considérablement les calculs et rend l’inférence bayésienne
+tractable même pour des modèles complexes.</p>
+<p>Dans ce chapitre, nous explorerons les fondements mathématiques des
+priors conjugués, leurs propriétés et leurs applications. Nous verrons
+comment cette notion permet de rendre l’inférence bayésienne à la fois
+puissante et accessible.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les priors conjugués, commençons par définir quelques
+concepts fondamentaux.</p>
+<h2 id="distribution-a-priori-et-a-posteriori">Distribution a priori et
+a posteriori</h2>
+<p>Considérons un paramètre <span class="math inline">\(\theta\)</span>
+que nous souhaitons estimer. En inférence bayésienne, nous modélisons
+notre incertitude initiale sur <span
+class="math inline">\(\theta\)</span> par une distribution a priori
+<span class="math inline">\(p(\theta)\)</span>.</p>
+<p>Lorsque nous observons des données <span
+class="math inline">\(X\)</span>, nous mettons à jour notre croyance sur
+<span class="math inline">\(\theta\)</span> en utilisant la distribution
+a posteriori <span class="math inline">\(p(\theta | X)\)</span>, qui est
+proportionnelle au produit de la distribution a priori et de la
+vraisemblance des données :</p>
+<p><span class="math display">\[\begin{equation}
+p(\theta | X) \propto p(X | \theta) p(\theta)
+\end{equation}\]</span></p>
+<h2 id="conjugaison">Conjugaison</h2>
+<p>Un prior <span class="math inline">\(p(\theta)\)</span> est dit
+conjugué pour une famille de vraisemblances <span
+class="math inline">\(p(X | \theta)\)</span> si la distribution a
+posteriori <span class="math inline">\(p(\theta | X)\)</span> appartient
+à la même famille de distributions que le prior.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{F}\)</span>
+une famille de distributions paramétrées par <span
+class="math inline">\(\eta\)</span>. Nous disons qu’un prior <span
+class="math inline">\(p(\theta)\)</span> est conjugué pour une famille
+de vraisemblances <span class="math inline">\(p(X | \theta)\)</span> si
+:</p>
+<p><span class="math display">\[\begin{equation}
+\exists \, \eta : p(\theta | X) = f_\eta(\theta)
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(f_\eta\)</span> est la densité de
+probabilité de la famille <span
+class="math inline">\(\mathcal{F}\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-conjugaison">Théorème de Conjugaison</h2>
+<p>Un résultat fondamental concernant les priors conjugués est le
+théorème suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{F}\)</span> une famille de
+distributions paramétrées par <span class="math inline">\(\eta\)</span>.
+Un prior <span class="math inline">\(p(\theta)\)</span> est conjugué
+pour une famille de vraisemblances <span class="math inline">\(p(X |
+\theta)\)</span> si et seulement si la distribution a posteriori <span
+class="math inline">\(p(\theta | X)\)</span> appartient à la même
+famille de distributions que le prior.</p>
+</div>
+<h2 id="démonstration-du-théorème-de-conjugaison">Démonstration du
+Théorème de Conjugaison</h2>
+<p>Pour démontrer ce théorème, considérons une famille de distributions
+<span class="math inline">\(\mathcal{F}\)</span> paramétrées par <span
+class="math inline">\(\eta\)</span>. Supposons que le prior <span
+class="math inline">\(p(\theta)\)</span> soit de la forme <span
+class="math inline">\(f_{\eta_0}(\theta)\)</span>, où <span
+class="math inline">\(\eta_0\)</span> est un paramètre fixe.</p>
+<p>Lorsque nous observons des données <span
+class="math inline">\(X\)</span>, la distribution a posteriori est
+donnée par :</p>
+<p><span class="math display">\[\begin{equation}
+p(\theta | X) \propto p(X | \theta) f_{\eta_0}(\theta)
+\end{equation}\]</span></p>
+<p>Pour que <span class="math inline">\(p(\theta | X)\)</span>
+appartienne à la même famille de distributions que le prior, il doit
+exister un paramètre <span class="math inline">\(\eta_1\)</span> tel que
+:</p>
+<p><span class="math display">\[\begin{equation}
+p(\theta | X) = f_{\eta_1}(\theta)
+\end{equation}\]</span></p>
+<p>Cela implique que :</p>
+<p><span class="math display">\[\begin{equation}
+f_{\eta_1}(\theta) \propto p(X | \theta) f_{\eta_0}(\theta)
+\end{equation}\]</span></p>
+<p>En d’autres termes, la famille <span
+class="math inline">\(\mathcal{F}\)</span> doit être fermée sous
+l’opération de multiplication par la vraisemblance <span
+class="math inline">\(p(X | \theta)\)</span>. Cela achève la
+démonstration.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="exemple-de-prior-conjugué-la-distribution-beta">Exemple de Prior
+Conjugué : La Distribution Beta</h2>
+<p>Pour illustrer le concept de prior conjugué, considérons un exemple
+concret. Supposons que nous modélisions une variable binaire <span
+class="math inline">\(X\)</span> par une distribution de Bernoulli avec
+paramètre <span class="math inline">\(\theta\)</span> :</p>
+<p><span class="math display">\[\begin{equation}
+p(X | \theta) = \theta^X (1 - \theta)^{1 - X}
+\end{equation}\]</span></p>
+<p>Un prior conjugué pour cette famille de vraisemblances est la
+distribution Beta, définie par :</p>
+<p><span class="math display">\[\begin{equation}
+p(\theta) = \frac{\theta^{\alpha - 1} (1 - \theta)^{\beta -
+1}}{B(\alpha, \beta)}
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(\alpha\)</span> et <span
+class="math inline">\(\beta\)</span> sont des paramètres positifs, et
+<span class="math inline">\(B(\alpha, \beta)\)</span> est la fonction
+Beta.</p>
+<p>Lorsque nous observons des données <span
+class="math inline">\(X\)</span>, la distribution a posteriori est
+donnée par :</p>
+<p><span class="math display">\[\begin{equation}
+p(\theta | X) \propto \theta^X (1 - \theta)^{1 - X} \cdot
+\frac{\theta^{\alpha - 1} (1 - \theta)^{\beta - 1}}{B(\alpha, \beta)}
+\end{equation}\]</span></p>
+<p>En simplifiant cette expression, nous obtenons :</p>
+<p><span class="math display">\[\begin{equation}
+p(\theta | X) = \frac{\theta^{\alpha + X - 1} (1 - \theta)^{\beta + 1 -
+X - 1}}{B(\alpha + X, \beta + 1 - X)}
+\end{equation}\]</span></p>
+<p>Nous voyons que la distribution a posteriori est également une
+distribution Beta, avec des paramètres mis à jour <span
+class="math inline">\(\alpha + X\)</span> et <span
+class="math inline">\(\beta + 1 - X\)</span>. Cela montre que la
+distribution Beta est bien un prior conjugué pour une famille de
+vraisemblances de Bernoulli.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-1-fermeture-sous-la-convolution">Propriété 1 :
+Fermeture sous la Convolution</h2>
+<p>Un prior conjugué est fermé sous la convolution. Cela signifie que si
+nous avons deux priors conjugués <span
+class="math inline">\(p_1(\theta)\)</span> et <span
+class="math inline">\(p_2(\theta)\)</span>, leur convolution est
+également un prior conjugué.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{F}\)</span>
+une famille de distributions paramétrées par <span
+class="math inline">\(\eta\)</span>. Si <span
+class="math inline">\(p_1(\theta)\)</span> et <span
+class="math inline">\(p_2(\theta)\)</span> sont des priors conjugués
+pour une famille de vraisemblances <span class="math inline">\(p(X |
+\theta)\)</span>, alors leur convolution est également un prior conjugué
+pour cette famille.</p>
+<h2 id="propriété-2-stabilité-sous-la-mise-à-jour">Propriété 2 :
+Stabilité sous la Mise à Jour</h2>
+<p>Un prior conjugué est stable sous la mise à jour. Cela signifie que
+si nous mettons à jour un prior conjugué avec des données, le résultat
+est également un prior conjugué.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{F}\)</span>
+une famille de distributions paramétrées par <span
+class="math inline">\(\eta\)</span>. Si <span
+class="math inline">\(p(\theta)\)</span> est un prior conjugué pour une
+famille de vraisemblances <span class="math inline">\(p(X |
+\theta)\)</span>, alors la distribution a posteriori <span
+class="math inline">\(p(\theta | X)\)</span> est également un prior
+conjugué pour cette famille.</p>
+<h2 id="propriété-3-efficacité-computationnelle">Propriété 3 :
+Efficacité Computationnelle</h2>
+<p>Les priors conjugués permettent une inférence bayésienne efficace sur
+le plan computationnel. En effet, comme la distribution a posteriori
+appartient à la même famille de distributions que le prior, les calculs
+nécessaires pour mettre à jour le prior sont simplifiés.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{F}\)</span>
+une famille de distributions paramétrées par <span
+class="math inline">\(\eta\)</span>. Si <span
+class="math inline">\(p(\theta)\)</span> est un prior conjugué pour une
+famille de vraisemblances <span class="math inline">\(p(X |
+\theta)\)</span>, alors la mise à jour du prior en une distribution a
+posteriori peut être effectuée de manière efficace.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les priors conjugués sont une notion centrale en inférence
+bayésienne. Ils offrent une solution élégante et efficace pour
+simplifier les calculs impliqués dans la mise à jour des croyances
+bayésiennes. En garantissant que la distribution a posteriori appartient
+à la même famille de distributions que le prior, les priors conjugués
+permettent une inférence bayésienne tractable même pour des modèles
+complexes.</p>
+<p>Dans ce chapitre, nous avons exploré les fondements mathématiques des
+priors conjugués, leurs propriétés et leurs applications. Nous avons vu
+comment cette notion permet de rendre l’inférence bayésienne à la fois
+puissante et accessible.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,347 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Jensen-Shannon généralisée</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Jensen-Shannon généralisée</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La divergence de Jensen-Shannon (JSD) est une mesure d’information
+largement utilisée pour quantifier la similarité entre distributions de
+probabilité. Introduite par Lin (1991), elle combine les avantages de la
+divergence de Kullback-Leibler (KL) et de l’entropie relative tout en
+étant symétrique. Cependant, dans des contextes plus complexes où les
+distributions peuvent être définies sur des espaces de dimensions
+variables ou sous contraintes spécifiques, la JSD classique peut se
+révéler limitée.</p>
+<p>L’objectif de cet article est d’introduire une généralisation de la
+divergence de Jensen-Shannon, adaptée à des cadres plus larges. Cette
+généralisation permettra de capturer des structures plus riches et
+d’offrir une flexibilité accrue dans l’analyse des distributions de
+probabilité.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la divergence de Jensen-Shannon généralisée,
+commençons par rappeler les concepts fondamentaux.</p>
+<h2 class="unnumbered" id="divergence-de-kullback-leibler">Divergence de
+Kullback-Leibler</h2>
+<p>La divergence de Kullback-Leibler mesure la distance entre deux
+distributions de probabilité <span class="math inline">\(P\)</span> et
+<span class="math inline">\(Q\)</span>. Elle est définie comme suit
+:</p>
+<p><span class="math display">\[D_{KL}(P \| Q) = \sum_{x} P(x) \log
+\left( \frac{P(x)}{Q(x)} \right)\]</span></p>
+<p>Cette divergence n’est pas symétrique, ce qui signifie que <span
+class="math inline">\(D_{KL}(P \| Q) \neq D_{KL}(Q \| P)\)</span>.</p>
+<h2 class="unnumbered" id="divergence-de-jensen-shannon">Divergence de
+Jensen-Shannon</h2>
+<p>La divergence de Jensen-Shannon est une mesure symétrique basée sur
+la divergence de Kullback-Leibler. Pour deux distributions <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>, la JSD est définie par :</p>
+<p><span class="math display">\[JSD(P \| Q) = \frac{1}{2} D_{KL}(P \| M)
++ \frac{1}{2} D_{KL}(Q \| M)\]</span></p>
+<p>où <span class="math inline">\(M = \frac{1}{2}(P + Q)\)</span> est la
+distribution moyenne de <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>.</p>
+<h2 class="unnumbered"
+id="divergence-de-jensen-shannon-généralisée">Divergence de
+Jensen-Shannon généralisée</h2>
+<p>Pour généraliser la divergence de Jensen-Shannon, nous introduisons
+une famille de distributions <span class="math inline">\(\{P_i\}_{i \in
+I}\)</span> et une fonction de poids <span class="math inline">\(w: I
+\rightarrow [0,1]\)</span> telle que :</p>
+<p><span class="math display">\[\sum_{i \in I} w(i) = 1\]</span></p>
+<p>La distribution moyenne généralisée <span
+class="math inline">\(M\)</span> est alors définie par :</p>
+<p><span class="math display">\[M = \sum_{i \in I} w(i) P_i\]</span></p>
+<p>La divergence de Jensen-Shannon généralisée est définie comme :</p>
+<p><span class="math display">\[JSD_{\text{gen}}(P \| Q) = \sum_{i \in
+I} w(i) D_{KL}(P_i \| M)\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons quelques propriétés fondamentales
+de la divergence de Jensen-Shannon généralisée.</p>
+<h2 class="unnumbered" id="théorème-1-symétrie">Théorème 1:
+Symétrie</h2>
+<p>La divergence de Jensen-Shannon généralisée est symétrique.</p>
+<p><em>Preuve:</em></p>
+<p>Nous devons montrer que :</p>
+<p><span class="math display">\[JSD_{\text{gen}}(P \| Q) =
+JSD_{\text{gen}}(Q \| P)\]</span></p>
+<p>Par définition, nous avons :</p>
+<p><span class="math display">\[JSD_{\text{gen}}(P \| Q) = \sum_{i \in
+I} w(i) D_{KL}(P_i \| M)\]</span></p>
+<p>et</p>
+<p><span class="math display">\[JSD_{\text{gen}}(Q \| P) = \sum_{i \in
+I} w(i) D_{KL}(Q_i \| M&#39;)\]</span></p>
+<p>où <span class="math inline">\(M&#39; = \sum_{i \in I} w(i)
+Q_i\)</span>.</p>
+<p>En utilisant la symétrie de la divergence de Kullback-Leibler et les
+propriétés des distributions moyennes, nous pouvons montrer que :</p>
+<p><span class="math display">\[\sum_{i \in I} w(i) D_{KL}(P_i \| M) =
+\sum_{i \in I} w(i) D_{KL}(Q_i \| M&#39;)\]</span></p>
+<p>Ainsi, la divergence de Jensen-Shannon généralisée est
+symétrique.</p>
+<h2 class="unnumbered" id="théorème-2-non-négativité">Théorème 2:
+Non-négativité</h2>
+<p>La divergence de Jensen-Shannon généralisée est non négative.</p>
+<p><em>Preuve:</em></p>
+<p>Nous devons montrer que :</p>
+<p><span class="math display">\[JSD_{\text{gen}}(P \| Q) \geq
+0\]</span></p>
+<p>Par définition, la divergence de Kullback-Leibler est non négative
+:</p>
+<p><span class="math display">\[D_{KL}(P_i \| M) \geq 0\]</span></p>
+<p>En conséquence, la somme pondérée des divergences de Kullback-Leibler
+est également non négative :</p>
+<p><span class="math display">\[\sum_{i \in I} w(i) D_{KL}(P_i \| M)
+\geq 0\]</span></p>
+<p>Ainsi, la divergence de Jensen-Shannon généralisée est non
+négative.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Dans cette section, nous explorons quelques propriétés
+supplémentaires de la divergence de Jensen-Shannon généralisée.</p>
+<h2 class="unnumbered"
+id="propriété-1-invariance-par-transformation-affine">Propriété 1:
+Invariance par transformation affine</h2>
+<p>La divergence de Jensen-Shannon généralisée est invariante par
+transformation affine.</p>
+<p><em>Preuve:</em></p>
+<p>Considérons une transformation affine <span
+class="math inline">\(T\)</span> telle que :</p>
+<p><span class="math display">\[T(x) = ax + b\]</span></p>
+<p>où <span class="math inline">\(a &gt; 0\)</span>. Nous devons montrer
+que :</p>
+<p><span class="math display">\[JSD_{\text{gen}}(P \| Q) =
+JSD_{\text{gen}}(T(P) \| T(Q))\]</span></p>
+<p>En utilisant les propriétés de la divergence de Kullback-Leibler et
+des transformations affines, nous pouvons montrer que :</p>
+<p><span class="math display">\[D_{KL}(P_i \| M) = D_{KL}(T(P_i) \|
+T(M))\]</span></p>
+<p>En conséquence, la divergence de Jensen-Shannon généralisée est
+invariante par transformation affine.</p>
+<h2 class="unnumbered" id="propriété-2-continuité">Propriété 2:
+Continuité</h2>
+<p>La divergence de Jensen-Shannon généralisée est continue par rapport
+aux distributions <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>.</p>
+<p><em>Preuve:</em></p>
+<p>Nous devons montrer que si <span class="math inline">\(P_n
+\rightarrow P\)</span> et <span class="math inline">\(Q_n \rightarrow
+Q\)</span>, alors :</p>
+<p><span class="math display">\[JSD_{\text{gen}}(P_n \| Q_n) \rightarrow
+JSD_{\text{gen}}(P \| Q)\]</span></p>
+<p>En utilisant la continuité de la divergence de Kullback-Leibler et
+les propriétés des sommes pondérées, nous pouvons montrer que :</p>
+<p><span class="math display">\[\sum_{i \in I} w(i) D_{KL}(P_{n,i} \|
+M_n) \rightarrow \sum_{i \in I} w(i) D_{KL}(P_i \| M)\]</span></p>
+<p>Ainsi, la divergence de Jensen-Shannon généralisée est continue.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Dans cet article, nous avons introduit une généralisation de la
+divergence de Jensen-Shannon adaptée à des cadres plus larges. Nous
+avons présenté les définitions fondamentales, les théorèmes clés et les
+propriétés de cette nouvelle mesure d’information. La divergence de
+Jensen-Shannon généralisée offre une flexibilité accrue et permet de
+capturer des structures plus riches dans l’analyse des distributions de
+probabilité.</p>
+<p>Les perspectives futures incluent l’application de cette
+généralisation à des problèmes concrets en apprentissage automatique, en
+traitement du signal et en théorie de l’information.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,320 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’ordre dual : une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’ordre dual : une exploration mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’ordre dual est un concept fondamental en analyse convexe et en
+optimisation. Il émerge naturellement lorsqu’on étudie les relations
+entre un espace vectoriel et son dual, en particulier dans le contexte
+des espaces de Banach. L’intérêt pour l’ordre dual vient de sa capacité
+à simplifier des problèmes complexes en les reformulant dans un cadre
+plus abstrait et souvent plus maniable.</p>
+<p>L’analyse convexe, qui étudie les propriétés des ensembles convexes
+et des fonctions convexes, trouve dans l’ordre dual un outil puissant
+pour traiter des problèmes d’optimisation. Par exemple, la dualité en
+optimisation convexe permet de transformer un problème primaire en un
+problème dual, souvent plus simple à résoudre. Cette transformation
+repose sur la notion d’ordre dual.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir formellement l’ordre dual, il est essentiel de
+comprendre le contexte dans lequel ce concept s’inscrit. Considérons un
+espace vectoriel <span class="math inline">\(E\)</span> muni d’une
+relation d’ordre partielle. Nous cherchons à définir une relation
+d’ordre sur l’espace dual <span class="math inline">\(E^*\)</span> de
+manière à ce que cette relation soit compatible avec la topologie
+faible-*.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(E\)</span> un espace vectoriel réel
+localement convexe. Une relation d’ordre partielle <span
+class="math inline">\(\leq\)</span> sur <span
+class="math inline">\(E\)</span> est dite <em>compatible</em> avec la
+topologie de <span class="math inline">\(E\)</span> si pour tout <span
+class="math inline">\(x, y \in E\)</span>, <span class="math inline">\(x
+\leq y\)</span> implique que pour toute forme linéaire continue <span
+class="math inline">\(f \in E^*\)</span>, on a <span
+class="math inline">\(f(x) \leq f(y)\)</span>.</p>
+</div>
+<div class="definition">
+<p>Soit <span class="math inline">\(E\)</span> un espace vectoriel réel
+localement convexe muni d’une relation d’ordre partielle compatible
+<span class="math inline">\(\leq\)</span>. L’<em>ordre dual</em> sur
+l’espace dual <span class="math inline">\(E^*\)</span> est défini par :
+<span class="math display">\[f \leq g \quad \text{si et seulement si}
+\quad f(x) \leq g(x) \quad \forall x \in E^+\]</span> où <span
+class="math inline">\(E^+ = \{ x \in E \mid x \geq 0 \}\)</span> est le
+cône positif de <span class="math inline">\(E\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant l’ordre dual est le théorème
+de Krein-Rutman, qui établit des conditions sous lesquelles un opérateur
+positif admet une valeur propre positive.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(E\)</span> un espace de Banach réel
+muni d’une relation d’ordre partielle compatible, et soit <span
+class="math inline">\(T : E \to E\)</span> un opérateur linéaire continu
+positif. Si <span class="math inline">\(T\)</span> est compact, alors il
+existe une valeur propre <span class="math inline">\(\lambda &gt;
+0\)</span> et un vecteur propre positif correspondant.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Krein-Rutman, nous suivons une approche
+basée sur la théorie spectrale des opérateurs compacts.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(T : E \to E\)</span>
+un opérateur linéaire continu positif et compact. Nous cherchons à
+montrer qu’il existe une valeur propre <span
+class="math inline">\(\lambda &gt; 0\)</span> et un vecteur propre
+positif correspondant.</p>
+<p>1. Considérons l’ensemble <span class="math inline">\(K = \{ x \in
+E^+ \mid \|x\| \leq 1 \}\)</span>, qui est un ensemble convexe compact
+en raison de la continuité de <span
+class="math inline">\(T\)</span>.</p>
+<p>2. Par le théorème de Krein-Milman, <span
+class="math inline">\(K\)</span> admet au moins un point extrême <span
+class="math inline">\(x_0\)</span>.</p>
+<p>3. Puisque <span class="math inline">\(T\)</span> est positif, <span
+class="math inline">\(T(K) \subseteq K\)</span>. Par le théorème de
+Schauder, il existe un point fixe <span class="math inline">\(x_0 \in
+K\)</span> tel que <span class="math inline">\(T(x_0) = \lambda
+x_0\)</span> pour un certain <span class="math inline">\(\lambda &gt;
+0\)</span>.</p>
+<p>4. En raison de la positivité de <span
+class="math inline">\(T\)</span>, nous avons <span
+class="math inline">\(x_0 &gt; 0\)</span>.</p>
+<p>Ainsi, <span class="math inline">\(\lambda\)</span> est une valeur
+propre positive de <span class="math inline">\(T\)</span>, et <span
+class="math inline">\(x_0\)</span> est un vecteur propre positif
+correspondant. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de l’ordre
+dual.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\(E\)</span> un espace vectoriel réel
+localement convexe muni d’une relation d’ordre partielle compatible. Les
+propriétés suivantes sont vérifiées :</p>
+<ol>
+<li><p>L’ordre dual est une relation d’ordre partielle sur <span
+class="math inline">\(E^*\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(f, g \in E^*\)</span> sont tels
+que <span class="math inline">\(f \leq g\)</span>, alors pour tout <span
+class="math inline">\(x \in E^+\)</span>, on a <span
+class="math inline">\(f(x) \leq g(x)\)</span>.</p></li>
+<li><p>L’ordre dual est compatible avec la topologie faible-* sur <span
+class="math inline">\(E^*\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ces propriétés découle directement des
+définitions et des propriétés de l’ordre partiel compatible sur <span
+class="math inline">\(E\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’ordre dual est un concept riche et puissant qui trouve des
+applications dans de nombreux domaines des mathématiques, notamment en
+analyse convexe et en optimisation. Sa capacité à reformuler des
+problèmes complexes dans un cadre plus abstrait en fait un outil
+indispensable pour les mathématiciens et les chercheurs en
+optimisation.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

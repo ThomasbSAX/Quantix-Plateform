@@ -1,0 +1,390 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Intégration des fonctions hyperboliques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Intégration des fonctions hyperboliques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’intégration des fonctions hyperboliques est un sujet d’une richesse
+insoupçonnée, qui trouve ses racines dans les travaux de Johann Heinrich
+Lambert au XVIIIème siècle. Ces fonctions, analogues aux fonctions
+trigonométriques mais dans un contexte hyperbolique, jouent un rôle
+crucial en physique théorique, en ingénierie et même dans l’étude des
+surfaces minimales. Leur intégration permet de résoudre une multitude de
+problèmes concrets, allant de la modélisation des pendules physiques à
+l’analyse des équations différentielles non linéaires.</p>
+<p>L’émergence de ces fonctions est intimement liée à la résolution des
+équations différentielles et à l’étude des géométries non euclidiennes.
+Elles apparaissent naturellement dans les solutions des équations
+différentielles linéaires à coefficients constants, et leur intégration
+permet de comprendre le comportement global des systèmes dynamiques.
+Dans ce cadre, elles sont indispensables pour décrire les trajectoires
+des particules dans un champ de force central ou pour analyser les
+propriétés des surfaces minimales en géométrie différentielle.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans l’intégration des fonctions hyperboliques, il
+est essentiel de bien comprendre ces fonctions. Nous commençons par
+définir les fonctions hyperboliques de base.</p>
+<h2 id="fonction-sinus-hyperbolique">Fonction sinus hyperbolique</h2>
+<p>Pour comprendre ce qu’est la fonction sinus hyperbolique, imaginons
+une courbe définie par l’équation <span class="math inline">\(x^2 - y^2
+= 1\)</span>. Cette courbe, appelée hyperbolique, est l’analogue de la
+fonction sinus dans le contexte euclidien. La fonction sinus
+hyperbolique, notée <span class="math inline">\(\sinh(x)\)</span>, est
+définie comme la moitié de la somme des exponentielles <span
+class="math inline">\(e^x\)</span> et <span
+class="math inline">\(e^{-x}\)</span>.</p>
+<div class="definition">
+<p>La fonction sinus hyperbolique est définie par : <span
+class="math display">\[\sinh(x) = \frac{e^x - e^{-x}}{2}\]</span> ou de
+manière équivalente : <span class="math display">\[\sinh(x) =
+\sum_{n=0}^{\infty} \frac{x^{2n+1}}{(2n+1)!}\]</span> pour tout <span
+class="math inline">\(x \in \mathbb{R}\)</span>.</p>
+</div>
+<h2 id="fonction-cosinus-hyperbolique">Fonction cosinus
+hyperbolique</h2>
+<p>De même, la fonction cosinus hyperbolique, notée <span
+class="math inline">\(\cosh(x)\)</span>, est définie comme la moitié de
+la somme des exponentielles <span class="math inline">\(e^x\)</span> et
+<span class="math inline">\(e^{-x}\)</span>.</p>
+<div class="definition">
+<p>La fonction cosinus hyperbolique est définie par : <span
+class="math display">\[\cosh(x) = \frac{e^x + e^{-x}}{2}\]</span> ou de
+manière équivalente : <span class="math display">\[\cosh(x) =
+\sum_{n=0}^{\infty} \frac{x^{2n}}{(2n)!}\]</span> pour tout <span
+class="math inline">\(x \in \mathbb{R}\)</span>.</p>
+</div>
+<h1 id="théorèmes-dintégration">Théorèmes d’intégration</h1>
+<p>Nous allons maintenant aborder l’intégration des fonctions
+hyperboliques. Commencer par rappeler que l’intégrale d’une fonction est
+une notion fondamentale en analyse, qui permet de calculer des aires
+sous des courbes et de résoudre des équations différentielles.</p>
+<h2 id="intégrale-du-sinus-hyperbolique">Intégrale du sinus
+hyperbolique</h2>
+<p>Pour intégrer la fonction <span
+class="math inline">\(\sinh(x)\)</span>, nous cherchons une fonction
+<span class="math inline">\(F(x)\)</span> telle que <span
+class="math inline">\(F&#39;(x) = \sinh(x)\)</span>. En utilisant la
+définition de <span class="math inline">\(\sinh(x)\)</span>, nous
+pouvons écrire :</p>
+<p><span class="math display">\[F(x) = \int \sinh(x) \, dx\]</span></p>
+<p>En utilisant la linéarité de l’intégrale, nous avons :</p>
+<p><span class="math display">\[F(x) = \frac{1}{2} \int (e^x - e^{-x})
+\, dx\]</span></p>
+<p>En intégrant terme par terme, nous obtenons :</p>
+<p><span class="math display">\[F(x) = \frac{1}{2} (e^x + e^{-x}) +
+C\]</span></p>
+<p>où <span class="math inline">\(C\)</span> est une constante
+d’intégration.</p>
+<div class="theorem">
+<p>L’intégrale de la fonction sinus hyperbolique est donnée par : <span
+class="math display">\[\int \sinh(x) \, dx = \cosh(x) + C\]</span> pour
+tout <span class="math inline">\(x \in \mathbb{R}\)</span>, où <span
+class="math inline">\(C\)</span> est une constante d’intégration.</p>
+</div>
+<h2 id="intégrale-du-cosinus-hyperbolique">Intégrale du cosinus
+hyperbolique</h2>
+<p>De même, pour intégrer la fonction <span
+class="math inline">\(\cosh(x)\)</span>, nous cherchons une fonction
+<span class="math inline">\(G(x)\)</span> telle que <span
+class="math inline">\(G&#39;(x) = \cosh(x)\)</span>. En utilisant la
+définition de <span class="math inline">\(\cosh(x)\)</span>, nous
+pouvons écrire :</p>
+<p><span class="math display">\[G(x) = \int \cosh(x) \, dx\]</span></p>
+<p>En utilisant la linéarité de l’intégrale, nous avons :</p>
+<p><span class="math display">\[G(x) = \frac{1}{2} \int (e^x + e^{-x})
+\, dx\]</span></p>
+<p>En intégrant terme par terme, nous obtenons :</p>
+<p><span class="math display">\[G(x) = \frac{1}{2} (e^x - e^{-x}) +
+C\]</span></p>
+<p>où <span class="math inline">\(C\)</span> est une constante
+d’intégration.</p>
+<div class="theorem">
+<p>L’intégrale de la fonction cosinus hyperbolique est donnée par :
+<span class="math display">\[\int \cosh(x) \, dx = \sinh(x) + C\]</span>
+pour tout <span class="math inline">\(x \in \mathbb{R}\)</span>, où
+<span class="math inline">\(C\)</span> est une constante
+d’intégration.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Nous allons maintenant démontrer les théorèmes d’intégration des
+fonctions hyperboliques.</p>
+<h2 id="preuve-de-lintégrale-du-sinus-hyperbolique">Preuve de
+l’intégrale du sinus hyperbolique</h2>
+<p>Pour démontrer que <span class="math inline">\(\int \sinh(x) \, dx =
+\cosh(x) + C\)</span>, nous commençons par rappeler la définition de
+<span class="math inline">\(\sinh(x)\)</span> :</p>
+<p><span class="math display">\[\sinh(x) = \frac{e^x -
+e^{-x}}{2}\]</span></p>
+<p>En intégrant cette expression, nous obtenons :</p>
+<p><span class="math display">\[\int \sinh(x) \, dx = \frac{1}{2} \int
+(e^x - e^{-x}) \, dx\]</span></p>
+<p>En utilisant la linéarité de l’intégrale, nous avons :</p>
+<p><span class="math display">\[\int \sinh(x) \, dx = \frac{1}{2} \left(
+\int e^x \, dx - \int e^{-x} \, dx \right)\]</span></p>
+<p>En intégrant terme par terme, nous obtenons :</p>
+<p><span class="math display">\[\int \sinh(x) \, dx = \frac{1}{2} (e^x +
+e^{-x}) + C\]</span></p>
+<p>En utilisant la définition de <span
+class="math inline">\(\cosh(x)\)</span>, nous avons :</p>
+<p><span class="math display">\[\int \sinh(x) \, dx = \cosh(x) +
+C\]</span></p>
+<p>Ce qui achève la preuve.</p>
+<h2 id="preuve-de-lintégrale-du-cosinus-hyperbolique">Preuve de
+l’intégrale du cosinus hyperbolique</h2>
+<p>Pour démontrer que <span class="math inline">\(\int \cosh(x) \, dx =
+\sinh(x) + C\)</span>, nous commençons par rappeler la définition de
+<span class="math inline">\(\cosh(x)\)</span> :</p>
+<p><span class="math display">\[\cosh(x) = \frac{e^x +
+e^{-x}}{2}\]</span></p>
+<p>En intégrant cette expression, nous obtenons :</p>
+<p><span class="math display">\[\int \cosh(x) \, dx = \frac{1}{2} \int
+(e^x + e^{-x}) \, dx\]</span></p>
+<p>En utilisant la linéarité de l’intégrale, nous avons :</p>
+<p><span class="math display">\[\int \cosh(x) \, dx = \frac{1}{2} \left(
+\int e^x \, dx + \int e^{-x} \, dx \right)\]</span></p>
+<p>En intégrant terme par terme, nous obtenons :</p>
+<p><span class="math display">\[\int \cosh(x) \, dx = \frac{1}{2} (e^x -
+e^{-x}) + C\]</span></p>
+<p>En utilisant la définition de <span
+class="math inline">\(\sinh(x)\)</span>, nous avons :</p>
+<p><span class="math display">\[\int \cosh(x) \, dx = \sinh(x) +
+C\]</span></p>
+<p>Ce qui achève la preuve.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et corollaires</h1>
+<p>Nous allons maintenant énoncer quelques propriétés et corollaires des
+intégrales des fonctions hyperboliques.</p>
+<h2 id="propriétés-de-linéarité">Propriétés de linéarité</h2>
+<p>Les intégrales des fonctions hyperboliques vérifient les propriétés
+de linéarité suivantes :</p>
+<div class="proposition">
+<p>Pour tout <span class="math inline">\(a, b \in \mathbb{R}\)</span> et
+pour toute fonction intégrable <span class="math inline">\(f\)</span>,
+nous avons :</p>
+<ol>
+<li><p><span class="math inline">\(\int (a \sinh(x) + b \cosh(x)) \, dx
+= a \cosh(x) + b \sinh(x) + C\)</span></p></li>
+<li><p><span class="math inline">\(\int (a f(x) + b g(x)) \, dx = a \int
+f(x) \, dx + b \int g(x) \, dx\)</span></p></li>
+</ol>
+</div>
+<h2 id="propriétés-de-composition">Propriétés de composition</h2>
+<p>Les intégrales des fonctions hyperboliques vérifient également les
+propriétés de composition suivantes :</p>
+<div class="proposition">
+<p>Pour toute fonction intégrable <span
+class="math inline">\(f\)</span>, nous avons :</p>
+<ol>
+<li><p><span class="math inline">\(\int \sinh(f(x)) \, dx = \cosh(f(x))
++ C\)</span></p></li>
+<li><p><span class="math inline">\(\int \cosh(f(x)) \, dx = \sinh(f(x))
++ C\)</span></p></li>
+</ol>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’intégration des fonctions hyperboliques est un sujet d’une grande
+richesse, qui trouve des applications dans de nombreux domaines des
+mathématiques et de la physique. Les théorèmes d’intégration que nous
+avons démontrés sont fondamentaux pour comprendre le comportement des
+systèmes dynamiques et pour résoudre les équations différentielles. Les
+propriétés et corollaires que nous avons énoncés ouvrent la voie à de
+nombreuses généralisations et applications dans des contextes plus
+complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

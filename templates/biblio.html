@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bibliothèque — Quantix</title>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+
+<body>
+
+  {% include 'header.html' %}
+
+  <main class="container" style="max-width: 1400px; padding: 20px;">
+
+    <section class="hero-section clean-hero" style="margin-bottom: 30px;">
+      <h1 id="main-title" class="gradient-text text-center" style="font-size: 2.5rem; font-weight: 300; color: #1a1a1a; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; opacity: 0;">Bibliothèque Quantix</h1>
+      <p class="hero-subtitle text-center">
+        Plus de 3975 cours de mathématiques générés automatiquement et classés par thématique.
+      </p>
+    </section>
+
+    <!-- Barre de recherche -->
+    <section style="max-width: 700px; margin: 0 auto 40px;">
+      <div style="position: relative;">
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Rechercher un cours (titre, catégorie...)"
+          style="width: 100%; padding: 14px 20px; font-size: 1rem; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; transition: border-color 0.2s;"
+          onfocus="this.style.borderColor='#3b82f6'"
+          onblur="this.style.borderColor='#e5e7eb'"
+        />
+      </div>
+      <div id="searchStats" style="text-align: center; margin-top: 10px; color: #6b7280; font-size: 0.9rem;"></div>
+    </section>
+
+    <!-- Navigation par catégories -->
+    <section style="margin-bottom: 30px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+        <button class="cat-btn active" onclick="filterCategory('all')" data-category="all">Tout afficher</button>
+        <button class="cat-btn" onclick="filterCategory('Trigonométrie')" data-category="Trigonométrie">Trigonométrie</button>
+        <button class="cat-btn" onclick="filterCategory('Séries')" data-category="Séries">Séries</button>
+        <button class="cat-btn" onclick="filterCategory('Intégrales')" data-category="Intégrales">Intégrales</button>
+        <button class="cat-btn" onclick="filterCategory('Inégalités')" data-category="Inégalités">Inégalités</button>
+        <button class="cat-btn" onclick="filterCategory('Complexité algorithmique')" data-category="Complexité algorithmique">Complexité</button>
+        <button class="cat-btn" onclick="filterCategory('Distances et Corrélations')" data-category="Distances et Corrélations">Distances</button>
+        <button class="cat-btn" onclick="filterCategory('Machine Learning')" data-category="Machine Learning">ML / Loss</button>
+        <button class="cat-btn" onclick="filterCategory('Développements limités')" data-category="Développements limités">Développements</button>
+        <button class="cat-btn" onclick="filterCategory('Algèbre linéaire')" data-category="Algèbre linéaire">Algèbre</button>
+        <button class="cat-btn" onclick="filterCategory('Théorèmes')" data-category="Théorèmes">Théorèmes</button>
+        <button class="cat-btn" onclick="filterCategory('Statistiques et Probabilités')" data-category="Statistiques et Probabilités">Stats/Proba</button>
+        <button class="cat-btn" onclick="filterCategory('Équations différentielles')" data-category="Équations différentielles">Équa. Diff.</button>
+        <button class="cat-btn" onclick="filterCategory('Topologie et Analyse fonctionnelle')" data-category="Topologie et Analyse fonctionnelle">Topologie</button>
+        <button class="cat-btn" onclick="filterCategory('Autres')" data-category="Autres">Autres</button>
+      </div>
+    </section>
+
+    <!-- Liste des cours par catégories -->
+    <section id="coursesContainer" class="library-content"></section>
+
+  </main>
+
+  {% include 'footer.html' %}
+
+  <style>
+    .cat-btn {
+      padding: 8px 16px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .cat-btn:hover {
+      background: #f3f4f6;
+      border-color: #3b82f6;
+    }
+    .cat-btn.active {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+    .category-section {
+      margin-bottom: 40px;
+    }
+    .category-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #1f2937;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+    .courses-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .course-link {
+      display: block;
+      padding: 12px 16px;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #1f2937;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+    }
+    .course-link:hover {
+      background: #f9fafb;
+      border-color: #3b82f6;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+  </style>
+
+  <script>
+    // Charger les cours depuis le JSON
+    let allCourses = [];
+    
+    fetch("/static/cours_list.json")
+      .then(res => res.json())
+      .then(data => {
+        allCourses = data;
+        renderCourses(allCourses);
+        updateStats(allCourses.length, allCourses.length);
+      })
+      .catch(err => {
+        console.error("Erreur chargement cours:", err);
+        document.getElementById('coursesContainer').innerHTML = '<p style="text-align:center; color:#ef4444;">Erreur lors du chargement des cours.</p>';
+      });
+
+    function renderCourses(courses) {
+      const container = document.getElementById('coursesContainer');
+      
+      // Grouper par catégorie
+      const grouped = {};
+      courses.forEach(c => {
+        if (!grouped[c.category]) grouped[c.category] = [];
+        grouped[c.category].push(c);
+      });
+
+      // Ordre des catégories
+      const order = ['Trigonométrie', 'Séries', 'Intégrales', 'Inégalités', 'Complexité algorithmique', 'Distances et Corrélations', 'Machine Learning', 'Développements limités', 'Algèbre linéaire', 'Théorèmes', 'Statistiques et Probabilités', 'Équations différentielles', 'Topologie et Analyse fonctionnelle', 'Autres'];
+      
+      let html = '';
+      order.forEach(cat => {
+        if (grouped[cat]) {
+          html += `
+            <div class="category-section" data-category="${cat}">
+              <h2 class="category-title">${cat} <span style="color:#9ca3af; font-size:0.9rem;">(${grouped[cat].length})</span></h2>
+              <div class="courses-list">
+                ${grouped[cat].map(c => `
+                  <a class="course-link" href="/cours/${c.file}" data-title="${c.title.toLowerCase()}" data-cat="${cat.toLowerCase()}">
+                    ${c.title}
+                  </a>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+      });
+      
+      container.innerHTML = html;
+    }
+
+    function filterCategory(category) {
+      // Mise à jour boutons
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.category === category);
+      });
+
+      // Filtrer sections
+      const sections = document.querySelectorAll('.category-section');
+      let visibleCount = 0;
+      
+      sections.forEach(section => {
+        if (category === 'all' || section.dataset.category === category) {
+          section.style.display = 'block';
+          visibleCount += section.querySelectorAll('.course-link').length;
+        } else {
+          section.style.display = 'none';
+        }
+      });
+
+      updateStats(visibleCount, allCourses.length);
+    }
+
+    // Recherche
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      const links = document.querySelectorAll('.course-link');
+      let visibleCount = 0;
+
+      if (!query) {
+        links.forEach(link => link.style.display = 'block');
+        document.querySelectorAll('.category-section').forEach(s => s.style.display = 'block');
+        visibleCount = allCourses.length;
+      } else {
+        links.forEach(link => {
+          const matches = link.dataset.title.includes(query) || link.dataset.cat.includes(query);
+          link.style.display = matches ? 'block' : 'none';
+          if (matches) visibleCount++;
+        });
+
+        // Masquer catégories vides
+        document.querySelectorAll('.category-section').forEach(section => {
+          const hasVisible = Array.from(section.querySelectorAll('.course-link'))
+            .some(link => link.style.display !== 'none');
+          section.style.display = hasVisible ? 'block' : 'none';
+        });
+      }
+
+      updateStats(visibleCount, allCourses.length);
+    });
+
+    function updateStats(visible, total) {
+      document.getElementById('searchStats').textContent = 
+        visible === total ? `${total} cours au total` : `${visible} cours affichés sur ${total}`;
+    }
+
+    // Effet typewriter pour le titre
+    function typeWriter(element, text, speed, callback) {
+      let i = 0;
+      element.textContent = '';
+      element.style.opacity = '1';
+      
+      function type() {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, speed);
+        } else if (callback) {
+          setTimeout(callback, 300);
+        }
+      }
+      type();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const title = document.getElementById('main-title');
+      if (title) {
+        typeWriter(title, 'Bibliothèque Quantix', 80);
+      }
+    });
+  </script>
+
+</body>
+</html>

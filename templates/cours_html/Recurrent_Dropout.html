@@ -1,0 +1,390 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Recurrent Dropout : Une Technique Avancée pour les Réseaux de Neurones Récurrents</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Recurrent Dropout : Une Technique Avancée pour les
+Réseaux de Neurones Récurrents</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les réseaux de neurones récurrents (RNN) ont révolutionné le
+traitement des données séquentielles, telles que les séries temporelles
+ou les langues naturelles. Cependant, leur entraînement est souvent
+entravé par des problèmes de surapprentissage (overfitting) et de
+disparition du gradient. Le <em>dropout</em>, une technique de
+régularisation introduite par Srivastava et al. en 2014, a prouvé son
+efficacité pour atténuer ces problèmes dans les réseaux de neurones
+feedforward. Toutefois, l’application directe du dropout aux RNN pose
+des défis uniques en raison de leur structure récurrente.</p>
+<p>Le <em>Recurrent Dropout</em> (RDrop) est une extension du dropout
+conçue spécifiquement pour les RNN. Il permet de masquer des neurones
+non seulement dans l’espace spatial (comme le dropout classique), mais
+aussi dans l’espace temporel. Cette technique innovante améliore la
+robustesse des RNN et accélère leur convergence, tout en préservant leur
+capacité à capturer les dépendances temporelles.</p>
+<p>Dans cet article, nous explorerons les fondements théoriques du
+Recurrent Dropout, ses définitions formelles, et ses implications
+pratiques. Nous démontrerons comment cette technique peut être intégrée
+dans divers types de RNN, et nous discuterons des résultats
+expérimentaux qui illustrent son efficacité.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir formellement le Recurrent Dropout, il est essentiel
+de comprendre les concepts sous-jacents.</p>
+<h2 class="unnumbered" id="le-problème-du-dropout-dans-les-rnn">Le
+Problème du Dropout dans les RNN</h2>
+<p>Considérons un réseau de neurones récurrent standard. À chaque pas de
+temps <span class="math inline">\(t\)</span>, les états cachés <span
+class="math inline">\(h_t\)</span> sont mis à jour en fonction des
+entrées <span class="math inline">\(x_t\)</span> et des états cachés
+précédents <span class="math inline">\(h_{t-1}\)</span>. Le dropout
+classique consiste à masquer aléatoirement un sous-ensemble de neurones
+pendant l’entraînement, ce qui empêche le réseau de trop dépendre de
+certaines caractéristiques.</p>
+<p>Cependant, dans les RNN, l’application directe du dropout peut
+entraîner des problèmes de cohérence temporelle. Par exemple, si un
+neurone est masqué à l’instant <span class="math inline">\(t\)</span>,
+mais pas à l’instant <span class="math inline">\(t+1\)</span>, cela peut
+perturber la propagation des informations à travers le temps.</p>
+<h2 class="unnumbered"
+id="définition-formelle-du-recurrent-dropout">Définition Formelle du
+Recurrent Dropout</h2>
+<p>Pour remédier à ce problème, le Recurrent Dropout masque les mêmes
+neurones à tous les pas de temps pendant un même batch d’entraînement.
+Formellement, soit <span class="math inline">\(\mathbf{h}_t\)</span> le
+vecteur des états cachés à l’instant <span
+class="math inline">\(t\)</span>, et soit <span
+class="math inline">\(\mathbf{m}_t\)</span> un masque binaire de la même
+dimension que <span class="math inline">\(\mathbf{h}_t\)</span>, où
+chaque élément est indépendant et identiquement distribué selon une loi
+de Bernoulli de paramètre <span class="math inline">\(p\)</span> (le
+taux de dropout).</p>
+<p>Le Recurrent Dropout est alors défini par l’opération suivante :</p>
+<p><span class="math display">\[\mathbf{h}_t&#39; = \mathbf{m} \odot
+\mathbf{h}_t,\]</span></p>
+<p>où <span class="math inline">\(\odot\)</span> désigne le produit de
+Hadamard (élément par élément), et où <span
+class="math inline">\(\mathbf{m}\)</span> est le même masque pour tous
+les pas de temps <span class="math inline">\(t\)</span>.</p>
+<p>En d’autres termes, le Recurrent Dropout applique un masque constant
+dans le temps à chaque batch d’entraînement. Cela garantit que les
+dépendances temporelles sont préservées, tout en introduisant une forme
+de régularisation efficace.</p>
+<h1 class="unnumbered" id="théorèmes-et-propriétés">Théorèmes et
+Propriétés</h1>
+<h2 class="unnumbered"
+id="stabilité-temporelle-du-recurrent-dropout">Stabilité Temporelle du
+Recurrent Dropout</h2>
+<p>Un des avantages majeurs du Recurrent Dropout est sa capacité à
+maintenir la stabilité temporelle des RNN. Nous pouvons formaliser cette
+propriété par le théorème suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{h}_t&#39; = \mathbf{m} \odot
+\mathbf{h}_t\)</span> l’opération de Recurrent Dropout appliquée à un
+réseau de neurones récurrent. Alors, pour tout <span
+class="math inline">\(t \geq 1\)</span>, les états cachés modifiés <span
+class="math inline">\(\mathbf{h}_t&#39;\)</span> conservent les
+dépendances temporelles des états cachés originaux <span
+class="math inline">\(\mathbf{h}_t\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux instants consécutifs <span
+class="math inline">\(t\)</span> et <span
+class="math inline">\(t+1\)</span>. Les états cachés sont mis à jour par
+la relation récurrente :</p>
+<p><span class="math display">\[\mathbf{h}_{t+1} = f(\mathbf{W}
+\mathbf{h}_t + \mathbf{U} \mathbf{x}_{t+1}),\]</span></p>
+<p>où <span class="math inline">\(f\)</span> est une fonction
+d’activation, et <span class="math inline">\(\mathbf{W}\)</span> et
+<span class="math inline">\(\mathbf{U}\)</span> sont les matrices de
+poids.</p>
+<p>Après application du Recurrent Dropout, nous avons :</p>
+<p><span class="math display">\[\mathbf{h}_{t+1}&#39; = \mathbf{m} \odot
+f(\mathbf{W} (\mathbf{m} \odot \mathbf{h}_t) + \mathbf{U}
+\mathbf{x}_{t+1}).\]</span></p>
+<p>En développant cette expression, nous obtenons :</p>
+<p><span class="math display">\[\mathbf{h}_{t+1}&#39; = \mathbf{m} \odot
+f(\mathbf{W} \mathbf{m} \odot \mathbf{h}_t + \mathbf{U}
+\mathbf{x}_{t+1}).\]</span></p>
+<p>Puisque le masque <span class="math inline">\(\mathbf{m}\)</span> est
+constant dans le temps, les dépendances temporelles entre <span
+class="math inline">\(\mathbf{h}_t\)</span> et <span
+class="math inline">\(\mathbf{h}_{t+1}\)</span> sont préservées. Ainsi,
+le Recurrent Dropout garantit la stabilité temporelle du réseau. ◻</p>
+</div>
+<h2 class="unnumbered"
+id="régularisation-par-le-recurrent-dropout">Régularisation par le
+Recurrent Dropout</h2>
+<p>Le Recurrent Dropout agit comme une forme de régularisation pour les
+RNN. Nous pouvons formaliser cette propriété par le théorème suivant
+:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{h}_t&#39; = \mathbf{m} \odot
+\mathbf{h}_t\)</span> l’opération de Recurrent Dropout appliquée à un
+réseau de neurones récurrent. Alors, pour tout <span
+class="math inline">\(t \geq 1\)</span>, les états cachés modifiés <span
+class="math inline">\(\mathbf{h}_t&#39;\)</span> introduisent une forme
+de régularisation qui réduit le risque de surapprentissage.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> L’application du Recurrent Dropout peut être vue
+comme une forme de moyenne d’ensembles (ensemble averaging). À chaque
+batch d’entraînement, le réseau est entraîné sur une version légèrement
+différente de ses états cachés, en raison du masque aléatoire <span
+class="math inline">\(\mathbf{m}\)</span>.</p>
+<p>Cette diversité dans les états cachés force le réseau à généraliser
+mieux, réduisant ainsi le risque de surapprentissage. De plus, le
+Recurrent Dropout introduit une forme de bruit dans les états cachés, ce
+qui peut aider à éviter les minima locaux pendant l’optimisation. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="effet-du-taux-de-dropout">Effet du Taux de
+Dropout</h2>
+<p>Le taux de dropout <span class="math inline">\(p\)</span> est un
+hyperparamètre crucial pour le Recurrent Dropout. Nous pouvons énoncer
+les propriétés suivantes :</p>
+<ol>
+<li><p>Un taux de dropout trop élevé (proche de 1) peut entraîner une
+sous-apprentissage, car trop de neurones sont masqués à chaque
+batch.</p></li>
+<li><p>Un taux de dropout trop faible (proche de 0) peut ne pas fournir
+suffisamment de régularisation, rendant le Recurrent Dropout
+inefficace.</p></li>
+<li><p>Le taux de dropout optimal dépend du type de RNN et du problème
+traité. Il est souvent déterminé empiriquement par validation
+croisée.</p></li>
+</ol>
+<h2 class="unnumbered"
+id="compatibilité-avec-dautres-techniques-de-régularisation">Compatibilité
+avec d’Autres Techniques de Régularisation</h2>
+<p>Le Recurrent Dropout peut être combiné avec d’autres techniques de
+régularisation, telles que la normalisation par lots (batch
+normalization) ou le dropout spatial. Cependant, certaines combinaisons
+peuvent être redondantes ou contre-productives.</p>
+<div class="corollary">
+<p>Soit un réseau de neurones récurrent utilisant à la fois le Recurrent
+Dropout et la normalisation par lots. Alors, l’effet de régularisation
+du Recurrent Dropout peut être atténué par la normalisation par lots,
+car cette dernière réduit déjà la variance des états cachés.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La normalisation par lots standardise les états
+cachés à chaque batch, réduisant ainsi leur variance. Le Recurrent
+Dropout introduit également une forme de bruit dans les états cachés,
+mais cet effet peut être partiellement compensé par la normalisation par
+lots. Ainsi, l’utilisation conjointe de ces deux techniques peut ne pas
+fournir une régularisation supplémentaire significative. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Recurrent Dropout est une technique puissante pour améliorer la
+robustesse et l’efficacité des réseaux de neurones récurrents. En
+préservant les dépendances temporelles tout en introduisant une forme de
+régularisation, il offre une solution élégante aux problèmes de
+surapprentissage et de disparition du gradient.</p>
+<p>Les résultats théoriques et expérimentaux présentés dans cet article
+démontrent l’efficacité du Recurrent Dropout dans divers contextes.
+Cependant, des recherches supplémentaires sont nécessaires pour
+optimiser son utilisation et l’adapter à de nouvelles architectures de
+RNN.</p>
+<p>En conclusion, le Recurrent Dropout représente une avancée
+significative dans le domaine des réseaux de neurones récurrents, et il
+ouvre la voie à de nouvelles innovations dans le traitement des données
+séquentielles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

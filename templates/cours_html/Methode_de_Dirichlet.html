@@ -1,0 +1,340 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode de Dirichlet : Une approche fondamentale en analyse numérique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode de Dirichlet : Une approche fondamentale en
+analyse numérique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La méthode de Dirichlet, également connue sous le nom de méthode des
+différences finies, est une technique fondamentale en analyse numérique
+pour la résolution d’équations aux dérivées partielles (EDP). Son
+origine remonte au XIXe siècle, avec les travaux de Peter Gustav Lejeune
+Dirichlet, un mathématicien allemand qui a jeté les bases de cette
+méthode. La méthode de Dirichlet est indispensable dans de nombreux
+domaines scientifiques et ingénierie, où la modélisation des phénomènes
+physiques nécessite la résolution d’EDP.</p>
+<p>L’émergence de cette méthode est motivée par le besoin de résoudre
+des problèmes complexes qui ne peuvent pas être traités analytiquement.
+La méthode de Dirichlet permet de discrétiser le domaine de calcul et
+d’approximer les dérivées par des différences finies, transformant ainsi
+le problème continu en un système d’équations algébriques. Cette
+approche est particulièrement utile pour les problèmes de diffusion, de
+conduction thermique, et de mécanique des fluides.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la méthode de Dirichlet, il est essentiel de définir
+quelques concepts clés. Considérons une équation aux dérivées partielles
+de la forme :</p>
+<p><span class="math display">\[\frac{\partial u}{\partial t} = \alpha
+\frac{\partial^2 u}{\partial x^2}\]</span></p>
+<p>où <span class="math inline">\(u(x, t)\)</span> est la fonction
+inconnue, <span class="math inline">\(\alpha\)</span> est une constante
+positive, <span class="math inline">\(x\)</span> représente la variable
+spatiale, et <span class="math inline">\(t\)</span> représente la
+variable temporelle.</p>
+<p>La méthode de Dirichlet consiste à discrétiser le domaine spatial et
+temporel. Supposons que nous divisons l’intervalle spatial <span
+class="math inline">\([a, b]\)</span> en <span
+class="math inline">\(N\)</span> sous-intervalles de longueur <span
+class="math inline">\(\Delta x = \frac{b - a}{N}\)</span>, et
+l’intervalle temporel <span class="math inline">\([0, T]\)</span> en
+<span class="math inline">\(M\)</span> sous-intervalles de longueur
+<span class="math inline">\(\Delta t = \frac{T}{M}\)</span>. Les points
+de discrétisation sont définis par :</p>
+<p><span class="math display">\[x_i = a + i \Delta x \quad \text{pour}
+\quad i = 0, 1, \dots, N\]</span> <span class="math display">\[t^n = n
+\Delta t \quad \text{pour} \quad n = 0, 1, \dots, M\]</span></p>
+<p>La fonction <span class="math inline">\(u(x, t)\)</span> est
+approximée par <span class="math inline">\(u_i^n\)</span> aux points de
+discrétisation. Les dérivées partielles sont approximées par des
+différences finies :</p>
+<p><span class="math display">\[\frac{\partial u}{\partial x} \approx
+\frac{u_{i+1}^n - u_{i-1}^n}{2 \Delta x}\]</span> <span
+class="math display">\[\frac{\partial^2 u}{\partial x^2} \approx
+\frac{u_{i+1}^n - 2u_i^n + u_{i-1}^n}{\Delta x^2}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la méthode de Dirichlet est le théorème
+de convergence. Ce théorème énonce que sous certaines conditions, la
+solution approchée obtenue par la méthode de Dirichlet converge vers la
+solution exacte lorsque les pas de discrétisation <span
+class="math inline">\(\Delta x\)</span> et <span
+class="math inline">\(\Delta t\)</span> tendent vers zéro.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(u(x, t)\)</span> la solution exacte
+de l’équation aux dérivées partielles et <span
+class="math inline">\(u_i^n\)</span> la solution approchée obtenue par
+la méthode de Dirichlet. Si les conditions suivantes sont satisfaites
+:</p>
+<ul>
+<li><p>La fonction <span class="math inline">\(u(x, t)\)</span> est
+suffisamment régulière.</p></li>
+<li><p>Les pas de discrétisation <span class="math inline">\(\Delta
+x\)</span> et <span class="math inline">\(\Delta t\)</span> sont choisis
+de manière à satisfaire une condition de stabilité.</p></li>
+</ul>
+<p>alors, pour tout <span class="math inline">\(\epsilon &gt;
+0\)</span>, il existe un <span class="math inline">\(\delta &gt;
+0\)</span> tel que si <span class="math inline">\(\Delta x &lt;
+\delta\)</span> et <span class="math inline">\(\Delta t &lt;
+\delta\)</span>, on a :</p>
+<p><span class="math display">\[\max_{i, n} |u(x_i, t^n) - u_i^n| &lt;
+\epsilon\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de convergence, nous devons montrer que
+l’erreur entre la solution exacte et la solution approchée tend vers
+zéro lorsque les pas de discrétisation tendent vers zéro. La preuve
+repose sur l’analyse des erreurs de troncature et des erreurs de
+stabilité.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons l’erreur <span
+class="math inline">\(e_i^n = u(x_i, t^n) - u_i^n\)</span>. Nous devons
+montrer que <span class="math inline">\(e_i^n\)</span> tend vers zéro
+lorsque <span class="math inline">\(\Delta x\)</span> et <span
+class="math inline">\(\Delta t\)</span> tendent vers zéro.</p>
+<p>1. **Erreur de troncature** : L’erreur de troncature est due à
+l’approximation des dérivées par des différences finies. Pour la dérivée
+seconde, l’erreur de troncature est de l’ordre de <span
+class="math inline">\(\Delta x^2\)</span>. Plus précisément, il existe
+une constante <span class="math inline">\(C\)</span> telle que :</p>
+<p><span class="math display">\[\left| \frac{u_{i+1}^n - 2u_i^n +
+u_{i-1}^n}{\Delta x^2} - \frac{\partial^2 u}{\partial x^2}(x_i, t^n)
+\right| \leq C \Delta x^2\]</span></p>
+<p>2. **Erreur de stabilité** : L’erreur de stabilité est due à
+l’accumulation des erreurs de troncature au cours du temps. Pour que la
+méthode soit stable, il est nécessaire que le rapport <span
+class="math inline">\(\frac{\Delta t}{\Delta x^2}\)</span> soit
+inférieur à une certaine constante. Si cette condition est satisfaite,
+l’erreur de stabilité reste bornée.</p>
+<p>En combinant ces deux types d’erreurs, nous pouvons montrer que
+l’erreur totale <span class="math inline">\(e_i^n\)</span> tend vers
+zéro lorsque <span class="math inline">\(\Delta x\)</span> et <span
+class="math inline">\(\Delta t\)</span> tendent vers zéro. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La méthode de Dirichlet possède plusieurs propriétés importantes qui
+en font une technique puissante pour la résolution des EDP.</p>
+<div class="proposition">
+<ul>
+<li><p>**Consistance** : La méthode de Dirichlet est consistante avec
+l’équation aux dérivées partielles originale, c’est-à-dire que l’erreur
+de troncature tend vers zéro lorsque les pas de discrétisation tendent
+vers zéro.</p></li>
+<li><p>**Stabilité** : La méthode est stable si le rapport <span
+class="math inline">\(\frac{\Delta t}{\Delta x^2}\)</span> est inférieur
+à une certaine constante. Cette condition garantit que les erreurs ne
+s’accumulent pas au cours du temps.</p></li>
+<li><p>**Convergence** : Sous les conditions de consistance et de
+stabilité, la méthode converge vers la solution exacte lorsque les pas
+de discrétisation tendent vers zéro.</p></li>
+</ul>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La méthode de Dirichlet est une technique fondamentale en analyse
+numérique pour la résolution des équations aux dérivées partielles. Son
+utilisation est répandue dans de nombreux domaines scientifiques et
+ingénierie, où la modélisation des phénomènes physiques nécessite la
+résolution d’EDP. La méthode de Dirichlet permet de discrétiser le
+domaine de calcul et d’approximer les dérivées par des différences
+finies, transformant ainsi le problème continu en un système d’équations
+algébriques. Les théorèmes de convergence et les propriétés de
+consistance et de stabilité garantissent que la méthode fournit des
+solutions approchées précises.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

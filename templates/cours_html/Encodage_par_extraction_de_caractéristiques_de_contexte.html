@@ -1,0 +1,324 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de contexte : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de
+contexte : Fondements et Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’encodage par extraction de caractéristiques de contexte, souvent
+désigné sous le terme de <em>contextual embeddings</em>, représente une
+avancée majeure dans le domaine du traitement automatique des langues
+(TAL). Cette technique émerge d’un besoin croissant de capturer le sens
+des mots en fonction du contexte dans lequel ils apparaissent, un défi
+que les modèles traditionnels de représentation lexicale, tels que
+Word2Vec ou GloVe, ne parviennent pas à surmonter de manière
+optimale.</p>
+<p>Les modèles d’encodage contextuel, comme BERT (Bidirectional Encoder
+Representations from Transformers) ou ELMo (Embeddings from Language
+Models), ont révolutionné le TAL en permettant une compréhension plus
+fine et nuancée du langage. Ces modèles exploitent des architectures
+complexes pour générer des représentations vectorielles de mots qui
+varient en fonction du contexte, ouvrant ainsi la voie à des
+applications innovantes dans la traduction automatique, l’analyse de
+sentiments et bien d’autres domaines.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’encodage par extraction de caractéristiques de
+contexte, il est essentiel d’abord de définir ce que l’on entend par
+<em>caractéristiques de contexte</em>. Ces caractéristiques représentent
+les informations linguistiques et sémantiques qui entourent un mot dans
+une phrase ou un texte. Elles peuvent inclure des éléments syntaxiques,
+sémantiques et même pragmatiques.</p>
+<p>Formellement, soit <span class="math inline">\(w_i\)</span> un mot
+dans une séquence de mots <span class="math inline">\(S = (w_1, w_2,
+\ldots, w_n)\)</span>. Les caractéristiques de contexte de <span
+class="math inline">\(w_i\)</span> peuvent être représentées par un
+vecteur <span class="math inline">\(c_i\)</span>, où chaque dimension
+correspond à une caractéristique spécifique. Par exemple, <span
+class="math inline">\(c_i\)</span> pourrait inclure des informations sur
+les mots voisins de <span class="math inline">\(w_i\)</span>, la
+structure syntaxique locale, ou encore le rôle sémantique de <span
+class="math inline">\(w_i\)</span> dans la phrase.</p>
+<p>L’encodage par extraction de caractéristiques de contexte consiste
+alors à transformer ces caractéristiques en une représentation
+vectorielle <span class="math inline">\(e_i\)</span> pour chaque mot
+<span class="math inline">\(w_i\)</span>, de sorte que <span
+class="math inline">\(e_i\)</span> capture le sens de <span
+class="math inline">\(w_i\)</span> dans le contexte spécifique de la
+séquence <span class="math inline">\(S\)</span>.</p>
+<h1 class="unnumbered"
+id="théorèmes-et-propriétés-fondamentales">Théorèmes et Propriétés
+Fondamentales</h1>
+<p>Un des théorèmes centraux dans le domaine de l’encodage contextuel
+est celui de la <em>compositionnalité sémantique</em>, qui stipule que
+le sens d’une phrase peut être déduit des sens de ses mots constitutifs
+et de leurs relations. Formellement, ce théorème peut être énoncé comme
+suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(S\)</span> une séquence de mots
+<span class="math inline">\((w_1, w_2, \ldots, w_n)\)</span>, et soit
+<span class="math inline">\(e_i\)</span> la représentation contextuelle
+de <span class="math inline">\(w_i\)</span>. Alors, le sens global de
+<span class="math inline">\(S\)</span>, noté <span
+class="math inline">\(E(S)\)</span>, peut être exprimé comme une
+fonction des représentations contextuelles des mots individuels : <span
+class="math display">\[E(S) = f(e_1, e_2, \ldots, e_n)\]</span> où <span
+class="math inline">\(f\)</span> est une fonction de composition qui
+peut être linéaire ou non-linéaire.</p>
+</div>
+<p>La preuve de ce théorème repose sur l’idée que les modèles d’encodage
+contextuel, comme BERT, utilisent des mécanismes d’attention pour
+capturer les interactions entre les mots dans une séquence. Ces
+interactions permettent de moduler les représentations des mots en
+fonction du contexte, ce qui est essentiel pour une compréhension
+précise du sens.</p>
+<h1 class="unnumbered" id="preuves-et-démonstrations">Preuves et
+Démonstrations</h1>
+<p>Pour illustrer la puissance de l’encodage contextuel, considérons un
+exemple simple. Supposons que nous ayons la phrase suivante : "Le
+banquier a déposé son argent à la banque." Dans cette phrase, le mot
+"banque" peut avoir deux sens différents : un bâtiment où l’on garde de
+l’argent, ou une institution financière. Un modèle d’encodage contextuel
+sera capable de distinguer ces deux sens en fonction du contexte dans
+lequel le mot apparaît.</p>
+<p>Formellement, soit <span class="math inline">\(w\)</span> le mot
+"banque" et <span class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span> deux séquences contextuelles
+différentes : <span class="math display">\[S_1 = (\text{Le banquier a
+déposé son argent à la } w)\]</span> <span class="math display">\[S_2 =
+(\text{La } w \text{ est située au coin de la rue})\]</span></p>
+<p>Les représentations contextuelles <span
+class="math inline">\(e_1\)</span> et <span
+class="math inline">\(e_2\)</span> de <span
+class="math inline">\(w\)</span> dans les séquences <span
+class="math inline">\(S_1\)</span> et <span
+class="math inline">\(S_2\)</span> seront différentes, reflétant ainsi
+les sens distincts du mot "banque".</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les modèles d’encodage contextuel possèdent plusieurs propriétés
+importantes qui en font des outils puissants pour le TAL. Parmi ces
+propriétés, on peut citer :</p>
+<ol>
+<li><p><strong>Adaptabilité contextuelle</strong> : Les représentations
+des mots varient en fonction du contexte, permettant de capturer les
+nuances sémantiques.</p></li>
+<li><p><strong>Generalisation</strong> : Les modèles peuvent généraliser
+à des mots ou des contextes non vus lors de l’entraînement, grâce à leur
+capacité à modéliser des relations sémantiques complexes.</p></li>
+<li><p><strong>Efficacité computationnelle</strong> : Les architectures
+modernes, comme les transformeurs, permettent un traitement efficace et
+parallèle des séquences de mots.</p></li>
+</ol>
+<p>Chacune de ces propriétés peut être démontrée en analysant les
+mécanismes internes des modèles d’encodage contextuel. Par exemple,
+l’adaptabilité contextuelle peut être illustrée en comparant les
+représentations d’un même mot dans différents contextes, comme nous
+l’avons fait pour le mot "banque".</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de contexte représente
+une avancée significative dans le domaine du traitement automatique des
+langues. En capturant les nuances sémantiques des mots en fonction de
+leur contexte, ces modèles ouvrent la voie à des applications innovantes
+et performantes. Les défis futurs incluent l’amélioration de
+l’efficacité computationnelle et l’extension de ces modèles à d’autres
+domaines, comme la compréhension multimodale.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

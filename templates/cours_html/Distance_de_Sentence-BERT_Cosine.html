@@ -1,0 +1,350 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Sentence-BERT Cosine</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Sentence-BERT Cosine</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’ère du traitement automatique des langues (TAL) a vu une révolution
+avec l’avènement des modèles de langage basés sur les transformateurs.
+Parmi ces innovations, Sentence-BERT (SBERT) se distingue par sa
+capacité à encoder des phrases entières en vecteurs denses, permettant
+ainsi des comparaisons sémantiques efficaces. La distance de
+Sentence-BERT Cosine émerge comme une mesure clé pour quantifier la
+similarité entre ces encodages, ouvrant des perspectives inédites en
+recherche d’information, classification de texte et analyse de
+sentiments.</p>
+<p>Cette notion résout un problème fondamental : comment comparer des
+phrases de manière sémantique plutôt que syntaxique ? Les approches
+traditionnelles, comme les sacs de mots (BoW) ou TF-IDF, peinent à
+capturer le sens profond des phrases. En revanche, SBERT, en exploitant
+les transformateurs pré-entraînés comme BERT, encode les phrases dans un
+espace vectoriel où la proximité géométrique reflète une similarité
+sémantique. La distance de Sentence-BERT Cosine, en mesurant l’angle
+entre ces vecteurs, offre une métrique robuste et interprétable.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de Sentence-BERT Cosine, commençons par
+définir les concepts sous-jacents. Nous cherchons une mesure qui capture
+la similarité sémantique entre deux phrases encodées en vecteurs.
+Intuitivement, si deux phrases ont des sens proches, leurs vecteurs
+devraient pointer dans des directions similaires dans l’espace
+vectoriel.</p>
+<p>Formellement, soit <span class="math inline">\(\mathbf{u}\)</span> et
+<span class="math inline">\(\mathbf{v}\)</span> deux vecteurs dans un
+espace euclidien de dimension <span class="math inline">\(n\)</span>. La
+similarité cosinus entre ces vecteurs est définie comme :</p>
+<p><span class="math display">\[\cos(\theta) = \frac{\mathbf{u} \cdot
+\mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|}\]</span></p>
+<p>où <span class="math inline">\(\theta\)</span> est l’angle entre les
+vecteurs, <span class="math inline">\(\mathbf{u} \cdot
+\mathbf{v}\)</span> est le produit scalaire des vecteurs, et <span
+class="math inline">\(\|\mathbf{u}\|\)</span> et <span
+class="math inline">\(\|\mathbf{v}\|\)</span> sont les normes
+euclidiennes des vecteurs.</p>
+<p>La distance de Sentence-BERT Cosine est alors définie comme :</p>
+<p><span class="math display">\[d_{\text{cos}}(\mathbf{u}, \mathbf{v}) =
+1 - \cos(\theta)\]</span></p>
+<p>Cette distance varie entre 0 et 2, où 0 indique une similarité
+maximale (les vecteurs sont identiques) et 2 une dissimilarité maximale
+(les vecteurs sont opposés).</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en analyse vectorielle est le théorème de
+Cauchy-Schwarz, qui établit une borne supérieure pour le produit
+scalaire de deux vecteurs. Ce théorème est crucial pour comprendre les
+propriétés de la similarité cosinus.</p>
+<p>Soit <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> deux vecteurs dans un espace
+euclidien. Le théorème de Cauchy-Schwarz stipule que :</p>
+<p><span class="math display">\[|\mathbf{u} \cdot \mathbf{v}| \leq
+\|\mathbf{u}\| \|\mathbf{v}\|\]</span></p>
+<p>En conséquence, la similarité cosinus est bornée par :</p>
+<p><span class="math display">\[-1 \leq \cos(\theta) \leq 1\]</span></p>
+<p>Ainsi, la distance de Sentence-BERT Cosine est également bornée :</p>
+<p><span class="math display">\[0 \leq d_{\text{cos}}(\mathbf{u},
+\mathbf{v}) \leq 2\]</span></p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Cauchy-Schwarz, considérons la fonction
+quadratique suivante :</p>
+<p><span class="math display">\[f(\lambda) = \|\mathbf{u} - \lambda
+\mathbf{v}\|^2\]</span></p>
+<p>Développons cette expression :</p>
+<p><span class="math display">\[f(\lambda) = \|\mathbf{u}\|^2 - 2\lambda
+(\mathbf{u} \cdot \mathbf{v}) + \lambda^2 \|\mathbf{v}\|^2\]</span></p>
+<p>Puisque <span class="math inline">\(f(\lambda) \geq 0\)</span> pour
+tout <span class="math inline">\(\lambda\)</span>, le discriminant de
+cette fonction quadratique doit être négatif ou nul :</p>
+<p><span class="math display">\[(2(\mathbf{u} \cdot \mathbf{v}))^2 - 4
+\|\mathbf{u}\|^2 \|\mathbf{v}\|^2 \leq 0\]</span></p>
+<p>Simplifions cette inégalité :</p>
+<p><span class="math display">\[4(\mathbf{u} \cdot \mathbf{v})^2 - 4
+\|\mathbf{u}\|^2 \|\mathbf{v}\|^2 \leq 0\]</span></p>
+<p><span class="math display">\[(\mathbf{u} \cdot \mathbf{v})^2 -
+\|\mathbf{u}\|^2 \|\mathbf{v}\|^2 \leq 0\]</span></p>
+<p><span class="math display">\[(\mathbf{u} \cdot \mathbf{v})^2 \leq
+\|\mathbf{u}\|^2 \|\mathbf{v}\|^2\]</span></p>
+<p>Prenons la racine carrée des deux côtés :</p>
+<p><span class="math display">\[|\mathbf{u} \cdot \mathbf{v}| \leq
+\|\mathbf{u}\| \|\mathbf{v}\|\]</span></p>
+<p>Ce qui achève la démonstration du théorème de Cauchy-Schwarz.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La distance de Sentence-BERT Cosine possède plusieurs propriétés
+intéressantes :</p>
+<p>(i) **Symétrie** : La distance est symétrique, c’est-à-dire que <span
+class="math inline">\(d_{\text{cos}}(\mathbf{u}, \mathbf{v}) =
+d_{\text{cos}}(\mathbf{v}, \mathbf{u})\)</span>.</p>
+<p>(ii) **Bornes** : Comme démontré précédemment, la distance est bornée
+entre 0 et 2.</p>
+<p>(iii) **Invariance par translation** : La distance est invariante par
+ajout d’un vecteur constant à tous les vecteurs. Cela signifie que si
+<span class="math inline">\(\mathbf{u}&#39; = \mathbf{u} +
+\mathbf{c}\)</span> et <span class="math inline">\(\mathbf{v}&#39; =
+\mathbf{v} + \mathbf{c}\)</span>, alors <span
+class="math inline">\(d_{\text{cos}}(\mathbf{u}&#39;, \mathbf{v}&#39;) =
+d_{\text{cos}}(\mathbf{u}, \mathbf{v})\)</span>.</p>
+<p>Pour démontrer la propriété (iii), considérons les vecteurs <span
+class="math inline">\(\mathbf{u}&#39; = \mathbf{u} + \mathbf{c}\)</span>
+et <span class="math inline">\(\mathbf{v}&#39; = \mathbf{v} +
+\mathbf{c}\)</span>. La similarité cosinus entre <span
+class="math inline">\(\mathbf{u}&#39;\)</span> et <span
+class="math inline">\(\mathbf{v}&#39;\)</span> est :</p>
+<p><span class="math display">\[\cos(\theta&#39;) = \frac{(\mathbf{u} +
+\mathbf{c}) \cdot (\mathbf{v} + \mathbf{c})}{\|\mathbf{u} + \mathbf{c}\|
+\|\mathbf{v} + \mathbf{c}\|}\]</span></p>
+<p>Développons le numérateur :</p>
+<p><span class="math display">\[(\mathbf{u} + \mathbf{c}) \cdot
+(\mathbf{v} + \mathbf{c}) = \mathbf{u} \cdot \mathbf{v} + \mathbf{u}
+\cdot \mathbf{c} + \mathbf{c} \cdot \mathbf{v} + \mathbf{c} \cdot
+\mathbf{c}\]</span></p>
+<p>Si <span class="math inline">\(\mathbf{c}\)</span> est orthogonal à
+<span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span>, alors <span
+class="math inline">\(\mathbf{u} \cdot \mathbf{c} = 0\)</span> et <span
+class="math inline">\(\mathbf{v} \cdot \mathbf{c} = 0\)</span>. Ainsi,
+le numérateur se simplifie en :</p>
+<p><span class="math display">\[\mathbf{u} \cdot \mathbf{v} +
+\|\mathbf{c}\|^2\]</span></p>
+<p>Le dénominateur est :</p>
+<p><span class="math display">\[\|\mathbf{u} + \mathbf{c}\| \|\mathbf{v}
++ \mathbf{c}\| = \sqrt{\|\mathbf{u}\|^2 + 2\mathbf{u} \cdot \mathbf{c} +
+\|\mathbf{c}\|^2} \sqrt{\|\mathbf{v}\|^2 + 2\mathbf{v} \cdot \mathbf{c}
++ \|\mathbf{c}\|^2}\]</span></p>
+<p>Si <span class="math inline">\(\mathbf{c}\)</span> est orthogonal à
+<span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span>, alors :</p>
+<p><span class="math display">\[\|\mathbf{u} + \mathbf{c}\| =
+\sqrt{\|\mathbf{u}\|^2 + \|\mathbf{c}\|^2}\]</span></p>
+<p><span class="math display">\[\|\mathbf{v} + \mathbf{c}\| =
+\sqrt{\|\mathbf{v}\|^2 + \|\mathbf{c}\|^2}\]</span></p>
+<p>Ainsi, la similarité cosinus devient :</p>
+<p><span class="math display">\[\cos(\theta&#39;) = \frac{\mathbf{u}
+\cdot \mathbf{v} + \|\mathbf{c}\|^2}{\sqrt{\|\mathbf{u}\|^2 +
+\|\mathbf{c}\|^2} \sqrt{\|\mathbf{v}\|^2 +
+\|\mathbf{c}\|^2}}\]</span></p>
+<p>Cependant, cette expression ne simplifie pas directement à <span
+class="math inline">\(\cos(\theta)\)</span>. Pour une démonstration plus
+rigoureuse, il faudrait considérer des conditions spécifiques sur <span
+class="math inline">\(\mathbf{c}\)</span>.</p>
+<p>En conclusion, la distance de Sentence-BERT Cosine est une mesure
+puissante et élégante pour comparer des phrases encodées par SBERT. Ses
+propriétés mathématiques et son interprétation géométrique en font un
+outil indispensable dans le domaine du TAL.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

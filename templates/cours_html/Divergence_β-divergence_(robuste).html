@@ -1,0 +1,410 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence \beta-divergence (robuste)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence <span
+class="math inline">\(\beta\)</span>-divergence (robuste)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La divergence <span class="math inline">\(\beta\)</span>-divergence,
+également connue sous le nom de divergence généralisée de
+Kullback-Leibler, est une mesure de dissimilarité entre deux
+distributions de probabilité. Elle généralise la divergence de
+Kullback-Leibler en introduisant un paramètre <span
+class="math inline">\(\beta\)</span> qui permet de contrôler la
+robustesse de la mesure. Cette notion est particulièrement utile dans
+les domaines de l’apprentissage automatique et du traitement du signal,
+où la robustesse aux valeurs aberrantes est cruciale.</p>
+<p>L’émergence de la <span
+class="math inline">\(\beta\)</span>-divergence est motivée par le
+besoin de mesures plus flexibles et robustes que la divergence de
+Kullback-Leibler classique. En effet, cette dernière peut être très
+sensible aux valeurs aberrantes, ce qui limite son utilisation dans
+certains contextes pratiques. La <span
+class="math inline">\(\beta\)</span>-divergence permet de pallier ce
+problème en offrant une famille de mesures paramétrées par <span
+class="math inline">\(\beta\)</span>, chacune ayant des propriétés
+spécifiques en termes de robustesse et de sensibilité.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la <span
+class="math inline">\(\beta\)</span>-divergence, commençons par
+comprendre ce que nous cherchons à mesurer. Nous voulons quantifier la
+dissimilarité entre deux distributions de probabilité <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>. La divergence de Kullback-Leibler
+mesure cette dissimilarité, mais elle peut être trop sensible aux
+valeurs aberrantes. Nous cherchons donc une mesure plus robuste, qui
+peut être ajustée en fonction de nos besoins.</p>
+<p>La <span class="math inline">\(\beta\)</span>-divergence est définie
+comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité
+discrètes ou continues. La <span
+class="math inline">\(\beta\)</span>-divergence entre <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est définie par : <span
+class="math display">\[D_{\beta}(P \parallel Q) =
+\frac{1}{\beta(1-\beta)} \left( \int q(x)^{\beta} \, dx - \frac{1 -
+\beta}{\beta} \int p(x) q(x)^{\beta-1} \, dx \right),\]</span> où <span
+class="math inline">\(\beta\)</span> est un paramètre réel tel que <span
+class="math inline">\(\beta \neq 0, 1\)</span>.</p>
+</div>
+<p>Cette définition peut être réécrite de plusieurs manières en fonction
+des valeurs de <span class="math inline">\(\beta\)</span> :</p>
+<ul>
+<li><p>Pour <span class="math inline">\(\beta = 0\)</span>, la <span
+class="math inline">\(\beta\)</span>-divergence se réduit à la
+divergence d’Itakura-Saito : <span class="math display">\[D_{0}(P
+\parallel Q) = \int \frac{p(x)}{q(x)} -
+\log\left(\frac{p(x)}{q(x)}\right) - 1 \, dx.\]</span></p></li>
+<li><p>Pour <span class="math inline">\(\beta = \frac{1}{2}\)</span>, la
+<span class="math inline">\(\beta\)</span>-divergence devient la
+divergence de Hellinger : <span class="math display">\[D_{\frac{1}{2}}(P
+\parallel Q) = 2 \left( \int (\sqrt{p(x)} - \sqrt{q(x)})^2 \, dx
+\right).\]</span></p></li>
+<li><p>Pour <span class="math inline">\(\beta = 1\)</span>, la <span
+class="math inline">\(\beta\)</span>-divergence se réduit à la
+divergence de Kullback-Leibler : <span class="math display">\[D_{1}(P
+\parallel Q) = \int p(x) \log\left(\frac{p(x)}{q(x)}\right) \,
+dx.\]</span></p></li>
+</ul>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la <span
+class="math inline">\(\beta\)</span>-divergence est le théorème de
+convexité, qui établit que la <span
+class="math inline">\(\beta\)</span>-divergence est convexe en fonction
+de <span class="math inline">\(Q\)</span> pour un <span
+class="math inline">\(\beta\)</span> donné.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(P\)</span> une distribution de
+probabilité fixe. La fonction <span class="math inline">\(Q \mapsto
+D_{\beta}(P \parallel Q)\)</span> est convexe pour tout <span
+class="math inline">\(\beta \in (0, 1) \cup (1, \infty)\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous utilisons le fait
+que la fonction <span class="math inline">\(x \mapsto x^{\beta}\)</span>
+est convexe pour <span class="math inline">\(\beta \in (0, 1) \cup (1,
+\infty)\)</span>. En effet, la dérivée seconde de <span
+class="math inline">\(x^{\beta}\)</span> est <span
+class="math inline">\(\beta(\beta - 1)x^{\beta-2}\)</span>, qui est
+positive pour ces valeurs de <span
+class="math inline">\(\beta\)</span>.</p>
+<p>Considérons deux distributions de probabilité <span
+class="math inline">\(Q_1\)</span> et <span
+class="math inline">\(Q_2\)</span>, et un <span
+class="math inline">\(\lambda \in [0, 1]\)</span>. Nous avons : <span
+class="math display">\[D_{\beta}(P \parallel \lambda Q_1 + (1 - \lambda)
+Q_2) = \frac{1}{\beta(1-\beta)} \left( \int (\lambda q_1(x) + (1 -
+\lambda) q_2(x))^{\beta} \, dx - \frac{1 - \beta}{\beta} \int p(x)
+(\lambda q_1(x) + (1 - \lambda) q_2(x))^{\beta-1} \, dx
+\right).\]</span></p>
+<p>En utilisant la convexité de <span
+class="math inline">\(x^{\beta}\)</span>, nous obtenons : <span
+class="math display">\[(\lambda q_1(x) + (1 - \lambda) q_2(x))^{\beta}
+\leq \lambda q_1(x)^{\beta} + (1 - \lambda) q_2(x)^{\beta).\]</span></p>
+<p>De même, en utilisant la convexité de <span
+class="math inline">\(x^{\beta-1}\)</span>, nous avons : <span
+class="math display">\[(\lambda q_1(x) + (1 - \lambda) q_2(x))^{\beta-1}
+\leq \lambda q_1(x)^{\beta-1} + (1 - \lambda)
+q_2(x)^{\beta-1).\]</span></p>
+<p>En combinant ces deux inégalités, nous obtenons : <span
+class="math display">\[D_{\beta}(P \parallel \lambda Q_1 + (1 - \lambda)
+Q_2) \leq \lambda D_{\beta}(P \parallel Q_1) + (1 - \lambda) D_{\beta}(P
+\parallel Q_2).\]</span></p>
+<p>Cela prouve que la <span
+class="math inline">\(\beta\)</span>-divergence est convexe en fonction
+de <span class="math inline">\(Q\)</span> pour les valeurs de <span
+class="math inline">\(\beta\)</span> spécifiées. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer l’utilisation de la <span
+class="math inline">\(\beta\)</span>-divergence, considérons un exemple
+simple où nous voulons estimer une distribution de probabilité <span
+class="math inline">\(P\)</span> à partir d’un échantillon de données.
+Nous utilisons la méthode des moindres carrés généralisés, qui minimise
+la <span class="math inline">\(\beta\)</span>-divergence entre la
+distribution empirique et la distribution estimée.</p>
+<div class="example">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> un
+échantillon de données indépendantes et identiquement distribuées selon
+une distribution <span class="math inline">\(P\)</span>. Nous voulons
+estimer <span class="math inline">\(P\)</span> en minimisant la <span
+class="math inline">\(\beta\)</span>-divergence entre la distribution
+empirique et une distribution paramétrée <span
+class="math inline">\(Q_{\theta}\)</span>.</p>
+<p>La fonction de coût à minimiser est : <span
+class="math display">\[\mathcal{L}(\theta) = D_{\beta}(P_n \parallel
+Q_{\theta}) = \frac{1}{\beta(1-\beta)} \left( \frac{1}{n} \sum_{i=1}^n
+q_{\theta}(X_i)^{\beta} - \frac{1 - \beta}{\beta} \frac{1}{n}
+\sum_{i=1}^n p_n(X_i) q_{\theta}(X_i)^{\beta-1} \right),\]</span> où
+<span class="math inline">\(P_n\)</span> est la distribution empirique
+définie par <span class="math inline">\(p_n(X_i) =
+\frac{1}{n}\)</span>.</p>
+<p>En prenant la dérivée de <span
+class="math inline">\(\mathcal{L}(\theta)\)</span> par rapport à <span
+class="math inline">\(\theta\)</span> et en l’égalant à zéro, nous
+obtenons les équations de likelihood généralisées : <span
+class="math display">\[\frac{1}{n} \sum_{i=1}^n
+q_{\theta}(X_i)^{\beta-1} \nabla_{\theta} q_{\theta}(X_i) = \frac{1 -
+\beta}{\beta} \frac{1}{n} \sum_{i=1}^n p_n(X_i)
+q_{\theta}(X_i)^{\beta-2} \nabla_{\theta} q_{\theta}(X_i).\]</span></p>
+<p>Ces équations peuvent être résolues numériquement pour obtenir
+l’estimateur de <span class="math inline">\(P\)</span>.</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La <span class="math inline">\(\beta\)</span>-divergence possède
+plusieurs propriétés intéressantes, que nous listons ci-dessous :</p>
+<ol>
+<li><p>La <span class="math inline">\(\beta\)</span>-divergence est non
+négative, c’est-à-dire que <span class="math inline">\(D_{\beta}(P
+\parallel Q) \geq 0\)</span> pour tout <span class="math inline">\(\beta
+\neq 0, 1\)</span>.</p></li>
+<li><p>La <span class="math inline">\(\beta\)</span>-divergence est
+symétrique pour <span class="math inline">\(\beta =
+\frac{1}{2}\)</span>, c’est-à-dire que <span
+class="math inline">\(D_{\frac{1}{2}}(P \parallel Q) = D_{\frac{1}{2}}(Q
+\parallel P)\)</span>.</p></li>
+<li><p>La <span class="math inline">\(\beta\)</span>-divergence est
+invariante par transformation affine, c’est-à-dire que pour toute
+fonction affine <span class="math inline">\(T\)</span>, nous avons <span
+class="math inline">\(D_{\beta}(P \parallel Q) = D_{\beta}(T(P)
+\parallel T(Q))\)</span>.</p></li>
+</ol>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver la non-négativité de la <span
+class="math inline">\(\beta\)</span>-divergence, nous utilisons
+l’inégalité de Jensen. Soit <span class="math inline">\(f(x) =
+x^{\beta}\)</span> pour <span class="math inline">\(\beta \in (0,
+1)\)</span>. La fonction <span class="math inline">\(f\)</span> est
+concave, donc par l’inégalité de Jensen, nous avons : <span
+class="math display">\[\int q(x)^{\beta} \, dx \leq p(x) \int
+\frac{q(x)^{\beta}}{p(x)} \, dx.\]</span></p>
+<p>En réarrangeant cette inégalité, nous obtenons : <span
+class="math display">\[\int q(x)^{\beta} \, dx - \frac{1 - \beta}{\beta}
+\int p(x) q(x)^{\beta-1} \, dx \geq 0.\]</span></p>
+<p>Cela prouve que <span class="math inline">\(D_{\beta}(P \parallel Q)
+\geq 0\)</span>.</p>
+<p>Pour prouver la symétrie de la <span
+class="math inline">\(\beta\)</span>-divergence pour <span
+class="math inline">\(\beta = \frac{1}{2}\)</span>, nous utilisons le
+fait que la divergence de Hellinger est symétrique. En effet, nous avons
+: <span class="math display">\[D_{\frac{1}{2}}(P \parallel Q) = 2 \left(
+\int (\sqrt{p(x)} - \sqrt{q(x)})^2 \, dx \right) = D_{\frac{1}{2}}(Q
+\parallel P).\]</span></p>
+<p>Pour prouver l’invariance par transformation affine, nous utilisons
+le fait que les transformations affines préservent les proportions. En
+effet, pour toute fonction affine <span
+class="math inline">\(T\)</span>, nous avons : <span
+class="math display">\[D_{\beta}(P \parallel Q) =
+\frac{1}{\beta(1-\beta)} \left( \int q(x)^{\beta} \, dx - \frac{1 -
+\beta}{\beta} \int p(x) q(x)^{\beta-1} \, dx \right) = D_{\beta}(T(P)
+\parallel T(Q)).\]</span> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La <span class="math inline">\(\beta\)</span>-divergence est une
+mesure de dissimilarité flexible et robuste, qui généralise la
+divergence de Kullback-Leibler. Elle trouve des applications dans divers
+domaines, notamment l’apprentissage automatique et le traitement du
+signal. Ses propriétés de convexité, de non-négativité, de symétrie et
+d’invariance par transformation affine en font un outil puissant pour
+l’estimation de distributions et la classification.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

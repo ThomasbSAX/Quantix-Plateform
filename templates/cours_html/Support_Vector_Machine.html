@@ -1,0 +1,315 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Support Vector Machines : Fondements Théoriques et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Support Vector Machines : Fondements Théoriques et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les Support Vector Machines (SVM) constituent l’une des méthodes les
+plus puissantes et élégantes de la classification supervisée.
+Introduites par Vapnik et ses collaborateurs dans les années 1990, elles
+reposent sur des principes issus de la théorie de l’apprentissage
+statistique et de l’optimisation convexe. Leur popularité tient à leur
+capacité à généraliser efficacement même avec un nombre limité de
+données d’entraînement, ainsi qu’à leur robustesse face aux dimensions
+élevées.</p>
+<p>Les SVM cherchent à trouver un hyperplan qui sépare au mieux les
+données de différentes classes. Cet hyperplan est choisi de manière à
+maximiser la marge entre les classes, ce qui améliore la généralisation
+du modèle. Lorsque les données ne sont pas linéairement séparables, les
+SVM utilisent un noyau (kernel) pour les projeter dans un espace de plus
+haute dimension où la séparation linéaire devient possible.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les SVM, commençons par définir quelques concepts
+clés. Supposons que nous avons un ensemble de données d’entraînement
+<span class="math inline">\(\mathcal{D} = \{(\mathbf{x}_i,
+y_i)\}_{i=1}^n\)</span>, où <span class="math inline">\(\mathbf{x}_i \in
+\mathbb{R}^d\)</span> sont les vecteurs de caractéristiques et <span
+class="math inline">\(y_i \in \{-1, 1\}\)</span> sont les étiquettes de
+classe.</p>
+<p>Nous cherchons à trouver un hyperplan défini par <span
+class="math inline">\(\mathbf{w}^T \mathbf{x} + b = 0\)</span>, où <span
+class="math inline">\(\mathbf{w}\)</span> est le vecteur normal à
+l’hyperplan et <span class="math inline">\(b\)</span> est un biais.
+L’objectif est de maximiser la marge entre les classes, c’est-à-dire la
+distance minimale entre l’hyperplan et les points de données des deux
+classes.</p>
+<p>La distance d’un point <span
+class="math inline">\(\mathbf{x}_i\)</span> à l’hyperplan est donnée
+par: <span class="math display">\[\frac{|\mathbf{w}^T \mathbf{x}_i +
+b|}{\|\mathbf{w}\|}\]</span></p>
+<p>Pour que les points soient correctement classifiés et que la marge
+soit maximisée, nous devons avoir: <span class="math display">\[y_i
+(\mathbf{w}^T \mathbf{x}_i + b) \geq 1 \quad \forall i\]</span></p>
+<p>Cela peut être reformulé comme un problème d’optimisation: <span
+class="math display">\[\min_{\mathbf{w}, b} \frac{1}{2}
+\|\mathbf{w}\|^2\]</span> sous les contraintes: <span
+class="math display">\[y_i (\mathbf{w}^T \mathbf{x}_i + b) \geq 1 \quad
+\forall i\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié aux SVM est le théorème de la marge
+optimale. Ce théorème stipule que l’hyperplan qui maximise la marge
+minimise le risque d’erreur de généralisation.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{D}\)</span> un ensemble de
+données linéairement séparables. L’hyperplan qui maximise la marge <span
+class="math inline">\(\frac{2}{\|\mathbf{w}\|}\)</span> minimise le
+risque d’erreur de généralisation.</p>
+</div>
+<p>La preuve de ce théorème repose sur des résultats de la théorie de
+l’apprentissage statistique, en particulier sur les inégalités de
+généralisation et les propriétés des fonctions convexes.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la marge optimale, nous devons montrer
+que l’hyperplan avec la plus grande marge a le risque d’erreur de
+généralisation le plus faible. Cela peut être fait en utilisant des
+inégalités de concentration et des résultats sur les fonctions
+convexes.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons l’hyperplan <span
+class="math inline">\(\mathbf{w}^T \mathbf{x} + b = 0\)</span> qui
+maximise la marge. La marge est donnée par <span
+class="math inline">\(\frac{2}{\|\mathbf{w}\|}\)</span>. Nous devons
+montrer que cet hyperplan minimise le risque d’erreur de
+généralisation.</p>
+<p>En utilisant l’inégalité de Hoeffding, nous pouvons montrer que le
+risque d’erreur empirique est une bonne approximation du risque d’erreur
+de généralisation. Plus précisément, si l’hyperplan classifie
+correctement toutes les données d’entraînement avec une marge <span
+class="math inline">\(\gamma\)</span>, alors le risque d’erreur de
+généralisation est borné par: <span
+class="math display">\[P(\text{erreur}) \leq e^{-2\gamma^2 n}\]</span>
+où <span class="math inline">\(n\)</span> est le nombre de données
+d’entraînement.</p>
+<p>En maximisant la marge, nous minimisons donc le risque d’erreur de
+généralisation. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les SVM possèdent plusieurs propriétés intéressantes qui en font un
+outil puissant pour la classification.</p>
+<ol>
+<li><p>Les SVM sont efficaces même dans des espaces de haute dimension.
+Cela est dû au fait que l’optimisation du problème dual peut être
+effectuée de manière efficace, même lorsque le nombre de
+caractéristiques est grand.</p></li>
+<li><p>Les SVM peuvent être étendus à des problèmes non linéaires en
+utilisant des noyaux. Un noyau est une fonction <span
+class="math inline">\(K(\mathbf{x}_i, \mathbf{x}_j)\)</span> qui calcule
+le produit scalaire entre les vecteurs <span
+class="math inline">\(\mathbf{x}_i\)</span> et <span
+class="math inline">\(\mathbf{x}_j\)</span> dans un espace de
+caractéristiques de haute dimension.</p></li>
+<li><p>Les SVM sont robustes aux surapprentissages. Grâce à la
+maximisation de la marge, les SVM généralisent bien même avec un nombre
+limité de données d’entraînement.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les Support Vector Machines sont une méthode puissante et élégante
+pour la classification supervisée. Leur capacité à maximiser la marge
+entre les classes, ainsi que leur robustesse face aux dimensions élevées
+et aux surapprentissages, en font un outil indispensable dans le domaine
+de l’apprentissage automatique.</p>
+<p>Les développements récents, tels que les noyaux et les machines à
+vecteurs de support non linéaires, ont encore élargi le champ
+d’application des SVM. À l’avenir, les recherches pourraient se
+concentrer sur l’amélioration de l’efficacité computationnelle des SVM
+et leur application à des problèmes toujours plus complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

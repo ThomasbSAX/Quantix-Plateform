@@ -1,0 +1,426 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Damerau-Levenshtein : Une Mesure de Similarité pour les Chaînes de Caractères</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Damerau-Levenshtein : Une Mesure de
+Similarité pour les Chaînes de Caractères</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La distance de Damerau-Levenshtein est une mesure de similarité entre
+deux chaînes de caractères qui étend la distance de Levenshtein en
+tenant compte des transpositions adjacentes. Introduite par Frederick J.
+Damerau en 1964, cette distance est particulièrement utile dans les
+applications de correction orthographique et de reconnaissance vocale,
+où les erreurs typiques incluent non seulement les insertions,
+suppressions et substitutions de caractères, mais aussi les
+transpositions de caractères adjacents.</p>
+<p>L’origine historique de cette distance remonte aux travaux de
+Vladimir Levenshtein, qui a introduit en 1965 une mesure de distance
+entre deux chaînes basée sur les opérations élémentaires d’insertion,
+suppression et substitution. Damerau a ensuite étendu cette notion en
+ajoutant l’opération de transposition, ce qui permet de capturer un type
+d’erreur plus courant dans les applications pratiques.</p>
+<p>La distance de Damerau-Levenshtein est indispensable dans les
+domaines où la précision de la correspondance entre chaînes est
+cruciale. Par exemple, dans les systèmes de correction orthographique,
+cette distance permet de détecter et de corriger les fautes
+d’orthographe en identifiant les mots proches du dictionnaire. De même,
+dans les systèmes de reconnaissance vocale, elle aide à corriger les
+erreurs de transcription en comparant les séquences de mots reconnues
+avec celles attendues.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la distance de Damerau-Levenshtein, nous devons d’abord
+comprendre les opérations élémentaires qui peuvent transformer une
+chaîne en une autre. Ces opérations sont l’insertion, la suppression, la
+substitution et la transposition de caractères adjacents.</p>
+<p>Supposons que nous ayons deux chaînes de caractères <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>. Nous cherchons à mesurer le nombre
+minimal d’opérations nécessaires pour transformer <span
+class="math inline">\(s\)</span> en <span
+class="math inline">\(t\)</span>. La distance de Damerau-Levenshtein
+prend en compte les quatre types d’opérations mentionnées ci-dessus.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> deux chaînes de caractères. La distance
+de Damerau-Levenshtein <span class="math inline">\(d(s, t)\)</span> est
+définie comme le nombre minimal d’opérations élémentaires (insertion,
+suppression, substitution, transposition) nécessaires pour transformer
+<span class="math inline">\(s\)</span> en <span
+class="math inline">\(t\)</span>.</p>
+<p>Formellement, nous avons : <span class="math display">\[d(s, t) =
+\min \{ n \mid s \xrightarrow{n} t \}\]</span> où <span
+class="math inline">\(s \xrightarrow{n} t\)</span> signifie qu’il existe
+une séquence de <span class="math inline">\(n\)</span> opérations
+élémentaires transformant <span class="math inline">\(s\)</span> en
+<span class="math inline">\(t\)</span>.</p>
+</div>
+<p>Pour calculer cette distance, nous pouvons utiliser une matrice de
+coût où chaque entrée <span class="math inline">\(D[i][j]\)</span>
+représente la distance entre les préfixes <span
+class="math inline">\(s[1..i]\)</span> et <span
+class="math inline">\(t[1..j]\)</span>. La matrice est initialisée avec
+des valeurs de base, et chaque entrée est calculée en fonction des
+opérations possibles.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> deux chaînes de longueurs <span
+class="math inline">\(m\)</span> et <span
+class="math inline">\(n\)</span> respectivement. La matrice de coût
+<span class="math inline">\(D\)</span> est définie par : <span
+class="math display">\[D[i][j] =
+\begin{cases}
+i &amp; \text{si } j = 0 \\
+j &amp; \text{si } i = 0 \\
+\min
+\begin{cases}
+D[i-1][j] + 1 &amp; \text{(suppression)} \\
+D[i][j-1] + 1 &amp; \text{(insertion)} \\
+D[i-1][j-1] + \mathbb{1}(s_i \neq t_j) &amp; \text{(substitution)}
+\end{cases}
+&amp; \text{si } i, j &gt; 0 \text{ et } s_i \neq t_{j-1} \\
+\min
+\begin{cases}
+D[i-1][j] + 1 &amp; \text{(suppression)} \\
+D[i][j-1] + 1 &amp; \text{(insertion)} \\
+D[i-2][j-2] + 1 &amp; \text{(transposition)}
+\end{cases}
+&amp; \text{si } i, j &gt; 0 \text{ et } s_i = t_{j-1} \text{ et }
+s_{i-1} = t_j
+\end{cases}\]</span> où <span class="math inline">\(\mathbb{1}(s_i \neq
+t_j)\)</span> est la fonction indicatrice qui vaut 0 si <span
+class="math inline">\(s_i = t_j\)</span> et 1 sinon.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour démontrer les propriétés de la distance de Damerau-Levenshtein,
+nous avons besoin de quelques théorèmes fondamentaux. Le premier
+théorème établit que la distance est bien définie et qu’elle satisfait
+les propriétés d’une distance.</p>
+<div class="theorem">
+<p>La distance de Damerau-Levenshtein <span
+class="math inline">\(d\)</span> satisfait les propriétés suivantes pour
+toutes chaînes <span class="math inline">\(s, t, u\)</span> :</p>
+<ol>
+<li><p><strong>Non-négativité</strong> : <span
+class="math inline">\(d(s, t) \geq 0\)</span></p></li>
+<li><p><strong>Identité</strong> : <span class="math inline">\(d(s, s) =
+0\)</span></p></li>
+<li><p><strong>Symétrie</strong> : <span class="math inline">\(d(s, t) =
+d(t, s)\)</span></p></li>
+<li><p><strong>Inégalité triangulaire</strong> : <span
+class="math inline">\(d(s, u) \leq d(s, t) + d(t, u)\)</span></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ces propriétés, nous procédons comme
+suit :</p>
+<p>1. <strong>Non-négativité</strong> : Le nombre d’opérations
+nécessaires pour transformer une chaîne en une autre est toujours non
+négatif.</p>
+<p>2. <strong>Identité</strong> : Aucune opération n’est nécessaire pour
+transformer une chaîne en elle-même.</p>
+<p>3. <strong>Symétrie</strong> : La distance est symétrique car les
+opérations de transformation sont inversibles. Par exemple, une
+insertion dans un sens correspond à une suppression dans l’autre
+sens.</p>
+<p>4. <strong>Inégalité triangulaire</strong> : Supposons que <span
+class="math inline">\(s\)</span> soit transformé en <span
+class="math inline">\(t\)</span> par une séquence d’opérations et que
+<span class="math inline">\(t\)</span> soit transformé en <span
+class="math inline">\(u\)</span> par une autre séquence. La
+concaténation de ces deux séquences transforme <span
+class="math inline">\(s\)</span> en <span
+class="math inline">\(u\)</span>, ce qui montre que <span
+class="math inline">\(d(s, u) \leq d(s, t) + d(t, u)\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver que la matrice de coût <span
+class="math inline">\(D\)</span> calcule correctement la distance de
+Damerau-Levenshtein, nous devons montrer que chaque entrée <span
+class="math inline">\(D[i][j]\)</span> représente bien la distance
+minimale entre les préfixes <span class="math inline">\(s[1..i]\)</span>
+et <span class="math inline">\(t[1..j]\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous procédons par induction sur les indices <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>.</p>
+<p><strong>Base de l’induction</strong> : Si <span
+class="math inline">\(i = 0\)</span> ou <span class="math inline">\(j =
+0\)</span>, la distance est simplement le nombre de caractères à insérer
+ou supprimer pour obtenir une chaîne vide.</p>
+<p><strong>Hérédité</strong> : Supposons que les entrées <span
+class="math inline">\(D[i-1][j]\)</span>, <span
+class="math inline">\(D[i][j-1]\)</span> et <span
+class="math inline">\(D[i-1][j-1]\)</span> soient correctes. Nous devons
+montrer que <span class="math inline">\(D[i][j]\)</span> est également
+correct.</p>
+<p>Si <span class="math inline">\(s_i \neq t_j\)</span>, alors la
+dernière opération peut être une suppression, une insertion ou une
+substitution. Nous choisissons l’opération qui minimise le coût.</p>
+<p>Si <span class="math inline">\(s_i = t_j\)</span> et <span
+class="math inline">\(s_{i-1} = t_{j-1}\)</span>, alors la dernière
+opération peut être une transposition. Nous choisissons l’opération qui
+minimise le coût.</p>
+<p>Par induction, chaque entrée <span
+class="math inline">\(D[i][j]\)</span> est correcte. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous énumérons quelques propriétés importantes de la distance de
+Damerau-Levenshtein et fournissons des preuves détaillées pour chacune
+d’elles.</p>
+<ol>
+<li><p><strong>Invariance par permutation</strong> : La distance de
+Damerau-Levenshtein est invariante par permutation des caractères dans
+les chaînes. Cela signifie que <span class="math inline">\(d(s, t) =
+d(\sigma(s), \tau(t))\)</span> pour toutes permutations <span
+class="math inline">\(\sigma\)</span> et <span
+class="math inline">\(\tau\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> La distance est basée sur les opérations élémentaires
+qui ne dépendent pas de l’ordre des caractères, mais seulement de leur
+présence ou absence. Par conséquent, les permutations n’affectent pas la
+distance. ◻</p>
+</div></li>
+<li><p><strong>Monotonicité</strong> : La distance de
+Damerau-Levenshtein est monotone. Cela signifie que si <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> diffèrent par au moins une opération,
+alors <span class="math inline">\(d(s, t) \geq 1\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Si <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> diffèrent par au moins une opération,
+alors il est nécessaire d’effectuer au moins une opération pour les
+transformer l’un en l’autre. Par conséquent, <span
+class="math inline">\(d(s, t) \geq 1\)</span>. ◻</p>
+</div></li>
+<li><p><strong>Stabilité</strong> : La distance de Damerau-Levenshtein
+est stable. Cela signifie que pour toute chaîne <span
+class="math inline">\(s\)</span> et tout caractère <span
+class="math inline">\(c\)</span>, il existe une constante <span
+class="math inline">\(k\)</span> telle que pour toute chaîne <span
+class="math inline">\(t\)</span>, <span class="math inline">\(d(s, t)
+\leq k\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> La distance est bornée par la longueur des chaînes.
+Plus précisément, <span class="math inline">\(d(s, t) \leq \max(|s|,
+|t|)\)</span>. Par conséquent, la distance est stable. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Damerau-Levenshtein est une mesure puissante et
+flexible pour comparer des chaînes de caractères. Elle étend la distance
+de Levenshtein en tenant compte des transpositions adjacentes, ce qui la
+rend particulièrement utile dans les applications pratiques où ces
+erreurs sont courantes. Les propriétés et théorèmes présentés dans cet
+article montrent que cette distance est bien définie et satisfait les
+propriétés attendues d’une mesure de similarité.</p>
+<p>Les algorithmes de calcul de cette distance sont efficaces et peuvent
+être implémentés en temps polynomial, ce qui les rend adaptés à une
+utilisation dans des systèmes en temps réel. Les applications
+potentielles de cette distance sont vastes et incluent la correction
+orthographique, la reconnaissance vocale, la bioinformatique et bien
+d’autres domaines.</p>
+<p>En conclusion, la distance de Damerau-Levenshtein est un outil
+précieux pour les chercheurs et les praticiens travaillant avec des
+chaînes de caractères, offrant une mesure précise et robuste de la
+similarité entre deux séquences.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

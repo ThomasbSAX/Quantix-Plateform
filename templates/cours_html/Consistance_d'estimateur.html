@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Consistance d’estimateur</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Consistance d’estimateur</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>En statistique mathématique, la notion de consistance d’un estimateur
+est fondamentale. Elle émerge dans le cadre de l’inférence statistique,
+où l’on cherche à estimer des paramètres inconnus d’une distribution de
+probabilité à partir d’échantillons aléatoires. La consistance est une
+propriété qui garantit que l’estimateur converge vers la vraie valeur du
+paramètre lorsque la taille de l’échantillon tend vers l’infini. Cette
+propriété est indispensable pour assurer la fiabilité des estimations
+dans les applications pratiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de consistance, considérons un échantillon
+aléatoire <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> de
+taille <span class="math inline">\(n\)</span> issu d’une distribution de
+probabilité <span class="math inline">\(P_\theta\)</span>, où <span
+class="math inline">\(\theta\)</span> est un paramètre inconnu que l’on
+souhaite estimer. Un estimateur <span
+class="math inline">\(\hat{\theta}_n\)</span> est une fonction mesurable
+de l’échantillon <span class="math inline">\(X_1, X_2, \ldots,
+X_n\)</span> qui fournit une estimation de <span
+class="math inline">\(\theta\)</span>.</p>
+<p>Nous cherchons à ce que l’estimateur <span
+class="math inline">\(\hat{\theta}_n\)</span> soit proche de la vraie
+valeur <span class="math inline">\(\theta\)</span> lorsque <span
+class="math inline">\(n\)</span> devient grand. Formellement, nous
+voulons que la distance entre <span
+class="math inline">\(\hat{\theta}_n\)</span> et <span
+class="math inline">\(\theta\)</span> soit petite en probabilité.</p>
+<div class="definition">
+<p>Un estimateur <span class="math inline">\(\hat{\theta}_n\)</span> est
+dit <strong>consistant en probabilité</strong> pour <span
+class="math inline">\(\theta\)</span> si, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, <span
+class="math display">\[\lim_{n \to \infty} P(|\hat{\theta}_n - \theta|
+\geq \epsilon) = 0.\]</span> En d’autres termes, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, la probabilité que <span
+class="math inline">\(\hat{\theta}_n\)</span> s’éloigne de <span
+class="math inline">\(\theta\)</span> d’au moins <span
+class="math inline">\(\epsilon\)</span> tend vers zéro lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini.</p>
+</div>
+<div class="definition">
+<p>Un estimateur <span class="math inline">\(\hat{\theta}_n\)</span> est
+dit <strong>consistant presque sûrement</strong> pour <span
+class="math inline">\(\theta\)</span> si <span
+class="math display">\[P\left( \lim_{n \to \infty} \hat{\theta}_n =
+\theta \right) = 1.\]</span> Cela signifie que <span
+class="math inline">\(\hat{\theta}_n\)</span> converge vers <span
+class="math inline">\(\theta\)</span> presque sûrement, c’est-à-dire que
+la probabilité que <span class="math inline">\(\hat{\theta}_n\)</span>
+ne converge pas vers <span class="math inline">\(\theta\)</span> est
+nulle.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour établir la consistance d’un estimateur, plusieurs théorèmes sont
+utilisés. L’un des plus importants est le théorème de la loi des grands
+nombres, qui garantit la convergence en moyenne d’un estimateur.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> un
+échantillon aléatoire issu d’une distribution de probabilité <span
+class="math inline">\(P_\theta\)</span> avec espérance <span
+class="math inline">\(E[X_i] = \mu\)</span>. Alors, <span
+class="math display">\[\lim_{n \to \infty} \frac{1}{n} \sum_{i=1}^n X_i
+= \mu \quad \text{presque sûrement}.\]</span></p>
+</div>
+<p>Un autre théorème important est le théorème central limite, qui
+garantit la convergence en distribution d’un estimateur.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> un
+échantillon aléatoire issu d’une distribution de probabilité <span
+class="math inline">\(P_\theta\)</span> avec espérance <span
+class="math inline">\(E[X_i] = \mu\)</span> et variance <span
+class="math inline">\(\text{Var}(X_i) = \sigma^2\)</span>. Alors, <span
+class="math display">\[\frac{\sqrt{n}}{\sigma} \left( \frac{1}{n}
+\sum_{i=1}^n X_i - \mu \right) \xrightarrow{d} \mathcal{N}(0,
+1),\]</span> où <span class="math inline">\(\xrightarrow{d}\)</span>
+désigne la convergence en distribution et <span
+class="math inline">\(\mathcal{N}(0, 1)\)</span> est la loi normale
+centrée réduite.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver la consistance d’un estimateur, nous utilisons souvent
+les théorèmes mentionnés ci-dessus. Par exemple, pour prouver la
+consistance en probabilité de la moyenne échantillonnelle <span
+class="math inline">\(\bar{X}_n = \frac{1}{n} \sum_{i=1}^n X_i\)</span>,
+nous pouvons utiliser le théorème de la loi des grands nombres.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\epsilon &gt;
+0\)</span>. Nous voulons montrer que <span
+class="math display">\[\lim_{n \to \infty} P(|\bar{X}_n - \mu| \geq
+\epsilon) = 0.\]</span> Par le théorème de la loi des grands nombres,
+nous savons que <span class="math inline">\(\bar{X}_n\)</span> converge
+vers <span class="math inline">\(\mu\)</span> presque sûrement. Cela
+implique que pour tout <span class="math inline">\(\epsilon &gt;
+0\)</span>, <span class="math display">\[P(|\bar{X}_n - \mu| \geq
+\epsilon) \to 0 \quad \text{lorsque} \quad n \to \infty.\]</span> Donc,
+<span class="math inline">\(\bar{X}_n\)</span> est consistant en
+probabilité pour <span class="math inline">\(\mu\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes des
+estimateurs consistants.</p>
+<ul>
+<li><p>Si un estimateur <span
+class="math inline">\(\hat{\theta}_n\)</span> est consistant presque
+sûrement, alors il est aussi consistant en probabilité.</p></li>
+<li><p>La moyenne échantillonnelle <span
+class="math inline">\(\bar{X}_n\)</span> est un estimateur consistant
+pour l’espérance <span class="math inline">\(\mu\)</span>.</p></li>
+<li><p>La variance échantillonnelle <span class="math inline">\(S_n^2 =
+\frac{1}{n} \sum_{i=1}^n (X_i - \bar{X}_n)^2\)</span> est un estimateur
+consistant pour la variance <span
+class="math inline">\(\sigma^2\)</span>.</p></li>
+</ul>
+<div class="proof">
+<p><em>Preuve de (ii).</em> Par le théorème de la loi des grands
+nombres, nous savons que <span class="math display">\[\lim_{n \to
+\infty} \bar{X}_n = \mu \quad \text{presque sûrement}.\]</span> Donc,
+<span class="math inline">\(\bar{X}_n\)</span> est consistant presque
+sûrement pour <span class="math inline">\(\mu\)</span>, et par
+conséquent, il est aussi consistant en probabilité. ◻</p>
+</div>
+<div class="proof">
+<p><em>Preuve de (iii).</em> Nous savons que <span
+class="math display">\[S_n^2 = \frac{1}{n} \sum_{i=1}^n (X_i -
+\bar{X}_n)^2 = \frac{1}{n} \sum_{i=1}^n X_i^2 - \bar{X}_n^2.\]</span>
+Par le théorème de la loi des grands nombres, <span
+class="math inline">\(\bar{X}_n\)</span> converge vers <span
+class="math inline">\(\mu\)</span> presque sûrement et <span
+class="math inline">\(\frac{1}{n} \sum_{i=1}^n X_i^2\)</span> converge
+vers <span class="math inline">\(E[X_1^2]\)</span> presque sûrement.
+Donc, <span class="math display">\[\lim_{n \to \infty} S_n^2 = E[X_1^2]
+- \mu^2 = \sigma^2 \quad \text{presque sûrement}.\]</span> Donc, <span
+class="math inline">\(S_n^2\)</span> est consistant presque sûrement
+pour <span class="math inline">\(\sigma^2\)</span>, et par conséquent,
+il est aussi consistant en probabilité. ◻</p>
+</div>
+</body>
+</html>
+{% include "footer.html" %}
+

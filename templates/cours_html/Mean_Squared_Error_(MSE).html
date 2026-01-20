@@ -1,0 +1,358 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Mean Squared Error (MSE): A Comprehensive Analysis</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Mean Squared Error (MSE): A Comprehensive
+Analysis</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>The Mean Squared Error (MSE) is a fundamental concept in statistics
+and machine learning, serving as a measure of the quality of an
+estimator or a predictor. Historically, the notion of MSE emerged from
+the least squares method, which was introduced by Carl Friedrich Gauss
+in the late 18th century. The least squares method aims to find the best
+function that minimizes the sum of the squares of the errors, making MSE
+a natural choice for this purpose.</p>
+<p>MSE is indispensable in various fields such as regression analysis,
+signal processing, and control systems. It provides a quantitative
+measure of the difference between the predicted values and the actual
+values, enabling researchers to evaluate the performance of their
+models. The use of squares in MSE ensures that positive and negative
+errors do not cancel each other out, and it gives more weight to larger
+errors, making it a robust measure of accuracy.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Consider the scenario where we have a set of observed values <span
+class="math inline">\(y_1, y_2, \ldots, y_n\)</span> and a set of
+predicted values <span class="math inline">\(\hat{y}_1, \hat{y}_2,
+\ldots, \hat{y}_n\)</span>. We aim to quantify the average squared
+difference between these observed and predicted values. This leads us to
+the concept of Mean Squared Error.</p>
+<div class="definition">
+<p>The Mean Squared Error (MSE) is defined as the average of the squared
+differences between the observed values and the predicted values.
+Formally, for a set of <span class="math inline">\(n\)</span>
+observations, the MSE is given by:</p>
+<p><span class="math display">\[\text{MSE} = \frac{1}{n} \sum_{i=1}^{n}
+(y_i - \hat{y}_i)^2\]</span></p>
+<p>Alternatively, using set notation and quantifiers:</p>
+<p><span class="math display">\[\text{MSE} = \frac{1}{n}
+\sum_{\substack{i \in \{1, 2, \ldots, n\} \\ y_i \text{ observed} \\
+\hat{y}_i \text{ predicted}}} (y_i - \hat{y}_i)^2\]</span></p>
+<p>This can also be expressed in terms of expectations:</p>
+<p><span class="math display">\[\text{MSE} = \mathbb{E}\left[(Y -
+\hat{Y})^2\right]\]</span></p>
+<p>where <span class="math inline">\(Y\)</span> is a random variable
+representing the observed values and <span
+class="math inline">\(\hat{Y}\)</span> is a random variable representing
+the predicted values.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>One of the key properties of MSE is its relationship with bias and
+variance, which is encapsulated in the Bias-Variance Decomposition
+Theorem. This theorem helps us understand how the MSE can be broken down
+into components that reflect the bias and variance of an estimator.</p>
+<div class="theorem">
+<p>Let <span class="math inline">\(\hat{Y}\)</span> be an estimator of a
+random variable <span class="math inline">\(Y\)</span>. The MSE can be
+decomposed into the sum of the variance of the estimator, the squared
+bias of the estimator, and the variance of the data:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}) =
+\text{Var}(\hat{Y}) + \left[\text{Bias}(\hat{Y})\right]^2 +
+\text{Var}(Y)\]</span></p>
+<p>where <span class="math inline">\(\text{Var}(\hat{Y}) =
+\mathbb{E}\left[(\hat{Y} - \mathbb{E}[\hat{Y}])^2\right]\)</span> and
+<span class="math inline">\(\text{Bias}(\hat{Y}) = \mathbb{E}[\hat{Y}] -
+\mathbb{E}[Y]\)</span>.</p>
+<p>Alternatively, using quantifiers:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}) =
+\mathbb{E}\left[(\hat{Y} - \mathbb{E}[\hat{Y}])^2\right] +
+\left[\mathbb{E}[\hat{Y}] - \mathbb{E}[Y]\right]^2 +
+\text{Var}(Y)\]</span></p>
+<p>This theorem is a consequence of the law of total expectation and the
+properties of variance.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>To prove the Bias-Variance Decomposition Theorem, we start by
+expanding the expression for MSE:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}) = \mathbb{E}\left[(Y
+- \hat{Y})^2\right]\]</span></p>
+<p>First, we add and subtract the expected value of <span
+class="math inline">\(\hat{Y}\)</span>:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}) = \mathbb{E}\left[(Y
+- \mathbb{E}[\hat{Y}] + \mathbb{E}[\hat{Y}] -
+\hat{Y})^2\right]\]</span></p>
+<p>Next, we expand the squared term:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}) = \mathbb{E}\left[(Y
+- \mathbb{E}[\hat{Y}])^2 + (\mathbb{E}[\hat{Y}] - \hat{Y})^2 + 2(Y -
+\mathbb{E}[\hat{Y}])(\mathbb{E}[\hat{Y}] - \hat{Y})\right]\]</span></p>
+<p>Using the linearity of expectation, we can separate the terms:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}) = \mathbb{E}\left[(Y
+- \mathbb{E}[\hat{Y}])^2\right] + \mathbb{E}\left[(\mathbb{E}[\hat{Y}] -
+\hat{Y})^2\right] + 2\mathbb{E}\left[(Y -
+\mathbb{E}[\hat{Y}])(\mathbb{E}[\hat{Y}] - \hat{Y})\right]\]</span></p>
+<p>The cross term can be shown to be zero:</p>
+<p><span class="math display">\[\mathbb{E}\left[(Y -
+\mathbb{E}[\hat{Y}])(\mathbb{E}[\hat{Y}] - \hat{Y})\right] =
+\mathbb{E}\left[(Y - \mathbb{E}[\hat{Y}])(-\mathbb{E}[\hat{Y}] +
+\hat{Y})\right] = -\mathbb{E}[Y -
+\mathbb{E}[\hat{Y}]]\mathbb{E}[\hat{Y}] + \mathbb{E}[(Y -
+\mathbb{E}[\hat{Y}])\hat{Y}]\]</span></p>
+<p>Since <span class="math inline">\(\mathbb{E}[Y - \mathbb{E}[\hat{Y}]]
+= 0\)</span>, the first term vanishes. The second term can be expanded
+as:</p>
+<p><span class="math display">\[\mathbb{E}[(Y -
+\mathbb{E}[\hat{Y}])\hat{Y}] = \mathbb{E}[Y\hat{Y} -
+\mathbb{E}[\hat{Y}]\hat{Y}] = \mathbb{E}[Y\hat{Y}] -
+\mathbb{E}[\hat{Y}]\mathbb{E}[\hat{Y}]\]</span></p>
+<p>But <span class="math inline">\(\mathbb{E}[Y\hat{Y}] =
+\mathbb{E}[Y]\mathbb{E}[\hat{Y}]\)</span> if <span
+class="math inline">\(Y\)</span> and <span
+class="math inline">\(\hat{Y}\)</span> are independent, which is
+generally not the case. However, for the purpose of this proof, we can
+consider the expected value:</p>
+<p><span class="math display">\[\mathbb{E}[(Y -
+\mathbb{E}[\hat{Y}])(\mathbb{E}[\hat{Y}] - \hat{Y})] = 0\]</span></p>
+<p>Thus, we are left with:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}) = \mathbb{E}\left[(Y
+- \mathbb{E}[\hat{Y}])^2\right] + \mathbb{E}\left[(\mathbb{E}[\hat{Y}] -
+\hat{Y})^2\right]\]</span></p>
+<p>The first term is the variance of <span
+class="math inline">\(Y\)</span>, and the second term can be rewritten
+as:</p>
+<p><span class="math display">\[\mathbb{E}\left[(\mathbb{E}[\hat{Y}] -
+\hat{Y})^2\right] = \text{Var}(\hat{Y}) + \left[\mathbb{E}[\hat{Y}] -
+\mathbb{E}[Y]\right]^2\]</span></p>
+<p>Combining these results, we obtain the Bias-Variance
+Decomposition:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}) =
+\text{Var}(\hat{Y}) + \left[\text{Bias}(\hat{Y})\right]^2 +
+\text{Var}(Y)\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>The MSE has several important properties and corollaries that are
+useful in various applications:</p>
+<ol type="i">
+<li><p><strong>Non-Negativity:</strong> The MSE is always non-negative,
+i.e., <span class="math inline">\(\text{MSE}(\hat{Y}) \geq 0\)</span>.
+This follows from the fact that squares of real numbers are
+non-negative.</p></li>
+<li><p><strong>Minimization:</strong> The MSE is minimized when the
+predicted values <span class="math inline">\(\hat{Y}\)</span> are equal
+to the expected value of the observed values <span
+class="math inline">\(Y\)</span>, i.e., <span
+class="math inline">\(\hat{Y} = \mathbb{E}[Y]\)</span>.</p></li>
+<li><p><strong>Scale Invariance:</strong> The MSE is invariant to linear
+transformations of the data. Specifically, if <span
+class="math inline">\(Y&#39; = aY + b\)</span> and <span
+class="math inline">\(\hat{Y}&#39; = a\hat{Y} + b\)</span>, then:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}&#39;) = a^2
+\text{MSE}(\hat{Y})\]</span></p></li>
+<li><p><strong>Relationship with Correlation:</strong> The MSE can be
+related to the correlation coefficient <span
+class="math inline">\(r\)</span> between the observed and predicted
+values:</p>
+<p><span class="math display">\[\text{MSE}(\hat{Y}) = (1 - r^2)
+\text{Var}(Y)\]</span></p>
+<p>This shows that minimizing the MSE is equivalent to maximizing the
+correlation between the observed and predicted values.</p></li>
+</ol>
+<p>Each of these properties can be derived using the definitions and
+theorems presented earlier, providing a comprehensive understanding of
+the MSE and its applications.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

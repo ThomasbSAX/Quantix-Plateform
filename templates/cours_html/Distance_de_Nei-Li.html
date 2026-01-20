@@ -1,0 +1,352 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Nei-Li : une mesure de la divergence génétique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Nei-Li : une mesure de la divergence
+génétique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude de la diversité génétique au sein des populations est un
+domaine central en biologie évolutive. La distance de Nei-Li, proposée
+par Masatoshi Nei et Wei-Zhong Li en 1979, est une mesure statistique
+qui quantifie la divergence génétique entre deux populations. Cette
+notion émerge d’un besoin crucial de comprendre les mécanismes
+sous-jacents à l’évolution des espèces, en particulier dans le contexte
+de la dérive génétique et de la sélection naturelle.</p>
+<p>La distance de Nei-Li est indispensable pour comparer les fréquences
+alléliques entre populations, permettant ainsi d’estimer le temps écoulé
+depuis leur divergence. Elle trouve des applications dans divers
+domaines, tels que la génétique des populations, la phylogénie et
+l’écologie évolutive. Son importance réside dans sa capacité à fournir
+une mesure standardisée et robuste de la divergence génétique,
+facilitant ainsi les comparaisons entre études.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la distance de Nei-Li, nous devons d’abord comprendre ce
+que nous cherchons à mesurer. Imaginons deux populations, chacune avec
+ses propres fréquences alléliques pour un ensemble de loci. Nous voulons
+quantifier à quel point ces fréquences diffèrent entre les deux
+populations.</p>
+<p>Supposons que nous avons deux populations, <span
+class="math inline">\(P_1\)</span> et <span
+class="math inline">\(P_2\)</span>, et un ensemble de <span
+class="math inline">\(L\)</span> loci. Pour chaque locus <span
+class="math inline">\(i\)</span> (où <span class="math inline">\(1 \leq
+i \leq L\)</span>), nous notons <span
+class="math inline">\(p_{i,j}\)</span> la fréquence de l’allèle <span
+class="math inline">\(j\)</span> dans la population <span
+class="math inline">\(P_1\)</span>, et <span
+class="math inline">\(q_{i,j}\)</span> la fréquence de l’allèle <span
+class="math inline">\(j\)</span> dans la population <span
+class="math inline">\(P_2\)</span>.</p>
+<p>La distance de Nei-Li entre les deux populations est définie comme
+suit :</p>
+<p><span class="math display">\[D_{\text{Nei-Li}}(P_1, P_2) = -\log
+\left( \frac{\sum_{i=1}^{L} \sum_{j} p_{i,j}
+q_{i,j}}{\sqrt{\sum_{i=1}^{L} \sum_{j} p_{i,j}^2 \sum_{i=1}^{L} \sum_{j}
+q_{i,j}^2}} \right)\]</span></p>
+<p>où les sommes sont prises sur tous les allèles <span
+class="math inline">\(j\)</span> pour chaque locus <span
+class="math inline">\(i\)</span>.</p>
+<p>Une autre formulation équivalente est :</p>
+<p><span class="math display">\[D_{\text{Nei-Li}}(P_1, P_2) = -\log
+\left( \frac{\sum_{i=1}^{L} I_i}{\sqrt{\sum_{i=1}^{L} J_i \sum_{i=1}^{L}
+K_i}} \right)\]</span></p>
+<p>où <span class="math inline">\(I_i = \sum_{j} p_{i,j}
+q_{i,j}\)</span>, <span class="math inline">\(J_i = \sum_{j}
+p_{i,j}^2\)</span>, et <span class="math inline">\(K_i = \sum_{j}
+q_{i,j}^2\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la distance de Nei-Li est le théorème de
+l’identité des fréquences alléliques. Ce théorème stipule que si deux
+populations ont les mêmes fréquences alléliques pour tous les loci,
+alors leur distance de Nei-Li est nulle.</p>
+<p>Formellement, nous avons :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(P_1\)</span> et <span
+class="math inline">\(P_2\)</span> deux populations avec les mêmes
+fréquences alléliques pour tous les loci. Alors,</p>
+<p><span class="math display">\[D_{\text{Nei-Li}}(P_1, P_2) =
+0\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Puisque les fréquences alléliques sont identiques,
+nous avons <span class="math inline">\(p_{i,j} = q_{i,j}\)</span> pour
+tous les <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>. Par conséquent,</p>
+<p><span class="math display">\[\sum_{i=1}^{L} \sum_{j} p_{i,j} q_{i,j}
+= \sum_{i=1}^{L} \sum_{j} p_{i,j}^2\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\sum_{i=1}^{L} \sum_{j} q_{i,j}^2 =
+\sum_{i=1}^{L} \sum_{j} p_{i,j}^2\]</span></p>
+<p>Donc,</p>
+<p><span class="math display">\[D_{\text{Nei-Li}}(P_1, P_2) = -\log
+\left( \frac{\sum_{i=1}^{L} \sum_{j} p_{i,j}^2}{\sqrt{\sum_{i=1}^{L}
+\sum_{j} p_{i,j}^2 \sum_{i=1}^{L} \sum_{j} p_{i,j}^2}} \right) =
+-\log(1) = 0\]</span></p>
+<p>Ce qui achève la démonstration. ◻</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer les propriétés de la distance de Nei-Li, nous devons
+utiliser des techniques de calcul différentiel et des inégalités
+classiques. Par exemple, pour montrer que la distance de Nei-Li est
+toujours non négative, nous pouvons utiliser l’inégalité de
+Cauchy-Schwarz.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux populations <span
+class="math inline">\(P_1\)</span> et <span
+class="math inline">\(P_2\)</span>. D’après l’inégalité de
+Cauchy-Schwarz, nous avons :</p>
+<p><span class="math display">\[\left( \sum_{i=1}^{L} \sum_{j} p_{i,j}
+q_{i,j} \right)^2 \leq \left( \sum_{i=1}^{L} \sum_{j} p_{i,j}^2 \right)
+\left( \sum_{i=1}^{L} \sum_{j} q_{i,j}^2 \right)\]</span></p>
+<p>En prenant la racine carrée des deux côtés, nous obtenons :</p>
+<p><span class="math display">\[\sum_{i=1}^{L} \sum_{j} p_{i,j} q_{i,j}
+\leq \sqrt{\left( \sum_{i=1}^{L} \sum_{j} p_{i,j}^2 \right) \left(
+\sum_{i=1}^{L} \sum_{j} q_{i,j}^2 \right)}\]</span></p>
+<p>Par conséquent,</p>
+<p><span class="math display">\[\frac{\sum_{i=1}^{L} \sum_{j} p_{i,j}
+q_{i,j}}{\sqrt{\left( \sum_{i=1}^{L} \sum_{j} p_{i,j}^2 \right) \left(
+\sum_{i=1}^{L} \sum_{j} q_{i,j}^2 \right)}} \leq 1\]</span></p>
+<p>En prenant le logarithme négatif, nous obtenons :</p>
+<p><span class="math display">\[D_{\text{Nei-Li}}(P_1, P_2) \geq
+0\]</span></p>
+<p>Ce qui achève la démonstration. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+distance de Nei-Li :</p>
+<ol>
+<li><p>La distance de Nei-Li est symétrique, c’est-à-dire que <span
+class="math inline">\(D_{\text{Nei-Li}}(P_1, P_2) =
+D_{\text{Nei-Li}}(P_2, P_1)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> La symétrie découle directement de la définition. En
+effet, en échangeant <span class="math inline">\(P_1\)</span> et <span
+class="math inline">\(P_2\)</span>, la formule reste inchangée. ◻</p>
+</div></li>
+<li><p>La distance de Nei-Li satisfait l’inégalité triangulaire,
+c’est-à-dire que pour trois populations <span
+class="math inline">\(P_1\)</span>, <span
+class="math inline">\(P_2\)</span> et <span
+class="math inline">\(P_3\)</span>,</p>
+<p><span class="math display">\[D_{\text{Nei-Li}}(P_1, P_3) \leq
+D_{\text{Nei-Li}}(P_1, P_2) + D_{\text{Nei-Li}}(P_2, P_3)\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété est une conséquence de la nature
+logarithmique de la distance et des propriétés des logarithmes. ◻</p>
+</div></li>
+<li><p>La distance de Nei-Li est invariante par transformation linéaire
+des fréquences alléliques.</p>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété découle du fait que la distance est
+définie en termes de produits de fréquences, qui sont invariants sous
+les transformations linéaires. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Nei-Li est un outil puissant pour quantifier la
+divergence génétique entre populations. Son utilisation permet de mieux
+comprendre les mécanismes évolutifs et de comparer les résultats de
+différentes études. Les propriétés mathématiques de cette distance en
+font un instrument robuste et fiable pour les recherches en biologie
+évolutive.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

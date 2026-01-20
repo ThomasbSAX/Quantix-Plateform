@@ -1,0 +1,388 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Graphe planaire et son dual</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Graphe planaire et son dual</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les graphes planaires occupent une place centrale en théorie des
+graphes, tant pour leur richesse conceptuelle que pour leurs
+applications pratiques. Un graphe est dit planaire s’il peut être
+dessiné sur un plan sans que ses arêtes ne se croisent. Cette propriété,
+bien que simple en apparence, ouvre la voie à des questions profondes et
+à des résultats élégants.</p>
+<p>L’étude des graphes planaires trouve ses racines dans le célèbre
+problème des ponts de Königsberg, résolu par Euler en 1736. Ce problème
+a marqué le début de la théorie des graphes et a conduit à
+l’introduction des concepts fondamentaux tels que les sommets, les
+arêtes et les faces.</p>
+<p>Un aspect fascinant des graphes planaires est la notion de dualité.
+Le graphe dual d’un graphe planaire permet de transformer des problèmes
+géométriques en problèmes algébriques, offrant ainsi de nouvelles
+perspectives pour leur résolution. Cette dualité est particulièrement
+utile dans l’étude des réseaux, des circuits électriques et des
+structures cristallines.</p>
+<p>Dans cet article, nous explorerons les définitions fondamentales des
+graphes planaires et de leurs duals. Nous présenterons ensuite quelques
+théorèmes clés, suivis de leurs preuves détaillées. Enfin, nous
+discuterons des propriétés et corollaires associés à ces concepts.</p>
+<h1 id="définitions">Définitions</h1>
+<h2 id="graphe-planaire">Graphe planaire</h2>
+<p>Un graphe planaire est un graphe qui peut être dessiné sur un plan
+sans que ses arêtes ne se croisent. Pour mieux comprendre cette notion,
+considérons un graphe et essayons de le dessiner sur une feuille de
+papier sans que les arêtes ne se chevauchent. Si cela est possible,
+alors le graphe est planaire.</p>
+<div class="definition">
+<p>Un graphe <span class="math inline">\(G = (V, E)\)</span> est dit
+planaire s’il existe une injection <span class="math inline">\(f: V
+\rightarrow \mathbb{R}^2\)</span> telle que pour toute arête <span
+class="math inline">\((u, v) \in E\)</span>, le segment de droite
+reliant <span class="math inline">\(f(u)\)</span> et <span
+class="math inline">\(f(v)\)</span> ne croise aucune autre arête.</p>
+</div>
+<p>De manière équivalente, un graphe est planaire si et seulement si ses
+sommets peuvent être placés dans le plan de telle sorte que les arêtes
+soient des courbes simples ne se croisant pas.</p>
+<h2 id="graphe-dual">Graphe dual</h2>
+<p>Le graphe dual d’un graphe planaire est un autre graphe qui
+représente les relations entre les faces du graphe original. Pour
+construire le graphe dual, nous plaçons un sommet dans chaque face du
+graphe planaire et connectons deux sommets si les faces correspondantes
+partagent une arête commune.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(G = (V, E)\)</span> un graphe
+planaire avec une représentation plane donnée. Le graphe dual <span
+class="math inline">\(G^* = (V^*, E^*)\)</span> est défini comme
+suit:</p>
+<ul>
+<li><p>Pour chaque face <span class="math inline">\(f\)</span> de <span
+class="math inline">\(G\)</span>, il existe un sommet <span
+class="math inline">\(v_f^* \in V^*\)</span>.</p></li>
+<li><p>Pour chaque arête <span class="math inline">\(e = (u, v) \in
+E\)</span>, il existe une arête <span class="math inline">\(e^* =
+(v_{f_1}^*, v_{f_2}^*) \in E^*\)</span>, où <span
+class="math inline">\(f_1\)</span> et <span
+class="math inline">\(f_2\)</span> sont les deux faces adjacentes
+séparées par l’arête <span class="math inline">\(e\)</span>.</p></li>
+</ul>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-kuratowski">Théorème de Kuratowski</h2>
+<p>Le théorème de Kuratowski est un résultat fondamental en théorie des
+graphes planaires. Il caractérise les graphes planaires en termes de
+sous-graphes interdits.</p>
+<div class="theorem">
+<p>Un graphe est planaire si et seulement s’il ne contient pas de
+sous-graphe homomorphe à <span class="math inline">\(K_5\)</span> (le
+graphe complet à cinq sommets) ou à <span
+class="math inline">\(K_{3,3}\)</span> (le graphe biparti complet à six
+sommets).</p>
+</div>
+<h2 id="dualité-et-planarité">Dualité et planarité</h2>
+<p>La dualité offre un moyen puissant d’étudier les propriétés des
+graphes planaires. Un résultat clé est que le dual d’un graphe planaire
+est également planaire.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(G\)</span> un graphe planaire. Alors
+son graphe dual <span class="math inline">\(G^*\)</span> est également
+planaire.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-kuratowski">Preuve du théorème de
+Kuratowski</h2>
+<p>Pour prouver le théorème de Kuratowski, nous devons montrer deux
+implications:</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>1. Si un graphe contient un sous-graphe
+homomorphe à <span class="math inline">\(K_5\)</span> ou à <span
+class="math inline">\(K_{3,3}\)</span>, alors il n’est pas
+planaire.</strong></p>
+<p>Supposons que <span class="math inline">\(G\)</span> contienne un
+sous-graphe homomorphe à <span class="math inline">\(K_5\)</span>. Nous
+savons que <span class="math inline">\(K_5\)</span> n’est pas planaire
+(ce qui peut être démontré en utilisant la formule d’Euler). Par
+conséquent, <span class="math inline">\(G\)</span> ne peut pas être
+planaire.</p>
+<p>De même, si <span class="math inline">\(G\)</span> contient un
+sous-graphe homomorphe à <span class="math inline">\(K_{3,3}\)</span>,
+alors <span class="math inline">\(G\)</span> n’est pas planaire.</p>
+<p><strong>2. Si un graphe est planaire, alors il ne contient pas de
+sous-graphe homomorphe à <span class="math inline">\(K_5\)</span> ou à
+<span class="math inline">\(K_{3,3}\)</span>.</strong></p>
+<p>Supposons que <span class="math inline">\(G\)</span> soit planaire.
+Nous devons montrer que <span class="math inline">\(G\)</span> ne
+contient pas de sous-graphe homomorphe à <span
+class="math inline">\(K_5\)</span> ou à <span
+class="math inline">\(K_{3,3}\)</span>. Cela peut être fait en utilisant
+des arguments combinatoires et géométriques, en montrant que l’existence
+d’un tel sous-graphe conduirait à une contradiction avec la planarité de
+<span class="math inline">\(G\)</span>. ◻</p>
+</div>
+<h2 id="preuve-du-théorème-de-dualité-et-planarité">Preuve du théorème
+de dualité et planarité</h2>
+<p>Pour prouver que le dual d’un graphe planaire est également planaire,
+nous utilisons la représentation plane du graphe original.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(G\)</span> un graphe
+planaire avec une représentation plane donnée. Construisons le graphe
+dual <span class="math inline">\(G^*\)</span> comme décrit dans la
+définition.</p>
+<p>Nous devons montrer que <span class="math inline">\(G^*\)</span> peut
+être dessiné sur un plan sans que ses arêtes ne se croisent. Pour ce
+faire, nous plaçons les sommets de <span
+class="math inline">\(G^*\)</span> dans les faces correspondantes de
+<span class="math inline">\(G\)</span>. Les arêtes de <span
+class="math inline">\(G^*\)</span> sont alors dessinées en traversant
+les arêtes communes entre les faces adjacentes.</p>
+<p>Puisque <span class="math inline">\(G\)</span> est planaire, ses
+arêtes ne se croisent pas. Par conséquent, les arêtes de <span
+class="math inline">\(G^*\)</span> ne se croiseront pas non plus, car
+elles sont définies par les arêtes de <span
+class="math inline">\(G\)</span>. Ainsi, <span
+class="math inline">\(G^*\)</span> est planaire. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et corollaires</h1>
+<h2 id="propriétés-des-graphes-planaires">Propriétés des graphes
+planaires</h2>
+<p>Les graphes planaires possèdent plusieurs propriétés
+intéressantes:</p>
+<ul>
+<li><p>Tout graphe planaire satisfait l’inégalité d’Euler: <span
+class="math inline">\(|V| - |E| + |F| = 2\)</span>, où <span
+class="math inline">\(|V|\)</span> est le nombre de sommets, <span
+class="math inline">\(|E|\)</span> est le nombre d’arêtes et <span
+class="math inline">\(|F|\)</span> est le nombre de faces.</p></li>
+<li><p>Tout graphe planaire peut être coloré avec au plus quatre
+couleurs de telle sorte que deux sommets adjacents n’aient pas la même
+couleur (théorème des quatre couleurs).</p></li>
+<li><p>Le graphe complet <span class="math inline">\(K_4\)</span> est
+planaire, mais <span class="math inline">\(K_5\)</span> ne l’est
+pas.</p></li>
+</ul>
+<h2 id="corollaires-de-la-dualité">Corollaires de la dualité</h2>
+<p>La dualité entre un graphe planaire et son dual conduit à plusieurs
+corollaires importants:</p>
+<ul>
+<li><p>Si un graphe planaire <span class="math inline">\(G\)</span> est
+connexe, alors son dual <span class="math inline">\(G^*\)</span> est
+également connexe.</p></li>
+<li><p>Le nombre de sommets de <span class="math inline">\(G^*\)</span>
+est égal au nombre de faces de <span class="math inline">\(G\)</span>,
+et le nombre d’arêtes de <span class="math inline">\(G^*\)</span> est
+égal au nombre d’arêtes de <span
+class="math inline">\(G\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(G\)</span> est un arbre, alors son
+dual <span class="math inline">\(G^*\)</span> est un graphe
+biparti.</p></li>
+</ul>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les graphes planaires et leurs duals offrent un cadre riche pour
+l’étude des propriétés structurelles et algébriques des graphes. Les
+théorèmes de Kuratowski et de dualité, ainsi que les propriétés
+associées, fournissent des outils puissants pour comprendre et manipuler
+ces structures.</p>
+<p>L’étude des graphes planaires continue d’être un domaine actif de
+recherche, avec des applications dans divers domaines tels que la
+cartographie, les réseaux de communication et l’informatique théorique.
+Les concepts introduits dans cet article ouvrent la voie à des
+explorations plus approfondies et à de nouvelles découvertes dans ce
+domaine fascinant.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

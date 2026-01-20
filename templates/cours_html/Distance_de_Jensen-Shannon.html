@@ -1,0 +1,344 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La Distance de Jensen-Shannon : Une Mesure d’Information Discriminante</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La Distance de Jensen-Shannon : Une Mesure
+d’Information Discriminante</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’information mesurable, quantifiable, est une notion qui a
+révolutionné la manière dont nous comprenons et traitons les données.
+Parmi les outils développés pour capturer cette essence, la distance de
+Jensen-Shannon émerge comme une mesure d’une élégance rare. Son origine
+remonte aux travaux fondateurs de Claude Shannon sur l’entropie, puis
+est enrichie par les contributions de Richard T. Shannon et d’autres
+chercheurs en théorie de l’information.</p>
+<p>La distance de Jensen-Shannon trouve son utilité dans des domaines
+aussi variés que la bioinformatique, le traitement du langage naturel et
+l’apprentissage automatique. Elle permet de quantifier la similarité
+entre deux distributions de probabilité, offrant une alternative
+symétrique et bornée à la divergence de Kullback-Leibler. Son émergence
+répond à un besoin crucial : disposer d’une mesure capable de capturer
+les nuances des distributions tout en restant robuste et
+interprétable.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de Jensen-Shannon, commençons par
+explorer l’entropie et la divergence de Kullback-Leibler. Supposons que
+nous ayons deux distributions de probabilité <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>. Nous cherchons une mesure qui capture
+à quel point ces distributions sont proches l’une de l’autre.</p>
+<p>L’entropie de Shannon d’une distribution <span
+class="math inline">\(P\)</span> est définie comme : <span
+class="math display">\[H(P) = -\sum_{i} p_i \log p_i\]</span></p>
+<p>La divergence de Kullback-Leibler entre <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est donnée par : <span
+class="math display">\[D_{KL}(P \| Q) = \sum_{i} p_i \log \left(
+\frac{p_i}{q_i} \right)\]</span></p>
+<p>Cependant, cette mesure n’est pas symétrique et peut être infinie.
+Pour remédier à ces limitations, nous introduisons la distance de
+Jensen-Shannon.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité
+discrètes sur un ensemble fini <span class="math inline">\(X\)</span>.
+La distance de Jensen-Shannon entre <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est définie comme : <span
+class="math display">\[JS(P \| Q) = \frac{1}{2} D_{KL}\left( P \| M
+\right) + \frac{1}{2} D_{KL}\left( Q \| M \right)\]</span> où <span
+class="math inline">\(M = \frac{1}{2}(P + Q)\)</span> est la
+distribution moyenne de <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>.</p>
+</div>
+<p>De manière équivalente, la distance de Jensen-Shannon peut être
+exprimée en utilisant l’entropie : <span class="math display">\[JS(P \|
+Q) = H(M) - \frac{1}{2} H(P) - \frac{1}{2} H(Q)\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la distance de Jensen-Shannon est
+sa bornitude et sa symétrie.</p>
+<div class="theorem">
+<p>La distance de Jensen-Shannon <span class="math inline">\(JS(P \|
+Q)\)</span> satisfait les propriétés suivantes :</p>
+<ol>
+<li><p>Symétrie : <span class="math inline">\(JS(P \| Q) = JS(Q \|
+P)\)</span></p></li>
+<li><p>Bornitude : <span class="math inline">\(0 \leq JS(P \| Q) \leq
+1\)</span></p></li>
+<li><p>Identité : <span class="math inline">\(JS(P \| Q) = 0\)</span> si
+et seulement si <span class="math inline">\(P = Q\)</span></p></li>
+</ol>
+</div>
+<p>La preuve de ces propriétés repose sur les caractéristiques bien
+connues de la divergence de Kullback-Leibler et de l’entropie de
+Shannon.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer la bornitude de la distance de Jensen-Shannon, nous
+utilisons les propriétés de l’entropie et de la divergence de
+Kullback-Leibler.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons d’abord la bornitude inférieure. Par
+définition, <span class="math inline">\(D_{KL}(P \| M) \geq 0\)</span>
+et <span class="math inline">\(D_{KL}(Q \| M) \geq 0\)</span>, donc :
+<span class="math display">\[JS(P \| Q) = \frac{1}{2} D_{KL}(P \| M) +
+\frac{1}{2} D_{KL}(Q \| M) \geq 0\]</span></p>
+<p>Pour la bornitude supérieure, nous utilisons l’inégalité de Pinsker :
+<span class="math display">\[D_{KL}(P \| Q) \leq \frac{1}{2} \| P - Q
+\|_1^2\]</span></p>
+<p>En appliquant cette inégalité à <span class="math inline">\(D_{KL}(P
+\| M)\)</span> et <span class="math inline">\(D_{KL}(Q \| M)\)</span>,
+nous obtenons : <span class="math display">\[JS(P \| Q) \leq \frac{1}{4}
+\| P - M \|_1^2 + \frac{1}{4} \| Q - M \|_1^2\]</span></p>
+<p>Puisque <span class="math inline">\(M = \frac{1}{2}(P + Q)\)</span>,
+il vient : <span class="math display">\[\| P - M \|_1 = \| Q - M \|_1 =
+\frac{1}{2} \| P - Q \|_1\]</span></p>
+<p>Donc : <span class="math display">\[JS(P \| Q) \leq \frac{1}{8} \| P
+- Q \|_1^2\]</span></p>
+<p>Enfin, comme <span class="math inline">\(\| P - Q \|_1 \leq
+2\)</span>, nous avons : <span class="math display">\[JS(P \| Q) \leq
+1\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La distance de Jensen-Shannon possède plusieurs propriétés
+intéressantes qui en font un outil puissant pour la comparaison de
+distributions.</p>
+<div class="proposition">
+<p>Les propriétés suivantes découlent directement de la définition de la
+distance de Jensen-Shannon :</p>
+<ol>
+<li><p>La distance de Jensen-Shannon est invariante par transformation
+affine. Si <span class="math inline">\(T\)</span> est une transformation
+affine, alors : <span class="math display">\[JS(T(P) \| T(Q)) = JS(P \|
+Q)\]</span></p></li>
+<li><p>La distance de Jensen-Shannon est convexe. Pour toute
+distribution <span class="math inline">\(R\)</span> et tout <span
+class="math inline">\(\lambda \in [0, 1]\)</span>, nous avons : <span
+class="math display">\[JS(\lambda P + (1 - \lambda) R \| \lambda Q + (1
+- \lambda) R) \leq \lambda JS(P \| Q) + (1 - \lambda) JS(R \|
+Q)\]</span></p></li>
+<li><p>La distance de Jensen-Shannon est métrique. Elle satisfait les
+propriétés de séparation, de symétrie et d’inégalité
+triangulaire.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer la propriété (i), nous utilisons le
+fait que l’entropie et la divergence de Kullback-Leibler sont
+invariantes par transformation affine. Ainsi, les transformations
+affines préservent la distance de Jensen-Shannon.</p>
+<p>Pour la propriété (ii), nous utilisons la convexité de l’entropie et
+de la divergence de Kullback-Leibler. La convexité de la distance de
+Jensen-Shannon découle directement de ces propriétés.</p>
+<p>Enfin, pour la propriété (iii), nous utilisons le fait que la
+distance de Jensen-Shannon est symétrique et bornée. L’inégalité
+triangulaire peut être démontrée en utilisant les propriétés de
+l’entropie et de la divergence de Kullback-Leibler. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Jensen-Shannon est un outil puissant et élégant pour
+la comparaison de distributions de probabilité. Ses propriétés de
+symétrie, de bornitude et de convexité en font un choix privilégié dans
+de nombreuses applications. En comprenant ses fondements théoriques et
+ses preuves, nous pouvons mieux apprécier son utilité et son importance
+dans le domaine de la théorie de l’information.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

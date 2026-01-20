@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Stabilité des systèmes à commande robuste</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Stabilité des systèmes à commande robuste</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’étude de la stabilité des systèmes à commande robuste est un
+domaine central en théorie du contrôle. Historiquement, les premières
+approches de commande robuste ont été motivées par la nécessité de
+concevoir des systèmes capables de fonctionner efficacement malgré les
+incertitudes et les perturbations. Ces incertitudes peuvent provenir de
+variations paramétriques, de non-linéarités ou encore de perturbations
+externes.</p>
+<p>La stabilité robuste est indispensable dans des applications où la
+sécurité et la fiabilité sont critiques, telles que l’aérospatiale, les
+systèmes automobiles ou encore les réseaux de distribution d’énergie. Un
+système à commande robuste doit garantir que, malgré ces incertitudes,
+le comportement du système reste stable et conforme aux spécifications
+requises.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour aborder la stabilité des systèmes à commande robuste, commençons
+par définir les notions fondamentales.</p>
+<h2 id="système-linéaire-incertain">Système linéaire incertain</h2>
+<p>Considérons un système dynamique linéaire décrit par les équations
+différentielles suivantes :</p>
+<p><span class="math display">\[\dot{x}(t) = (A + \Delta A)x(t) + (B +
+\Delta B)u(t)\]</span> <span class="math display">\[y(t) =
+Cx(t)\]</span></p>
+<p>où <span class="math inline">\(x(t) \in \mathbb{R}^n\)</span> est
+l’état du système, <span class="math inline">\(u(t) \in
+\mathbb{R}^m\)</span> est le contrôle, et <span
+class="math inline">\(y(t) \in \mathbb{R}^p\)</span> est la sortie. Les
+matrices <span class="math inline">\(A\)</span>, <span
+class="math inline">\(B\)</span>, et <span
+class="math inline">\(C\)</span> sont les matrices nominales du système,
+tandis que <span class="math inline">\(\Delta A\)</span> et <span
+class="math inline">\(\Delta B\)</span> représentent les
+incertitudes.</p>
+<h2 id="stabilité-de-lyapunov">Stabilité de Lyapunov</h2>
+<p>Un système est dit stable au sens de Lyapunov si, pour toute
+condition initiale <span class="math inline">\(x(0)\)</span>, l’état
+<span class="math inline">\(x(t)\)</span> reste borné pour tout <span
+class="math inline">\(t \geq 0\)</span>. Formellement, cela s’exprime
+par :</p>
+<p><span class="math display">\[\forall x(0) \in \mathbb{R}^n, \exists M
+&gt; 0 \text{ tel que } \|x(t)\| \leq M, \forall t \geq 0\]</span></p>
+<h2 id="stabilité-robuste">Stabilité robuste</h2>
+<p>Un système est dit stable de manière robuste si la stabilité est
+garantie pour toutes les incertitudes <span class="math inline">\(\Delta
+A\)</span> et <span class="math inline">\(\Delta B\)</span> dans un
+ensemble donné. Formellement, cela signifie :</p>
+<p><span class="math display">\[\forall (\Delta A, \Delta B) \in
+\mathcal{U}, \text{ le système est stable au sens de
+Lyapunov}\]</span></p>
+<p>où <span class="math inline">\(\mathcal{U}\)</span> est l’ensemble
+des incertitudes admissibles.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-stabilité-robuste">Théorème de stabilité
+robuste</h2>
+<p>Pour établir la stabilité robuste, nous utilisons le théorème suivant
+:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(V(x) = x^T P x\)</span> une fonction
+de Lyapunov candidate, où <span class="math inline">\(P\)</span> est une
+matrice symétrique définie positive. Le système est stable de manière
+robuste si :</p>
+<p><span class="math display">\[\forall x \in \mathbb{R}^n, \forall
+(\Delta A, \Delta B) \in \mathcal{U}, \dot{V}(x) = x^T (A + \Delta A)^T
+P (A + \Delta A)x &lt; 0\]</span></p>
+</div>
+<h2 id="démonstration-du-théorème-de-stabilité-robuste">Démonstration du
+théorème de stabilité robuste</h2>
+<p>Pour démontrer ce théorème, nous procédons comme suit :</p>
+<p>1. **Définition de la dérivée de Lyapunov** : <span
+class="math display">\[\dot{V}(x) = \frac{d}{dt} (x^T P x) = 2x^T P
+\dot{x}\]</span></p>
+<p>2. **Substitution de l’équation d’état** : <span
+class="math display">\[\dot{V}(x) = 2x^T P \left( (A + \Delta A)x + (B +
+\Delta B)u \right)\]</span></p>
+<p>3. **Condition de stabilité** : Pour garantir la stabilité, il faut
+que <span class="math inline">\(\dot{V}(x) &lt; 0\)</span>. Cela
+implique : <span class="math display">\[x^T (A + \Delta A)^T P (A +
+\Delta A)x &lt; 0\]</span></p>
+<p>4. **Conclusion** : Si cette condition est satisfaite pour toutes les
+incertitudes <span class="math inline">\((\Delta A, \Delta B) \in
+\mathcal{U}\)</span>, alors le système est stable de manière
+robuste.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="justification-des-étapes">Justification des étapes</h2>
+<p>1. **Dérivée de Lyapunov** : La dérivée de la fonction de Lyapunov
+<span class="math inline">\(V(x)\)</span> est calculée en utilisant la
+règle de dérivation des fonctions composites.</p>
+<p>2. **Substitution** : Nous substituons l’équation d’état dans la
+dérivée de Lyapunov pour obtenir une expression en termes des matrices
+du système.</p>
+<p>3. **Condition de stabilité** : La condition <span
+class="math inline">\(\dot{V}(x) &lt; 0\)</span> garantit que la
+fonction de Lyapunov diminue au cours du temps, ce qui est une condition
+suffisante pour la stabilité.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-robustesse">Propriété de robustesse</h2>
+<ol>
+<li><p>**Incertitudes bornées** : Les incertitudes <span
+class="math inline">\(\Delta A\)</span> et <span
+class="math inline">\(\Delta B\)</span> sont supposées appartenir à un
+ensemble borné <span
+class="math inline">\(\mathcal{U}\)</span>.</p></li>
+<li><p>**Stabilité globale** : La stabilité robuste garantit que le
+système reste stable pour toutes les incertitudes dans <span
+class="math inline">\(\mathcal{U}\)</span>.</p></li>
+<li><p>**Conception de contrôleurs** : La conception de contrôleurs
+robustes repose sur la satisfaction des conditions de stabilité pour
+toutes les incertitudes admissibles.</p></li>
+</ol>
+<h2 id="corollaire-sur-la-stabilité-robuste">Corollaire sur la stabilité
+robuste</h2>
+<div class="corollary">
+<p>Si le système nominal <span class="math inline">\((A, B)\)</span> est
+stable et si les incertitudes <span class="math inline">\((\Delta A,
+\Delta B)\)</span> sont suffisamment petites, alors le système est
+stable de manière robuste.</p>
+</div>
+<h2 id="démonstration-du-corollaire">Démonstration du corollaire</h2>
+<p>1. **Stabilité du système nominal** : Supposons que le système
+nominal <span class="math inline">\((A, B)\)</span> est stable. Cela
+signifie qu’il existe une matrice <span class="math inline">\(P\)</span>
+telle que : <span class="math display">\[A^T P + PA &lt; 0\]</span></p>
+<p>2. **Perturbation des matrices** : Pour de petites incertitudes, les
+matrices <span class="math inline">\(A + \Delta A\)</span> et <span
+class="math inline">\(B + \Delta B\)</span> restent proches de <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>.</p>
+<p>3. **Stabilité robuste** : En utilisant le théorème de stabilité
+robuste, nous pouvons montrer que pour de petites incertitudes, la
+condition <span class="math inline">\(\dot{V}(x) &lt; 0\)</span> est
+satisfaite.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La stabilité des systèmes à commande robuste est un domaine essentiel
+en théorie du contrôle. Les concepts de stabilité de Lyapunov et de
+stabilité robuste permettent de garantir le bon fonctionnement des
+systèmes malgré les incertitudes. Les théorèmes et corollaires présentés
+fournissent des outils puissants pour l’analyse et la conception de
+systèmes robustes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

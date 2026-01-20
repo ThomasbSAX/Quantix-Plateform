@@ -1,0 +1,404 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Gower pour variables ordinales : Une approche unifiée pour l’analyse des données</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Gower pour variables ordinales : Une
+approche unifiée pour l’analyse des données</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des données multivariées, en particulier lorsque celles-ci
+sont de nature mixte (continues, catégorielles, ordinales), représente
+un défi majeur en statistique. Parmi les outils développés pour répondre
+à ce besoin, la distance de Gower occupe une place prépondérante.
+Introduite par M.J. Gower en 1971, cette métrique a révolutionné
+l’analyse des données en offrant une solution élégante pour mesurer la
+dissimilarité entre individus, même lorsque les variables sont de types
+différents.</p>
+<p>L’émergence de cette notion est étroitement liée à la nécessité de
+traiter des données ordinales, c’est-à-dire des variables où l’ordre des
+catégories est significatif mais où les écarts entre elles ne sont pas
+quantifiés. La distance de Gower permet d’intégrer ces variables dans un
+cadre unifié, aux côtés des variables continues et catégorielles, en
+adaptant la mesure de dissimilarité à la nature spécifique de chaque
+variable.</p>
+<p>Dans ce chapitre, nous explorerons en profondeur la distance de Gower
+pour les variables ordinales. Nous commencerons par définir
+rigoureusement cette notion, puis nous examinerons ses propriétés
+fondamentales et ses implications dans l’analyse des données. Nous
+illustrerons également son utilisation par des exemples concrets et
+discuterons de ses avantages et limites.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Gower pour les variables ordinales,
+commençons par comprendre ce que nous cherchons à mesurer. Supposons que
+nous ayons un ensemble de variables ordinales, où chaque variable prend
+des valeurs dans un ensemble ordonné. Notre objectif est de définir une
+mesure de dissimilarité entre deux individus, basée sur leurs valeurs
+pour ces variables.</p>
+<p>Nous voulons que cette mesure soit :</p>
+<ul>
+<li><p>Symétrique : la dissimilarité entre deux individus <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> doit être égale à celle entre <span
+class="math inline">\(j\)</span> et <span
+class="math inline">\(i\)</span>.</p></li>
+<li><p>Normalisée : la dissimilarité doit être comprise entre 0
+(identité) et 1 (dissimilarité maximale).</p></li>
+<li><p>Sensible à l’ordre : la dissimilarité doit refléter les
+différences d’ordre entre les catégories.</p></li>
+</ul>
+<p>Nous sommes maintenant prêts à définir formellement la distance de
+Gower pour une variable ordinale.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une variable ordinale
+prenant des valeurs dans un ensemble ordonné <span
+class="math inline">\(\{x_1, x_2, \dots, x_k\}\)</span> avec <span
+class="math inline">\(x_1 &lt; x_2 &lt; \dots &lt; x_k\)</span>. Pour
+deux individus <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, la dissimilarité pour la variable
+<span class="math inline">\(X\)</span> est définie par : <span
+class="math display">\[d_{ij}^X = \frac{|x_i - x_j|}{\max(X) -
+\min(X)}\]</span> où <span class="math inline">\(\max(X)\)</span> et
+<span class="math inline">\(\min(X)\)</span> sont respectivement la
+valeur maximale et minimale de <span class="math inline">\(X\)</span>
+dans l’échantillon.</p>
+</div>
+<p>Cette définition peut être reformulée en utilisant des
+quantificateurs : <span class="math display">\[d_{ij}^X = \frac{|x_i -
+x_j|}{\max_{k \in \{1, \dots, n\}} x_k - \min_{k \in \{1, \dots, n\}}
+x_k}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour étendre la distance de Gower à un ensemble de variables
+ordinales, nous devons définir une mesure globale de dissimilarité. Nous
+cherchons une fonction qui combine les dissimilarités pour chaque
+variable tout en respectant les propriétés de symétrie et de
+normalisation.</p>
+<p>Nous voulons que cette mesure globale soit :</p>
+<ul>
+<li><p>Additive : la dissimilarité globale doit être la somme des
+dissimilarités pour chaque variable.</p></li>
+<li><p>Normalisée : la dissimilarité globale doit être comprise entre 0
+et 1.</p></li>
+</ul>
+<p>Nous sommes maintenant prêts à énoncer le théorème central de ce
+chapitre.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{X} = (X_1, X_2, \dots,
+X_p)\)</span> un ensemble de <span class="math inline">\(p\)</span>
+variables ordinales. Pour deux individus <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, la distance de Gower globale est
+définie par : <span class="math display">\[d_{ij} = \frac{\sum_{k=1}^p
+s_k d_{ij}^{X_k}}{\sum_{k=1}^p s_k}\]</span> où <span
+class="math inline">\(s_k\)</span> est un poids optionnel associé à la
+variable <span class="math inline">\(X_k\)</span>, et <span
+class="math inline">\(d_{ij}^{X_k}\)</span> est la dissimilarité pour la
+variable <span class="math inline">\(X_k\)</span> définie
+précédemment.</p>
+</div>
+<p>Cette définition peut être reformulée en utilisant des
+quantificateurs : <span class="math display">\[d_{ij} =
+\frac{\sum_{k=1}^p s_k \cdot \frac{|x_{ik} - x_{jk}|}{\max_{l \in \{1,
+\dots, n\}} x_l^k - \min_{l \in \{1, \dots, n\}} x_l^k}}{\sum_{k=1}^p
+s_k}\]</span></p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver que la distance de Gower globale est bien définie et
+possède les propriétés souhaitées, nous procédons comme suit :</p>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p><strong>Symétrie</strong> : Par construction, <span
+class="math inline">\(d_{ij}^{X_k} = d_{ji}^{X_k}\)</span> pour chaque
+variable <span class="math inline">\(X_k\)</span>. Il s’ensuit que :
+<span class="math display">\[d_{ij} = \frac{\sum_{k=1}^p s_k
+d_{ij}^{X_k}}{\sum_{k=1}^p s_k} = \frac{\sum_{k=1}^p s_k
+d_{ji}^{X_k}}{\sum_{k=1}^p s_k} = d_{ji}\]</span></p></li>
+<li><p><strong>Normalisation</strong> : Pour chaque variable <span
+class="math inline">\(X_k\)</span>, nous avons <span
+class="math inline">\(0 \leq d_{ij}^{X_k} \leq 1\)</span>. Par
+conséquent : <span class="math display">\[0 \leq d_{ij} =
+\frac{\sum_{k=1}^p s_k d_{ij}^{X_k}}{\sum_{k=1}^p s_k} \leq
+1\]</span></p></li>
+<li><p><strong>Additivité</strong> : La distance de Gower globale est
+explicitement définie comme une somme pondérée des dissimilarités pour
+chaque variable.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous énonçons maintenant quelques propriétés importantes de la
+distance de Gower pour les variables ordinales.</p>
+<div class="proposition">
+<ol>
+<li><p>La distance de Gower est invariante par transformation monotone
+des variables ordinales. C’est-à-dire, si nous appliquons une fonction
+strictement croissante <span class="math inline">\(f\)</span> à chaque
+variable <span class="math inline">\(X_k\)</span>, la distance de Gower
+globale reste inchangée.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(f\)</span> une
+fonction strictement croissante. Pour chaque variable <span
+class="math inline">\(X_k\)</span>, nous avons : <span
+class="math display">\[d_{ij}^{f(X_k)} = \frac{|f(x_{ik}) -
+f(x_{jk})|}{f(\max(X_k)) - f(\min(X_k))} = \frac{|x_{ik} -
+x_{jk}|}{\max(X_k) - \min(X_k)} = d_{ij}^{X_k}\]</span> où la dernière
+égalité découle du fait que <span class="math inline">\(f\)</span> est
+strictement croissante. Il s’ensuit que : <span
+class="math display">\[d_{ij} = \frac{\sum_{k=1}^p s_k
+d_{ij}^{f(X_k)}}{\sum_{k=1}^p s_k} = \frac{\sum_{k=1}^p s_k
+d_{ij}^{X_k}}{\sum_{k=1}^p s_k}\]</span> ◻</p>
+</div></li>
+<li><p>La distance de Gower est compatible avec les variables continues.
+C’est-à-dire, si une variable <span class="math inline">\(X_k\)</span>
+est continue, la dissimilarité pour cette variable coïncide avec la
+distance euclidienne normalisée.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour une variable continue <span
+class="math inline">\(X_k\)</span>, nous avons : <span
+class="math display">\[d_{ij}^{X_k} = \frac{|x_{ik} - x_{jk}|}{\max(X_k)
+- \min(X_k)}\]</span> qui est exactement la distance euclidienne
+normalisée. ◻</p>
+</div></li>
+<li><p>La distance de Gower est robuste aux valeurs manquantes.
+C’est-à-dire, si certains individus n’ont pas de valeur pour une
+variable <span class="math inline">\(X_k\)</span>, cette variable peut
+être exclue du calcul de la distance pour ces individus.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que l’individu <span
+class="math inline">\(i\)</span> n’ait pas de valeur pour la variable
+<span class="math inline">\(X_k\)</span>. Nous pouvons alors définir :
+<span class="math display">\[d_{ij} = \frac{\sum_{k=1}^p s_k&#39;
+d_{ij}^{X_k}}{\sum_{k=1}^p s_k&#39;}\]</span> où <span
+class="math inline">\(s_k&#39;\)</span> est égal à <span
+class="math inline">\(s_k\)</span> si la variable <span
+class="math inline">\(X_k\)</span> est disponible pour les individus
+<span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, et 0 sinon. La preuve suit alors
+directement de la définition. ◻</p>
+</div></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Dans ce chapitre, nous avons exploré en profondeur la distance de
+Gower pour les variables ordinales. Nous avons vu comment cette métrique
+permet de mesurer la dissimilarité entre individus dans un cadre unifié,
+intégrant des variables de types différents. Nous avons défini
+rigoureusement cette notion, examiné ses propriétés fondamentales et
+démontré son utilité dans l’analyse des données.</p>
+<p>La distance de Gower offre une solution élégante et flexible pour
+traiter des données mixtes, en particulier lorsqu’elles contiennent des
+variables ordinales. Son utilisation permet de réaliser diverses
+analyses multivariées, telles que les méthodes de classification et
+d’ordonnancement, tout en respectant la nature spécifique de chaque
+variable.</p>
+<p>Cependant, il est important de noter que la distance de Gower
+présente également certaines limites. Par exemple, elle peut être
+sensible aux variables avec un grand nombre de catégories ou aux données
+contenant des valeurs aberrantes. Il est donc essentiel d’adapter et
+d’ajuster cette métrique en fonction du contexte spécifique de
+l’analyse.</p>
+<p>En conclusion, la distance de Gower pour les variables ordinales
+représente un outil puissant et polyvalent pour l’analyse des données
+multivariées. Son utilisation continue de stimuler la recherche et le
+développement de nouvelles méthodes statistiques, ouvrant ainsi de
+nouvelles perspectives pour l’exploration et la compréhension des
+données complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

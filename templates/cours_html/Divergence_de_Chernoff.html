@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Chernoff : Une Approche Théorique et Historique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Chernoff : Une Approche Théorique et
+Historique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La divergence de Chernoff, nommée en l’honneur du statisticien Herman
+Chernoff, est un outil fondamental dans la théorie des probabilités et
+de l’inférence statistique. Elle émerge comme une généralisation de la
+divergence de Kullback-Leibler, permettant de comparer des distributions
+de probabilité de manière plus flexible. Son importance réside dans sa
+capacité à mesurer la distance entre deux distributions, ce qui est
+crucial pour des applications telles que l’apprentissage automatique, la
+théorie de l’information et la modélisation statistique.</p>
+<p>L’origine historique de la divergence de Chernoff remonte aux travaux
+de Chernoff dans les années 1950, où il a introduit cette notion pour
+résoudre des problèmes de tests statistiques. Depuis lors, la divergence
+de Chernoff a trouvé des applications dans divers domaines, notamment en
+bioinformatique, en finance et en ingénierie.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la divergence de Chernoff, commençons par rappeler ce
+que nous cherchons à mesurer. Supposons que nous ayons deux
+distributions de probabilité <span class="math inline">\(P\)</span> et
+<span class="math inline">\(Q\)</span>. Nous voulons quantifier à quel
+point ces deux distributions diffèrent l’une de l’autre. La divergence
+de Kullback-Leibler est une mesure bien connue pour cela, mais elle a
+certaines limitations. La divergence de Chernoff généralise cette idée
+en introduisant un paramètre <span
+class="math inline">\(\lambda\)</span> qui permet de pondérer la
+comparaison entre <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>.</p>
+<p>Formellement, la divergence de Chernoff est définie comme suit :</p>
+<div class="definition">
+<p>La divergence de Chernoff entre deux distributions de probabilité
+<span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est donnée par : <span
+class="math display">\[D_C(P||Q) = -\lim_{\lambda \to 0^+}
+\frac{1}{\lambda} \log \left( \int_{\mathcal{X}} p(x)^{\lambda}
+q(x)^{1-\lambda} \, dx \right)\]</span> où <span
+class="math inline">\(p(x)\)</span> et <span
+class="math inline">\(q(x)\)</span> sont les densités de probabilité des
+distributions <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>, respectivement, et <span
+class="math inline">\(\mathcal{X}\)</span> est l’espace des
+événements.</p>
+</div>
+<p>Une autre formulation équivalente de la divergence de Chernoff est
+:</p>
+<p><span class="math display">\[D_C(P||Q) = \sup_{\lambda \in (0,1)}
+D_\lambda(P||Q)\]</span></p>
+<p>où <span class="math inline">\(D_\lambda(P||Q)\)</span> est la
+divergence de Chernoff d’ordre <span
+class="math inline">\(\lambda\)</span>, définie par :</p>
+<p><span class="math display">\[D_\lambda(P||Q) =
+-\frac{1}{\lambda(1-\lambda)} \log \left( \int_{\mathcal{X}}
+p(x)^{\lambda} q(x)^{1-\lambda} \, dx \right)\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la divergence de Chernoff est le
+théorème de Chernoff, qui fournit une borne supérieure sur la
+probabilité que deux distributions diffèrent significativement.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité sur
+un espace <span class="math inline">\(\mathcal{X}\)</span>. Pour toute
+fonction mesurable <span class="math inline">\(f: \mathcal{X} \to
+\mathbb{R}\)</span>, nous avons : <span class="math display">\[P(f(X)
+&gt; a) \leq e^{-\lambda a} M_\lambda(\lambda)\]</span> et <span
+class="math display">\[Q(f(X) &lt; b) \leq e^{\lambda b}
+M_\lambda(\lambda)\]</span> où <span class="math inline">\(a &gt;
+\mathbb{E}_P[f(X)]\)</span>, <span class="math inline">\(b &lt;
+\mathbb{E}_Q[f(X)]\)</span> et <span
+class="math inline">\(M_\lambda(\lambda) = \int_{\mathcal{X}}
+p(x)^{\lambda} q(x)^{1-\lambda} \, dx\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Chernoff, nous utilisons la fonction
+génératrice de moments et les inégalités exponentielles. Commençons par
+rappeler que pour toute fonction mesurable <span
+class="math inline">\(f\)</span> et tout <span class="math inline">\(t
+&gt; 0\)</span>, nous avons :</p>
+<p><span class="math display">\[P(f(X) &gt; a) = P(e^{t f(X)} &gt; e^{t
+a}) \leq e^{-t a} \mathbb{E}_P[e^{t f(X)}]\]</span></p>
+<p>En utilisant la définition de <span
+class="math inline">\(M_\lambda(\lambda)\)</span>, nous pouvons écrire
+:</p>
+<p><span class="math display">\[\mathbb{E}_P[e^{t f(X)}] =
+M_\lambda(\lambda) e^{\lambda t}\]</span></p>
+<p>En combinant ces deux résultats, nous obtenons :</p>
+<p><span class="math display">\[P(f(X) &gt; a) \leq e^{-t a}
+M_\lambda(\lambda) e^{\lambda t}\]</span></p>
+<p>En choisissant <span class="math inline">\(t =
+\frac{a}{\lambda}\)</span>, nous obtenons :</p>
+<p><span class="math display">\[P(f(X) &gt; a) \leq
+e^{-\frac{a^2}{2\lambda}} M_\lambda(\lambda)\]</span></p>
+<p>Ce qui complète la preuve du premier inégalité. La preuve de la
+seconde inégalité suit un raisonnement similaire.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La divergence de Chernoff possède plusieurs propriétés intéressantes.
+En voici quelques-unes :</p>
+<ol>
+<li><p>La divergence de Chernoff est toujours non négative, c’est-à-dire
+<span class="math inline">\(D_C(P||Q) \geq 0\)</span>, avec égalité si
+et seulement si <span class="math inline">\(P = Q\)</span>.</p></li>
+<li><p>La divergence de Chernoff est convexe en <span
+class="math inline">\(P\)</span> et en <span
+class="math inline">\(Q\)</span>.</p></li>
+<li><p>La divergence de Chernoff est invariante sous les transformations
+mesurables, c’est-à-dire que pour toute transformation mesurable <span
+class="math inline">\(\phi: \mathcal{X} \to \mathcal{Y}\)</span>, nous
+avons : <span class="math display">\[D_C(P||Q) = D_C(\phi_* P || \phi_*
+Q)\]</span></p></li>
+</ol>
+<p>Pour prouver la première propriété, nous utilisons le fait que <span
+class="math inline">\(\log(x) \leq x - 1\)</span> pour tout <span
+class="math inline">\(x &gt; 0\)</span>. En appliquant cette inégalité à
+l’intégrale définissant <span class="math inline">\(D_C(P||Q)\)</span>,
+nous obtenons :</p>
+<p><span class="math display">\[D_C(P||Q) = -\lim_{\lambda \to 0^+}
+\frac{1}{\lambda} \log \left( \int_{\mathcal{X}} p(x)^{\lambda}
+q(x)^{1-\lambda} \, dx \right) \geq 0\]</span></p>
+<p>L’égalité a lieu si et seulement si <span class="math inline">\(p(x)
+= q(x)\)</span> pour presque tout <span
+class="math inline">\(x\)</span>, c’est-à-dire si et seulement si <span
+class="math inline">\(P = Q\)</span>.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La divergence de Chernoff est un outil puissant et flexible pour
+comparer des distributions de probabilité. Ses applications sont vastes
+et variées, allant de la théorie des tests statistiques à
+l’apprentissage automatique. En comprenant ses propriétés et ses
+théorèmes associés, nous pouvons mieux apprécier son importance dans le
+domaine de la théorie des probabilités et de l’inférence
+statistique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

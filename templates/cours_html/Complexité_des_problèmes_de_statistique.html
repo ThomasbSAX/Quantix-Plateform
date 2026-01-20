@@ -1,0 +1,366 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de statistique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de statistique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La statistique, en tant que discipline mathématique, a pour objectif
+de tirer des conclusions à partir de données observées. Cependant, la
+complexité des problèmes statistiques varie considérablement en fonction
+de la nature des données, des hypothèses sous-jacentes et des objectifs
+de l’analyse. L’étude de la complexité en statistique émerge comme un
+domaine crucial pour comprendre les limites et les possibilités des
+méthodes statistiques.</p>
+<p>Historiquement, la statistique a évolué pour répondre à des besoins
+pratiques, tels que l’estimation de paramètres, le test d’hypothèses et
+la modélisation prédictive. Avec l’avènement des grandes données et des
+modèles complexes, la nécessité de quantifier la complexité des
+problèmes statistiques est devenue évidente. Cette quantification permet
+de comparer différentes méthodes, d’optimiser les ressources
+computationnelles et de garantir la robustesse des résultats.</p>
+<p>La notion de complexité en statistique est indispensable pour
+plusieurs raisons. Tout d’abord, elle permet de comprendre les limites
+des méthodes statistiques existantes. Ensuite, elle aide à développer de
+nouvelles méthodes plus efficaces et adaptées aux défis modernes. Enfin,
+elle fournit un cadre théorique pour évaluer la performance des
+algorithmes statistiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour aborder la complexité des problèmes de statistique, il est
+essentiel de définir quelques concepts clés. Nous commençons par
+expliquer pédagogiquement ce que nous cherchons à avoir, de manière à ce
+que le lecteur puisse deviner la définition.</p>
+<h2 id="complexité-computationnelle">Complexité Computationnelle</h2>
+<p>La complexité computationnelle en statistique se réfère au temps et à
+la mémoire nécessaires pour résoudre un problème statistique donné. Elle
+est souvent exprimée en termes de la taille des données et du nombre
+d’opérations requises.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{P}\)</span> un problème
+statistique et <span class="math inline">\(n\)</span> la taille des
+données. La complexité computationnelle de <span
+class="math inline">\(\mathcal{P}\)</span> est définie comme la fonction
+<span class="math inline">\(T(n)\)</span> qui représente le nombre
+d’opérations nécessaires pour résoudre <span
+class="math inline">\(\mathcal{P}\)</span>.</p>
+<p>Formellement, nous avons : <span class="math display">\[T(n) =
+\max_{x \in \mathcal{D}_n} \text{temps}(A(x))\]</span> où <span
+class="math inline">\(\mathcal{D}_n\)</span> est l’ensemble des
+instances de taille <span class="math inline">\(n\)</span> et <span
+class="math inline">\(A\)</span> est un algorithme résolvant <span
+class="math inline">\(\mathcal{P}\)</span>.</p>
+</div>
+<h2 id="complexité-statistique">Complexité Statistique</h2>
+<p>La complexité statistique se réfère à la difficulté de résoudre un
+problème statistique en termes de la quantité de données nécessaires
+pour atteindre une certaine précision.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{P}\)</span> un problème
+statistique et <span class="math inline">\(\epsilon &gt; 0\)</span>. La
+complexité statistique de <span
+class="math inline">\(\mathcal{P}\)</span> est définie comme la fonction
+<span class="math inline">\(N(\epsilon)\)</span> qui représente le
+nombre minimal d’observations nécessaires pour estimer un paramètre avec
+une précision <span class="math inline">\(\epsilon\)</span>.</p>
+<p>Formellement, nous avons : <span class="math display">\[N(\epsilon) =
+\min_{n \in \mathbb{N}} \left\{ n : \sup_{\theta \in \Theta}
+\mathbb{E}_{\theta} \left[ L(\hat{\theta}_n, \theta) \right] \leq
+\epsilon \right\}\]</span> où <span
+class="math inline">\(L(\hat{\theta}_n, \theta)\)</span> est une
+fonction de perte et <span class="math inline">\(\hat{\theta}_n\)</span>
+est un estimateur basé sur <span class="math inline">\(n\)</span>
+observations.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Nous présentons maintenant quelques théorèmes importants liés à la
+complexité des problèmes de statistique.</p>
+<h2 id="théorème-de-cramer-rao">Théorème de Cramer-Rao</h2>
+<p>Le théorème de Cramer-Rao établit une borne inférieure sur la
+variance d’un estimateur non biaisé.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, \ldots, X_n\)</span> des
+variables aléatoires indépendantes et identiquement distribuées avec une
+densité de probabilité <span class="math inline">\(f(x|\theta)\)</span>,
+où <span class="math inline">\(\theta \in \Theta \subset
+\mathbb{R}\)</span>. Supposons que l’estimateur <span
+class="math inline">\(\hat{\theta}_n\)</span> est non biaisé, i.e.,
+<span class="math inline">\(\mathbb{E}_{\theta} [\hat{\theta}_n] =
+\theta\)</span>.</p>
+<p>Alors, la variance de <span
+class="math inline">\(\hat{\theta}_n\)</span> est bornée inférieurement
+par : <span class="math display">\[\text{Var}_{\theta} (\hat{\theta}_n)
+\geq \frac{1}{n I(\theta)}\]</span> où <span
+class="math inline">\(I(\theta)\)</span> est l’information de Fisher
+définie par : <span class="math display">\[I(\theta) =
+\mathbb{E}_{\theta} \left[ \left( \frac{\partial}{\partial \theta} \log
+f(X_1|\theta) \right)^2 \right]\]</span></p>
+</div>
+<h2 id="démonstration-du-théorème-de-cramer-rao">Démonstration du
+Théorème de Cramer-Rao</h2>
+<p>Nous fournissons une démonstration détaillée du théorème de
+Cramer-Rao.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la fonction de score <span
+class="math inline">\(S(\theta) = \frac{\partial}{\partial \theta} \log
+f(X_1|\theta)\)</span>. Nous avons : <span
+class="math display">\[\mathbb{E}_{\theta} [S(\theta)] = 0\]</span> et
+<span class="math display">\[\text{Var}_{\theta} (S(\theta)) =
+I(\theta)\]</span></p>
+<p>Par l’inégalité de Cauchy-Schwarz, nous avons : <span
+class="math display">\[\text{Cov}_{\theta} (\hat{\theta}_n, S(\theta))^2
+\leq \text{Var}_{\theta} (\hat{\theta}_n) \cdot \text{Var}_{\theta}
+(S(\theta))\]</span></p>
+<p>Puisque <span class="math inline">\(\mathbb{E}_{\theta}
+[\hat{\theta}_n] = \theta\)</span>, nous avons : <span
+class="math display">\[\text{Cov}_{\theta} (\hat{\theta}_n, S(\theta)) =
+\text{Cov}_{\theta} (\theta, S(\theta)) = 0\]</span></p>
+<p>En utilisant l’identité de Stein, nous obtenons : <span
+class="math display">\[1 = \text{Cov}_{\theta} (\hat{\theta}_n,
+S(\theta))^2 \leq \text{Var}_{\theta} (\hat{\theta}_n) \cdot
+I(\theta)\]</span></p>
+<p>En divisant par <span class="math inline">\(n I(\theta)\)</span>,
+nous obtenons la borne souhaitée : <span
+class="math display">\[\text{Var}_{\theta} (\hat{\theta}_n) \geq
+\frac{1}{n I(\theta)}\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous présentons maintenant quelques propriétés et corollaires
+importants liés à la complexité des problèmes de statistique.</p>
+<h2 id="propriétés-de-linformation-de-fisher">Propriétés de
+l’Information de Fisher</h2>
+<ol>
+<li><p>L’information de Fisher est toujours non négative, i.e., <span
+class="math inline">\(I(\theta) \geq 0\)</span>.</p></li>
+<li><p>L’information de Fisher est additive pour des échantillons
+indépendants, i.e., si <span class="math inline">\(X_1, \ldots,
+X_n\)</span> sont indépendants, alors : <span
+class="math display">\[I(\theta; X_1, \ldots, X_n) = \sum_{i=1}^n
+I(\theta; X_i)\]</span></p></li>
+<li><p>L’information de Fisher est invariante sous les transformations
+bijectives, i.e., si <span class="math inline">\(\phi\)</span> est une
+transformation bijective, alors : <span
+class="math display">\[I(\phi(\theta)) = I(\theta)\]</span></p></li>
+</ol>
+<h2
+id="démonstration-des-propriétés-de-linformation-de-fisher">Démonstration
+des Propriétés de l’Information de Fisher</h2>
+<div class="proof">
+<p><em>Proof.</em> Pour la propriété (i), nous avons : <span
+class="math display">\[I(\theta) = \mathbb{E}_{\theta} \left[ \left(
+\frac{\partial}{\partial \theta} \log f(X_1|\theta) \right)^2 \right]
+\geq 0\]</span></p>
+<p>Pour la propriété (ii), nous avons : <span
+class="math display">\[I(\theta; X_1, \ldots, X_n) = \mathbb{E}_{\theta}
+\left[ \left( \frac{\partial}{\partial \theta} \log f(X_1, \ldots,
+X_n|\theta) \right)^2 \right] = \sum_{i=1}^n I(\theta; X_i)\]</span></p>
+<p>Pour la propriété (iii), nous avons : <span
+class="math display">\[I(\phi(\theta)) = \mathbb{E}_{\phi(\theta)}
+\left[ \left( \frac{\partial}{\partial \phi(\theta)} \log
+f(X_1|\phi(\theta)) \right)^2 \right] = I(\theta)\]</span> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La complexité des problèmes de statistique est un domaine riche et
+fascinant qui offre des outils puissants pour comprendre les limites et
+les possibilités des méthodes statistiques. En quantifiant la complexité
+computationnelle et statistique, nous pouvons développer des algorithmes
+plus efficaces et garantir la robustesse de nos analyses. Les théorèmes
+et propriétés présentés dans cet article fournissent un cadre théorique
+solide pour l’étude de la complexité en statistique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,321 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Analyse de Variance à Mesures Répétées : Théorie et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Analyse de Variance à Mesures Répétées : Théorie et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse de variance (ANOVA) à mesures répétées est une méthode
+statistique puissante utilisée pour analyser des données où les mêmes
+sujets sont mesurés plusieurs fois dans différentes conditions. Cette
+approche est particulièrement utile en psychologie, médecine, et
+sciences sociales, où les expériences impliquent souvent des mesures
+longitudinales ou des designs factoriels répétés.</p>
+<p>L’ANOVA à mesures répétées émerge comme une réponse aux limitations
+de l’ANOVA classique, qui suppose des erreurs indépendantes et
+identiquement distribuées. En revanche, les mesures répétées
+introduisent une corrélation entre les observations d’un même sujet,
+nécessitant des modèles plus sophistiqués pour capturer cette
+dépendance.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’ANOVA à mesures répétées, commençons par définir
+les concepts clés.</p>
+<h2 class="unnumbered" id="modèle-linéaire-général">Modèle Linéaire
+Général</h2>
+<p>Considérons un modèle linéaire général pour des mesures répétées.
+Supposons que nous avons <span class="math inline">\(n\)</span> sujets,
+et que chaque sujet est mesuré <span class="math inline">\(p\)</span>
+fois sous différentes conditions. Soit <span
+class="math inline">\(Y_{ij}\)</span> la mesure du sujet <span
+class="math inline">\(i\)</span> à la condition <span
+class="math inline">\(j\)</span>.</p>
+<p>Nous cherchons à modéliser <span
+class="math inline">\(Y_{ij}\)</span> comme suit : <span
+class="math display">\[Y_{ij} = \mu + \alpha_i + \epsilon_{ij}\]</span>
+où : - <span class="math inline">\(\mu\)</span> est la moyenne globale,
+- <span class="math inline">\(\alpha_i\)</span> est l’effet fixe de la
+condition <span class="math inline">\(i\)</span>, - <span
+class="math inline">\(\epsilon_{ij}\)</span> est l’erreur aléatoire
+associée à la mesure <span class="math inline">\(j\)</span> du sujet
+<span class="math inline">\(i\)</span>.</p>
+<h2 class="unnumbered" id="matrice-de-covariance">Matrice de
+Covariance</h2>
+<p>Une caractéristique cruciale des mesures répétées est la structure de
+covariance entre les observations. La matrice de covariance <span
+class="math inline">\(\Sigma\)</span> peut être modélisée de différentes
+manières, par exemple : <span class="math display">\[\Sigma = \sigma^2 I
++ \tau^2 J\]</span> où <span class="math inline">\(I\)</span> est la
+matrice identité, <span class="math inline">\(J\)</span> est une matrice
+de uns, <span class="math inline">\(\sigma^2\)</span> est la variance
+des erreurs, et <span class="math inline">\(\tau^2\)</span> est la
+variance due aux effets aléatoires.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-sphéricité">Théorème de
+Sphéricité</h2>
+<p>Un théorème fondamental en ANOVA à mesures répétées est le théorème
+de sphéricité, qui stipule que les variances des différences entre les
+mesures doivent être égales.</p>
+<p>Formellement, pour <span class="math inline">\(p\)</span> conditions,
+le théorème de sphéricité s’énonce comme suit : <span
+class="math display">\[\text{Var}(Y_{i1} - Y_{i2}) = \text{Var}(Y_{i1} -
+Y_{i3}) = \dots = \text{Var}(Y_{i(p-1)} - Y_{ip})\]</span></p>
+<h2 class="unnumbered" id="théorème-de-greenhouse-geisser">Théorème de
+Greenhouse-Geisser</h2>
+<p>Lorsque l’hypothèse de sphéricité est violée, le théorème de
+Greenhouse-Geisser fournit une correction pour les tests d’ANOVA. La
+statistique corrigée est donnée par : <span
+class="math display">\[\epsilon = \frac{(p-1)^2}{\sum_{k=1}^{p-1} (p-k)
+\rho_k}\]</span> où <span class="math inline">\(\rho_k\)</span> est le
+coefficient de corrélation entre les mesures séparées par <span
+class="math inline">\(k\)</span> conditions.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered" id="preuve-du-théorème-de-sphéricité">Preuve du
+Théorème de Sphéricité</h2>
+<p>Pour prouver le théorème de sphéricité, nous devons montrer que les
+variances des différences entre les mesures sont égales.</p>
+<p>Considérons deux conditions <span class="math inline">\(j\)</span> et
+<span class="math inline">\(k\)</span>. La variance de la différence est
+: <span class="math display">\[\text{Var}(Y_{ij} - Y_{ik}) =
+\text{Var}(Y_{ij}) + \text{Var}(Y_{ik}) - 2 \text{Cov}(Y_{ij},
+Y_{ik})\]</span></p>
+<p>En supposant que <span class="math inline">\(\text{Var}(Y_{ij}) =
+\sigma^2\)</span> pour toutes les conditions <span
+class="math inline">\(j\)</span>, et que <span
+class="math inline">\(\text{Cov}(Y_{ij}, Y_{ik}) = \rho
+\sigma^2\)</span> pour toutes les paires <span class="math inline">\((j,
+k)\)</span>, nous obtenons : <span
+class="math display">\[\text{Var}(Y_{ij} - Y_{ik}) = 2\sigma^2 (1 -
+\rho)\]</span></p>
+<p>Cette expression est indépendante de <span
+class="math inline">\(j\)</span> et <span
+class="math inline">\(k\)</span>, prouvant ainsi le théorème de
+sphéricité.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered"
+id="propriété-1-robustesse-aux-violations-de-sphéricité">Propriété 1:
+Robustesse aux Violations de Sphéricité</h2>
+<p>L’ANOVA à mesures répétées est robuste aux violations de l’hypothèse
+de sphéricité, surtout lorsque le nombre de conditions est élevé. Des
+corrections comme celle de Greenhouse-Geisser peuvent être appliquées
+pour maintenir la validité des tests.</p>
+<h2 class="unnumbered"
+id="propriété-2-efficacité-des-modèles-multiniveaux">Propriété 2:
+Efficacité des Modèles Multiniveaux</h2>
+<p>Les modèles multiniveaux sont souvent plus efficaces que les modèles
+traditionnels pour analyser des données à mesures répétées, car ils
+permettent de capturer la hiérarchie des données (sujets imbriqués dans
+les conditions).</p>
+<h2 class="unnumbered"
+id="propriété-3-importance-de-la-structure-de-covariance">Propriété 3:
+Importance de la Structure de Covariance</h2>
+<p>La spécification correcte de la structure de covariance est cruciale
+pour l’ANOVA à mesures répétées. Des structures comme la structure
+composée symétrique (CS) ou la structure autoregressive (AR1) peuvent
+améliorer la précision des estimations.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’ANOVA à mesures répétées est une méthode statistique essentielle
+pour l’analyse de données longitudinales et expérimentales. En
+comprenant ses fondements théoriques, ses hypothèses, et ses extensions,
+les chercheurs peuvent tirer des conclusions plus précises et robustes
+de leurs données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

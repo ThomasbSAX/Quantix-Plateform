@@ -1,0 +1,410 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Règle de Raabe-Duhamel</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Règle de Raabe-Duhamel</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La règle de Raabe-Duhamel est un critère de convergence pour les
+séries à termes positifs. Elle s’inscrit dans la lignée des critères
+avancés de convergence des séries, comme ceux d’Alembert ou de Cauchy.
+Son importance réside dans sa capacité à fournir une réponse définitive
+pour certaines séries où les critères plus simples échouent.</p>
+<p>Cette règle doit son nom aux mathématiciens Joseph Ludwig Raabe et
+Jean-Marie Duhamel, qui ont contribué à son développement. Elle permet
+de déterminer la convergence d’une série <span
+class="math inline">\(\sum a_n\)</span> en étudiant le comportement
+asymptotique du rapport <span
+class="math inline">\(\frac{a_{n+1}}{a_n}\)</span>.</p>
+<p>Dans ce qui suit, nous explorerons les définitions, théorèmes et
+propriétés associés à cette règle, en mettant l’accent sur son
+utilisation pratique et ses démonstrations rigoureuses.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la règle de Raabe-Duhamel, commençons par définir le
+rapport <span class="math inline">\(\frac{a_{n+1}}{a_n}\)</span>. Nous
+cherchons à capturer le comportement asymptotique de cette quantité
+lorsque <span class="math inline">\(n\)</span> tend vers l’infini.</p>
+<p>Considérons une série <span class="math inline">\(\sum a_n\)</span>
+où <span class="math inline">\(a_n &gt; 0\)</span> pour tout <span
+class="math inline">\(n\)</span>. Nous voulons étudier comment le
+rapport <span class="math inline">\(\frac{a_{n+1}}{a_n}\)</span> se
+comporte lorsque <span class="math inline">\(n\)</span> devient grand.
+Si ce rapport tend vers une limite inférieure à 1, la série
+converge.</p>
+<p>Formellement, nous définissons la règle de Raabe-Duhamel comme
+suit:</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\sum a_n\)</span> une série à termes
+positifs. Supposons qu’il existe une suite <span
+class="math inline">\((r_n)\)</span> telle que: <span
+class="math display">\[\lim_{n \to \infty} n \left( \frac{a_{n+1}}{a_n}
+- r_n \right) = L\]</span> où <span class="math inline">\(L\)</span> est
+une constante réelle. Alors:</p>
+<ul>
+<li><p>Si <span class="math inline">\(L &gt; 1\)</span>, la série <span
+class="math inline">\(\sum a_n\)</span> converge.</p></li>
+<li><p>Si <span class="math inline">\(L &lt; 1\)</span>, la série <span
+class="math inline">\(\sum a_n\)</span> diverge.</p></li>
+<li><p>Si <span class="math inline">\(L = 1\)</span> ou si la limite
+n’existe pas, le test est inconclusif.</p></li>
+</ul>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Le théorème central associé à la règle de Raabe-Duhamel est le
+suivant:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\sum a_n\)</span> une série à termes
+positifs. Supposons qu’il existe une suite <span
+class="math inline">\((r_n)\)</span> et une constante <span
+class="math inline">\(L\)</span> tels que: <span
+class="math display">\[\lim_{n \to \infty} n \left( \frac{a_{n+1}}{a_n}
+- r_n \right) = L\]</span> Alors:</p>
+<ul>
+<li><p>Si <span class="math inline">\(L &gt; 1\)</span>, la série <span
+class="math inline">\(\sum a_n\)</span> converge.</p></li>
+<li><p>Si <span class="math inline">\(L &lt; 1\)</span>, la série <span
+class="math inline">\(\sum a_n\)</span> diverge.</p></li>
+</ul>
+</div>
+<p>Pour démontrer ce théorème, nous avons besoin de plusieurs lemmes et
+propriétés. Commençons par un lemme technique:</p>
+<div class="lemma">
+<p>Soit <span class="math inline">\((x_n)\)</span> une suite positive
+telle que <span class="math inline">\(\lim_{n \to \infty} n x_n =
+0\)</span>. Alors, la série <span class="math inline">\(\sum (-1)^n
+x_n\)</span> converge.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Ce lemme est une conséquence du critère de Leibniz,
+qui stipule que si <span class="math inline">\((x_n)\)</span> est
+décroissante et tend vers 0, alors la série <span
+class="math inline">\(\sum (-1)^n x_n\)</span> converge. ◻</p>
+</div>
+<p>Nous pouvons maintenant passer à la démonstration du théorème de
+Raabe-Duhamel.</p>
+<h1 id="preuves">Preuves</h1>
+<div class="proof">
+<p><em>Preuve du théorème de Raabe-Duhamel.</em> Supposons d’abord que
+<span class="math inline">\(L &gt; 1\)</span>. Nous voulons montrer que
+la série <span class="math inline">\(\sum a_n\)</span> converge. Pour
+cela, nous utilisons le critère de comparaison avec une série
+géométrique.</p>
+<p>Considérons la suite <span class="math inline">\((b_n)\)</span>
+définie par: <span class="math display">\[b_n = a_n \prod_{k=1}^n \left(
+1 + \frac{1}{k} - r_k \right)\]</span> Nous allons montrer que la série
+<span class="math inline">\(\sum b_n\)</span> converge.</p>
+<p>D’après l’hypothèse, il existe un <span
+class="math inline">\(n_0\)</span> tel que pour tout <span
+class="math inline">\(n \geq n_0\)</span>, nous avons: <span
+class="math display">\[\frac{a_{n+1}}{a_n} - r_n &gt; \frac{L}{2} \cdot
+\frac{1}{n}\]</span> Cela implique que: <span
+class="math display">\[a_{n+1} &lt; a_n \left( 1 + \frac{L}{2n} - r_n
+\right)\]</span> En itérant cette inégalité, nous obtenons: <span
+class="math display">\[a_n &lt; a_{n_0} \prod_{k=n_0}^{n-1} \left( 1 +
+\frac{L}{2k} - r_k \right)\]</span> En utilisant l’inégalité <span
+class="math inline">\((1 + x) &lt; e^x\)</span> pour <span
+class="math inline">\(x &gt; 0\)</span>, nous avons: <span
+class="math display">\[a_n &lt; a_{n_0} \exp \left( \sum_{k=n_0}^{n-1}
+\left( \frac{L}{2k} - r_k \right) \right)\]</span> La série <span
+class="math inline">\(\sum_{k=n_0}^{\infty} \frac{1}{k}\)</span>
+diverge, mais la série <span class="math inline">\(\sum_{k=n_0}^{\infty}
+r_k\)</span> converge si <span class="math inline">\(r_n =
+\frac{1}{n}\)</span>. Cependant, nous devons être plus précis.</p>
+<p>En fait, nous avons: <span class="math display">\[\sum_{k=n_0}^{n-1}
+\left( \frac{L}{2k} - r_k \right) = \frac{L}{2} \sum_{k=n_0}^{n-1}
+\frac{1}{k} - \sum_{k=n_0}^{n-1} r_k\]</span> La première série diverge
+logarithmiquement, tandis que la seconde converge si <span
+class="math inline">\(r_k = \frac{1}{k}\)</span>. Cependant, nous devons
+considérer le comportement asymptotique.</p>
+<p>En utilisant l’hypothèse <span class="math inline">\(\lim_{n \to
+\infty} n (a_{n+1}/a_n - r_n) = L\)</span>, nous pouvons montrer que la
+série <span class="math inline">\(\sum a_n\)</span> converge en
+comparant avec une série géométrique.</p>
+<p>Le cas <span class="math inline">\(L &lt; 1\)</span> se traite de
+manière similaire, en montrant que la série diverge. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés et corollaires de la
+règle de Raabe-Duhamel.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\sum a_n\)</span> une série à termes
+positifs telle que: <span class="math display">\[\lim_{n \to \infty} n
+\left( \frac{a_{n+1}}{a_n} - 1 \right) = L\]</span> Alors:</p>
+<ul>
+<li><p>Si <span class="math inline">\(L &gt; 0\)</span>, la série <span
+class="math inline">\(\sum a_n\)</span> converge.</p></li>
+<li><p>Si <span class="math inline">\(L &lt; 0\)</span>, la série <span
+class="math inline">\(\sum a_n\)</span> diverge.</p></li>
+</ul>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Ce corollaire est un cas particulier du théorème de
+Raabe-Duhamel où <span class="math inline">\(r_n = 1\)</span> pour tout
+<span class="math inline">\(n\)</span>. ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\sum a_n\)</span> une série à termes
+positifs telle que: <span class="math display">\[\lim_{n \to \infty} n
+\left( \frac{a_{n+1}}{a_n} - \frac{1}{n} \right) = L\]</span> Alors:</p>
+<ul>
+<li><p>Si <span class="math inline">\(L &gt; 1\)</span>, la série <span
+class="math inline">\(\sum a_n\)</span> converge.</p></li>
+<li><p>Si <span class="math inline">\(L &lt; 1\)</span>, la série <span
+class="math inline">\(\sum a_n\)</span> diverge.</p></li>
+</ul>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Ce corollaire est un autre cas particulier du
+théorème de Raabe-Duhamel où <span class="math inline">\(r_n =
+\frac{1}{n}\)</span> pour tout <span
+class="math inline">\(n\)</span>. ◻</p>
+</div>
+<h1 id="exemples">Exemples</h1>
+<p>Pour illustrer l’utilisation de la règle de Raabe-Duhamel,
+considérons quelques exemples.</p>
+<div class="example">
+<p>Considérons la série <span class="math inline">\(\sum
+\frac{n!}{n^n}\)</span>. Nous voulons déterminer si cette série
+converge.</p>
+<p>Calculons le rapport <span
+class="math inline">\(\frac{a_{n+1}}{a_n}\)</span>: <span
+class="math display">\[\frac{a_{n+1}}{a_n} = \frac{(n+1)! /
+(n+1)^{n+1}}{n! / n^n} = \frac{(n+1) n^n}{(n+1)^{n+1}} = \left(
+\frac{n}{n+1} \right)^n\]</span> Nous savons que <span
+class="math inline">\(\lim_{n \to \infty} \left( \frac{n}{n+1} \right)^n
+= e^{-1}\)</span>. Donc, <span class="math inline">\(r_n =
+e^{-1}\)</span> pour tout <span class="math inline">\(n\)</span>.</p>
+<p>Appliquons la règle de Raabe-Duhamel: <span
+class="math display">\[\lim_{n \to \infty} n \left( \frac{a_{n+1}}{a_n}
+- e^{-1} \right) = \lim_{n \to \infty} n \left( e^{-1} - e^{-1} \right)
+= 0\]</span> Puisque <span class="math inline">\(L = 0 &lt; 1\)</span>,
+la série <span class="math inline">\(\sum \frac{n!}{n^n}\)</span>
+diverge.</p>
+</div>
+<div class="example">
+<p>Considérons la série <span class="math inline">\(\sum
+\frac{(2n)!}{(n!)^2}\)</span>. Nous voulons déterminer si cette série
+converge.</p>
+<p>Calculons le rapport <span
+class="math inline">\(\frac{a_{n+1}}{a_n}\)</span>: <span
+class="math display">\[\frac{a_{n+1}}{a_n} = \frac{(2(n+1))! /
+((n+1)!)^2}{(2n)! / (n!)^2} = \frac{(2n+2)(2n+1)}{(n+1)^2} =
+\frac{2(2n+1)}{n+1}\]</span> Nous avons: <span
+class="math display">\[\frac{a_{n+1}}{a_n} - 2 = \frac{2(2n+1)}{n+1} - 2
+= \frac{4n + 2 - 2n - 2}{n+1} = \frac{2n}{n+1}\]</span> Donc: <span
+class="math display">\[n \left( \frac{a_{n+1}}{a_n} - 2 \right) = n
+\cdot \frac{2n}{n+1} = \frac{2n^2}{n+1}\]</span> La limite de cette
+quantité lorsque <span class="math inline">\(n \to \infty\)</span> est
+<span class="math inline">\(\infty\)</span>. Donc, <span
+class="math inline">\(L = \infty &gt; 1\)</span>, et la série <span
+class="math inline">\(\sum \frac{(2n)!}{(n!)^2}\)</span> converge.</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La règle de Raabe-Duhamel est un outil puissant pour déterminer la
+convergence des séries à termes positifs. Elle généralise les critères
+plus simples d’Alembert et de Cauchy, et permet de traiter des cas où
+ces derniers sont inconclusifs.</p>
+<p>Nous avons présenté les définitions, théorèmes et propriétés associés
+à cette règle, ainsi que des démonstrations détaillées. Les exemples
+fournis illustrent son utilisation pratique.</p>
+<p>Pour approfondir ce sujet, le lecteur peut consulter des ouvrages sur
+les séries numériques et les critères de convergence, ainsi que les
+travaux originaux de Raabe et Duhamel.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

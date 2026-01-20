@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Gaussian Kernel: A Fundamental Tool in Statistical Learning and Signal Processing</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Gaussian Kernel: A Fundamental Tool in Statistical
+Learning and Signal Processing</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-and-motivations">Introduction
+and Motivations</h1>
+<p>The Gaussian kernel, rooted in the ubiquitous Gaussian function, has
+emerged as a cornerstone in various fields such as statistical learning,
+signal processing, and machine learning. Its origins can be traced back
+to the pioneering works of Carl Friedrich Gauss in probability theory
+and statistics. The kernel’s appeal lies in its smooth, bell-shaped
+curve, which ensures that nearby points exert a stronger influence than
+distant ones. This property makes it indispensable in non-parametric
+methods like kernel density estimation and support vector machines,
+where the local structure of data is crucial. The Gaussian kernel’s
+ability to adapt to different scales via its bandwidth parameter further
+enhances its versatility, making it a preferred choice in numerous
+applications.</p>
+<h1 class="unnumbered" id="definitions">Definitions</h1>
+<p>To understand the Gaussian kernel, let us first consider a scenario
+where we wish to measure the similarity between two points in a feature
+space. Intuitively, we want this measure to be high when the points are
+close and low when they are far apart. This leads us naturally to the
+concept of a kernel function, which computes an inner product in some
+(possibly high-dimensional) space.</p>
+<div class="definition">
+<p>Let <span class="math inline">\(\mathcal{X}\)</span> be a set, and
+let <span class="math inline">\(x, y \in \mathcal{X}\)</span>. The
+Gaussian kernel (or Radial Basis Function kernel) is defined as: <span
+class="math display">\[k(x, y) = \exp\left(-\frac{\|x -
+y\|^2}{2\sigma^2}\right),\]</span> where <span
+class="math inline">\(\sigma &gt; 0\)</span> is a parameter controlling
+the width of the kernel. Alternatively, using the exponential’s
+properties, we can express it as: <span class="math display">\[k(x, y) =
+\prod_{i=1}^d \exp\left(-\frac{(x_i -
+y_i)^2}{2\sigma^2}\right),\]</span> where <span
+class="math inline">\(d\)</span> is the dimension of the feature space,
+and <span class="math inline">\(x_i\)</span>, <span
+class="math inline">\(y_i\)</span> are the components of <span
+class="math inline">\(x\)</span> and <span
+class="math inline">\(y\)</span> respectively.</p>
+</div>
+<p>The parameter <span class="math inline">\(\sigma\)</span> plays a
+crucial role in determining the kernel’s behavior. A small <span
+class="math inline">\(\sigma\)</span> results in a narrow kernel, which
+emphasizes local similarities, while a large <span
+class="math inline">\(\sigma\)</span> leads to a wide kernel, capturing
+more global structures.</p>
+<h1 class="unnumbered" id="theorems">Theorems</h1>
+<p>One of the most significant theorems related to the Gaussian kernel
+is the universal kernel theorem, which states that under certain
+conditions, a kernel can approximate any continuous function on a
+compact set. The Gaussian kernel is a prime example of such a universal
+kernel.</p>
+<div class="theorem">
+<p>Let <span class="math inline">\(\mathcal{X}\)</span> be a compact
+subset of <span class="math inline">\(\mathbb{R}^d\)</span>, and let
+<span class="math inline">\(C(\mathcal{X})\)</span> denote the space of
+continuous functions on <span
+class="math inline">\(\mathcal{X}\)</span>. If a kernel <span
+class="math inline">\(k\)</span> is continuous, shift-invariant, and its
+Fourier transform does not vanish at infinity, then the space of
+functions generated by <span class="math inline">\(k\)</span> is dense
+in <span class="math inline">\(C(\mathcal{X})\)</span> with respect to
+the supremum norm.</p>
+</div>
+<p>The Gaussian kernel satisfies these conditions, making it a universal
+kernel. This theorem underscores the kernel’s ability to approximate
+complex functions, which is particularly useful in machine learning
+tasks like regression and classification.</p>
+<h1 class="unnumbered" id="proofs">Proofs</h1>
+<p>To prove that the Gaussian kernel is indeed a universal kernel, we
+need to verify the conditions mentioned in the theorem. Let us start by
+examining the Fourier transform of the Gaussian kernel.</p>
+<div class="proof">
+<p><em>Proof.</em> The Fourier transform <span
+class="math inline">\(\hat{k}\)</span> of the Gaussian kernel <span
+class="math inline">\(k(x, y) = \exp\left(-\frac{\|x -
+y\|^2}{2\sigma^2}\right)\)</span> is given by: <span
+class="math display">\[\hat{k}(\omega) = \exp\left(-\frac{\sigma^2
+\|\omega\|^2}{2}\right).\]</span> This Fourier transform is continuous
+and does not vanish at infinity, as <span
+class="math inline">\(\lim_{\|\omega\| \to \infty} \hat{k}(\omega) =
+0\)</span>. Moreover, the Gaussian kernel is shift-invariant, meaning
+that <span class="math inline">\(k(x - y) = k(y - x)\)</span> for all
+<span class="math inline">\(x, y \in \mathcal{X}\)</span>. These
+properties satisfy the conditions of the universal kernel theorem,
+thereby proving that the Gaussian kernel is indeed a universal
+kernel. ◻</p>
+</div>
+<h1 class="unnumbered" id="properties-and-corollaries">Properties and
+Corollaries</h1>
+<p>The Gaussian kernel possesses several important properties that
+contribute to its widespread use. Let us explore some of these
+properties and their implications.</p>
+<ol>
+<li><p><strong>Positive Definiteness:</strong> The Gaussian kernel is
+positive definite, meaning that for any finite set of points <span
+class="math inline">\(\{x_1, \ldots, x_n\}\)</span> and any vector <span
+class="math inline">\(a \in \mathbb{R}^n\)</span>, the following holds:
+<span class="math display">\[\sum_{i=1}^n \sum_{j=1}^n a_i a_j k(x_i,
+x_j) \geq 0.\]</span> This property ensures that the kernel can be used
+to define an inner product in a feature space, which is essential for
+algorithms like support vector machines.</p>
+<div class="proof">
+<p><em>Proof.</em> The positive definiteness of the Gaussian kernel can
+be shown by recognizing that it is a special case of the squared
+exponential kernel. The Fourier transform <span
+class="math inline">\(\hat{k}(\omega) = \exp\left(-\frac{\sigma^2
+\|\omega\|^2}{2}\right)\)</span> is non-negative, which implies that the
+kernel itself is positive definite. ◻</p>
+</div></li>
+<li><p><strong>Smoothness:</strong> The Gaussian kernel is infinitely
+differentiable, which means that it can capture smooth variations in the
+data. This property is particularly useful in applications like kernel
+regression, where smoothness of the estimated function is desirable.</p>
+<div class="proof">
+<p><em>Proof.</em> The infinite differentiability of the Gaussian kernel
+follows from the fact that the exponential function is infinitely
+differentiable, and the argument <span class="math inline">\(-\frac{\|x
+- y\|^2}{2\sigma^2}\)</span> is a polynomial in <span
+class="math inline">\(x\)</span> and <span
+class="math inline">\(y\)</span>. ◻</p>
+</div></li>
+<li><p><strong>Bandwidth Parameter:</strong> The bandwidth parameter
+<span class="math inline">\(\sigma\)</span> controls the width of the
+kernel. A small <span class="math inline">\(\sigma\)</span> results in a
+narrow kernel, which emphasizes local similarities, while a large <span
+class="math inline">\(\sigma\)</span> leads to a wide kernel, capturing
+more global structures. This adaptability makes the Gaussian kernel
+suitable for a wide range of applications.</p></li>
+</ol>
+<p>In conclusion, the Gaussian kernel is a powerful tool in statistical
+learning and signal processing, with its versatility stemming from its
+smoothness, positive definiteness, and adaptability through the
+bandwidth parameter. Its status as a universal kernel further cements
+its importance in modern machine learning algorithms.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

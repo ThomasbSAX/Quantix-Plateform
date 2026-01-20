@@ -1,0 +1,341 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Corrélation de rang de tau-C : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Corrélation de rang de tau-C : Une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La corrélation de rang de tau-C est une mesure non paramétrique de la
+dépendance entre deux variables. Son origine remonte aux travaux
+pionniers de Karl Pearson au début du XXe siècle, qui a introduit le
+coefficient de corrélation linéaire. Cependant, la limitation de cette
+approche à la dépendance linéaire a conduit à l’émergence de mesures non
+paramétriques, dont le tau-C est un exemple emblématique.</p>
+<p>L’intérêt pour le tau-C émerge dans les situations où la relation
+entre deux variables n’est pas linéaire, mais où une dépendance monotone
+existe. Cette mesure est particulièrement indispensable en statistique
+non paramétrique, en bioinformatique et dans l’analyse de données
+complexes où les hypothèses paramétriques sont souvent violées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la notion de corrélation de rang de tau-C,
+considérons deux variables aléatoires <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Nous cherchons une mesure qui capture
+la tendance des valeurs de <span class="math inline">\(X\)</span> à
+augmenter ou diminuer avec celles de <span
+class="math inline">\(Y\)</span>, sans supposer une relation
+linéaire.</p>
+<p>Supposons que nous avons un échantillon de <span
+class="math inline">\(n\)</span> paires ordonnées <span
+class="math inline">\((x_i, y_i)\)</span>. Nous voulons quantifier la
+force et la direction de la relation monotone entre <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(X = (x_1, \ldots, x_n)\)</span> et
+<span class="math inline">\(Y = (y_1, \ldots, y_n)\)</span> deux
+échantillons de rangs. Le coefficient de corrélation de rang de tau-C
+est défini par : <span class="math display">\[\tau_C = \frac{n_c -
+n_d}{\binom{n}{2}}\]</span> où <span class="math inline">\(n_c\)</span>
+est le nombre de paires concordantes, <span
+class="math inline">\(n_d\)</span> est le nombre de paires discordantes
+et <span class="math inline">\(\binom{n}{2}\)</span> est le nombre total
+de paires possibles.</p>
+</div>
+<p>Une paire <span class="math inline">\((x_i, y_i)\)</span> et <span
+class="math inline">\((x_j, y_j)\)</span> est concordante si <span
+class="math inline">\(x_i &lt; x_j\)</span> et <span
+class="math inline">\(y_i &lt; y_j\)</span> ou <span
+class="math inline">\(x_i &gt; x_j\)</span> et <span
+class="math inline">\(y_i &gt; y_j\)</span>. Elle est discordante si
+<span class="math inline">\(x_i &lt; x_j\)</span> et <span
+class="math inline">\(y_i &gt; y_j\)</span> ou <span
+class="math inline">\(x_i &gt; x_j\)</span> et <span
+class="math inline">\(y_i &lt; y_j\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre les propriétés du coefficient tau-C, considérons le
+théorème suivant :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables aléatoires. Le
+coefficient tau-C satisfait les propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(-1 \leq \tau_C \leq
+1\)</span></p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendantes, alors <span
+class="math inline">\(\tau_C = 0\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont parfaitement monotones, alors
+<span class="math inline">\(\tau_C = 1\)</span> ou <span
+class="math inline">\(\tau_C = -1\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer la première propriété, nous utilisons
+le fait que <span class="math inline">\(n_c + n_d \leq
+\binom{n}{2}\)</span>. Ainsi, <span
+class="math inline">\(\tau_C\)</span> est borné par <span
+class="math inline">\(-1\)</span> et <span
+class="math inline">\(1\)</span>.</p>
+<p>Pour la deuxième propriété, si <span class="math inline">\(X\)</span>
+et <span class="math inline">\(Y\)</span> sont indépendantes, le nombre
+de paires concordantes est égal au nombre de paires discordantes, ce qui
+implique que <span class="math inline">\(\tau_C = 0\)</span>.</p>
+<p>Enfin, si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont parfaitement monotones, toutes les
+paires sont soit concordantes soit discordantes, ce qui donne <span
+class="math inline">\(\tau_C = 1\)</span> ou <span
+class="math inline">\(\tau_C = -1\)</span>. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Considérons maintenant une preuve plus détaillée de la propriété du
+coefficient tau-C.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour montrer que <span class="math inline">\(-1 \leq
+\tau_C \leq 1\)</span>, nous utilisons le fait que : <span
+class="math display">\[n_c + n_d \leq \binom{n}{2}\]</span> Ainsi, nous
+avons : <span class="math display">\[\tau_C = \frac{n_c -
+n_d}{\binom{n}{2}} \leq \frac{\binom{n}{2}}{\binom{n}{2}} = 1\]</span>
+De même, nous avons : <span class="math display">\[\tau_C \geq
+\frac{-\binom{n}{2}}{\binom{n}{2}} = -1\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes du
+coefficient tau-C :</p>
+<ol>
+<li><p>Le coefficient tau-C est invariant par transformation monotone.
+Cela signifie que si nous appliquons une fonction strictement croissante
+à <span class="math inline">\(X\)</span> et/ou <span
+class="math inline">\(Y\)</span>, le coefficient tau-C reste
+inchangé.</p></li>
+<li><p>Le coefficient tau-C est une mesure non paramétrique, ce qui
+signifie qu’il ne suppose pas de distribution particulière pour <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p></li>
+<li><p>Le coefficient tau-C peut être utilisé pour tester l’indépendance
+entre deux variables. Si <span class="math inline">\(\tau_C =
+0\)</span>, nous pouvons rejeter l’hypothèse d’indépendance.</p></li>
+</ol>
+<div class="proof">
+<p><em>Proof.</em> Pour la propriété (i), supposons que nous appliquions
+une fonction strictement croissante <span
+class="math inline">\(f\)</span> à <span
+class="math inline">\(X\)</span>. Alors, les rangs de <span
+class="math inline">\(f(X)\)</span> sont les mêmes que ceux de <span
+class="math inline">\(X\)</span>, et donc le nombre de paires
+concordantes et discordantes reste inchangé.</p>
+<p>Pour la propriété (ii), le coefficient tau-C ne fait aucune hypothèse
+sur la distribution des variables <span class="math inline">\(X\)</span>
+et <span class="math inline">\(Y\)</span>.</p>
+<p>Pour la propriété (iii), si <span class="math inline">\(\tau_C =
+0\)</span>, cela signifie que le nombre de paires concordantes est égal
+au nombre de paires discordantes, ce qui implique que <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendantes. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La corrélation de rang de tau-C est une mesure puissante et flexible
+pour quantifier la dépendance monotone entre deux variables. Ses
+propriétés mathématiques solides et son invariance par transformation
+monotone en font un outil précieux dans de nombreuses applications
+statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

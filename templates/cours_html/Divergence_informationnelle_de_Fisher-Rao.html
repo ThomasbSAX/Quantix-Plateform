@@ -1,0 +1,361 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence informationnelle de Fisher-Rao : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence informationnelle de Fisher-Rao : Une
+exploration mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’information géométrique, un domaine passionnant à l’intersection de
+la statistique et de la géométrie différentielle, trouve son fondement
+dans les travaux pionniers de Fisher (1925) et Rao (1945). La divergence
+informationnelle de Fisher-Rao, souvent appelée simplement divergence de
+Rao, émerge comme une mesure clé pour quantifier la distance entre
+distributions de probabilité. Cette notion est indispensable dans des
+domaines variés tels que l’apprentissage automatique, la théorie de
+l’information et les systèmes dynamiques.</p>
+<p>L’origine historique de cette divergence remonte aux travaux de
+Ronald A. Fisher sur l’information de Fisher, une mesure de la quantité
+d’information contenue dans un paramètre statistique. C.W.R. Rao a
+ensuite généralisé cette notion en introduisant une métrique sur
+l’espace des distributions de probabilité. La divergence de Fisher-Rao
+est alors apparue comme une mesure naturelle de la distance entre deux
+distributions, basée sur cette métrique.</p>
+<p>Dans ce chapitre, nous explorerons les définitions formelles de la
+divergence de Fisher-Rao, ses propriétés fondamentales et ses
+applications. Nous verrons comment cette notion permet de résoudre des
+problèmes complexes dans l’analyse des données et la modélisation
+statistique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la divergence informationnelle de Fisher-Rao,
+commençons par comprendre ce que nous cherchons à mesurer. Supposons que
+nous ayons deux distributions de probabilité <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> sur un espace mesurable <span
+class="math inline">\(\mathcal{X}\)</span>. Nous voulons quantifier la
+distance entre ces deux distributions en tenant compte de la structure
+géométrique sous-jacente.</p>
+<p>La divergence de Fisher-Rao est une mesure de cette distance qui
+prend en compte la métrique de Fisher, une métrique riemannienne sur
+l’espace des distributions de probabilité. Cette métrique est définie en
+termes du gradient de la log-vraisemblance, ce qui lui confère une
+interprétation informationnelle profonde.</p>
+<p>Formellement, la divergence de Fisher-Rao entre deux distributions
+<span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité sur
+un espace mesurable <span class="math inline">\(\mathcal{X}\)</span>. La
+divergence informationnelle de Fisher-Rao entre <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est donnée par : <span
+class="math display">\[D_{\text{FR}}(P, Q) = \int_{\mathcal{X}} \left(
+\sqrt{\frac{dP}{d\mu}} - \sqrt{\frac{dQ}{d\mu}} \right)^2 d\mu\]</span>
+où <span class="math inline">\(\mu\)</span> est une mesure de référence
+sur <span class="math inline">\(\mathcal{X}\)</span>, et <span
+class="math inline">\(\frac{dP}{d\mu}\)</span> et <span
+class="math inline">\(\frac{dQ}{d\mu}\)</span> sont les densités de
+<span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> par rapport à <span
+class="math inline">\(\mu\)</span>.</p>
+</div>
+<p>Une autre formulation équivalente de la divergence de Fisher-Rao est
+: <span class="math display">\[D_{\text{FR}}(P, Q) = 2 - 2
+\int_{\mathcal{X}} \sqrt{\frac{dP}{d\mu} \cdot \frac{dQ}{d\mu}}
+d\mu\]</span></p>
+<p>Cette définition met en évidence la nature quadratique de la
+divergence, qui est une mesure de la différence entre les racines
+carrées des densités.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la divergence de Fisher-Rao est le
+théorème de l’information de Fisher, qui établit une relation entre la
+divergence de Fisher-Rao et la métrique de Fisher.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{P}\)</span> un espace de
+distributions de probabilité paramétré par un paramètre <span
+class="math inline">\(\theta\)</span>. La métrique de Fisher en <span
+class="math inline">\(\theta\)</span> est donnée par : <span
+class="math display">\[g_{ij}(\theta) = \int_{\mathcal{X}}
+\frac{\partial \log p(x|\theta)}{\partial \theta_i} \frac{\partial \log
+p(x|\theta)}{\partial \theta_j} p(x|\theta) dx\]</span> où <span
+class="math inline">\(p(x|\theta)\)</span> est la densité de probabilité
+conditionnelle.</p>
+</div>
+<p>Un autre théorème important est le théorème de la divergence
+minimale, qui montre que la divergence de Fisher-Rao atteint son minimum
+lorsque les deux distributions sont identiques.</p>
+<div class="theorem">
+<p>Pour toute paire de distributions <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>, la divergence de Fisher-Rao satisfait
+: <span class="math display">\[D_{\text{FR}}(P, Q) \geq 0\]</span> avec
+l’égalité si et seulement si <span class="math inline">\(P = Q\)</span>
+presque partout.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la divergence minimale, commençons par
+rappeler l’inégalité de Cauchy-Schwarz. Soient <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> deux fonctions intégrables sur un
+espace mesurable <span class="math inline">\(\mathcal{X}\)</span>.
+L’inégalité de Cauchy-Schwarz affirme que : <span
+class="math display">\[\left( \int_{\mathcal{X}} f(x)g(x) d\mu(x)
+\right)^2 \leq \left( \int_{\mathcal{X}} f(x)^2 d\mu(x) \right) \left(
+\int_{\mathcal{X}} g(x)^2 d\mu(x) \right)\]</span></p>
+<p>Appliquons cette inégalité aux fonctions <span
+class="math inline">\(f = \sqrt{\frac{dP}{d\mu}}\)</span> et <span
+class="math inline">\(g = \sqrt{\frac{dQ}{d\mu}}\)</span>. Nous obtenons
+: <span class="math display">\[\left( \int_{\mathcal{X}}
+\sqrt{\frac{dP}{d\mu} \cdot \frac{dQ}{d\mu}} d\mu \right)^2 \leq \left(
+\int_{\mathcal{X}} \frac{dP}{d\mu} d\mu \right) \left(
+\int_{\mathcal{X}} \frac{dQ}{d\mu} d\mu \right) = 1\]</span></p>
+<p>En prenant la racine carrée des deux côtés, nous avons : <span
+class="math display">\[\int_{\mathcal{X}} \sqrt{\frac{dP}{d\mu} \cdot
+\frac{dQ}{d\mu}} d\mu \leq 1\]</span></p>
+<p>En substituant cette inégalité dans la définition de la divergence de
+Fisher-Rao, nous obtenons : <span
+class="math display">\[D_{\text{FR}}(P, Q) = 2 - 2 \int_{\mathcal{X}}
+\sqrt{\frac{dP}{d\mu} \cdot \frac{dQ}{d\mu}} d\mu \geq 0\]</span></p>
+<p>L’égalité a lieu si et seulement si <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> sont proportionnels, c’est-à-dire si
+<span class="math inline">\(P = Q\)</span> presque partout.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La divergence de Fisher-Rao possède plusieurs propriétés
+intéressantes, que nous énumérons ci-dessous :</p>
+<ol>
+<li><p>Symétrie : La divergence de Fisher-Rao est symétrique,
+c’est-à-dire que <span class="math inline">\(D_{\text{FR}}(P, Q) =
+D_{\text{FR}}(Q, P)\)</span>.</p></li>
+<li><p>Non-négativité : Comme démontré dans le théorème de la divergence
+minimale, <span class="math inline">\(D_{\text{FR}}(P, Q) \geq
+0\)</span>.</p></li>
+<li><p>Identité : <span class="math inline">\(D_{\text{FR}}(P, P) =
+0\)</span>.</p></li>
+<li><p>Invariance par transformation mesurable : Si <span
+class="math inline">\(T\)</span> est une transformation mesurable de
+<span class="math inline">\(\mathcal{X}\)</span> dans lui-même, alors
+<span class="math inline">\(D_{\text{FR}}(P \circ T^{-1}, Q \circ
+T^{-1}) = D_{\text{FR}}(P, Q)\)</span>.</p></li>
+<li><p>Continuité : La divergence de Fisher-Rao est continue par rapport
+à la convergence faible des distributions.</p></li>
+</ol>
+<p>Pour prouver la propriété de symétrie, remarquons que : <span
+class="math display">\[D_{\text{FR}}(P, Q) = \int_{\mathcal{X}} \left(
+\sqrt{\frac{dP}{d\mu}} - \sqrt{\frac{dQ}{d\mu}} \right)^2 d\mu =
+\int_{\mathcal{X}} \left( \sqrt{\frac{dQ}{d\mu}} -
+\sqrt{\frac{dP}{d\mu}} \right)^2 d\mu = D_{\text{FR}}(Q, P)\]</span></p>
+<p>La propriété de non-négativité a déjà été démontrée dans la section
+précédente. La propriété d’identité est une conséquence immédiate de la
+définition. Pour les propriétés d’invariance et de continuité, nous
+renvoyons le lecteur à des références plus avancées en théorie de
+l’information géométrique.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La divergence informationnelle de Fisher-Rao est une notion centrale
+en théorie de l’information géométrique, offrant une mesure puissante et
+élégante de la distance entre distributions de probabilité. Ses
+propriétés fondamentales, telles que la symétrie, la non-négativité et
+l’invariance, en font un outil précieux pour les statisticiens et les
+chercheurs en apprentissage automatique. Les théorèmes présentés dans ce
+chapitre mettent en lumière la profondeur mathématique de cette notion
+et ouvrent la voie à des applications pratiques dans divers
+domaines.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

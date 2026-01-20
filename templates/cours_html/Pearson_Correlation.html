@@ -1,0 +1,314 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Analyse de la Corrélation de Pearson : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Analyse de la Corrélation de Pearson : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La corrélation de Pearson, nommée d’après Karl Pearson (1857-1936),
+est une mesure fondamentale en statistique descriptive. Elle quantifie
+la relation linéaire entre deux variables aléatoires continues. Son
+émergence historique coïncide avec le développement des méthodes
+statistiques modernes, répondant à un besoin crucial d’analyser les
+relations entre variables dans divers champs disciplinaires. En
+biologie, en économie ou encore en sciences sociales, la corrélation de
+Pearson offre un outil puissant pour évaluer l’intensité et le sens des
+liens entre phénomènes observés.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de formuler la corrélation de Pearson, il convient de
+comprendre ce que l’on cherche à mesurer. Imaginons deux variables
+aléatoires continues <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. On souhaite quantifier la force de
+leur relation linéaire. Pour cela, on peut envisager une droite de
+régression linéaire <span class="math inline">\(Y = aX + b\)</span>. La
+corrélation de Pearson mesure la qualité de cette approximation
+linéaire.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables aléatoires continues. On
+définit la corrélation de Pearson <span class="math inline">\(\rho(X,
+Y)\)</span> par : <span class="math display">\[\rho(X, Y) =
+\frac{\text{Cov}(X, Y)}{\sqrt{\text{Var}(X)\text{Var}(Y)}}\]</span> où
+<span class="math inline">\(\text{Cov}(X, Y)\)</span> est la covariance
+entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, et <span
+class="math inline">\(\text{Var}(X)\)</span>, <span
+class="math inline">\(\text{Var}(Y)\)</span> sont les variances
+respectives de <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+<p>De manière équivalente, pour un échantillon <span
+class="math inline">\((x_i, y_i)_{1 \leq i \leq n}\)</span> de <span
+class="math inline">\(n\)</span> observations indépendantes et
+identiquement distribuées (i.i.d.) de <span class="math inline">\((X,
+Y)\)</span>, on a : <span class="math display">\[r =
+\frac{\sum_{i=1}^{n} (x_i - \bar{x})(y_i -
+\bar{y})}{\sqrt{\sum_{i=1}^{n} (x_i - \bar{x})^2 \sum_{i=1}^{n} (y_i -
+\bar{y})^2}}\]</span> où <span class="math inline">\(\bar{x}\)</span> et
+<span class="math inline">\(\bar{y}\)</span> sont les moyennes
+empiriques de <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un résultat fondamental lié à la corrélation de Pearson est
+l’inégalité de Cauchy-Schwarz, qui garantit que <span
+class="math inline">\(\rho(X, Y)\)</span> reste bornée entre <span
+class="math inline">\(-1\)</span> et <span
+class="math inline">\(1\)</span>.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables aléatoires continues. On
+a : <span class="math display">\[|\rho(X, Y)| \leq 1\]</span> De plus,
+l’égalité a lieu si et seulement si <span
+class="math inline">\(Y\)</span> est une fonction affine de <span
+class="math inline">\(X\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer l’inégalité de Cauchy-Schwarz, on peut procéder comme
+suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la variance de <span
+class="math inline">\(X - \lambda Y\)</span> pour un <span
+class="math inline">\(\lambda \in \mathbb{R}\)</span> : <span
+class="math display">\[\text{Var}(X - \lambda Y) = \text{Var}(X) +
+\lambda^2 \text{Var}(Y) - 2\lambda \text{Cov}(X, Y)\]</span> Puisque la
+variance est toujours non négative, on a : <span
+class="math display">\[\text{Var}(X) + \lambda^2 \text{Var}(Y) -
+2\lambda \text{Cov}(X, Y) \geq 0\]</span> Cette inégalité quadratique en
+<span class="math inline">\(\lambda\)</span> doit être vérifiée pour
+tout <span class="math inline">\(\lambda \in \mathbb{R}\)</span>. Le
+discriminant de cette équation quadratique doit donc être négatif ou nul
+: <span class="math display">\[(2\text{Cov}(X, Y))^2 - 4 \text{Var}(X)
+\text{Var}(Y) \leq 0\]</span> En simplifiant, on obtient : <span
+class="math display">\[\text{Cov}(X, Y)^2 \leq \text{Var}(X)
+\text{Var}(Y)\]</span> En prenant la racine carrée de chaque côté, on
+aboutit à l’inégalité souhaitée : <span class="math display">\[|\rho(X,
+Y)| \leq 1\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La corrélation de Pearson possède plusieurs propriétés intéressantes
+:</p>
+<ol>
+<li><p><strong>Invariance par translation et homogénéité</strong> : La
+corrélation de Pearson est invariante par translation et homothétie.
+Autrement dit, pour tout <span class="math inline">\(a, b, c, d \in
+\mathbb{R}\)</span> : <span class="math display">\[\rho(X + a, Y + b) =
+\rho(X, Y)\]</span> <span class="math display">\[\rho(cX, dY) =
+\text{sgn}(cd)\rho(X, Y)\]</span></p></li>
+<li><p><strong>Symétrie</strong> : La corrélation de Pearson est
+symétrique : <span class="math display">\[\rho(X, Y) = \rho(Y,
+X)\]</span></p></li>
+<li><p><strong>Interprétation géométrique</strong> : La corrélation de
+Pearson peut être interprétée comme le cosinus de l’angle entre les
+vecteurs <span class="math inline">\((X - \mathbb{E}[X], Y -
+\mathbb{E}[Y])\)</span> dans l’espace des variables aléatoires
+centrées.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La corrélation de Pearson reste un outil indispensable en statistique
+descriptive. Son interprétation intuitive, combinée à ses propriétés
+mathématiques robustes, en fait un pilier des analyses multivariées. Les
+développements récents en apprentissage automatique et en analyse de
+données massives continuent d’enrichir son champ d’application,
+consolidant ainsi son statut de mesure fondamentale en sciences des
+données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

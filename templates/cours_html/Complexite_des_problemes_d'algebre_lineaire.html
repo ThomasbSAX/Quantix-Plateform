@@ -1,0 +1,388 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes d’algèbre linéaire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes d’algèbre linéaire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’algèbre linéaire est une branche fondamentale des mathématiques,
+avec des applications vastes et profondes dans de nombreux domaines
+scientifiques et techniques. L’étude de la complexité des problèmes
+d’algèbre linéaire est cruciale pour comprendre les limites et les
+possibilités des algorithmes utilisés dans ces domaines. Cette étude
+permet de déterminer quels problèmes peuvent être résolus efficacement
+et quels problèmes sont intrinsèquement difficiles.</p>
+<p>L’essor des ordinateurs et l’augmentation de la puissance de calcul
+ont rendu l’algèbre linéaire numérique une partie essentielle des
+sciences du calcul. Les problèmes d’algèbre linéaire apparaissent dans
+des domaines aussi variés que la physique, l’ingénierie, l’économie et
+même les sciences sociales. Comprendre la complexité de ces problèmes
+permet d’optimiser les algorithmes et de développer des méthodes plus
+efficaces pour résoudre des problèmes réels.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails, il est essentiel de définir
+certains concepts clés. Nous commençons par la notion de complexité
+algorithmique, qui mesure le temps ou les ressources nécessaires pour
+résoudre un problème donné.</p>
+<h2 id="complexité-algorithmique">Complexité Algorithmique</h2>
+<p>Pour comprendre ce que nous cherchons à mesurer, considérons un
+problème d’algèbre linéaire classique : la résolution d’un système
+d’équations linéaires. Supposons que nous ayons un système de <span
+class="math inline">\(n\)</span> équations à <span
+class="math inline">\(n\)</span> inconnues. Nous voulons savoir combien
+d’opérations élémentaires (additions, multiplications, etc.) sont
+nécessaires pour résoudre ce système.</p>
+<p>La complexité algorithmique est souvent exprimée en termes de la
+taille de l’entrée du problème. Pour un système d’équations linéaires,
+la taille de l’entrée est proportionnelle à <span
+class="math inline">\(n^2\)</span>, car nous avons <span
+class="math inline">\(n^2\)</span> coefficients dans la matrice des
+coefficients.</p>
+<p>Formellement, la complexité algorithmique d’un problème est définie
+comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> un algorithme qui résout
+un problème donné. La complexité de <span
+class="math inline">\(A\)</span> est la fonction <span
+class="math inline">\(T(n)\)</span> qui donne le nombre maximal
+d’opérations élémentaires nécessaires pour résoudre le problème en
+fonction de la taille <span class="math inline">\(n\)</span> de
+l’entrée.</p>
+</div>
+<p>Pour un système d’équations linéaires, la complexité peut être
+exprimée comme :</p>
+<p><span class="math display">\[T(n) = O(n^3)\]</span></p>
+<p>Cela signifie que le nombre d’opérations nécessaires est
+proportionnel à <span class="math inline">\(n^3\)</span> pour de grandes
+valeurs de <span class="math inline">\(n\)</span>.</p>
+<h2 id="problèmes-dalgèbre-linéaire">Problèmes d’Algèbre Linéaire</h2>
+<p>Les problèmes d’algèbre linéaire incluent la résolution de systèmes
+d’équations, le calcul de déterminants, l’inversion de matrices, et la
+diagonalisation de matrices. Chacun de ces problèmes a sa propre
+complexité algorithmique.</p>
+<div class="definition">
+<p>Un problème d’algèbre linéaire est un problème qui peut être formulé
+en termes de matrices et de vecteurs. Les problèmes courants incluent
+:</p>
+<ul>
+<li><p>La résolution de systèmes d’équations linéaires <span
+class="math inline">\(Ax = b\)</span>.</p></li>
+<li><p>Le calcul du déterminant d’une matrice <span
+class="math inline">\(A\)</span>.</p></li>
+<li><p>L’inversion d’une matrice <span
+class="math inline">\(A\)</span>.</p></li>
+<li><p>La diagonalisation d’une matrice <span
+class="math inline">\(A\)</span>.</p></li>
+</ul>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-la-complexité-cubique">Théorème de la Complexité
+Cubique</h2>
+<p>Un des résultats fondamentaux en algèbre linéaire numérique est le
+théorème de la complexité cubique, qui stipule que la résolution d’un
+système d’équations linéaires nécessite au moins <span
+class="math inline">\(O(n^3)\)</span> opérations.</p>
+<p>Pour comprendre ce théorème, considérons que la méthode de
+Gauss-Jordan pour résoudre un système d’équations linéaires nécessite
+<span class="math inline">\(n^3\)</span> opérations. Ce résultat est
+optimal dans le pire des cas.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span> et <span
+class="math inline">\(b\)</span> un vecteur de taille <span
+class="math inline">\(n\)</span>. La résolution du système <span
+class="math inline">\(Ax = b\)</span> nécessite au moins <span
+class="math inline">\(O(n^3)\)</span> opérations élémentaires.</p>
+</div>
+<h2
+id="démonstration-du-théorème-de-la-complexité-cubique">Démonstration du
+Théorème de la Complexité Cubique</h2>
+<p>La démonstration de ce théorème repose sur l’analyse de la méthode de
+Gauss-Jordan. Cette méthode implique les étapes suivantes :</p>
+<p>1. **Élimination vers l’avant** : Pour chaque colonne <span
+class="math inline">\(j\)</span> de la matrice, nous éliminons les
+éléments sous le pivot en utilisant des opérations de ligne. Cela
+nécessite <span class="math inline">\(O(n^2)\)</span> opérations pour
+chaque colonne.</p>
+<p>2. **Substitution vers l’arrière** : Après avoir réduit la matrice à
+une forme triangulaire supérieure, nous résolvons le système en
+utilisant la substitution vers l’arrière. Cela nécessite <span
+class="math inline">\(O(n^2)\)</span> opérations.</p>
+<p>En combinant ces étapes, nous obtenons une complexité totale de <span
+class="math inline">\(O(n^3)\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-de-la-complexité-cubique">Preuve de la Complexité
+Cubique</h2>
+<p>Pour prouver que la complexité cubique est optimale, nous devons
+montrer qu’aucun algorithme ne peut résoudre un système d’équations
+linéaires en moins de <span class="math inline">\(O(n^3)\)</span>
+opérations dans le pire des cas.</p>
+<p>Considérons la méthode de Gauss-Jordan. À chaque étape, nous devons
+effectuer des opérations sur les lignes de la matrice pour éliminer les
+éléments sous le pivot. Chaque opération nécessite une multiplication et
+une soustraction, ce qui compte pour deux opérations élémentaires.</p>
+<p>Le nombre total d’opérations est donc :</p>
+<p><span class="math display">\[\sum_{j=1}^{n} (2(n-j+1)(n-j)) = 2
+\sum_{k=1}^{n} k(k-1)\]</span></p>
+<p>En utilisant la formule pour la somme des carrés, nous obtenons :</p>
+<p><span class="math display">\[2 \sum_{k=1}^{n} k(k-1) = 2 \left(
+\frac{n(n+1)(2n+1)}{6} - \frac{n(n+1)}{2} \right) = O(n^3)\]</span></p>
+<p>Ainsi, la complexité cubique est optimale.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-la-complexité-des-déterminants">Propriété de la
+Complexité des Déterminants</h2>
+<p>Le calcul du déterminant d’une matrice est un autre problème
+fondamental en algèbre linéaire. La complexité de ce problème est
+également cubique.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span>. Le calcul du
+déterminant de <span class="math inline">\(A\)</span> nécessite au moins
+<span class="math inline">\(O(n^3)\)</span> opérations élémentaires.</p>
+</div>
+<h2
+id="démonstration-de-la-propriété-de-la-complexité-des-déterminants">Démonstration
+de la Propriété de la Complexité des Déterminants</h2>
+<p>La démonstration repose sur le fait que le calcul du déterminant peut
+être effectué en utilisant la méthode de Gauss-Jordan pour réduire la
+matrice à une forme triangulaire supérieure. Le déterminant est alors le
+produit des éléments diagonaux de la matrice triangulaire.</p>
+<p>Le nombre d’opérations nécessaires pour réduire la matrice à une
+forme triangulaire supérieure est <span
+class="math inline">\(O(n^3)\)</span>, comme démontré précédemment.
+Ainsi, le calcul du déterminant a également une complexité cubique.</p>
+<h2 id="propriété-de-la-complexité-de-linversion-de-matrices">Propriété
+de la Complexité de l’Inversion de Matrices</h2>
+<p>L’inversion d’une matrice est un autre problème important en algèbre
+linéaire. La complexité de ce problème est également cubique.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span>. L’inversion de
+<span class="math inline">\(A\)</span> nécessite au moins <span
+class="math inline">\(O(n^3)\)</span> opérations élémentaires.</p>
+</div>
+<h2
+id="démonstration-de-la-propriété-de-la-complexité-de-linversion-de-matrices">Démonstration
+de la Propriété de la Complexité de l’Inversion de Matrices</h2>
+<p>La démonstration repose sur le fait que l’inversion d’une matrice
+peut être effectuée en utilisant la méthode de Gauss-Jordan pour réduire
+la matrice augmentée <span class="math inline">\([A | I]\)</span> à une
+forme où <span class="math inline">\(A\)</span> est la matrice identité
+et <span class="math inline">\(I\)</span> est l’inverse de <span
+class="math inline">\(A\)</span>.</p>
+<p>Le nombre d’opérations nécessaires pour effectuer cette réduction est
+<span class="math inline">\(O(n^3)\)</span>, comme démontré
+précédemment. Ainsi, l’inversion de matrices a également une complexité
+cubique.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’étude de la complexité des problèmes d’algèbre linéaire est
+essentielle pour comprendre les limites et les possibilités des
+algorithmes utilisés dans divers domaines scientifiques et techniques.
+Les théorèmes et propriétés présentés dans cet article montrent que de
+nombreux problèmes fondamentaux en algèbre linéaire ont une complexité
+cubique, ce qui signifie qu’ils nécessitent <span
+class="math inline">\(O(n^3)\)</span> opérations élémentaires dans le
+pire des cas.</p>
+<p>Ces résultats sont cruciaux pour le développement d’algorithmes plus
+efficaces et pour l’optimisation des méthodes numériques utilisées dans
+les applications pratiques. En comprenant la complexité de ces
+problèmes, nous pouvons mieux apprécier les défis et les opportunités
+dans le domaine de l’algèbre linéaire numérique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

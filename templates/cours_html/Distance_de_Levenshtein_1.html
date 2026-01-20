@@ -1,0 +1,374 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Levenshtein : Une Mesure Fondamentale en Informatique Théorique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Levenshtein : Une Mesure Fondamentale en
+Informatique Théorique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La distance de Levenshtein, nommée d’après le mathématicien russe
+Vladimir Levenshtein qui l’a introduite en 1965, est une métrique
+essentielle dans le domaine de l’informatique théorique et de la
+bioinformatique. Cette distance mesure le nombre minimal d’opérations
+nécessaires pour transformer une chaîne de caractères en une autre. Les
+opérations considérées sont l’insertion, la suppression et la
+substitution d’un caractère.</p>
+<p>L’émergence de cette notion est étroitement liée aux problèmes de
+correction d’erreurs et de comparaison de séquences. En effet, dans de
+nombreux domaines tels que la reconnaissance vocale, la correction
+orthographique ou l’alignement de séquences ADN, il est crucial de
+disposer d’une mesure fiable pour évaluer la similitude entre deux
+séquences. La distance de Levenshtein offre une solution élégante et
+efficace à ces problèmes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de Levenshtein, commençons par nous
+demander comment mesurer la différence entre deux chaînes de caractères.
+Imaginons que nous voulions transformer la chaîne "chat" en "chien".
+Quelles opérations sont nécessaires ?</p>
+<p>Formellement, la distance de Levenshtein entre deux chaînes <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(s = s_1s_2 \dots s_m\)</span> et
+<span class="math inline">\(t = t_1t_2 \dots t_n\)</span> deux chaînes
+de caractères. La distance de Levenshtein <span
+class="math inline">\(d(s, t)\)</span> est le nombre minimal
+d’opérations nécessaires pour transformer <span
+class="math inline">\(s\)</span> en <span
+class="math inline">\(t\)</span>, où une opération est soit l’insertion,
+la suppression ou la substitution d’un caractère.</p>
+</div>
+<p>Nous pouvons également exprimer cette distance de manière récursive
+:</p>
+<p><span class="math display">\[d(s, t) =
+\begin{cases}
+m &amp; \text{si } n = 0 \\
+n &amp; \text{si } m = 0 \\
+\min
+\begin{cases}
+d(s_{1..m-1}, t) + 1 &amp; \text{(suppression)} \\
+d(s, t_{1..n-1}) + 1 &amp; \text{(insertion)} \\
+d(s_{1..m-1}, t_{1..n-1}) &amp; \text{si } s_m = t_n \\
+d(s_{1..m-1}, t_{1..n-1}) + 1 &amp; \text{(substitution)}
+\end{cases}
+&amp; \text{sinon}
+\end{cases}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Levenshtein est le
+théorème de calcul dynamique, qui permet de calculer cette distance de
+manière efficace en utilisant une matrice de distances.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> deux chaînes de longueurs <span
+class="math inline">\(m\)</span> et <span
+class="math inline">\(n\)</span> respectivement. La distance de
+Levenshtein <span class="math inline">\(d(s, t)\)</span> peut être
+calculée en utilisant la matrice <span class="math inline">\(D\)</span>
+définie par :</p>
+<p><span class="math display">\[D[i][j] =
+\begin{cases}
+i &amp; \text{si } j = 0 \\
+j &amp; \text{si } i = 0 \\
+\min
+\begin{cases}
+D[i-1][j] + 1 &amp; \text{(suppression)} \\
+D[i][j-1] + 1 &amp; \text{(insertion)} \\
+D[i-1][j-1] &amp; \text{si } s_i = t_j \\
+D[i-1][j-1] + 1 &amp; \text{(substitution)}
+\end{cases}
+&amp; \text{sinon}
+\end{cases}\]</span></p>
+<p>où <span class="math inline">\(D[i][j]\)</span> représente la
+distance de Levenshtein entre les sous-chaînes <span
+class="math inline">\(s_{1..i}\)</span> et <span
+class="math inline">\(t_{1..j}\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de calcul dynamique, nous procédons par
+induction.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Base de l’induction :</strong></p>
+<p>Si <span class="math inline">\(j = 0\)</span>, alors <span
+class="math inline">\(D[i][0] = i\)</span> car il faut supprimer <span
+class="math inline">\(i\)</span> caractères pour transformer <span
+class="math inline">\(s_{1..i}\)</span> en une chaîne vide.</p>
+<p>Si <span class="math inline">\(i = 0\)</span>, alors <span
+class="math inline">\(D[0][j] = j\)</span> car il faut insérer <span
+class="math inline">\(j\)</span> caractères pour transformer une chaîne
+vide en <span class="math inline">\(t_{1..j}\)</span>.</p>
+<p><strong>Hypothèse d’induction :</strong></p>
+<p>Supposons que le théorème est vrai pour toutes les sous-chaînes de
+longueurs inférieures à <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>.</p>
+<p><strong>Étape d’induction :</strong></p>
+<p>Pour <span class="math inline">\(D[i][j]\)</span>, nous avons quatre
+cas possibles :</p>
+<p>1. **Suppression :** Si nous supprimons le dernier caractère de <span
+class="math inline">\(s\)</span>, alors la distance est <span
+class="math inline">\(D[i-1][j] + 1\)</span>.</p>
+<p>2. **Insertion :** Si nous insérons le dernier caractère de <span
+class="math inline">\(t\)</span> à la fin de <span
+class="math inline">\(s\)</span>, alors la distance est <span
+class="math inline">\(D[i][j-1] + 1\)</span>.</p>
+<p>3. **Substitution :** Si les derniers caractères de <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> sont égaux, alors la distance est <span
+class="math inline">\(D[i-1][j-1]\)</span>.</p>
+<p>4. **Substitution :** Si les derniers caractères de <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span> sont différents, alors la distance est
+<span class="math inline">\(D[i-1][j-1] + 1\)</span>.</p>
+<p>En prenant le minimum de ces quatre cas, nous obtenons la distance
+minimale pour transformer <span class="math inline">\(s_{1..i}\)</span>
+en <span class="math inline">\(t_{1..j}\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ici quelques propriétés importantes de la distance de
+Levenshtein :</p>
+<ol>
+<li><p>**Propriété de Symétrie :** La distance de Levenshtein est
+symétrique, c’est-à-dire que <span class="math inline">\(d(s, t) = d(t,
+s)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> La symétrie découle du fait que les opérations
+d’insertion et de suppression sont inverses l’une de l’autre. Ainsi,
+transformer <span class="math inline">\(s\)</span> en <span
+class="math inline">\(t\)</span> est équivalent à transformer <span
+class="math inline">\(t\)</span> en <span
+class="math inline">\(s\)</span>. ◻</p>
+</div></li>
+<li><p>**Propriété de Triangle :** La distance de Levenshtein satisfait
+l’inégalité triangulaire, c’est-à-dire que pour toutes chaînes <span
+class="math inline">\(s\)</span>, <span class="math inline">\(t\)</span>
+et <span class="math inline">\(u\)</span>, nous avons :</p>
+<p><span class="math display">\[d(s, u) \leq d(s, t) + d(t,
+u)\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété découle du fait que la distance de
+Levenshtein est une métrique. Pour prouver l’inégalité triangulaire,
+nous pouvons utiliser la définition récursive de la distance et montrer
+que pour toute transformation de <span class="math inline">\(s\)</span>
+en <span class="math inline">\(u\)</span>, nous pouvons passer par une
+chaîne intermédiaire <span class="math inline">\(t\)</span>. ◻</p>
+</div></li>
+<li><p>**Complexité Algorithmique :** Le calcul de la distance de
+Levenshtein peut être effectué en temps <span
+class="math inline">\(O(mn)\)</span>, où <span
+class="math inline">\(m\)</span> et <span
+class="math inline">\(n\)</span> sont les longueurs des chaînes <span
+class="math inline">\(s\)</span> et <span
+class="math inline">\(t\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> La complexité découle de l’algorithme de calcul
+dynamique décrit dans le théorème. Nous devons remplir une matrice <span
+class="math inline">\(m \times n\)</span>, ce qui nécessite <span
+class="math inline">\(O(mn)\)</span> opérations. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Levenshtein est une mesure fondamentale en
+informatique théorique et en bioinformatique. Son utilisation permet de
+résoudre des problèmes complexes de comparaison de séquences et de
+correction d’erreurs. Grâce à l’algorithme de calcul dynamique, cette
+distance peut être calculée efficacement, ce qui en fait un outil
+puissant pour de nombreuses applications pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

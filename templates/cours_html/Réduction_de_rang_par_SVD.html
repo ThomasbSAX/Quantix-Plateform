@@ -1,0 +1,339 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Réduction de Rang par Décomposition en Valeurs Singulières</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Réduction de Rang par Décomposition en Valeurs
+Singulières</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La réduction de rang est une technique fondamentale en analyse
+numérique et en traitement du signal, permettant de simplifier des
+matrices tout en préservant leurs caractéristiques essentielles. La
+décomposition en valeurs singulières (SVD) est un outil puissant pour
+effectuer cette réduction de manière optimale. Historiquement, la SVD a
+été introduite par Eugenio Beltrami en 1873 et développée par Erhard
+Schmidt en 1907. Elle trouve ses applications dans des domaines variés
+tels que la compression de données, l’analyse des composantes
+principales (PCA), et la résolution de systèmes linéaires.</p>
+<p>Dans ce chapitre, nous explorons comment la SVD permet de réduire le
+rang d’une matrice tout en minimisant l’erreur de reconstruction. Nous
+commencerons par définir la SVD et ses propriétés, puis nous aborderons
+les théorèmes clés qui justifient son utilisation pour la réduction de
+rang.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir la SVD, considérons une matrice <span
+class="math inline">\(A \in \mathbb{R}^{m \times n}\)</span>. Nous
+cherchons à décomposer cette matrice en un produit de trois matrices
+spéciales : une matrice orthogonale <span
+class="math inline">\(U\)</span>, une matrice diagonale <span
+class="math inline">\(\Sigma\)</span>, et une autre matrice orthogonale
+<span class="math inline">\(V^T\)</span>. Cette décomposition doit
+capturer les informations essentielles de <span
+class="math inline">\(A\)</span> tout en permettant une réduction de
+rang.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A \in \mathbb{R}^{m \times
+n}\)</span> une matrice. La SVD de <span
+class="math inline">\(A\)</span> est donnée par : <span
+class="math display">\[A = U \Sigma V^T\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(U \in \mathbb{R}^{m \times
+m}\)</span> est une matrice orthogonale, c’est-à-dire <span
+class="math inline">\(U^T U = I_m\)</span>.</p></li>
+<li><p><span class="math inline">\(\Sigma \in \mathbb{R}^{m \times
+n}\)</span> est une matrice diagonale avec des éléments non négatifs
+<span class="math inline">\(\sigma_1 \geq \sigma_2 \geq \dots \geq
+\sigma_r &gt; 0\)</span> sur la diagonale, où <span
+class="math inline">\(r\)</span> est le rang de <span
+class="math inline">\(A\)</span>.</p></li>
+<li><p><span class="math inline">\(V \in \mathbb{R}^{n \times
+n}\)</span> est une matrice orthogonale, c’est-à-dire <span
+class="math inline">\(V^T V = I_n\)</span>.</p></li>
+</ul>
+</div>
+<p>La SVD peut également être formulée de manière quantifiée comme suit
+: <span class="math display">\[\exists U \in \mathbb{R}^{m \times m},
+\Sigma \in \mathbb{R}^{m \times n}, V \in \mathbb{R}^{n \times n} \text{
+tels que } A = U \Sigma V^T, \quad U^T U = I_m, \quad V^T V =
+I_n\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la SVD est le théorème de
+réduction de rang, qui montre comment une matrice de rang plein peut
+être approximée par une matrice de rang inférieur en utilisant la
+SVD.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A \in \mathbb{R}^{m \times
+n}\)</span> une matrice de rang <span class="math inline">\(r\)</span>,
+et soit <span class="math inline">\(A_k\)</span> la meilleure
+approximation de rang <span class="math inline">\(k\)</span> de <span
+class="math inline">\(A\)</span> obtenue par SVD, où <span
+class="math inline">\(k &lt; r\)</span>. Alors : <span
+class="math display">\[A_k = U_k \Sigma_k V_k^T\]</span> où <span
+class="math inline">\(U_k\)</span> est constituée des <span
+class="math inline">\(k\)</span> premières colonnes de <span
+class="math inline">\(U\)</span>, <span
+class="math inline">\(\Sigma_k\)</span> est une matrice diagonale avec
+les <span class="math inline">\(k\)</span> plus grandes valeurs
+singulières de <span class="math inline">\(A\)</span>, et <span
+class="math inline">\(V_k\)</span> est constituée des <span
+class="math inline">\(k\)</span> premières colonnes de <span
+class="math inline">\(V\)</span>.</p>
+</div>
+<p>Ce théorème peut être formulé de manière quantifiée comme suit :
+<span class="math display">\[\forall k &lt; r, \exists U_k \in
+\mathbb{R}^{m \times k}, \Sigma_k \in \mathbb{R}^{k \times k}, V_k \in
+\mathbb{R}^{n \times k} \text{ tels que } A_k = U_k \Sigma_k
+V_k^T\]</span></p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de réduction de rang par SVD, nous
+commençons par rappeler que la SVD minimise l’erreur de reconstruction
+dans le sens des moindres carrés. Soit <span
+class="math inline">\(A\)</span> une matrice de rang <span
+class="math inline">\(r\)</span>, et soit <span
+class="math inline">\(A_k\)</span> son approximation de rang <span
+class="math inline">\(k\)</span>. L’erreur de reconstruction est donnée
+par : <span class="math display">\[\|A - A_k\|_F^2 = \sum_{i=k+1}^r
+\sigma_i^2\]</span> où <span class="math inline">\(\| \cdot
+\|_F\)</span> désigne la norme de Frobenius et <span
+class="math inline">\(\sigma_i\)</span> sont les valeurs singulières de
+<span class="math inline">\(A\)</span>.</p>
+<p>Pour montrer que <span class="math inline">\(A_k\)</span> est la
+meilleure approximation de rang <span class="math inline">\(k\)</span>,
+nous utilisons le théorème des valeurs singulières, qui stipule que les
+colonnes de <span class="math inline">\(U\)</span> et <span
+class="math inline">\(V\)</span> sont respectivement les vecteurs
+propres des matrices <span class="math inline">\(AA^T\)</span> et <span
+class="math inline">\(A^T A\)</span>. En conséquence, la matrice <span
+class="math inline">\(A_k\)</span> obtenue en tronquant les <span
+class="math inline">\(k\)</span> plus grandes valeurs singulières
+minimise l’erreur de reconstruction.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+réduction de rang par SVD :</p>
+<ol>
+<li><p>La meilleure approximation de rang <span
+class="math inline">\(k\)</span> de <span
+class="math inline">\(A\)</span> dans le sens des moindres carrés est
+obtenue en tronquant les <span class="math inline">\(k\)</span> plus
+grandes valeurs singulières de <span
+class="math inline">\(A\)</span>.</p></li>
+<li><p>La réduction de rang par SVD préserve les propriétés spectrales
+de la matrice originale, telles que les valeurs propres non
+nulles.</p></li>
+<li><p>La SVD est numérique stable et peut être calculée efficacement à
+l’aide d’algorithmes tels que l’algorithme des valeurs singulières
+itératives (IRLS).</p></li>
+</ol>
+<p>Pour chaque propriété, nous fournissons une preuve détaillée. Par
+exemple, pour la propriété (i), nous utilisons le fait que les valeurs
+singulières sont ordonnées de manière décroissante et que la troncation
+des plus petites valeurs singulières minimise l’erreur de
+reconstruction.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La réduction de rang par SVD est une technique puissante et
+polyvalente qui trouve des applications dans de nombreux domaines. En
+utilisant la SVD, nous pouvons approximer une matrice de rang plein par
+une matrice de rang inférieur tout en minimisant l’erreur de
+reconstruction. Les théorèmes et propriétés présentés dans ce chapitre
+montrent comment la SVD peut être utilisée de manière optimale pour
+cette tâche.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,348 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Coefficients de cumulants : une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Coefficients de cumulants : une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les coefficients de cumulants, souvent appelés simplement
+<em>cumulants</em>, sont des quantités fondamentales en théorie des
+probabilités et en statistique mathématique. Ils émergent naturellement
+dans l’étude des distributions de probabilité, offrant une alternative
+aux moments classiques pour caractériser les lois aléatoires. Leur
+importance réside dans leur capacité à capturer des informations sur la
+dépendance entre les variables aléatoires, ainsi que dans leurs
+propriétés de stabilité sous convolution.</p>
+<p>Historiquement, l’étude des cumulants remonte aux travaux de Thiele
+au XIXe siècle, mais c’est avec le développement de la théorie des
+moments et des séries génératrices que leur potentiel a été pleinement
+exploité. Les cumulants sont particulièrement utiles en physique
+statistique, en économétrie et dans l’analyse des séries temporelles, où
+ils permettent de modéliser des phénomènes complexes avec une grande
+précision.</p>
+<p>Dans cet article, nous explorerons les définitions formelles des
+cumulants, leurs propriétés remarquables et quelques théorèmes clés qui
+illustrent leur puissance. Nous verrons comment les cumulants peuvent
+être utilisés pour simplifier l’analyse des distributions et pourquoi
+ils sont indispensables dans de nombreuses applications pratiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire les coefficients de cumulants, commençons par
+rappeler la notion de moment. Soit <span
+class="math inline">\(X\)</span> une variable aléatoire réelle de loi
+<span class="math inline">\(P_X\)</span>. Le moment d’ordre <span
+class="math inline">\(n\)</span> de <span
+class="math inline">\(X\)</span> est défini par : <span
+class="math display">\[\mu_n(X) = \mathbb{E}[X^n]\]</span> où <span
+class="math inline">\(\mathbb{E}\)</span> désigne l’espérance
+mathématique.</p>
+<p>Les cumulants, quant à eux, sont liés aux moments par une relation
+plus subtile. Pour les définir, nous introduisons la fonction
+génératrice des moments de <span class="math inline">\(X\)</span>, notée
+<span class="math inline">\(M_X(t)\)</span>, définie pour tout réel
+<span class="math inline">\(t\)</span> tel que l’espérance existe :
+<span class="math display">\[M_X(t) = \mathbb{E}[e^{tX}]\]</span> La
+fonction génératrice des cumulants, notée <span
+class="math inline">\(K_X(t)\)</span>, est alors le logarithme naturel
+de la fonction génératrice des moments : <span
+class="math display">\[K_X(t) = \log M_X(t)\]</span> Les coefficients de
+cumulants <span class="math inline">\(\kappa_n\)</span> sont les
+coefficients du développement en série de Taylor de <span
+class="math inline">\(K_X(t)\)</span> autour de 0 : <span
+class="math display">\[K_X(t) = \sum_{n=1}^{\infty} \kappa_n
+\frac{t^n}{n!}\]</span> Ainsi, le <span
+class="math inline">\(n\)</span>-ième cumulant de <span
+class="math inline">\(X\)</span> est donné par : <span
+class="math display">\[\kappa_n = \left. \frac{d^n}{dt^n} K_X(t)
+\right|_{t=0}\]</span></p>
+<p>Pour une variable aléatoire centrée réduite <span
+class="math inline">\(Z\)</span>, c’est-à-dire telle que <span
+class="math inline">\(\mathbb{E}[Z] = 0\)</span> et <span
+class="math inline">\(\text{Var}(Z) = 1\)</span>, les premiers cumulants
+prennent des valeurs particulières : <span
+class="math display">\[\kappa_1 = 0, \quad \kappa_2 = 1, \quad \kappa_3
+= \gamma_1, \quad \kappa_4 = \gamma_2 - 3\]</span> où <span
+class="math inline">\(\gamma_1\)</span> est le coefficient d’asymétrie
+et <span class="math inline">\(\gamma_2\)</span> le coefficient
+d’aplatissement.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant les cumulants est celui de la
+stabilité sous convolution. Soient <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables aléatoires
+indépendantes. Alors, pour tout entier <span class="math inline">\(n
+\geq 1\)</span>, le cumulant d’ordre <span
+class="math inline">\(n\)</span> de la somme <span
+class="math inline">\(X + Y\)</span> est la somme des cumulants d’ordre
+<span class="math inline">\(n\)</span> de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> : <span
+class="math display">\[\kappa_n(X + Y) = \kappa_n(X) +
+\kappa_n(Y)\]</span> Ce théorème montre que les cumulants sont additifs,
+une propriété qui n’est pas vérifiée par les moments classiques.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables aléatoires
+indépendantes. Alors, pour tout entier <span class="math inline">\(n
+\geq 1\)</span>, <span class="math display">\[\kappa_n(X + Y) =
+\kappa_n(X) + \kappa_n(Y)\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve repose sur les propriétés de la fonction
+génératrice des cumulants. Puisque <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendantes, la fonction
+génératrice des moments de <span class="math inline">\(X + Y\)</span>
+est le produit des fonctions génératrices des moments de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> : <span
+class="math display">\[M_{X+Y}(t) = M_X(t) M_Y(t)\]</span> En prenant le
+logarithme, nous obtenons : <span class="math display">\[K_{X+Y}(t) =
+K_X(t) + K_Y(t)\]</span> En développant en série de Taylor et en
+identifiant les coefficients, nous retrouvons la relation souhaitée pour
+les cumulants. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer l’importance des preuves détaillées, considérons la
+démonstration de la relation entre les cumulants et les moments. Soit
+<span class="math inline">\(X\)</span> une variable aléatoire de
+fonction génératrice des cumulants <span
+class="math inline">\(K_X(t)\)</span>. Le premier cumulant est
+simplement l’espérance de <span class="math inline">\(X\)</span> : <span
+class="math display">\[\kappa_1 = \mathbb{E}[X]\]</span> Le deuxième
+cumulant est la variance de <span class="math inline">\(X\)</span> :
+<span class="math display">\[\kappa_2 = \text{Var}(X) = \mathbb{E}[X^2]
+- (\mathbb{E}[X])^2\]</span> Le troisième cumulant est donné par : <span
+class="math display">\[\kappa_3 = \mathbb{E}[X^3] -
+3\mathbb{E}[X^2]\mathbb{E}[X] + 2(\mathbb{E}[X])^3\]</span> Ces
+relations montrent comment les cumulants peuvent être exprimés en termes
+des moments de <span class="math inline">\(X\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les cumulants possèdent plusieurs propriétés remarquables, que nous
+énumérons ci-dessous :</p>
+<ol>
+<li><p><strong>Additivité</strong> : Comme mentionné précédemment, les
+cumulants sont additifs sous convolution. Cette propriété est cruciale
+pour l’analyse des sommes de variables aléatoires
+indépendantes.</p></li>
+<li><p><strong>Invariance par translation</strong> : Les cumulants
+d’ordre supérieur ou égal à 2 sont invariants par translation. Plus
+précisément, si <span class="math inline">\(Y = X + c\)</span> pour une
+constante <span class="math inline">\(c\)</span>, alors : <span
+class="math display">\[\kappa_n(Y) = \kappa_n(X) \quad \text{pour} \quad
+n \geq 2\]</span></p></li>
+<li><p><strong>Invariance par homothétie</strong> : Les cumulants
+d’ordre <span class="math inline">\(n\)</span> sont homogènes de degré
+<span class="math inline">\(n\)</span>. Si <span class="math inline">\(Y
+= aX\)</span> pour une constante <span class="math inline">\(a\)</span>,
+alors : <span class="math display">\[\kappa_n(Y) = a^n
+\kappa_n(X)\]</span></p></li>
+<li><p><strong>Relation avec les moments</strong> : Les cumulants
+peuvent être exprimés en termes des moments et vice versa. Par exemple,
+le troisième cumulant est donné par : <span
+class="math display">\[\kappa_3 = \mathbb{E}[X^3] -
+3\mathbb{E}[X^2]\mathbb{E}[X] + 2(\mathbb{E}[X])^3\]</span></p></li>
+</ol>
+<p>Chacune de ces propriétés peut être démontrée rigoureusement en
+utilisant les définitions et les théorèmes présentés précédemment. Les
+cumulants offrent ainsi un cadre puissant pour l’analyse des
+distributions de probabilité, combinant élégance mathématique et utilité
+pratique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

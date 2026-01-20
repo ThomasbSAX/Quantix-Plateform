@@ -1,0 +1,364 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Algorithmes pour Matrices Creuses</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Algorithmes pour Matrices Creuses</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les matrices creuses, c’est-à-dire celles dont une grande majorité
+d’éléments sont nuls, apparaissent naturellement dans de nombreuses
+applications scientifiques et industrielles. Leur manipulation efficace
+est cruciale pour des domaines tels que la physique des particules,
+l’analyse de réseaux sociaux, ou encore les simulations numériques en
+ingénierie. L’émergence des algorithmes spécialisés pour ces matrices
+répond à un besoin impérieux de réduire la complexité computationnelle
+et la consommation mémoire, tout en préservant l’exactitude des
+calculs.</p>
+<p>Dans ce chapitre, nous explorons les fondements théoriques et
+pratiques des algorithmes conçus pour exploiter la structure creuse des
+matrices. Nous aborderons les méthodes de stockage, les opérations
+élémentaires, et les techniques avancées pour résoudre des systèmes
+linéaires ou calculer des valeurs propres.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les algorithmes pour matrices creuses, il est
+essentiel de définir précisément ce que l’on entend par matrice creuse
+et les opérations qui leur sont associées.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice de taille
+<span class="math inline">\(m \times n\)</span>. On dit que <span
+class="math inline">\(A\)</span> est creuse si le nombre d’éléments non
+nuls est significativement inférieur au produit <span
+class="math inline">\(m \times n\)</span>. Formellement, il existe un
+paramètre <span class="math inline">\(\rho \in (0,1)\)</span> tel que :
+<span class="math display">\[\forall A \text{ creuse}, \quad
+\frac{\text{nombre d&#39;éléments non nuls}(A)}{m \times n} &lt;
+\rho.\]</span></p>
+</div>
+<p>Les matrices creuses peuvent être représentées de différentes
+manières, chacune ayant ses avantages et inconvénients. Les
+représentations les plus courantes sont le format COO (Coordinate List),
+CSR (Compressed Sparse Row), et CSC (Compressed Sparse Column).</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice creuse de
+taille <span class="math inline">\(m \times n\)</span>. Le format COO
+représente <span class="math inline">\(A\)</span> par trois tableaux
+:</p>
+<ul>
+<li><p><span class="math inline">\(\text{row} \in \mathbb{N}^k\)</span>
+où <span class="math inline">\(k\)</span> est le nombre d’éléments non
+nuls de <span class="math inline">\(A\)</span>, et <span
+class="math inline">\(\text{row}[i]\)</span> est l’indice de la ligne de
+l’élément non nul <span class="math inline">\(i\)</span>.</p></li>
+<li><p><span class="math inline">\(\text{col} \in \mathbb{N}^k\)</span>
+où <span class="math inline">\(\text{col}[i]\)</span> est l’indice de la
+colonne de l’élément non nul <span
+class="math inline">\(i\)</span>.</p></li>
+<li><p><span class="math inline">\(\text{value} \in
+\mathbb{R}^k\)</span> où <span
+class="math inline">\(\text{value}[i]\)</span> est la valeur de
+l’élément non nul <span class="math inline">\(i\)</span>.</p></li>
+</ul>
+<p>Formellement, pour tout <span class="math inline">\(1 \leq i \leq
+k\)</span>, on a : <span class="math display">\[A[\text{row}[i],
+\text{col}[i]] = \text{value}[i].\]</span></p>
+</div>
+<h1 id="théorèmes-et-algorithmes">Théorèmes et Algorithmes</h1>
+<p>Dans cette section, nous présentons les algorithmes fondamentaux pour
+manipuler les matrices creuses. Nous commençons par l’addition de deux
+matrices creuses, puis nous abordons la multiplication
+matrice-vecteur.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices creuses de taille <span
+class="math inline">\(m \times n\)</span> représentées en format COO.
+L’algorithme suivant calcule la somme <span class="math inline">\(C = A
++ B\)</span> en format COO.</p>
+<div class="algorithm">
+<div class="algorithmic">
+<p><span class="math inline">\(C \leftarrow\)</span> nouvelle matrice
+creuse vide Ajouter <span class="math inline">\((i,j,v)\)</span> à <span
+class="math inline">\(C\)</span> Mettre à jour <span
+class="math inline">\(C[i,j] \leftarrow C[i,j] + v\)</span> Ajouter
+<span class="math inline">\((i,j,v)\)</span> à <span
+class="math inline">\(C\)</span> Retourner <span
+class="math inline">\(C\)</span></p>
+</div>
+</div>
+</div>
+<div class="proof">
+<p><em>Proof.</em> L’algorithme fonctionne en deux étapes. D’abord, tous
+les éléments non nuls de <span class="math inline">\(A\)</span> sont
+ajoutés à <span class="math inline">\(C\)</span>. Ensuite, pour chaque
+élément non nul de <span class="math inline">\(B\)</span>, on vérifie
+s’il existe déjà dans <span class="math inline">\(C\)</span>. Si c’est
+le cas, on met à jour sa valeur; sinon, on l’ajoute à <span
+class="math inline">\(C\)</span>. La complexité de cet algorithme est
+<span class="math inline">\(O(k_A + k_B)\)</span>, où <span
+class="math inline">\(k_A\)</span> et <span
+class="math inline">\(k_B\)</span> sont le nombre d’éléments non nuls de
+<span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> respectivement. ◻</p>
+</div>
+<h1 id="multiplication-matrice-vecteur">Multiplication
+Matrice-Vecteur</h1>
+<p>La multiplication matrice-vecteur est une opération fondamentale dans
+de nombreuses applications numériques. Pour les matrices creuses, il
+existe des algorithmes spécialisés qui exploitent la structure creuse
+pour améliorer l’efficacité.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> une matrice creuse de
+taille <span class="math inline">\(m \times n\)</span> représentée en
+format CSR, et soit <span class="math inline">\(x\)</span> un vecteur de
+taille <span class="math inline">\(n\)</span>. L’algorithme suivant
+calcule le produit <span class="math inline">\(y = A x\)</span>.</p>
+<div class="algorithm">
+<div class="algorithmic">
+<p><span class="math inline">\(y \leftarrow\)</span> vecteur nul de
+taille <span class="math inline">\(m\)</span> <span
+class="math inline">\(sum \leftarrow 0\)</span> <span
+class="math inline">\(sum \leftarrow sum + v \times x[j]\)</span> <span
+class="math inline">\(y[i] \leftarrow sum\)</span> Retourner <span
+class="math inline">\(y\)</span></p>
+</div>
+</div>
+</div>
+<div class="proof">
+<p><em>Proof.</em> L’algorithme initialise le vecteur <span
+class="math inline">\(y\)</span> à zéro. Pour chaque ligne <span
+class="math inline">\(i\)</span> de <span
+class="math inline">\(A\)</span>, il calcule la somme des produits des
+éléments non nuls de cette ligne avec les éléments correspondants du
+vecteur <span class="math inline">\(x\)</span>. La complexité de cet
+algorithme est <span class="math inline">\(O(nnz(A))\)</span>, où <span
+class="math inline">\(nnz(A)\)</span> est le nombre d’éléments non nuls
+de <span class="math inline">\(A\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les algorithmes pour matrices creuses possèdent plusieurs propriétés
+intéressantes qui peuvent être exploitées pour améliorer leur
+efficacité.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(A\)</span> une matrice creuse
+symétrique de taille <span class="math inline">\(n \times n\)</span>. La
+multiplication matrice-vecteur <span class="math inline">\(y = A
+x\)</span> peut être calculée en utilisant uniquement les éléments de la
+partie inférieure ou supérieure de <span
+class="math inline">\(A\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Puisque <span class="math inline">\(A\)</span> est
+symétrique, pour chaque élément non nul <span
+class="math inline">\(A[i,j]\)</span>, on a <span
+class="math inline">\(A[j,i] = A[i,j]\)</span>. Par conséquent, lors du
+calcul de <span class="math inline">\(y[i]\)</span>, on peut utiliser
+soit <span class="math inline">\(A[i,j]\)</span> soit <span
+class="math inline">\(A[j,i]\)</span>. Cela permet de réduire le nombre
+d’opérations nécessaires. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les algorithmes pour matrices creuses sont essentiels pour traiter
+efficacement les grandes matrices creuses qui apparaissent dans de
+nombreuses applications. Dans ce chapitre, nous avons présenté les
+définitions fondamentales, les algorithmes pour l’addition et la
+multiplication matrice-vecteur, ainsi que quelques propriétés
+intéressantes. Ces techniques sont la base pour développer des
+algorithmes plus avancés, tels que les méthodes itératives pour résoudre
+des systèmes linéaires ou calculer des valeurs propres.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

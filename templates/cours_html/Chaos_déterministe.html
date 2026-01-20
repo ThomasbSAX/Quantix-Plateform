@@ -1,0 +1,370 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Chaos déterministe : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Chaos déterministe : Une exploration mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le chaos déterministe est un phénomène fascinant qui émerge dans des
+systèmes dynamiques où les équations de mouvement sont parfaitement
+déterminées. Contrairement aux systèmes stochastiques, le chaos
+déterministe ne résulte pas de l’incertitude ou du bruit aléatoire, mais
+plutôt d’une sensibilité extrême aux conditions initiales. Ce concept a
+révolutionné notre compréhension des systèmes complexes, allant de la
+météo à l’économie.</p>
+<p>L’origine du chaos déterministe remonte aux travaux d’Henri Poincaré
+sur les problèmes des trois corps en mécanique céleste. Cependant, c’est
+avec l’ère numérique et les travaux d’Edward Lorenz dans les années 1960
+que le chaos a commencé à être étudié systématiquement. Lorenz a
+découvert que de petites variations dans les conditions initiales
+pouvaient conduire à des comportements radicalement différents, un
+phénomène qu’il a baptisé "l’effet papillon".</p>
+<p>Le chaos déterministe est indispensable pour comprendre les systèmes
+non linéaires et complexes. Il nous permet de saisir pourquoi certaines
+prédictions deviennent impossibles à long terme, malgré la déterminisme
+des équations sous-jacentes. Ce concept est crucial dans de nombreux
+domaines, notamment la météorologie, la biologie, l’ingénierie et même
+les sciences sociales.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le chaos déterministe, commençons par définir les
+concepts clés.</p>
+<h2 id="système-dynamique">Système dynamique</h2>
+<p>Un système dynamique est un ensemble d’entités évoluant dans le temps
+selon des règles déterminées. Formellement, on peut définir un système
+dynamique comme suit :</p>
+<div class="definition">
+<p>Un <strong>système dynamique</strong> est un triplet <span
+class="math inline">\((X, f, \mathbb{T})\)</span>, où :</p>
+<ul>
+<li><p><span class="math inline">\(X\)</span> est un espace des
+phases,</p></li>
+<li><p><span class="math inline">\(f: X \times \mathbb{T} \rightarrow
+X\)</span> est une application de transition,</p></li>
+<li><p><span class="math inline">\(\mathbb{T}\)</span> est un ensemble
+de temps (souvent <span class="math inline">\(\mathbb{R}\)</span> ou
+<span class="math inline">\(\mathbb{Z}\)</span>).</p></li>
+</ul>
+</div>
+<h2 id="sensibilité-aux-conditions-initiales">Sensibilité aux conditions
+initiales</h2>
+<p>La sensibilité aux conditions initiales est une caractéristique clé
+des systèmes chaotiques. Elle signifie que de petites variations dans
+les conditions initiales peuvent conduire à des comportements
+radicalement différents.</p>
+<div class="definition">
+<p>Un système dynamique <span class="math inline">\((X, f,
+\mathbb{T})\)</span> est dit <strong>sensible aux conditions
+initiales</strong> s’il existe une constante <span
+class="math inline">\(\delta &gt; 0\)</span> telle que pour tout <span
+class="math inline">\(x \in X\)</span>, il existe un point <span
+class="math inline">\(y \in X\)</span> et un temps <span
+class="math inline">\(t \in \mathbb{T}\)</span> pour lesquels : <span
+class="math display">\[d(f(t, x), f(t, y)) &gt; \delta\]</span> où <span
+class="math inline">\(d\)</span> est une distance sur <span
+class="math inline">\(X\)</span>, et <span class="math display">\[d(x,
+y) &lt; \epsilon\]</span> pour tout <span class="math inline">\(\epsilon
+&gt; 0\)</span>.</p>
+</div>
+<h2 id="attracteur-étrange">Attracteur étrange</h2>
+<p>Un attracteur étrange est un ensemble vers lequel le système évolue,
+mais qui présente une structure complexe et fractale.</p>
+<div class="definition">
+<p>Un <strong>attracteur étrange</strong> est un ensemble compact <span
+class="math inline">\(A \subset X\)</span> tel que :</p>
+<ul>
+<li><p>Pour tout voisinage <span class="math inline">\(U\)</span> de
+<span class="math inline">\(A\)</span>, il existe un temps <span
+class="math inline">\(t_0 \in \mathbb{T}\)</span> tel que pour tout
+<span class="math inline">\(x \in U\)</span>, il existe un temps <span
+class="math inline">\(t \geq t_0\)</span> pour lequel <span
+class="math inline">\(f(t, x) \in A\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(x \in A\)</span>, la
+trajectoire <span class="math inline">\(\{f(t, x) | t \in
+\mathbb{T}\}\)</span> reste dans <span
+class="math inline">\(A\)</span>.</p></li>
+<li><p>L’attracteur a une dimension fractale.</p></li>
+</ul>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-lorenz">Théorème de Lorenz</h2>
+<p>Le théorème de Lorenz est un résultat fondamental dans l’étude du
+chaos déterministe. Il montre que même des systèmes simples peuvent
+présenter un comportement chaotique.</p>
+<div class="theorem">
+<p>Soit le système dynamique défini par les équations différentielles :
+<span class="math display">\[\frac{dx}{dt} = \sigma(y - x), \quad
+\frac{dy}{dt} = rx - y - xz, \quad \frac{dz}{dt} = xy - bz\]</span> où
+<span class="math inline">\(\sigma\)</span>, <span
+class="math inline">\(r\)</span> et <span
+class="math inline">\(b\)</span> sont des paramètres positifs. Pour
+certaines valeurs de ces paramètres, le système présente un comportement
+chaotique.</p>
+</div>
+<h2 id="démonstration-du-théorème-de-lorenz">Démonstration du théorème
+de Lorenz</h2>
+<p>La démonstration du théorème de Lorenz repose sur l’analyse des
+points fixes et des valeurs propres du système.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons les équations de Lorenz : <span
+class="math display">\[\frac{dx}{dt} = \sigma(y - x), \quad
+\frac{dy}{dt} = rx - y - xz, \quad \frac{dz}{dt} = xy - bz\]</span></p>
+<p>1. **Points fixes** : Les points fixes sont les solutions des
+équations <span class="math inline">\(\frac{dx}{dt} = 0\)</span>, <span
+class="math inline">\(\frac{dy}{dt} = 0\)</span> et <span
+class="math inline">\(\frac{dz}{dt} = 0\)</span>. On trouve deux points
+fixes : <span class="math inline">\((0, 0, 0)\)</span> et <span
+class="math inline">\((\sqrt{b(r-1)}, \sqrt{b(r-1)}, r-1)\)</span>.</p>
+<p>2. **Stabilité linéaire** : Pour analyser la stabilité de ces points
+fixes, on linéarise le système autour de chaque point fixe. La matrice
+jacobienne est : <span class="math display">\[J = \begin{pmatrix}
+-\sigma &amp; \sigma &amp; 0 \\
+r - z &amp; -1 &amp; -x \\
+y &amp; x &amp; -b
+\end{pmatrix}\]</span></p>
+<p>3. **Valeurs propres** : Pour le point fixe <span
+class="math inline">\((0, 0, 0)\)</span>, les valeurs propres sont <span
+class="math inline">\(\lambda_1 = -\sigma\)</span>, <span
+class="math inline">\(\lambda_2 = -1\)</span> et <span
+class="math inline">\(\lambda_3 = r-1\)</span>. Pour le point fixe <span
+class="math inline">\((\sqrt{b(r-1)}, \sqrt{b(r-1)}, r-1)\)</span>, les
+valeurs propres sont plus complexes et peuvent être calculées
+numériquement.</p>
+<p>4. **Chaos** : Pour certaines valeurs des paramètres <span
+class="math inline">\(\sigma\)</span>, <span
+class="math inline">\(r\)</span> et <span
+class="math inline">\(b\)</span>, le système présente un comportement
+chaotique. Cela peut être démontré en montrant que le système est
+sensible aux conditions initiales et possède un attracteur
+étrange. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-sensibilité-aux-conditions-initiales">Propriété de
+sensibilité aux conditions initiales</h2>
+<ul>
+<li><p>La sensibilité aux conditions initiales est une propriété
+fondamentale des systèmes chaotiques. Elle signifie que de petites
+erreurs dans les conditions initiales peuvent conduire à des prédictions
+radicalement différentes.</p></li>
+<li><p>Cette propriété est souvent quantifiée par l’exposant de
+Lyapunov, qui mesure la vitesse à laquelle les trajectoires
+divergentes.</p></li>
+</ul>
+<h2 id="propriété-des-attracteurs-étranges">Propriété des attracteurs
+étranges</h2>
+<ul>
+<li><p>Les attracteurs étranges sont des objets mathématiques complexes
+qui possèdent une structure fractale. Ils attirent les trajectoires du
+système dynamique vers eux.</p></li>
+<li><p>La dimension fractale d’un attracteur étrange est un outil
+important pour caractériser le chaos.</p></li>
+</ul>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le chaos déterministe est un phénomène fascinant qui a révolutionné
+notre compréhension des systèmes complexes. Grâce aux travaux de
+Poincaré, Lorenz et d’autres, nous avons pu saisir l’importance de la
+sensibilité aux conditions initiales et des attracteurs étranges. Les
+applications du chaos déterministe sont vastes, allant de la
+météorologie à l’économie.</p>
+<p>Cependant, malgré les progrès réalisés, de nombreuses questions
+restent ouvertes. La compréhension complète du chaos déterministe reste
+un défi pour les mathématiciens et les scientifiques. Les recherches
+futures devraient se concentrer sur le développement de nouvelles
+méthodes pour analyser et prédire les comportements chaotiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

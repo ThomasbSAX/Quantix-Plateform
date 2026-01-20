@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Les Conditions de Karush-Kuhn-Tucker : Un Fondement des Optimisations Non Linéaires</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Les Conditions de Karush-Kuhn-Tucker : Un Fondement
+des Optimisations Non Linéaires</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’optimisation non linéaire constitue un pilier fondamental dans de
+nombreux domaines scientifiques et industriels, allant de l’ingénierie à
+la finance en passant par les sciences sociales. Au cœur de cette
+discipline, les conditions de Karush-Kuhn-Tucker (KKT) émergent comme un
+outil indispensable pour résoudre des problèmes d’optimisation sous
+contraintes. Ces conditions, introduites par William Karush en 1939 et
+développées par Harold Kuhn et Albert Tucker dans les années 1950,
+fournissent des critères nécessaires pour l’existence de points optimaux
+dans les problèmes d’optimisation non linéaire sous contraintes.</p>
+<p>Les conditions KKT généralisent le théorème de Lagrange, qui ne
+s’applique qu’aux contraintes d’égalité. Elles permettent ainsi de
+traiter des problèmes plus complexes, intégrant à la fois des
+contraintes d’égalité et d’inégalité. Leur importance réside dans leur
+capacité à transformer un problème d’optimisation sous contraintes en un
+système d’équations et inéquations, facilitant ainsi l’analyse des
+points critiques potentiels.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre les conditions KKT, il est essentiel de définir
+préalablement le cadre dans lequel elles s’appliquent. Considérons un
+problème d’optimisation non linéaire sous contraintes :</p>
+<p><span class="math display">\[\begin{equation}
+    \begin{cases}
+        \min_{x \in \mathbb{R}^n} &amp; f(x) \\
+        \text{subject to } &amp; g_i(x) \leq 0, \quad i = 1, \ldots, m
+\\
+        &amp; h_j(x) = 0, \quad j = 1, \ldots, p
+    \end{cases}
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(f : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> est la fonction objectif à minimiser, <span
+class="math inline">\(g_i : \mathbb{R}^n \rightarrow \mathbb{R}\)</span>
+sont les contraintes d’inégalité, et <span class="math inline">\(h_j :
+\mathbb{R}^n \rightarrow \mathbb{R}\)</span> sont les contraintes
+d’égalité.</p>
+<p>Les conditions KKT fournissent des critères nécessaires pour qu’un
+point <span class="math inline">\(x^*\)</span> soit un minimum local du
+problème (1). Ces critères sont les suivants :</p>
+<div class="definition">
+<p>Un point <span class="math inline">\(x^* \in \mathbb{R}^n\)</span>
+est dit satisfaire les conditions KKT pour le problème (1) s’il existe
+des multiplicateurs de Lagrange <span class="math inline">\(\lambda_i
+\geq 0\)</span> pour <span class="math inline">\(i = 1, \ldots,
+m\)</span> et <span class="math inline">\(\mu_j \in \mathbb{R}\)</span>
+pour <span class="math inline">\(j = 1, \ldots, p\)</span> tels que
+:</p>
+<ol>
+<li><p><span class="math inline">\(\nabla f(x^*) + \sum_{i=1}^m
+\lambda_i \nabla g_i(x^*) + \sum_{j=1}^p \mu_j \nabla h_j(x^*) =
+0\)</span></p></li>
+<li><p><span class="math inline">\(g_i(x^*) \leq 0, \quad i = 1, \ldots,
+m\)</span> et <span class="math inline">\(h_j(x^*) = 0, \quad j = 1,
+\ldots, p\)</span></p></li>
+<li><p><span class="math inline">\(\lambda_i g_i(x^*) = 0, \quad i = 1,
+\ldots, m\)</span></p></li>
+<li><p><span class="math inline">\(\lambda_i \geq 0, \quad i = 1,
+\ldots, m\)</span></p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le théorème fondamental associé aux conditions KKT est le suivant
+:</p>
+<div class="theorem">
+<p>Supposons que <span class="math inline">\(f, g_i, h_j\)</span> soient
+continûment différentiables sur un ensemble convexe <span
+class="math inline">\(S \subset \mathbb{R}^n\)</span>. Supposons de plus
+que les contraintes d’égalité <span class="math inline">\(h_j\)</span>
+soient linéairement indépendantes et que les contraintes d’inégalité
+<span class="math inline">\(g_i\)</span> satisfassent la condition de
+qualification de Slater. Alors, si <span class="math inline">\(x^* \in
+S\)</span> est un point optimal local pour le problème (1), les
+conditions KKT sont satisfaites en <span
+class="math inline">\(x^*\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Karush-Kuhn-Tucker, nous procédons par
+étapes :</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Étape 1 : Réduction des contraintes
+d’inégalité</strong></p>
+<p>Considérons l’ensemble actif <span class="math inline">\(I(x^*) = \{
+i \mid g_i(x^*) = 0 \}\)</span>. Nous pouvons restreindre les
+contraintes d’inégalité à cet ensemble actif, car pour <span
+class="math inline">\(i \notin I(x^*)\)</span>, nous avons <span
+class="math inline">\(g_i(x^*) &lt; 0\)</span> et donc <span
+class="math inline">\(\lambda_i = 0\)</span> par complémentarité.</p>
+<p><strong>Étape 2 : Application du théorème des fonctions
+implicites</strong></p>
+<p>En utilisant la condition de qualification de Slater, nous pouvons
+appliquer le théorème des fonctions implicites pour exprimer localement
+les contraintes d’égalité et les contraintes d’inégalité actives comme
+des fonctions de <span class="math inline">\(x\)</span>. Cela nous
+permet de définir un nouveau problème d’optimisation sans
+contraintes.</p>
+<p><strong>Étape 3 : Application du théorème de Lagrange</strong></p>
+<p>Le problème sans contraintes obtenu peut être traité à l’aide du
+théorème de Lagrange. Les conditions de stationnarité pour ce problème
+sans contraintes correspondent aux conditions de stationnarité des
+KKT.</p>
+<p><strong>Étape 4 : Vérification des conditions de complémentarité et
+duales</strong></p>
+<p>Les conditions de complémentarité et les contraintes duales découlent
+directement des propriétés des multiplicateurs de Lagrange dans le cadre
+du théorème de Lagrange. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les conditions KKT possèdent plusieurs propriétés importantes :</p>
+<ol>
+<li><p>Les conditions KKT sont des conditions nécessaires pour
+l’optimalité, mais pas toujours suffisantes. Des conditions
+supplémentaires, telles que la convexité de la fonction objectif et des
+contraintes, sont nécessaires pour garantir la suffisance.</p></li>
+<li><p>Dans le cas où les contraintes d’inégalité sont absentes, les
+conditions KKT se réduisent aux conditions de Lagrange.</p></li>
+<li><p>Les conditions KKT peuvent être utilisées pour formuler des
+algorithmes numériques efficaces pour résoudre les problèmes
+d’optimisation sous contraintes.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les conditions de Karush-Kuhn-Tucker constituent un outil puissant et
+polyvalent pour l’analyse des problèmes d’optimisation non linéaire sous
+contraintes. Leur capacité à généraliser le théorème de Lagrange en
+intégrant des contraintes d’inégalité les rend indispensables dans de
+nombreux domaines appliqués. Bien que leur utilisation nécessite des
+conditions de qualification strictes, elles offrent une base solide pour
+le développement d’algorithmes numériques et l’analyse théorique des
+problèmes d’optimisation.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

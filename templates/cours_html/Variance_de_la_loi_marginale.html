@@ -1,0 +1,314 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance de la loi marginale</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance de la loi marginale</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La variance d’une loi marginale est un concept fondamental en théorie
+des probabilités et en statistique. Elle émerge naturellement lorsque
+l’on s’intéresse à la dispersion d’une variable aléatoire dans un
+contexte multidimensionnel. En effet, lorsque nous avons affaire à
+plusieurs variables aléatoires, il est souvent utile de considérer leur
+comportement individuel en marginalisant par rapport aux autres
+variables. La variance de la loi marginale quantifie alors l’étendue des
+valeurs que peut prendre une variable aléatoire, indépendamment des
+autres variables du système.</p>
+<p>Ce concept est indispensable dans de nombreux domaines, notamment en
+économie pour l’analyse des risques, en finance pour la gestion de
+portefeuille, et en sciences sociales pour l’étude des comportements
+individuels au sein d’une population. Il permet de comprendre la
+variabilité inhérente à une variable tout en tenant compte des
+interactions avec d’autres variables.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la variance de la loi marginale, commençons par rappeler
+ce qu’est une loi marginale. Considérons un vecteur aléatoire <span
+class="math inline">\((X_1, X_2, \ldots, X_n)\)</span> de loi conjointe
+<span class="math inline">\(P\)</span>. La loi marginale d’une variable
+<span class="math inline">\(X_i\)</span> est obtenue en sommant la loi
+conjointe sur toutes les autres variables. Formellement, si <span
+class="math inline">\(P_{X_i}\)</span> est la loi marginale de <span
+class="math inline">\(X_i\)</span>, alors :</p>
+<p><span class="math display">\[P_{X_i}(A) = \sum_{x_1, \ldots, x_{i-1},
+x_{i+1}, \ldots, x_n} P(\{x_1, \ldots, x_i, \ldots, x_n\} \cap
+A)\]</span></p>
+<p>pour tout ensemble mesurable <span
+class="math inline">\(A\)</span>.</p>
+<p>La variance de la loi marginale de <span
+class="math inline">\(X_i\)</span> est alors définie comme la variance
+de cette loi. Si <span class="math inline">\(E[X_i]\)</span> désigne
+l’espérance de <span class="math inline">\(X_i\)</span>, la variance est
+donnée par :</p>
+<p><span class="math display">\[\text{Var}(X_i) = E\left[(X_i -
+E[X_i])^2\right]\]</span></p>
+<p>Cette définition peut être réécrite de plusieurs manières, par
+exemple :</p>
+<p><span class="math display">\[\text{Var}(X_i) = E[X_i^2] -
+(E[X_i])^2\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème important concernant la variance de la loi marginale est
+le théorème de la variance totale. Ce théorème permet de décomposer la
+variance d’une variable aléatoire en fonction des variances marginales
+et des covariances.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((X_1, X_2, \ldots, X_n)\)</span> un
+vecteur aléatoire. La variance de <span
+class="math inline">\(X_i\)</span> peut être décomposée comme suit :</p>
+<p><span class="math display">\[\text{Var}(X_i) = \text{Var}_j(E[X_i |
+X_j]) + E[\text{Var}(X_i | X_j)]\]</span></p>
+<p>où <span class="math inline">\(\text{Var}_j\)</span> désigne la
+variance conditionnelle par rapport à <span
+class="math inline">\(X_j\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la variance totale, nous utilisons les
+propriétés de l’espérance conditionnelle et de la variance. Commençons
+par rappeler que :</p>
+<p><span class="math display">\[\text{Var}(X_i) = E[X_i^2] -
+(E[X_i])^2\]</span></p>
+<p>En utilisant la loi des espérances totales, nous avons :</p>
+<p><span class="math display">\[E[X_i^2] = E[E[X_i^2 |
+X_j]]\]</span></p>
+<p>et</p>
+<p><span class="math display">\[(E[X_i])^2 = E[E[X_i |
+X_j]]^2\]</span></p>
+<p>En substituant ces expressions dans la définition de la variance,
+nous obtenons :</p>
+<p><span class="math display">\[\text{Var}(X_i) = E[E[X_i^2 | X_j]] -
+E[E[X_i | X_j]]^2\]</span></p>
+<p>En utilisant l’égalité de Parseval, nous pouvons écrire :</p>
+<p><span class="math display">\[E[E[X_i^2 | X_j]] = \text{Var}_j(E[X_i |
+X_j]) + E[\text{Var}(X_i | X_j)]\]</span></p>
+<p>En substituant cette expression dans l’équation précédente, nous
+obtenons finalement :</p>
+<p><span class="math display">\[\text{Var}(X_i) = \text{Var}_j(E[X_i |
+X_j]) + E[\text{Var}(X_i | X_j)]\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+variance de la loi marginale :</p>
+<ol>
+<li><p>La variance d’une loi marginale est toujours non négative,
+c’est-à-dire que <span class="math inline">\(\text{Var}(X_i) \geq
+0\)</span> pour toute variable aléatoire <span
+class="math inline">\(X_i\)</span>.</p></li>
+<li><p>La variance d’une loi marginale est invariante par translation,
+c’est-à-dire que <span class="math inline">\(\text{Var}(X_i + c) =
+\text{Var}(X_i)\)</span> pour toute constante <span
+class="math inline">\(c\)</span>.</p></li>
+<li><p>La variance d’une loi marginale est homogène de degré 2,
+c’est-à-dire que <span class="math inline">\(\text{Var}(aX_i) = a^2
+\text{Var}(X_i)\)</span> pour toute constante <span
+class="math inline">\(a\)</span>.</p></li>
+</ol>
+<p>Pour prouver la propriété (i), nous utilisons le fait que l’espérance
+de <span class="math inline">\((X_i - E[X_i])^2\)</span> est non
+négative, car le carré d’une différence est toujours non négatif.</p>
+<p>Pour prouver la propriété (ii), nous utilisons le fait que
+l’espérance d’une constante est égale à cette constante, et que la
+variance d’une constante est nulle.</p>
+<p>Pour prouver la propriété (iii), nous utilisons le fait que
+l’espérance d’une variable aléatoire multipliée par une constante est
+égale à la constante fois l’espérance de la variable aléatoire, et que
+la variance d’une variable aléatoire multipliée par une constante est
+égale au carré de la constante fois la variance de la variable
+aléatoire.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

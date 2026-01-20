@@ -1,0 +1,374 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Aire de surface en coordonnées cylindriques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Aire de surface en coordonnées cylindriques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’étude des surfaces en mathématiques est un domaine riche et
+fascinant, notamment dans le cadre de la géométrie différentielle. Les
+coordonnées cylindriques offrent un outil puissant pour décrire et
+analyser ces surfaces, en particulier celles qui présentent une symétrie
+cylindrique. L’aire de surface est une mesure fondamentale qui permet de
+quantifier l’étendue d’une surface dans l’espace. Comprendre comment
+calculer cette aire en coordonnées cylindriques est essentiel pour
+résoudre de nombreux problèmes en physique, ingénierie et mathématiques
+pures.</p>
+<p>Les coordonnées cylindriques étendent le système de coordonnées
+polaires en deux dimensions à trois dimensions, en ajoutant une
+troisième coordonnée pour la hauteur. Cette extension permet de décrire
+des surfaces complexes avec une relative simplicité. L’aire de surface
+en coordonnées cylindriques trouve ses applications dans des domaines
+variés, tels que l’électromagnétisme, la mécanique des fluides et la
+thermodynamique.</p>
+<p>Dans cet article, nous explorerons les concepts fondamentaux
+nécessaires pour comprendre l’aire de surface en coordonnées
+cylindriques. Nous commencerons par définir les coordonnées cylindriques
+et leurs relations avec les coordonnées cartésiennes. Ensuite, nous
+introduirons la notion d’élément de surface et dériverons la formule
+pour l’aire de surface. Enfin, nous illustrerons ces concepts avec des
+exemples concrets et des applications pratiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans le calcul de l’aire de surface, il est
+essentiel de bien comprendre les coordonnées cylindriques et leurs
+propriétés.</p>
+<h2 id="coordonnées-cylindriques">Coordonnées Cylindriques</h2>
+<p>Les coordonnées cylindriques sont un système de coordonnées
+tridimensionnel qui étend les coordonnées polaires en deux dimensions.
+Elles sont particulièrement utiles pour décrire des surfaces qui
+présentent une symétrie autour d’un axe, typiquement l’axe <span
+class="math inline">\(z\)</span>.</p>
+<p>Pour comprendre les coordonnées cylindriques, imaginons un point
+<span class="math inline">\(P\)</span> dans l’espace tridimensionnel.
+Nous pouvons décrire la position de ce point en utilisant trois
+coordonnées : <span class="math inline">\((r, \theta, z)\)</span>, où :
+- <span class="math inline">\(r\)</span> est la distance du point à
+l’axe <span class="math inline">\(z\)</span>, - <span
+class="math inline">\(\theta\)</span> est l’angle entre la projection du
+point sur le plan <span class="math inline">\(xy\)</span> et l’axe <span
+class="math inline">\(x\)</span>, - <span
+class="math inline">\(z\)</span> est la hauteur du point par rapport au
+plan <span class="math inline">\(xy\)</span>.</p>
+<p>La relation entre les coordonnées cartésiennes <span
+class="math inline">\((x, y, z)\)</span> et les coordonnées cylindriques
+<span class="math inline">\((r, \theta, z)\)</span> est donnée par :
+<span class="math display">\[x = r \cos \theta, \quad y = r \sin \theta,
+\quad z = z\]</span></p>
+<h2 id="élément-de-surface">Élément de Surface</h2>
+<p>L’élément de surface <span class="math inline">\(dS\)</span> est une
+quantité infinitésimale qui représente une petite portion de la surface.
+En coordonnées cylindriques, l’élément de surface peut être exprimé en
+fonction des coordonnées <span class="math inline">\(r\)</span> et <span
+class="math inline">\(\theta\)</span>.</p>
+<p>Pour comprendre l’élément de surface, considérons une petite portion
+de la surface dans le plan <span class="math inline">\(r\theta\)</span>.
+Cette portion peut être vue comme un petit rectangle dont les côtés sont
+<span class="math inline">\(dr\)</span> et <span class="math inline">\(r
+d\theta\)</span>. L’aire de ce petit rectangle est donc : <span
+class="math display">\[dS = r \, dr \, d\theta\]</span></p>
+<p>Cependant, cette expression ne tient pas compte de la courbure de la
+surface dans l’espace tridimensionnel. Pour prendre en compte cette
+courbure, nous devons introduire un facteur de correction qui dépend de
+la dérivée de <span class="math inline">\(z\)</span> par rapport à <span
+class="math inline">\(r\)</span> et <span
+class="math inline">\(\theta\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="formule-de-laire-de-surface">Formule de l’Aire de Surface</h2>
+<p>Le théorème fondamental pour le calcul de l’aire de surface en
+coordonnées cylindriques est donné par la formule suivante :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(S\)</span> une surface lisse
+paramétrée par les coordonnées cylindriques <span
+class="math inline">\((r, \theta)\)</span>, avec une fonction de hauteur
+<span class="math inline">\(z = f(r, \theta)\)</span>. L’aire de la
+surface <span class="math inline">\(S\)</span> est donnée par : <span
+class="math display">\[A = \iint_S dS = \iint_D \sqrt{ \left(
+\frac{\partial f}{\partial r} \right)^2 + \left( \frac{\partial
+f}{\partial \theta} \right)^2 + 1 } \, r \, dr \, d\theta\]</span> où
+<span class="math inline">\(D\)</span> est la projection de la surface
+<span class="math inline">\(S\)</span> sur le plan <span
+class="math inline">\(r\theta\)</span>.</p>
+</div>
+<h2 id="démonstration-du-théorème">Démonstration du Théorème</h2>
+<p>Pour démontrer cette formule, nous devons d’abord comprendre comment
+l’élément de surface <span class="math inline">\(dS\)</span> se
+transforme en coordonnées cylindriques.</p>
+<p>Considérons un petit élément de surface sur <span
+class="math inline">\(S\)</span>. Ce petit élément peut être vu comme
+une petite portion d’un plan tangent à la surface en ce point. Le
+vecteur normal à cette surface peut être obtenu en prenant le produit
+vectoriel des dérivées partielles de la position par rapport à <span
+class="math inline">\(r\)</span> et <span
+class="math inline">\(\theta\)</span>.</p>
+<p>Les vecteurs tangents à la surface sont donnés par : <span
+class="math display">\[\mathbf{r}_r = \left( \cos \theta, \sin \theta,
+\frac{\partial f}{\partial r} \right), \quad \mathbf{r}_\theta = \left(
+-r \sin \theta, r \cos \theta, \frac{\partial f}{\partial \theta}
+\right)\]</span></p>
+<p>Le vecteur normal <span class="math inline">\(\mathbf{n}\)</span> est
+alors : <span class="math display">\[\mathbf{n} = \mathbf{r}_r \times
+\mathbf{r}_\theta = \left( -r \frac{\partial f}{\partial r} \sin \theta
+- \frac{\partial f}{\partial \theta} \cos \theta, r \frac{\partial
+f}{\partial r} \cos \theta - \frac{\partial f}{\partial \theta} \sin
+\theta, r \right)\]</span></p>
+<p>La magnitude du vecteur normal est : <span
+class="math display">\[|\mathbf{n}| = \sqrt{ \left( r \frac{\partial
+f}{\partial r} \right)^2 + \left( \frac{\partial f}{\partial \theta}
+\right)^2 + r^2 }\]</span></p>
+<p>L’élément de surface <span class="math inline">\(dS\)</span> est donc
+: <span class="math display">\[dS = |\mathbf{n}| \, dr \, d\theta =
+\sqrt{ \left( \frac{\partial f}{\partial r} \right)^2 + \left(
+\frac{\partial f}{\partial \theta} \right)^2 + 1 } \, r \, dr \,
+d\theta\]</span></p>
+<p>En intégrant sur tout le domaine <span
+class="math inline">\(D\)</span>, nous obtenons l’aire totale de la
+surface : <span class="math display">\[A = \iint_D \sqrt{ \left(
+\frac{\partial f}{\partial r} \right)^2 + \left( \frac{\partial
+f}{\partial \theta} \right)^2 + 1 } \, r \, dr \, d\theta\]</span></p>
+<h1 id="exemples">Exemples</h1>
+<p>Pour illustrer l’application de cette formule, considérons quelques
+exemples concrets.</p>
+<h2 id="exemple-1-cylindre-circulaire">Exemple 1 : Cylindre
+Circulaire</h2>
+<p>Considérons un cylindre circulaire de rayon <span
+class="math inline">\(a\)</span> et de hauteur <span
+class="math inline">\(h\)</span>. La surface latérale du cylindre peut
+être paramétrée par : <span class="math display">\[r = a, \quad 0 \leq
+\theta \leq 2\pi, \quad z = f(r, \theta) = h\]</span></p>
+<p>Les dérivées partielles de <span class="math inline">\(f\)</span>
+sont : <span class="math display">\[\frac{\partial f}{\partial r} = 0,
+\quad \frac{\partial f}{\partial \theta} = 0\]</span></p>
+<p>L’aire de la surface latérale est donc : <span
+class="math display">\[A = \int_0^{2\pi} \sqrt{0 + 0 + 1} \, a \,
+d\theta = 2\pi a\]</span></p>
+<h2 id="exemple-2-cône-circulaire">Exemple 2 : Cône Circulaire</h2>
+<p>Considérons un cône circulaire de rayon <span
+class="math inline">\(a\)</span> à la base et de hauteur <span
+class="math inline">\(h\)</span>. La surface latérale du cône peut être
+paramétrée par : <span class="math display">\[r = a \frac{h - z}{h},
+\quad 0 \leq \theta \leq 2\pi, \quad z = f(r, \theta) = h - \frac{h}{a}
+r\]</span></p>
+<p>Les dérivées partielles de <span class="math inline">\(f\)</span>
+sont : <span class="math display">\[\frac{\partial f}{\partial r} =
+-\frac{h}{a}, \quad \frac{\partial f}{\partial \theta} = 0\]</span></p>
+<p>L’aire de la surface latérale est donc : <span
+class="math display">\[A = \int_0^{2\pi} \sqrt{ \left( -\frac{h}{a}
+\right)^2 + 0 + 1 } \, r \, d\theta\]</span></p>
+<p>En substituant <span class="math inline">\(r = a \frac{h -
+z}{h}\)</span> et en intégrant sur <span
+class="math inline">\(z\)</span> de 0 à <span
+class="math inline">\(h\)</span>, nous obtenons : <span
+class="math display">\[A = \pi a \sqrt{ \left( \frac{h}{a} \right)^2 + 1
+} = \pi a \sqrt{ \frac{h^2}{a^2} + 1 }\]</span></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Dans cet article, nous avons exploré le concept d’aire de surface en
+coordonnées cylindriques. Nous avons commencé par définir les
+coordonnées cylindriques et leurs relations avec les coordonnées
+cartésiennes. Ensuite, nous avons introduit la notion d’élément de
+surface et dérivé la formule pour l’aire de surface. Enfin, nous avons
+illustré ces concepts avec des exemples concrets.</p>
+<p>L’aire de surface en coordonnées cylindriques est un outil puissant
+pour analyser et quantifier les surfaces présentant une symétrie
+cylindrique. Ses applications sont vastes et variées, allant de la
+physique à l’ingénierie en passant par les mathématiques pures. En
+comprenant ces concepts fondamentaux, nous pouvons résoudre une
+multitude de problèmes complexes et ouvrir la voie à de nouvelles
+découvertes et innovations.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

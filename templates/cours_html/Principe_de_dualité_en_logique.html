@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Principe de dualité en logique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Principe de dualité en logique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le principe de dualité en logique est un concept fondamental qui
+émerge des structures algébriques sous-jacentes aux systèmes logiques.
+Historiquement, ce principe trouve ses racines dans les travaux de De
+Morgan et Boole au XIXème siècle, qui ont posé les bases de l’algèbre de
+la logique. Le principe de dualité permet de comprendre et d’explorer
+les symétries intrinsèques des opérateurs logiques, offrant ainsi une
+compréhension plus profonde et unifiée des systèmes logiques.</p>
+<p>Ce principe est indispensable dans l’analyse des structures
+algébriques telles que les treillis, les algèbres de Boole et les
+algèbres de Heyting. Il permet de simplifier considérablement l’étude
+des propriétés logiques en établissant des correspondances entre les
+opérateurs de conjonction et disjonction, ainsi qu’entre leurs
+négations. En outre, le principe de dualité joue un rôle crucial dans la
+théorie des modèles et l’étude des systèmes logiques non classiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le principe de dualité, il est essentiel de définir
+les concepts fondamentaux qui le sous-tendent. Commençons par l’idée
+intuitive que la dualité en logique reflète une symétrie entre les
+opérateurs de conjonction et disjonction.</p>
+<p>Considérons un treillis <span class="math inline">\((L, \wedge,
+\vee)\)</span>, où <span class="math inline">\(L\)</span> est un
+ensemble partiellement ordonné et <span
+class="math inline">\(\wedge\)</span> (rencontre) et <span
+class="math inline">\(\vee\)</span> (jointure) sont des opérateurs
+binaires. Nous cherchons une relation qui permette d’exprimer la
+conjonction en termes de disjonction et vice versa.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((L, \wedge, \vee)\)</span> un
+treillis. On dit que deux éléments <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> de <span
+class="math inline">\(L\)</span> sont duals si pour tout élément <span
+class="math inline">\(x \in L\)</span>, on a : <span
+class="math display">\[a \wedge x = b \vee x\]</span></p>
+</div>
+<p>De manière plus formelle, on peut définir la dualité comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((L, \wedge, \vee)\)</span> un
+treillis. On dit que deux éléments <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> de <span
+class="math inline">\(L\)</span> sont duals si pour tout élément <span
+class="math inline">\(x \in L\)</span>, on a : <span
+class="math display">\[(\forall x \in L) (a \wedge x = b \vee
+x)\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Le principe de dualité en logique est formalisé par plusieurs
+théorèmes importants. L’un des plus célèbres est le théorème de dualité
+de De Morgan, qui établit une relation entre les opérateurs de négation
+et les opérateurs de conjonction et disjonction.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((L, \wedge, \vee, \neg)\)</span> une
+algèbre de Boole. Pour tout <span class="math inline">\(a, b \in
+L\)</span>, on a : <span class="math display">\[\neg (a \wedge b) = \neg
+a \vee \neg b\]</span> et <span class="math display">\[\neg (a \vee b) =
+\neg a \wedge \neg b\]</span></p>
+</div>
+<p>Une autre formulation de ce théorème est la suivante :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((L, \wedge, \vee, \neg)\)</span> une
+algèbre de Boole. Pour tout <span class="math inline">\(a, b \in
+L\)</span>, on a : <span class="math display">\[(\forall a, b \in
+L)(\neg (a \wedge b) = \neg a \vee \neg b)\]</span> et <span
+class="math display">\[(\forall a, b \in L)(\neg (a \vee b) = \neg a
+\wedge \neg b)\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de dualité de De Morgan, nous allons
+utiliser les propriétés fondamentales des algèbres de Boole.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons une algèbre de Boole <span
+class="math inline">\((L, \wedge, \vee, \neg)\)</span>. Nous voulons
+montrer que pour tout <span class="math inline">\(a, b \in L\)</span>,
+on a : <span class="math display">\[\neg (a \wedge b) = \neg a \vee \neg
+b\]</span></p>
+<p>Commençons par montrer que <span class="math inline">\(\neg (a \wedge
+b) \leq \neg a \vee \neg b\)</span>. Par distributivité de la
+conjonction sur la disjonction, on a : <span class="math display">\[a
+\wedge b \leq a\]</span> et <span class="math display">\[a \wedge b \leq
+b\]</span></p>
+<p>En appliquant la négation, on obtient : <span
+class="math display">\[\neg (a \wedge b) \geq \neg a\]</span> et <span
+class="math display">\[\neg (a \wedge b) \geq \neg b\]</span></p>
+<p>Par la propriété de la disjonction, on a : <span
+class="math display">\[\neg (a \wedge b) \geq \neg a \vee \neg
+b\]</span></p>
+<p>Maintenant, montrons que <span class="math inline">\(\neg a \vee \neg
+b \leq \neg (a \wedge b)\)</span>. Supposons que <span
+class="math inline">\(x \leq \neg a \vee \neg b\)</span>. Alors, soit
+<span class="math inline">\(x \leq \neg a\)</span>, soit <span
+class="math inline">\(x \leq \neg b\)</span>.</p>
+<p>Si <span class="math inline">\(x \leq \neg a\)</span>, alors <span
+class="math inline">\(a \wedge x = 0\)</span>. Par conséquent, <span
+class="math inline">\(\neg (a \wedge x) = 1\)</span>, ce qui implique
+que <span class="math inline">\(x \leq \neg (a \wedge b)\)</span>.</p>
+<p>De même, si <span class="math inline">\(x \leq \neg b\)</span>, alors
+<span class="math inline">\(b \wedge x = 0\)</span>. Par conséquent,
+<span class="math inline">\(\neg (b \wedge x) = 1\)</span>, ce qui
+implique que <span class="math inline">\(x \leq \neg (a \wedge
+b)\)</span>.</p>
+<p>Ainsi, on a : <span class="math display">\[\neg a \vee \neg b \leq
+\neg (a \wedge b)\]</span></p>
+<p>Par conséquent, on conclut que : <span class="math display">\[\neg (a
+\wedge b) = \neg a \vee \neg b\]</span></p>
+<p>La preuve pour <span class="math inline">\(\neg (a \vee b) = \neg a
+\wedge \neg b\)</span> est similaire et est laissée en exercice. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le principe de dualité en logique possède plusieurs propriétés
+intéressantes. En voici quelques-unes :</p>
+<ol>
+<li><p>Dans une algèbre de Boole, la négation est son propre dual.
+C’est-à-dire que pour tout <span class="math inline">\(a \in L\)</span>,
+on a : <span class="math display">\[\neg (\neg a) = a\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> Par le théorème de dualité de De Morgan, on a : <span
+class="math display">\[\neg (\neg a) = \neg a\]</span> Ce qui montre que
+la négation est son propre dual. ◻</p>
+</div></li>
+<li><p>La conjonction et la disjonction sont duales l’une de l’autre.
+C’est-à-dire que pour tout <span class="math inline">\(a, b \in
+L\)</span>, on a : <span class="math display">\[a \wedge b = \neg (\neg
+a \vee \neg b)\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> Par le théorème de dualité de De Morgan, on a : <span
+class="math display">\[\neg (\neg a \vee \neg b) = \neg (\neg a) \wedge
+\neg (\neg b) = a \wedge b\]</span> Ce qui montre que la conjonction et
+la disjonction sont duales l’une de l’autre. ◻</p>
+</div></li>
+<li><p>La distributivité de la conjonction sur la disjonction est duale
+à la distributivité de la disjonction sur la conjonction. C’est-à-dire
+que pour tout <span class="math inline">\(a, b, c \in L\)</span>, on a :
+<span class="math display">\[a \wedge (b \vee c) = (a \wedge b) \vee (a
+\wedge c)\]</span> et <span class="math display">\[a \vee (b \wedge c) =
+(a \vee b) \wedge (a \vee c)\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ces propriétés découle directement des
+lois de De Morgan et des propriétés fondamentales des algèbres de
+Boole. ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le principe de dualité en logique est un concept puissant qui permet
+de comprendre les symétries et les relations entre les opérateurs
+logiques. Il joue un rôle crucial dans l’étude des structures
+algébriques telles que les treillis, les algèbres de Boole et les
+algèbres de Heyting. Les théorèmes de dualité, tels que le théorème de
+De Morgan, fournissent des outils essentiels pour l’analyse et la
+simplification des systèmes logiques. En explorant les propriétés et les
+corollaires du principe de dualité, nous pouvons approfondir notre
+compréhension des fondements de la logique et des mathématiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

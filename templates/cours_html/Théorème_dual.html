@@ -1,0 +1,350 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le théorème dual en optimisation linéaire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le théorème dual en optimisation linéaire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’optimisation linéaire est un domaine fondamental en mathématiques
+appliquées, avec des applications variées allant de l’économie à la
+gestion de projets. Au cœur de cette discipline se trouve le théorème
+dual, un résultat profond qui établit une relation symétrique entre deux
+problèmes d’optimisation linéaire : le problème primal et son problème
+dual associé. Ce théorème ne se contente pas de fournir une méthode
+alternative pour résoudre des problèmes d’optimisation ; il offre
+également des insights théoriques précieux, comme les conditions de
+complémentarité et la compréhension de l’optimalité.</p>
+<p>L’origine du théorème dual remonte aux travaux pionniers de John von
+Neumann dans les années 1940, bien que les concepts sous-jacents aient
+été explorés par des mathématiciens comme George Dantzig, le fondateur
+de la programmation linéaire. Le théorème dual émerge comme une réponse
+à la nécessité de comprendre les limites et les propriétés des solutions
+optimales dans les problèmes d’optimisation linéaire. Il est
+indispensable pour plusieurs raisons : il permet de vérifier
+l’optimalité des solutions, d’interpréter les variables duales comme des
+prix ombraux ou des coûts marginaux, et de simplifier la résolution de
+problèmes complexes en exploitant la symétrie entre les problèmes primal
+et dual.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour aborder le théorème dual, commençons par définir les concepts
+fondamentaux. Supposons que nous avons un problème d’optimisation
+linéaire primal de la forme suivante :</p>
+<p><span class="math display">\[\begin{equation}
+    \begin{aligned}
+        \text{minimiser} \quad &amp; c^T x \\
+        \text{sous les contraintes} \quad &amp; Ax \geq b, \\
+        &amp; x \geq 0.
+    \end{aligned}
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(c \in \mathbb{R}^n\)</span>, <span
+class="math inline">\(b \in \mathbb{R}^m\)</span>, et <span
+class="math inline">\(A\)</span> est une matrice <span
+class="math inline">\(m \times n\)</span>.</p>
+<h4 class="unnumbered" id="problème-dual-associé">Problème dual
+associé</h4>
+<p>: Le problème dual associé au problème primal ci-dessus est défini
+comme suit :</p>
+<p><span class="math display">\[\begin{equation}
+    \begin{aligned}
+        \text{maximiser} \quad &amp; b^T y \\
+        \text{sous les contraintes} \quad &amp; A^T y \leq c, \\
+        &amp; y \geq 0.
+    \end{aligned}
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(y \in \mathbb{R}^m\)</span> est le
+vecteur des variables duales.</p>
+<h4 class="unnumbered" id="solution-optimale">Solution optimale</h4>
+<p>: Une solution <span class="math inline">\(x^*\)</span> au problème
+primal est dite optimale si elle satisfait les contraintes du problème
+primal et minimise la fonction objectif <span class="math inline">\(c^T
+x\)</span>. De même, une solution <span
+class="math inline">\(y^*\)</span> au problème dual est dite optimale si
+elle satisfait les contraintes du problème dual et maximise la fonction
+objectif <span class="math inline">\(b^T y\)</span>.</p>
+<h1 class="unnumbered" id="théorème-dual">Théorème Dual</h1>
+<p>Le théorème dual est un résultat central en optimisation linéaire qui
+établit une relation entre les solutions des problèmes primal et dual.
+Voici l’énoncé formel du théorème :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(x^*\)</span> une solution optimale
+du problème primal et <span class="math inline">\(y^*\)</span> une
+solution optimale du problème dual associé. Alors, les valeurs optimales
+des deux problèmes sont égales, c’est-à-dire : <span
+class="math display">\[\begin{equation}
+        c^T x^* = b^T y^*.
+\end{equation}\]</span></p>
+<p>De plus, si l’un des problèmes admet une solution optimale, alors
+l’autre problème en admet également une.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème dual, nous allons utiliser les concepts de
+complémentarité et les conditions de Karush-Kuhn-Tucker (KKT). Supposons
+que <span class="math inline">\(x^*\)</span> est une solution optimale
+du problème primal et <span class="math inline">\(y^*\)</span> est une
+solution optimale du problème dual.</p>
+<h4 class="unnumbered" id="condition-de-complémentarité">Condition de
+complémentarité</h4>
+<p>: Pour toute solution optimale <span
+class="math inline">\(x^*\)</span> du problème primal et <span
+class="math inline">\(y^*\)</span> du problème dual, les conditions de
+complémentarité suivantes sont satisfaites : <span
+class="math display">\[\begin{equation}
+    y_i^*(A x^* - b)_i = 0 \quad \text{pour tout } i = 1, \ldots, m,
+\end{equation}\]</span> <span class="math display">\[\begin{equation}
+    (A^T y^* - c)^T x^* = 0.
+\end{equation}\]</span></p>
+<h4 class="unnumbered"
+id="preuve-de-légalité-des-valeurs-optimales">Preuve de l’égalité des
+valeurs optimales</h4>
+<p>: En utilisant les conditions de complémentarité, nous avons : <span
+class="math display">\[\begin{align*}
+    c^T x^* &amp;= (A^T y^*)^T x^* \\
+            &amp;= y^{*T} A x^* \\
+            &amp;= y^{*T} b + y^{*T} (A x^* - b) \\
+            &amp;= y^{*T} b \quad (\text{car } y_i^*(A x^* - b)_i = 0).
+\end{align*}\]</span></p>
+<p>Ainsi, nous avons montré que <span class="math inline">\(c^T x^* =
+b^T y^*\)</span>, ce qui prouve l’égalité des valeurs optimales.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le théorème dual possède plusieurs propriétés importantes qui
+enrichissent notre compréhension des problèmes d’optimisation
+linéaire.</p>
+<h4 class="unnumbered" id="propriété-i">Propriété (i)</h4>
+<p>: Si le problème primal admet une solution optimale et que les
+contraintes du problème dual sont compatibles, alors le problème dual
+admet également une solution optimale.</p>
+<h4 class="unnumbered" id="preuve">Preuve</h4>
+<p>: Cette propriété découle directement du théorème dual. En effet, si
+le problème primal admet une solution optimale <span
+class="math inline">\(x^*\)</span>, alors il existe une solution
+optimale <span class="math inline">\(y^*\)</span> au problème dual, et
+les valeurs optimales sont égales.</p>
+<h4 class="unnumbered" id="propriété-ii">Propriété (ii)</h4>
+<p>: Les variables duales <span class="math inline">\(y^*\)</span>
+peuvent être interprétées comme des prix ombraux ou des coûts marginaux
+associés aux contraintes du problème primal.</p>
+<h4 class="unnumbered" id="preuve-1">Preuve</h4>
+<p>: Cette interprétation découle de la condition <span
+class="math inline">\(A^T y^* \leq c\)</span>. Les variables duales
+<span class="math inline">\(y^*\)</span> représentent les coûts
+marginaux des ressources, et leur interprétation économique est un outil
+puissant pour l’analyse de sensibilité.</p>
+<h4 class="unnumbered" id="propriété-iii">Propriété (iii)</h4>
+<p>: Si le problème primal est non borné, alors le problème dual est
+incompatible et réciproquement.</p>
+<h4 class="unnumbered" id="preuve-2">Preuve</h4>
+<p>: Cette propriété résulte de la dualité forte. Si le problème primal
+est non borné, cela signifie que <span class="math inline">\(c^T
+x\)</span> peut être rendu arbitrairement petit, ce qui implique que le
+problème dual est incompatible car <span class="math inline">\(b^T
+y\)</span> ne peut pas être rendu arbitrairement grand.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le théorème dual est un pilier de l’optimisation linéaire, offrant
+une symétrie élégante entre les problèmes primal et dual. Il ne se
+contente pas de fournir des méthodes de résolution alternatives ; il
+enrichit notre compréhension théorique et pratique des problèmes
+d’optimisation. Les applications du théorème dual sont vastes, allant de
+l’analyse économique à la gestion des ressources, en passant par les
+sciences de l’ingénieur. En maîtrisant ce théorème, nous ouvrons la voie
+à des solutions plus efficaces et à une meilleure interprétation des
+problèmes d’optimisation linéaire.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

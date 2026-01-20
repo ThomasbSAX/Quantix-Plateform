@@ -1,0 +1,427 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Lemme de Lax-Milgram : Un outil fondamental en analyse fonctionnelle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Lemme de Lax-Milgram : Un outil fondamental en analyse
+fonctionnelle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le lemme de Lax-Milgram est un résultat fondamental en analyse
+fonctionnelle, particulièrement dans l’étude des équations aux dérivées
+partielles (EDP). Ce lemme, établi par Peter Lax et Alexander Milgram en
+1954, fournit des conditions suffisantes pour l’existence et l’unicité
+de solutions à certaines équations variationnelles. Il est souvent
+utilisé pour prouver l’existence de solutions faibles à des EDP
+elliptiques, ce qui en fait un outil indispensable dans de nombreuses
+applications physiques et ingénierie.</p>
+<p>L’importance du lemme réside dans sa capacité à garantir l’existence
+d’une solution unique pour des formes bilinéaires satisfaisant certaines
+conditions de coercivité et de continuité. Ces propriétés sont cruciales
+pour l’analyse des problèmes aux limites et des problèmes variationnels
+en général.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de formuler le lemme de Lax-Milgram, il est essentiel de
+définir quelques concepts clés.</p>
+<h2 class="unnumbered" id="espace-de-hilbert">Espace de Hilbert</h2>
+<p>Un espace de Hilbert <span class="math inline">\(H\)</span> est un
+espace vectoriel réel ou complexe muni d’un produit scalaire <span
+class="math inline">\(\langle \cdot, \cdot \rangle\)</span> qui le rend
+complet. Formellement, un espace de Hilbert est un triplet <span
+class="math inline">\((H, \langle \cdot, \cdot \rangle, \| \cdot
+\|)\)</span>, où <span class="math inline">\(H\)</span> est un espace
+vectoriel, <span class="math inline">\(\langle \cdot, \cdot
+\rangle\)</span> est un produit scalaire et <span
+class="math inline">\(\| \cdot \|\)</span> est la norme associée définie
+par : <span class="math display">\[\| x \| = \sqrt{\langle x, x \rangle}
+\quad \forall x \in H.\]</span></p>
+<h2 class="unnumbered" id="forme-bilinéaire">Forme Bilinéaire</h2>
+<p>Une forme bilinéaire <span class="math inline">\(a(\cdot,
+\cdot)\)</span> sur un espace de Hilbert <span
+class="math inline">\(H\)</span> est une application : <span
+class="math display">\[a(\cdot, \cdot) : H \times H \to
+\mathbb{R}\]</span> telle que pour tout <span class="math inline">\(u,
+v, w \in H\)</span> et tout scalaire <span
+class="math inline">\(\lambda\)</span>, on a : <span
+class="math display">\[a(u + v, w) = a(u, w) + a(v, w),\]</span> <span
+class="math display">\[a(\lambda u, v) = \lambda a(u, v).\]</span></p>
+<h2 class="unnumbered" id="coercivité">Coercivité</h2>
+<p>Une forme bilinéaire <span class="math inline">\(a(\cdot,
+\cdot)\)</span> est dite coercive s’il existe une constante <span
+class="math inline">\(\alpha &gt; 0\)</span> telle que : <span
+class="math display">\[a(u, u) \geq \alpha \| u \|^2 \quad \forall u \in
+H.\]</span></p>
+<h2 class="unnumbered" id="continuité">Continuité</h2>
+<p>Une forme bilinéaire <span class="math inline">\(a(\cdot,
+\cdot)\)</span> est dite continue s’il existe une constante <span
+class="math inline">\(M &gt; 0\)</span> telle que : <span
+class="math display">\[|a(u, v)| \leq M \| u \| \| v \| \quad \forall u,
+v \in H.\]</span></p>
+<h1 class="unnumbered" id="lemme-de-lax-milgram">Lemme de
+Lax-Milgram</h1>
+<p>Nous sommes maintenant prêts à énoncer le lemme de Lax-Milgram.</p>
+<h2 class="unnumbered" id="énoncé-du-lemme">Énoncé du Lemme</h2>
+<p>Soit <span class="math inline">\(H\)</span> un espace de Hilbert et
+<span class="math inline">\(a(\cdot, \cdot)\)</span> une forme
+bilinéaire sur <span class="math inline">\(H\)</span>. Supposons que
+:</p>
+<ol>
+<li><p>La forme bilinéaire <span class="math inline">\(a(\cdot,
+\cdot)\)</span> est coercive, c’est-à-dire qu’il existe <span
+class="math inline">\(\alpha &gt; 0\)</span> tel que : <span
+class="math display">\[a(u, u) \geq \alpha \| u \|^2 \quad \forall u \in
+H.\]</span></p></li>
+<li><p>La forme bilinéaire <span class="math inline">\(a(\cdot,
+\cdot)\)</span> est continue, c’est-à-dire qu’il existe <span
+class="math inline">\(M &gt; 0\)</span> tel que : <span
+class="math display">\[|a(u, v)| \leq M \| u \| \| v \| \quad \forall u,
+v \in H.\]</span></p></li>
+</ol>
+<p>Alors, pour toute forme linéaire continue <span
+class="math inline">\(l(\cdot)\)</span> sur <span
+class="math inline">\(H\)</span>, il existe un unique <span
+class="math inline">\(u \in H\)</span> tel que : <span
+class="math display">\[a(u, v) = l(v) \quad \forall v \in
+H.\]</span></p>
+<h2 class="unnumbered" id="interprétation">Interprétation</h2>
+<p>Le lemme de Lax-Milgram garantit l’existence et l’unicité d’une
+solution <span class="math inline">\(u\)</span> à l’équation
+variationnelle <span class="math inline">\(a(u, v) = l(v)\)</span>.
+Cette solution est obtenue en utilisant les propriétés de coercivité et
+de continuité de la forme bilinéaire <span
+class="math inline">\(a(\cdot, \cdot)\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Nous allons maintenant démontrer le lemme de Lax-Milgram en suivant
+une approche détaillée.</p>
+<h2 class="unnumbered" id="existence-de-la-solution">Existence de la
+Solution</h2>
+<p>Pour montrer l’existence d’une solution, nous utilisons le théorème
+de Riesz et les propriétés de la forme bilinéaire.</p>
+<div class="proof">
+<p><em>Proof.</em> 1. **Application du Théorème de Riesz** : Puisque
+<span class="math inline">\(l(\cdot)\)</span> est une forme linéaire
+continue sur un espace de Hilbert <span
+class="math inline">\(H\)</span>, d’après le théorème de Riesz, il
+existe un unique <span class="math inline">\(f \in H\)</span> tel que :
+<span class="math display">\[l(v) = \langle f, v \rangle \quad \forall v
+\in H.\]</span></p>
+<p>2. **Définition de l’Opérateur <span
+class="math inline">\(A\)</span>** : Nous définissons un opérateur <span
+class="math inline">\(A : H \to H\)</span> par : <span
+class="math display">\[\langle Au, v \rangle = a(u, v) \quad \forall u,
+v \in H.\]</span> Nous devons montrer que <span
+class="math inline">\(A\)</span> est un isomorphisme de <span
+class="math inline">\(H\)</span> sur lui-même.</p>
+<p>3. **Continuité de l’Opérateur <span
+class="math inline">\(A\)</span>** : La continuité de la forme
+bilinéaire <span class="math inline">\(a(\cdot, \cdot)\)</span> implique
+que : <span class="math display">\[|\langle Au, v \rangle| = |a(u, v)|
+\leq M \| u \| \| v \|.\]</span> Par conséquent, l’opérateur <span
+class="math inline">\(A\)</span> est continu et borné.</p>
+<p>4. **Injectivité de l’Opérateur <span
+class="math inline">\(A\)</span>** : Supposons que <span
+class="math inline">\(Au = 0\)</span>. Alors, pour tout <span
+class="math inline">\(v \in H\)</span>, on a : <span
+class="math display">\[\langle Au, u \rangle = a(u, u) \geq \alpha \| u
+\|^2.\]</span> Mais <span class="math inline">\(\langle Au, u \rangle =
+0\)</span>, donc <span class="math inline">\(\| u \|^2 = 0\)</span> et
+<span class="math inline">\(u = 0\)</span>. Ainsi, <span
+class="math inline">\(A\)</span> est injectif.</p>
+<p>5. **Surjectivité de l’Opérateur <span
+class="math inline">\(A\)</span>** : Nous devons montrer que pour tout
+<span class="math inline">\(f \in H\)</span>, il existe un unique <span
+class="math inline">\(u \in H\)</span> tel que : <span
+class="math display">\[Au = f.\]</span> Considérons l’application <span
+class="math inline">\(A\)</span> comme un opérateur linéaire. Puisque
+<span class="math inline">\(A\)</span> est continu et injectif, il
+suffit de montrer que <span class="math inline">\(A\)</span> est
+surjectif.</p>
+<p>6. **Application du Théorème des Valeurs Intermédiaires** : Nous
+utilisons le théorème des valeurs intermédiaires pour montrer que <span
+class="math inline">\(A\)</span> est surjectif. Pour tout <span
+class="math inline">\(u \in H\)</span>, on a : <span
+class="math display">\[\langle Au, u \rangle = a(u, u) \geq \alpha \| u
+\|^2.\]</span> Cela implique que <span class="math inline">\(A\)</span>
+est coercif. Par conséquent, d’après le théorème des valeurs
+intermédiaires, <span class="math inline">\(A\)</span> est
+surjectif.</p>
+<p>7. **Existence de la Solution** : Puisque <span
+class="math inline">\(A\)</span> est un isomorphisme, pour tout <span
+class="math inline">\(f \in H\)</span>, il existe un unique <span
+class="math inline">\(u \in H\)</span> tel que : <span
+class="math display">\[Au = f.\]</span> En d’autres termes, il existe un
+unique <span class="math inline">\(u \in H\)</span> tel que : <span
+class="math display">\[a(u, v) = l(v) \quad \forall v \in
+H.\]</span> ◻</p>
+</div>
+<h2 class="unnumbered" id="unicité-de-la-solution">Unicité de la
+Solution</h2>
+<p>Pour montrer l’unicité de la solution, nous utilisons les propriétés
+de coercivité et de continuité de la forme bilinéaire.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons qu’il existe deux solutions <span
+class="math inline">\(u_1\)</span> et <span
+class="math inline">\(u_2\)</span> telles que : <span
+class="math display">\[a(u_1, v) = l(v) \quad \forall v \in H,\]</span>
+<span class="math display">\[a(u_2, v) = l(v) \quad \forall v \in
+H.\]</span> Alors, pour tout <span class="math inline">\(v \in
+H\)</span>, on a : <span class="math display">\[a(u_1 - u_2, v) =
+0.\]</span> En particulier, en prenant <span class="math inline">\(v =
+u_1 - u_2\)</span>, on obtient : <span class="math display">\[a(u_1 -
+u_2, u_1 - u_2) = 0.\]</span> Mais d’après la coercivité de <span
+class="math inline">\(a(\cdot, \cdot)\)</span>, on a : <span
+class="math display">\[a(u_1 - u_2, u_1 - u_2) \geq \alpha \| u_1 - u_2
+\|^2.\]</span> Par conséquent, <span class="math inline">\(\| u_1 - u_2
+\|^2 = 0\)</span> et <span class="math inline">\(u_1 = u_2\)</span>.
+Ainsi, la solution est unique. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous allons maintenant énoncer quelques propriétés et corollaires du
+lemme de Lax-Milgram.</p>
+<h2 class="unnumbered" id="propriété-1-stabilité">Propriété 1 :
+Stabilité</h2>
+<p>Soit <span class="math inline">\(H\)</span> un espace de Hilbert et
+<span class="math inline">\(a(\cdot, \cdot)\)</span> une forme
+bilinéaire coercive et continue sur <span
+class="math inline">\(H\)</span>. Supposons que <span
+class="math inline">\(\{a_n(\cdot, \cdot)\}_{n \in \mathbb{N}}\)</span>
+soit une suite de formes bilinéaires coercives et continues sur <span
+class="math inline">\(H\)</span> telle que : <span
+class="math display">\[a_n(u, v) \to a(u, v) \quad \forall u, v \in
+H.\]</span> Alors, pour toute forme linéaire continue <span
+class="math inline">\(l(\cdot)\)</span> sur <span
+class="math inline">\(H\)</span>, il existe une suite de solutions <span
+class="math inline">\(\{u_n\}_{n \in \mathbb{N}}\)</span> telle que :
+<span class="math display">\[a_n(u_n, v) = l(v) \quad \forall v \in
+H,\]</span> et <span class="math inline">\(u_n \to u\)</span> où <span
+class="math inline">\(u\)</span> est la solution unique de : <span
+class="math display">\[a(u, v) = l(v) \quad \forall v \in
+H.\]</span></p>
+<h2 class="unnumbered" id="propriété-2-généralisation">Propriété 2 :
+Généralisation</h2>
+<p>Le lemme de Lax-Milgram peut être généralisé à des espaces de Banach
+et à des formes multilinéaires. Cependant, la coercivité et la
+continuité restent des conditions essentielles pour garantir l’existence
+et l’unicité des solutions.</p>
+<h2 class="unnumbered" id="corollaire-1-application-aux-edp">Corollaire
+1 : Application aux EDP</h2>
+<p>Le lemme de Lax-Milgram est souvent utilisé pour prouver l’existence
+de solutions faibles à des EDP elliptiques. Par exemple, considérons le
+problème de Dirichlet pour l’équation de Poisson : <span
+class="math display">\[-\Delta u = f \quad \text{dans } \Omega,\]</span>
+<span class="math display">\[u = 0 \quad \text{sur } \partial
+\Omega.\]</span> En utilisant le lemme de Lax-Milgram, on peut montrer
+l’existence et l’unicité d’une solution faible <span
+class="math inline">\(u \in H_0^1(\Omega)\)</span> telle que : <span
+class="math display">\[\int_{\Omega} \nabla u \cdot \nabla v \, dx =
+\int_{\Omega} f v \, dx \quad \forall v \in H_0^1(\Omega).\]</span></p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le lemme de Lax-Milgram est un outil puissant en analyse
+fonctionnelle et dans l’étude des EDP. Il fournit des conditions
+suffisantes pour l’existence et l’unicité de solutions à des problèmes
+variationnels, ce qui en fait un résultat fondamental dans de nombreuses
+applications. Les propriétés et corollaires du lemme permettent
+d’étendre son utilisation à des contextes plus généraux, comme les
+espaces de Banach et les formes multilinéaires.</p>
+<p>En conclusion, le lemme de Lax-Milgram est un pilier de l’analyse
+fonctionnelle moderne et continue d’être une source d’inspiration pour
+les recherches en mathématiques appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,380 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Ratio de Variance Expliquée : Une Mesure Fondamentale en Analyse Factorielle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Ratio de Variance Expliquée : Une Mesure Fondamentale
+en Analyse Factorielle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse factorielle, qu’elle soit principale ou des
+correspondances, est une méthode statistique multidimensionnelle visant
+à réduire la dimension d’un ensemble de données tout en préservant au
+maximum l’information contenue. Dans ce contexte, le <em>ratio de
+variance expliquée</em> émerge comme une mesure fondamentale pour
+évaluer la qualité d’une réduction de dimension.</p>
+<p>L’origine historique de cette notion remonte aux travaux pionniers de
+Karl Pearson et Charles Spearman au début du XXe siècle, qui cherchaient
+à comprendre les structures latentes derrière des données
+multidimensionnelles. Le ratio de variance expliquée répond à un besoin
+crucial : quantifier la part de l’information originale conservée après
+une réduction de dimension.</p>
+<p>Ce concept est indispensable dans divers domaines tels que la
+psychométrie, la bioinformatique, et l’analyse de données textuelles. Il
+permet aux chercheurs de faire des choix éclairés sur le nombre de
+dimensions à retenir, en équilibrant la simplicité du modèle et la perte
+d’information.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire le ratio de variance expliquée, commençons par
+comprendre ce que nous cherchons à mesurer. Supposons que nous ayons un
+ensemble de données multidimensionnelles, où chaque dimension représente
+une variable. Lorsque nous appliquons une méthode de réduction de
+dimension, nous projetons ces données sur un sous-espace de dimension
+inférieure. La question centrale est : quelle part de la variance totale
+des données originales est capturée par cette projection ?</p>
+<p>La variance totale des données peut être vue comme la somme des
+variances de chaque variable, pondérée par leur importance relative. Le
+ratio de variance expliquée mesure la proportion de cette variance
+totale qui est expliquée par les nouvelles dimensions.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> une matrice
+de données de taille <span class="math inline">\(n \times p\)</span>, où
+<span class="math inline">\(n\)</span> est le nombre d’observations et
+<span class="math inline">\(p\)</span> est le nombre de variables.
+Supposons que nous projetions ces données sur un sous-espace de
+dimension <span class="math inline">\(k\)</span>, avec <span
+class="math inline">\(k &lt; p\)</span>. Notons <span
+class="math inline">\(\sigma^2\)</span> la variance totale des données
+originales et <span class="math inline">\(\sigma_k^2\)</span> la
+variance expliquée par les <span class="math inline">\(k\)</span>
+premières dimensions.</p>
+<p>Le ratio de variance expliquée est alors défini comme :</p>
+<p><span class="math display">\[RVE_k =
+\frac{\sigma_k^2}{\sigma^2}\]</span></p>
+<p>Cette définition peut être réécrite en utilisant les valeurs propres
+de la matrice de covariance <span class="math inline">\(\Sigma\)</span>
+des données. Soit <span class="math inline">\(\lambda_1, \lambda_2,
+\dots, \lambda_p\)</span> les valeurs propres de <span
+class="math inline">\(\Sigma\)</span>, triées par ordre décroissant. La
+variance totale est alors :</p>
+<p><span class="math display">\[\sigma^2 = \sum_{i=1}^p
+\lambda_i\]</span></p>
+<p>La variance expliquée par les <span class="math inline">\(k\)</span>
+premières dimensions est :</p>
+<p><span class="math display">\[\sigma_k^2 = \sum_{i=1}^k
+\lambda_i\]</span></p>
+<p>Ainsi, le ratio de variance expliquée peut également s’exprimer comme
+:</p>
+<p><span class="math display">\[RVE_k = \frac{\sum_{i=1}^k
+\lambda_i}{\sum_{i=1}^p \lambda_i}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en analyse factorielle est celui de la
+décomposition spectrale de la matrice de covariance. Ce théorème permet
+de comprendre comment les valeurs propres et les vecteurs propres
+capturent la variance des données.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\Sigma\)</span> une matrice de
+covariance symétrique définie positive. Il existe une décomposition de
+<span class="math inline">\(\Sigma\)</span> en :</p>
+<p><span class="math display">\[\Sigma = V \Lambda V^T\]</span></p>
+<p>où <span class="math inline">\(V\)</span> est une matrice orthogonale
+dont les colonnes sont les vecteurs propres de <span
+class="math inline">\(\Sigma\)</span>, et <span
+class="math inline">\(\Lambda\)</span> est une matrice diagonale dont
+les éléments sont les valeurs propres de <span
+class="math inline">\(\Sigma\)</span>, triées par ordre décroissant.</p>
+</div>
+<p>La preuve de ce théorème repose sur le fait que toute matrice
+symétrique définie positive admet une décomposition en valeurs propres
+réelles et positives. Les vecteurs propres associés forment une base
+orthonormale de l’espace des données, et les valeurs propres
+représentent la variance capturée par chaque dimension principale.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver que le ratio de variance expliquée <span
+class="math inline">\(RVE_k\)</span> est bien défini et qu’il capture
+effectivement la proportion de variance expliquée, nous devons montrer
+que <span class="math inline">\(\sigma_k^2\)</span> est bien une partie
+de la variance totale <span class="math inline">\(\sigma^2\)</span>.</p>
+<p>Considérons la décomposition spectrale de la matrice de covariance
+<span class="math inline">\(\Sigma\)</span> :</p>
+<p><span class="math display">\[\Sigma = V \Lambda V^T\]</span></p>
+<p>où <span class="math inline">\(V\)</span> est une matrice orthogonale
+et <span class="math inline">\(\Lambda\)</span> est une matrice
+diagonale avec les valeurs propres <span
+class="math inline">\(\lambda_1, \lambda_2, \dots,
+\lambda_p\)</span>.</p>
+<p>La variance totale des données est donnée par la trace de <span
+class="math inline">\(\Sigma\)</span> :</p>
+<p><span class="math display">\[\sigma^2 = \text{tr}(\Sigma) =
+\sum_{i=1}^p \lambda_i\]</span></p>
+<p>La variance expliquée par les <span class="math inline">\(k\)</span>
+premières dimensions est la somme des <span
+class="math inline">\(k\)</span> plus grandes valeurs propres :</p>
+<p><span class="math display">\[\sigma_k^2 = \sum_{i=1}^k
+\lambda_i\]</span></p>
+<p>Ainsi, le ratio de variance expliquée est :</p>
+<p><span class="math display">\[RVE_k = \frac{\sum_{i=1}^k
+\lambda_i}{\sum_{i=1}^p \lambda_i}\]</span></p>
+<p>Pour montrer que <span class="math inline">\(RVE_k\)</span> est bien
+défini, il suffit de vérifier que <span class="math inline">\(0 \leq
+RVE_k \leq 1\)</span>. En effet, les valeurs propres <span
+class="math inline">\(\lambda_i\)</span> sont toutes positives, et <span
+class="math inline">\(\sum_{i=1}^k \lambda_i \leq \sum_{i=1}^p
+\lambda_i\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le ratio de variance expliquée possède plusieurs propriétés
+intéressantes, que nous énumérons et démontrons ci-dessous.</p>
+<ol>
+<li><p><strong>Monotonie</strong> : Le ratio de variance expliquée est
+une fonction croissante du nombre de dimensions <span
+class="math inline">\(k\)</span>. Plus précisément, pour tout <span
+class="math inline">\(k &lt; l\)</span>, nous avons :</p>
+<p><span class="math display">\[RVE_k \leq RVE_l\]</span></p>
+<p><strong>Preuve</strong> : Puisque les valeurs propres sont triées par
+ordre décroissant, <span class="math inline">\(\sum_{i=1}^k \lambda_i
+\leq \sum_{i=1}^l \lambda_i\)</span>. Ainsi, <span
+class="math inline">\(RVE_k \leq RVE_l\)</span>.</p></li>
+<li><p><strong>Borne supérieure</strong> : Le ratio de variance
+expliquée atteint son maximum lorsque <span class="math inline">\(k =
+p\)</span>. Dans ce cas, nous avons :</p>
+<p><span class="math display">\[RVE_p = 1\]</span></p>
+<p><strong>Preuve</strong> : Lorsque <span class="math inline">\(k =
+p\)</span>, <span class="math inline">\(\sigma_k^2 = \sigma^2\)</span>.
+Ainsi, <span class="math inline">\(RVE_p = \frac{\sigma^2}{\sigma^2} =
+1\)</span>.</p></li>
+<li><p><strong>Interprétation géométrique</strong> : Le ratio de
+variance expliquée peut être interprété comme la proportion de la norme
+au carré des données projetées par rapport à la norme au carré des
+données originales. Plus précisément, si <span
+class="math inline">\(P_k\)</span> est la matrice de projection sur les
+<span class="math inline">\(k\)</span> premières dimensions principales,
+alors :</p>
+<p><span class="math display">\[RVE_k = \frac{\|P_k
+X\|_F^2}{\|X\|_F^2}\]</span></p>
+<p>où <span class="math inline">\(\| \cdot \|_F\)</span> désigne la
+norme de Frobenius.</p>
+<p><strong>Preuve</strong> : La norme de Frobenius de <span
+class="math inline">\(X\)</span> est donnée par :</p>
+<p><span class="math display">\[\|X\|_F^2 = \text{tr}(X^T X) = n
+\text{tr}(\Sigma)\]</span></p>
+<p>De même, la norme de Frobenius de <span class="math inline">\(P_k
+X\)</span> est :</p>
+<p><span class="math display">\[\|P_k X\|_F^2 = \text{tr}((P_k X)^T (P_k
+X)) = n \text{tr}(P_k \Sigma P_k)\]</span></p>
+<p>Puisque <span class="math inline">\(P_k\)</span> est la matrice de
+projection sur les <span class="math inline">\(k\)</span> premières
+dimensions principales, <span class="math inline">\(P_k \Sigma
+P_k\)</span> a pour trace la somme des <span
+class="math inline">\(k\)</span> plus grandes valeurs propres de <span
+class="math inline">\(\Sigma\)</span>. Ainsi,</p>
+<p><span class="math display">\[RVE_k = \frac{n \sum_{i=1}^k
+\lambda_i}{n \sum_{i=1}^p \lambda_i} = \frac{\sum_{i=1}^k
+\lambda_i}{\sum_{i=1}^p \lambda_i}\]</span></p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le ratio de variance expliquée est une mesure fondamentale en analyse
+factorielle, permettant de quantifier la part de l’information conservée
+après une réduction de dimension. Ses propriétés mathématiques et son
+interprétation géométrique en font un outil indispensable pour évaluer
+la qualité des modèles de réduction de dimension. En comprenant et en
+utilisant ce concept, les chercheurs peuvent faire des choix éclairés
+sur le nombre de dimensions à retenir, en équilibrant la simplicité du
+modèle et la perte d’information.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

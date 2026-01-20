@@ -1,0 +1,338 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode QR pour les valeurs propres</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode QR pour les valeurs propres</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La méthode QR est une technique numérique puissante pour le calcul
+des valeurs propres et des vecteurs propres d’une matrice. Son origine
+remonte aux travaux de John Francis et Vera Kublanovskaya dans les
+années 1960. Cette méthode est particulièrement utile pour les matrices
+non symétriques, où les méthodes classiques comme la diagonalisation ou
+la tridiagonalisation peuvent échouer.</p>
+<p>L’idée centrale de la méthode QR est d’effectuer une décomposition en
+produits de matrices orthogonales et triangulaires supérieures, ce qui
+permet d’itérer vers une forme de Schur. Cette approche est robuste et
+convergente, même pour les matrices mal conditionnées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans la méthode QR, il est essentiel de comprendre
+quelques concepts fondamentaux.</p>
+<h2 id="décomposition-qr">Décomposition QR</h2>
+<p>Considérons une matrice <span class="math inline">\(A \in
+\mathbb{C}^{n \times n}\)</span>. Nous cherchons à exprimer <span
+class="math inline">\(A\)</span> comme un produit d’une matrice
+orthogonale <span class="math inline">\(Q\)</span> et d’une matrice
+triangulaire supérieure <span class="math inline">\(R\)</span>.
+Formellement, nous avons :</p>
+<p><span class="math display">\[A = QR\]</span></p>
+<p>où : - <span class="math inline">\(Q \in \mathbb{C}^{n \times
+n}\)</span> est une matrice orthogonale, c’est-à-dire que <span
+class="math inline">\(Q^*Q = I\)</span>. - <span class="math inline">\(R
+\in \mathbb{C}^{n \times n}\)</span> est une matrice triangulaire
+supérieure.</p>
+<h2 id="forme-de-schur">Forme de Schur</h2>
+<p>La forme de Schur d’une matrice <span
+class="math inline">\(A\)</span> est une décomposition de la forme :</p>
+<p><span class="math display">\[A = QSQ^*\]</span></p>
+<p>où : - <span class="math inline">\(S\)</span> est une matrice
+triangulaire supérieure. - <span class="math inline">\(Q\)</span> est
+une matrice orthogonale.</p>
+<p>Cette forme est particulièrement utile car les valeurs propres de
+<span class="math inline">\(A\)</span> sont simplement les éléments
+diagonaux de <span class="math inline">\(S\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-la-méthode-qr">Théorème de la Méthode QR</h2>
+<p>Le théorème central de la méthode QR est le suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A \in \mathbb{C}^{n \times
+n}\)</span> une matrice avec des valeurs propres distinctes. Alors, pour
+toute initialisation <span class="math inline">\(A_0 = A\)</span>, la
+suite définie par :</p>
+<p><span class="math display">\[A_{k+1} = Q_k^*A_kQ_k\]</span></p>
+<p>où <span class="math inline">\(A_k = Q_kR_k\)</span> est la
+décomposition QR de <span class="math inline">\(A_k\)</span>, converge
+vers une matrice triangulaire supérieure <span
+class="math inline">\(S\)</span> dont les éléments diagonaux sont les
+valeurs propres de <span class="math inline">\(A\)</span>.</p>
+</div>
+<h2 id="démonstration-du-théorème">Démonstration du Théorème</h2>
+<p>La démonstration de ce théorème repose sur plusieurs étapes clés
+:</p>
+<p>1. **Décomposition QR** : Pour chaque itération <span
+class="math inline">\(k\)</span>, nous effectuons une décomposition QR
+de <span class="math inline">\(A_k\)</span> pour obtenir <span
+class="math inline">\(Q_k\)</span> et <span
+class="math inline">\(R_k\)</span>.</p>
+<p>2. **Similarité** : Nous définissons <span
+class="math inline">\(A_{k+1} = Q_k^*A_kQ_k\)</span>. Cette
+transformation est une similarité, ce qui signifie que <span
+class="math inline">\(A_{k+1}\)</span> a les mêmes valeurs propres que
+<span class="math inline">\(A_k\)</span>.</p>
+<p>3. **Convergence** : En itérant ce processus, la matrice <span
+class="math inline">\(A_k\)</span> converge vers une forme triangulaire
+supérieure. Les éléments diagonaux de cette matrice triangulaire sont
+les valeurs propres de <span class="math inline">\(A\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-de-la-convergence">Preuve de la Convergence</h2>
+<p>Pour démontrer la convergence de la méthode QR, nous devons montrer
+que les éléments hors diagonale de <span
+class="math inline">\(A_k\)</span> tendent vers zéro. Considérons la
+norme de Frobenius de <span class="math inline">\(A_k\)</span>, notée
+<span class="math inline">\(\|A_k\|_F\)</span>. Nous avons :</p>
+<p><span class="math display">\[\|A_{k+1}\|_F = \|Q_k^*A_kQ_k\|_F =
+\|A_k\|_F\]</span></p>
+<p>Cette égalité montre que la norme de Frobenius est conservée à chaque
+itération. Cependant, les éléments hors diagonale diminuent en valeur
+absolue, ce qui conduit à la convergence vers une matrice
+triangulaire.</p>
+<h2 id="preuve-de-lorthogonalité">Preuve de l’Orthogonalité</h2>
+<p>Pour montrer que <span class="math inline">\(Q_k\)</span> est
+orthogonale, nous utilisons la propriété de la décomposition QR :</p>
+<p><span class="math display">\[Q_k^*Q_k = I\]</span></p>
+<p>Cette relation est une conséquence directe de la construction de
+<span class="math inline">\(Q_k\)</span> et <span
+class="math inline">\(R_k\)</span>. En effet, <span
+class="math inline">\(Q_k\)</span> est obtenue par une série de
+transformations orthogonales (comme la réflexion de Householder ou les
+rotations de Givens), ce qui garantit son orthogonalité.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-convergence">Propriété de Convergence</h2>
+<p>La méthode QR converge sous certaines conditions. Plus précisément,
+nous avons les propriétés suivantes :</p>
+<ol>
+<li><p>Si <span class="math inline">\(A\)</span> a des valeurs propres
+distinctes, la méthode QR converge linéairement.</p></li>
+<li><p>Si <span class="math inline">\(A\)</span> a des valeurs propres
+multiples, la méthode QR peut converger plus lentement ou nécessiter des
+techniques de déflation.</p></li>
+<li><p>La méthode QR est stable numériquement, ce qui signifie que les
+erreurs d’arrondi n’affectent pas significativement la
+convergence.</p></li>
+</ol>
+<h2 id="corollaire-de-la-forme-de-schur">Corollaire de la Forme de
+Schur</h2>
+<p>Un corollaire important de la méthode QR est le suivant :</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(A \in \mathbb{C}^{n \times
+n}\)</span> une matrice avec des valeurs propres distinctes. Alors, la
+méthode QR produit une suite de matrices <span
+class="math inline">\(A_k\)</span> qui convergent vers une matrice
+triangulaire supérieure <span class="math inline">\(S\)</span> dont les
+éléments diagonaux sont les valeurs propres de <span
+class="math inline">\(A\)</span>.</p>
+</div>
+<h2 id="démonstration-du-corollaire">Démonstration du Corollaire</h2>
+<p>La démonstration de ce corollaire repose sur le théorème de la
+méthode QR. En effet, si <span class="math inline">\(A\)</span> a des
+valeurs propres distinctes, alors la suite <span
+class="math inline">\(A_k\)</span> converge vers une matrice
+triangulaire supérieure <span class="math inline">\(S\)</span>. Les
+éléments diagonaux de <span class="math inline">\(S\)</span> sont les
+valeurs propres de <span class="math inline">\(A\)</span>, ce qui achève
+la démonstration.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La méthode QR est une technique puissante et robuste pour le calcul
+des valeurs propres et des vecteurs propres d’une matrice. Son
+efficacité et sa stabilité numérique en font un outil indispensable en
+analyse numérique. En comprenant les concepts fondamentaux et les
+théorèmes sous-jacents, nous pouvons apprécier la beauté et l’utilité de
+cette méthode.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

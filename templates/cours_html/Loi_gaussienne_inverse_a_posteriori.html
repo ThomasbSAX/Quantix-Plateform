@@ -1,0 +1,333 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Loi gaussienne inverse a posteriori</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Loi gaussienne inverse a posteriori</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des lois gaussiennes inverses a posteriori trouve ses racines
+dans les travaux pionniers de Thomas Bayes au XVIIIème siècle, qui a
+posé les fondements de l’inférence statistique. La loi gaussienne
+inverse, quant à elle, a été développée pour modéliser des phénomènes où
+les observations sont bruitées par un bruit gaussien, mais où l’on
+souhaite inférer des paramètres non pas directement observables.
+L’intérêt pour cette loi a posteriori émerge naturellement dans le cadre
+de l’apprentissage statistique et de la modélisation bayésienne, où elle
+permet de capturer l’incertitude sur les paramètres d’un modèle à partir
+des données observées.</p>
+<p>La loi gaussienne inverse a posteriori est indispensable dans de
+nombreux domaines, tels que la finance pour l’estimation des risques, en
+biostatistique pour l’analyse de données médicales, ou encore en
+ingénierie pour la modélisation de systèmes dynamiques. Elle offre un
+cadre rigoureux pour quantifier l’incertitude et prendre des décisions
+sous incertitude.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir formellement la loi gaussienne inverse a posteriori,
+il est essentiel de comprendre le contexte dans lequel elle s’inscrit.
+Supposons que nous ayons un modèle où les observations <span
+class="math inline">\(y\)</span> sont générées par une loi normale dont
+la variance est inconnue. Nous souhaitons inférer cette variance à
+partir des données observées, tout en tenant compte de notre incertitude
+initiale sur cette variance.</p>
+<p>Formellement, la loi gaussienne inverse a posteriori peut être
+définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(y = (y_1, \ldots, y_n)\)</span> un
+échantillon de données observées, supposées indépendantes et
+identiquement distribuées selon une loi normale <span
+class="math inline">\(\mathcal{N}(\mu, \sigma^2)\)</span>, où <span
+class="math inline">\(\mu\)</span> est connu et <span
+class="math inline">\(\sigma^2\)</span> est inconnu. Supposons que notre
+a priori sur <span class="math inline">\(\sigma^{-2}\)</span> suit une
+loi gamma inverse <span class="math inline">\(\mathcal{IG}(\alpha,
+\beta)\)</span>. Alors, la loi a posteriori de <span
+class="math inline">\(\sigma^{-2}\)</span> est donnée par : <span
+class="math display">\[p(\sigma^{-2} | y) = \frac{p(y | \sigma^{-2})
+p(\sigma^{-2})}{p(y)}\]</span> où <span class="math inline">\(p(y |
+\sigma^{-2})\)</span> est la vraisemblance des données, <span
+class="math inline">\(p(\sigma^{-2})\)</span> est l’a priori, et <span
+class="math inline">\(p(y)\)</span> est la constante de
+normalisation.</p>
+</div>
+<p>Une autre formulation équivalente est : <span
+class="math display">\[p(\sigma^{-2} | y) \propto (\sigma^2)^{-\alpha -
+1} e^{-\beta / \sigma^2} \prod_{i=1}^n e^{-(y_i - \mu)^2 /
+(2\sigma^2)}\]</span> Simplifiant cette expression, nous obtenons :
+<span class="math display">\[p(\sigma^{-2} | y) \propto
+(\sigma^2)^{-\alpha - n/2 - 1} e^{-(\beta + \sum_{i=1}^n (y_i - \mu)^2 /
+2) / \sigma^2}\]</span> Ce qui montre que la loi a posteriori suit
+également une loi gamma inverse avec des paramètres mis à jour.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la loi gaussienne inverse a posteriori
+est le théorème de conjugaison, qui stipule que la loi gamma inverse est
+une distribution conjuguée pour le problème d’inférence de la variance
+dans un modèle gaussien.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(y = (y_1, \ldots, y_n)\)</span> un
+échantillon de données observées indépendantes et identiquement
+distribuées selon une loi normale <span
+class="math inline">\(\mathcal{N}(\mu, \sigma^2)\)</span>, où <span
+class="math inline">\(\mu\)</span> est connu et <span
+class="math inline">\(\sigma^2\)</span> est inconnu. Supposons que notre
+a priori sur <span class="math inline">\(\sigma^{-2}\)</span> suit une
+loi gamma inverse <span class="math inline">\(\mathcal{IG}(\alpha,
+\beta)\)</span>. Alors, la loi a posteriori de <span
+class="math inline">\(\sigma^{-2}\)</span> est également une loi gamma
+inverse avec des paramètres mis à jour : <span
+class="math display">\[\alpha&#39; = \alpha + n/2, \quad \beta&#39; =
+\beta + \sum_{i=1}^n (y_i - \mu)^2 / 2\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de conjugaison, nous devons montrer que la
+loi a posteriori suit une loi gamma inverse avec les paramètres mis à
+jour. Commençons par écrire la vraisemblance des données : <span
+class="math display">\[p(y | \sigma^{-2}) = \prod_{i=1}^n
+\frac{1}{\sqrt{2\pi\sigma^2}} e^{-(y_i - \mu)^2 / (2\sigma^2)}\]</span>
+En prenant le logarithme, nous obtenons : <span
+class="math display">\[\log p(y | \sigma^{-2}) = -\frac{n}{2} \log
+(2\pi) - \frac{n}{2} \log (\sigma^2) - \sum_{i=1}^n \frac{(y_i -
+\mu)^2}{2\sigma^2}\]</span> L’a priori sur <span
+class="math inline">\(\sigma^{-2}\)</span> est donné par : <span
+class="math display">\[p(\sigma^{-2}) =
+\frac{\beta^\alpha}{\Gamma(\alpha)} (\sigma^2)^{-\alpha - 1} e^{-\beta /
+\sigma^2}\]</span> En combinant la vraisemblance et l’a priori, nous
+obtenons : <span class="math display">\[\log p(\sigma^{-2} | y) \propto
+-\frac{n}{2} \log (\sigma^2) - \sum_{i=1}^n \frac{(y_i -
+\mu)^2}{2\sigma^2} - (\alpha + 1) \log (\sigma^2) -
+\frac{\beta}{\sigma^2}\]</span> Simplifiant cette expression, nous
+obtenons : <span class="math display">\[\log p(\sigma^{-2} | y) \propto
+-(\alpha + n/2 + 1) \log (\sigma^2) - \frac{\beta + \sum_{i=1}^n (y_i -
+\mu)^2 / 2}{\sigma^2}\]</span> Ce qui montre que la loi a posteriori
+suit une loi gamma inverse avec les paramètres mis à jour : <span
+class="math display">\[\alpha&#39; = \alpha + n/2, \quad \beta&#39; =
+\beta + \sum_{i=1}^n (y_i - \mu)^2 / 2\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Plusieurs propriétés intéressantes découlent du théorème de
+conjugaison. En voici quelques-unes :</p>
+<ol>
+<li><p>La loi a posteriori est également une loi gamma inverse, ce qui
+signifie que la distribution conjuguée préserve sa forme après mise à
+jour avec les données observées.</p></li>
+<li><p>Les paramètres de la loi a posteriori dépendent des données
+observées. Plus précisément, le paramètre <span
+class="math inline">\(\alpha&#39;\)</span> est augmenté par <span
+class="math inline">\(n/2\)</span>, où <span
+class="math inline">\(n\)</span> est le nombre de données observées, et
+le paramètre <span class="math inline">\(\beta&#39;\)</span> est
+augmenté par la somme des carrés des écarts entre les données observées
+et la moyenne connue.</p></li>
+<li><p>La loi a posteriori permet de quantifier l’incertitude sur la
+variance inconnue <span class="math inline">\(\sigma^2\)</span>. Plus
+les données sont concentrées autour de la moyenne connue, plus
+l’incertitude sur <span class="math inline">\(\sigma^2\)</span>
+diminue.</p></li>
+</ol>
+<p>Pour prouver la propriété (iii), nous pouvons utiliser le fait que la
+variance de la loi gamma inverse est donnée par : <span
+class="math display">\[\text{Var}(\sigma^{-2}) =
+\frac{2\beta&#39;^2}{(\alpha&#39; - 1)^2 (\alpha&#39; - 2)}\]</span> En
+utilisant les paramètres mis à jour <span
+class="math inline">\(\alpha&#39;\)</span> et <span
+class="math inline">\(\beta&#39;\)</span>, nous pouvons montrer que la
+variance de la loi a posteriori diminue lorsque les données sont plus
+concentrées autour de la moyenne connue.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

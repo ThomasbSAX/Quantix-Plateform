@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Gower pour variables continues asymétriques standardisées</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Gower pour variables continues
+asymétriques standardisées</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des données multivariées est un domaine fondamental en
+statistique, où la mesure de similarité entre objets joue un rôle
+central. Parmi les nombreuses métriques proposées, la distance de Gower
+se distingue par sa capacité à traiter simultanément des variables de
+types différents (catégorielles, ordinales, continues). Cependant, son
+application aux variables continues asymétriques standardisées soulève
+des défis spécifiques.</p>
+<p>L’asymétrie dans les distributions de variables continues est un
+phénomène courant, souvent négligé dans les analyses standard. Ignorer
+cette caractéristique peut conduire à des conclusions biaisées,
+notamment lorsque l’on utilise des distances euclidiennes classiques. La
+distance de Gower offre une alternative robuste, mais son adaptation aux
+variables asymétriques nécessite une normalisation appropriée.</p>
+<p>Ce chapitre explore la distance de Gower dans le contexte des
+variables continues asymétriques standardisées. Nous commençons par
+définir rigoureusement cette distance, puis nous examinons ses
+propriétés théoriques et pratiques. Enfin, nous discutons de son
+utilisation dans divers scénarios d’analyse de données.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la distance de Gower, nous devons d’abord comprendre ce
+que nous cherchons à mesurer. Supposons que nous ayons un ensemble de
+variables continues asymétriques. Nous voulons une métrique qui capture
+la similarité entre deux objets en tenant compte de l’asymétrie de
+chaque variable.</p>
+<p>La distance de Gower pour des variables continues standardisées est
+une mesure qui normalise les différences entre les valeurs des variables
+en fonction de leur écart-type. Elle est particulièrement utile lorsque
+les variables ont des échelles différentes ou sont asymétriques.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> un ensemble
+de variables continues standardisées. Pour deux objets <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, la distance de Gower est définie comme
+suit :</p>
+<p><span class="math display">\[d_{ij} = \frac{1}{p} \sum_{k=1}^{p}
+|x_{ik} - x_{jk}|\]</span></p>
+<p>où <span class="math inline">\(p\)</span> est le nombre de variables,
+et <span class="math inline">\(x_{ik}\)</span> et <span
+class="math inline">\(x_{jk}\)</span> sont les valeurs standardisées des
+variables <span class="math inline">\(k\)</span> pour les objets <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>.</p>
+<p>Une autre formulation, utilisant des quantificateurs, est :</p>
+<p><span class="math display">\[d_{ij} = \frac{1}{p} \sum_{k=1}^{p}
+|x_{ik} - x_{jk}| \quad \text{pour tout } i, j \in \{1, 2, \dots,
+n\}\]</span></p>
+<p>où <span class="math inline">\(n\)</span> est le nombre d’objets.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Gower est le suivant
+:</p>
+<p><strong>Théorème 1.</strong> <em>La distance de Gower pour des
+variables continues standardisées est une métrique valide si les
+variables sont symétriques.</em></p>
+<p>Pour démontrer ce théorème, nous devons vérifier que la distance de
+Gower satisfait les propriétés d’une métrique : non-négativité, identité
+des indiscernables, symétrie et inégalité triangulaire.</p>
+<div class="proof">
+<p><em>Proof.</em> 1. <strong>Non-négativité</strong> : Pour tout <span
+class="math inline">\(i, j\)</span>, <span class="math inline">\(d_{ij}
+\geq 0\)</span> car la valeur absolue est toujours non négative.</p>
+<p>2. <strong>Identité des indiscernables</strong> : Si <span
+class="math inline">\(i = j\)</span>, alors <span
+class="math inline">\(d_{ij} = 0\)</span> car <span
+class="math inline">\(x_{ik} - x_{jk} = 0\)</span> pour tout <span
+class="math inline">\(k\)</span>.</p>
+<p>3. <strong>Symétrie</strong> : <span class="math inline">\(d_{ij} =
+d_{ji}\)</span> car la somme des valeurs absolues est commutative.</p>
+<p>4. <strong>Inégalité triangulaire</strong> : Pour tout <span
+class="math inline">\(i, j, k\)</span>, <span
+class="math inline">\(d_{ij} + d_{jk} \geq d_{ik}\)</span>. Cela découle
+du fait que la somme des distances euclidiennes satisfait l’inégalité
+triangulaire, et la distance de Gower est une généralisation de cette
+notion. ◻</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour justifier l’utilisation de la distance de Gower dans le contexte
+des variables continues asymétriques standardisées, nous devons examiner
+comment la normalisation affecte les propriétés de la distance.</p>
+<p>Considérons une variable continue asymétrique <span
+class="math inline">\(X\)</span>. Pour standardiser cette variable, nous
+utilisons la transformation suivante :</p>
+<p><span class="math display">\[z_{ik} = \frac{x_{ik} -
+\mu_k}{\sigma_k}\]</span></p>
+<p>où <span class="math inline">\(\mu_k\)</span> est la moyenne de la
+variable <span class="math inline">\(k\)</span>, et <span
+class="math inline">\(\sigma_k\)</span> est son écart-type.</p>
+<p>La distance de Gower pour les variables standardisées devient alors
+:</p>
+<p><span class="math display">\[d_{ij} = \frac{1}{p} \sum_{k=1}^{p}
+|z_{ik} - z_{jk}|\]</span></p>
+<p>Cette transformation garantit que chaque variable contribue de
+manière égale à la distance, indépendamment de son échelle originale. De
+plus, elle permet de comparer des objets sur un pied d’égalité, même si
+leurs distributions sont asymétriques.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+distance de Gower pour les variables continues asymétriques
+standardisées :</p>
+<ol>
+<li><p><strong>Invariance par translation</strong> : La distance de
+Gower est invariante par translation des variables. Cela signifie que
+l’ajout d’une constante à une variable ne change pas la distance entre
+les objets.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(c\)</span> une
+constante. La transformation des variables donne :</p>
+<p><span class="math display">\[z&#39;_{ik} = \frac{x_{ik} + c -
+\mu_k}{\sigma_k} = z_{ik} + \frac{c}{\sigma_k}\]</span></p>
+<p>La distance devient :</p>
+<p><span class="math display">\[d&#39;_{ij} = \frac{1}{p} \sum_{k=1}^{p}
+|z&#39;_{ik} - z&#39;_{jk}| = \frac{1}{p} \sum_{k=1}^{p} |z_{ik} -
+z_{jk}| = d_{ij}\]</span></p>
+<p>Ainsi, la distance reste inchangée. ◻</p>
+</div></li>
+<li><p><strong>Sensibilité à l’échelle</strong> : La distance de Gower
+est sensible à l’échelle des variables. Si une variable a un écart-type
+plus grand, sa contribution à la distance sera plus faible.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux variables <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> avec des écarts-types différents. La
+standardisation de <span class="math inline">\(X\)</span> réduira ses
+valeurs par rapport à celles de <span class="math inline">\(Y\)</span>,
+ce qui diminuera son impact sur la distance. ◻</p>
+</div></li>
+<li><p><strong>Robustesse à l’asymétrie</strong> : La distance de Gower
+est robuste aux distributions asymétriques grâce à la standardisation.
+Cela permet de comparer des objets de manière équitable, même si leurs
+distributions sont biaisées.</p></li>
+</ol>
+<p>En conclusion, la distance de Gower pour les variables continues
+asymétriques standardisées est un outil puissant pour l’analyse des
+données multivariées. Sa capacité à traiter les variables de types
+différents et son invariance par translation en font une métrique
+précieuse dans de nombreux domaines d’application.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

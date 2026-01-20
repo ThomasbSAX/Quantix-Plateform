@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Lemme d’Itô : Un Fondement de l’Analyse Stochastique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Lemme d’Itô : Un Fondement de l’Analyse
+Stochastique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse stochastique, branche de la théorie des probabilités, a
+connu un essor remarquable grâce à des outils puissants comme le lemme
+d’Itô. Ce lemme, nommé en l’honneur du mathématicien japonais Kiyosi
+Itô, est un pilier central dans la théorie des processus stochastiques
+et des martingales. Il permet de calculer les variations infinitésimales
+d’une fonction d’un processus stochastique, généralisant ainsi le
+théorème de Taylor à des contextes aléatoires.</p>
+<p>Le lemme d’Itô émerge naturellement dans l’étude des équations
+différentielles stochastiques (EDS), où il joue un rôle crucial dans la
+compréhension et la résolution de ces équations. Il est indispensable
+pour modéliser des phénomènes aléatoires complexes, comme les mouvements
+browniens en finance ou en physique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de formuler le lemme d’Itô, il est essentiel de définir
+certains concepts fondamentaux.</p>
+<div class="definition">
+<p>Un processus stochastique est une famille de variables aléatoires
+<span class="math inline">\(\{X_t\}_{t \geq 0}\)</span> indexée par le
+temps <span class="math inline">\(t\)</span>, définies sur un espace de
+probabilité <span class="math inline">\((\Omega, \mathcal{F},
+\mathbb{P})\)</span>.</p>
+</div>
+<div class="definition">
+<p>Un mouvement brownien <span class="math inline">\(\{B_t\}_{t \geq
+0}\)</span> est un processus stochastique vérifiant les propriétés
+suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(B_0 = 0\)</span> presque
+sûrement.</p></li>
+<li><p>Les incréments sont indépendants : pour tout <span
+class="math inline">\(0 \leq t_1 &lt; t_2 &lt; \dots &lt; t_n\)</span>,
+les variables aléatoires <span class="math inline">\(B_{t_1}, B_{t_2} -
+B_{t_1}, \dots, B_{t_n} - B_{t_{n-1}}\)</span> sont
+indépendantes.</p></li>
+<li><p>Les incréments ont une distribution gaussienne : pour tout <span
+class="math inline">\(s &lt; t\)</span>, <span class="math inline">\(B_t
+- B_s \sim \mathcal{N}(0, t-s)\)</span>.</p></li>
+<li><p>Les trajectoires sont presque sûrement continues.</p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="le-lemme-ditô">Le Lemme d’Itô</h1>
+<p>Nous allons maintenant formuler le lemme d’Itô. Supposons que <span
+class="math inline">\(\{B_t\}_{t \geq 0}\)</span> soit un mouvement
+brownien et que <span class="math inline">\(f(t, x)\)</span> soit une
+fonction suffisamment régulière.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f(t, x)\)</span> une fonction de
+classe <span class="math inline">\(\mathcal{C}^{1,2}\)</span> en <span
+class="math inline">\((t, x)\)</span>. Alors, le processus <span
+class="math inline">\(Y_t = f(t, B_t)\)</span> vérifie : <span
+class="math display">\[\begin{equation*}
+    dY_t = \left( \frac{\partial f}{\partial t}(t, B_t) + \frac{1}{2}
+\frac{\partial^2 f}{\partial x^2}(t, B_t) \right) dt + \frac{\partial
+f}{\partial x}(t, B_t) dB_t.
+\end{equation*}\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuve-du-lemme-ditô">Preuve du Lemme
+d’Itô</h1>
+<p>La preuve du lemme d’Itô repose sur un développement de Taylor à
+l’ordre 2 et des propriétés du mouvement brownien. Nous allons détailler
+chaque étape.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un instant <span class="math inline">\(t
+\geq 0\)</span> et un incrément <span class="math inline">\(\Delta t
+&gt; 0\)</span>. Nous avons : <span
+class="math display">\[\begin{equation*}
+    f(t + \Delta t, B_{t + \Delta t}) = f(t, B_t) + \frac{\partial
+f}{\partial t}(t, B_t) \Delta t + \frac{\partial f}{\partial x}(t, B_t)
+(B_{t + \Delta t} - B_t)
+\end{equation*}\]</span> <span class="math display">\[+ \frac{1}{2}
+\left( \frac{\partial^2 f}{\partial t^2}(t, B_t) (\Delta t)^2 + 2
+\frac{\partial^2 f}{\partial t \partial x}(t, B_t) \Delta t (B_{t +
+\Delta t} - B_t) + \frac{\partial^2 f}{\partial x^2}(t, B_t) (B_{t +
+\Delta t} - B_t)^2 \right)\]</span> <span class="math display">\[+
+o(\Delta t).\]</span></p>
+<p>En utilisant le fait que <span class="math inline">\(B_{t + \Delta t}
+- B_t \sim \mathcal{N}(0, \Delta t)\)</span>, nous avons <span
+class="math inline">\(\mathbb{E}[(B_{t + \Delta t} - B_t)^2] = \Delta
+t\)</span>. De plus, les termes d’ordre supérieur en <span
+class="math inline">\(\Delta t\)</span> sont négligeables. Ainsi, nous
+obtenons : <span class="math display">\[\begin{equation*}
+    f(t + \Delta t, B_{t + \Delta t}) - f(t, B_t) = \frac{\partial
+f}{\partial t}(t, B_t) \Delta t + \frac{1}{2} \frac{\partial^2
+f}{\partial x^2}(t, B_t) \Delta t + \frac{\partial f}{\partial x}(t,
+B_t) (B_{t + \Delta t} - B_t) + o(\Delta t).
+\end{equation*}\]</span></p>
+<p>En divisant par <span class="math inline">\(\Delta t\)</span> et en
+prenant la limite lorsque <span class="math inline">\(\Delta t \to
+0\)</span>, nous retrouvons le lemme d’Itô. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous allons maintenant énoncer quelques propriétés et corollaires
+importants du lemme d’Itô.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(f(t, x)\)</span> une fonction de
+classe <span class="math inline">\(\mathcal{C}^{1,2}\)</span> et soit
+<span class="math inline">\(\{H_t\}_{t \geq 0}\)</span> un processus
+adapté. Alors, le processus <span class="math inline">\(Y_t = f(t,
+\int_0^t H_s dB_s)\)</span> vérifie : <span
+class="math display">\[\begin{equation*}
+    dY_t = \left( \frac{\partial f}{\partial t}(t, Y_t) + \frac{1}{2}
+H_t^2 \frac{\partial^2 f}{\partial x^2}(t, Y_t) \right) dt + H_t
+\frac{\partial f}{\partial x}(t, Y_t) dB_t.
+\end{equation*}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve suit directement du lemme d’Itô en
+remplaçant <span class="math inline">\(B_t\)</span> par <span
+class="math inline">\(\int_0^t H_s dB_s\)</span>. ◻</p>
+</div>
+<div class="corollary">
+<p>Soient <span class="math inline">\(\{X_t\}_{t \geq 0}\)</span> et
+<span class="math inline">\(\{Y_t\}_{t \geq 0}\)</span> deux processus
+stochastiques continus. Alors, le processus <span
+class="math inline">\(Z_t = X_t Y_t\)</span> vérifie : <span
+class="math display">\[\begin{equation*}
+    dZ_t = X_t dY_t + Y_t dX_t + d\langle X, Y \rangle_t,
+\end{equation*}\]</span> où <span class="math inline">\(\langle X, Y
+\rangle_t\)</span> est la covariation quadratique des processus <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve repose sur le développement de Taylor à
+l’ordre 1 et les propriétés des covariations quadratiques. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le lemme d’Itô est un outil fondamental en analyse stochastique,
+permettant de généraliser des concepts classiques comme le théorème de
+Taylor à des contextes aléatoires. Ses applications sont vastes, allant
+de la finance mathématique à la physique des particules. La
+compréhension approfondie de ce lemme est essentielle pour toute
+personne souhaitant explorer les domaines avancés de la théorie des
+probabilités et des processus stochastiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

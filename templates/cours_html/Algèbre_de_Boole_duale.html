@@ -1,0 +1,422 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Algèbre de Boole duale</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Algèbre de Boole duale</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’algèbre de Boole, introduite par George Boole au XIXème siècle, est
+un pilier fondamental des mathématiques discrètes et de l’informatique
+théorique. Elle modélise les opérations logiques telles que la
+conjonction, la disjonction et la négation. Cependant, une notion moins
+connue mais tout aussi cruciale est celle de l’algèbre de Boole duale.
+Cette structure émerge naturellement lorsque l’on considère les
+propriétés symétriques des opérations de base.</p>
+<p>L’algèbre de Boole duale trouve ses applications dans divers
+domaines, notamment en théorie des circuits logiques, en théorie des
+graphes et en algèbre universelle. Elle permet de mieux comprendre les
+symétries et les dualités dans les structures algébriques, offrant ainsi
+des outils puissants pour l’analyse et la conception de systèmes
+complexes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’algèbre de Boole duale, commençons par rappeler la
+définition classique d’une algèbre de Boole.</p>
+<p>Une algèbre de Boole est un ensemble <span
+class="math inline">\(B\)</span> muni de deux opérations binaires <span
+class="math inline">\(\land\)</span> (conjonction) et <span
+class="math inline">\(\lor\)</span> (disjonction), d’une opération
+unaire <span class="math inline">\(^c\)</span> (complémentation) et de
+deux éléments distincts <span class="math inline">\(0\)</span> et <span
+class="math inline">\(1\)</span>, satisfaisant les axiomes suivants pour
+tous <span class="math inline">\(a, b, c \in B\)</span> :</p>
+<ol>
+<li><p>Associativité : <span class="math inline">\((a \land b) \land c =
+a \land (b \land c)\)</span> et <span class="math inline">\((a \lor b)
+\lor c = a \lor (b \lor c)\)</span>.</p></li>
+<li><p>Commutativité : <span class="math inline">\(a \land b = b \land
+a\)</span> et <span class="math inline">\(a \lor b = b \lor
+a\)</span>.</p></li>
+<li><p>Distributivité : <span class="math inline">\(a \land (b \lor c) =
+(a \land b) \lor (a \land c)\)</span> et <span class="math inline">\(a
+\lor (b \land c) = (a \lor b) \land (a \lor c)\)</span>.</p></li>
+<li><p>Identité : <span class="math inline">\(a \land 1 = a\)</span> et
+<span class="math inline">\(a \lor 0 = a\)</span>.</p></li>
+<li><p>Complément : <span class="math inline">\(a \land a^c = 0\)</span>
+et <span class="math inline">\(a \lor a^c = 1\)</span>.</p></li>
+</ol>
+<p>L’algèbre de Boole duale est obtenue en échangeant les rôles des
+opérations <span class="math inline">\(\land\)</span> et <span
+class="math inline">\(\lor\)</span>, ainsi que ceux des éléments <span
+class="math inline">\(0\)</span> et <span
+class="math inline">\(1\)</span>. Formellement, une algèbre de Boole
+duale est un ensemble <span class="math inline">\(B^*\)</span> muni des
+opérations <span class="math inline">\(\land^*\)</span>, <span
+class="math inline">\(\lor^*\)</span> et <span
+class="math inline">\(^c\)</span>, ainsi que des éléments <span
+class="math inline">\(0^*\)</span> et <span
+class="math inline">\(1^*\)</span>, satisfaisant les axiomes suivants
+pour tous <span class="math inline">\(a, b, c \in B^*\)</span> :</p>
+<ol>
+<li><p>Associativité : <span class="math inline">\((a \lor^* b) \lor^* c
+= a \lor^* (b \lor^* c)\)</span> et <span class="math inline">\((a
+\land^* b) \land^* c = a \land^* (b \land^* c)\)</span>.</p></li>
+<li><p>Commutativité : <span class="math inline">\(a \lor^* b = b \lor^*
+a\)</span> et <span class="math inline">\(a \land^* b = b \land^*
+a\)</span>.</p></li>
+<li><p>Distributivité : <span class="math inline">\(a \lor^* (b \land^*
+c) = (a \lor^* b) \land^* (a \lor^* c)\)</span> et <span
+class="math inline">\(a \land^* (b \lor^* c) = (a \land^* b) \lor^* (a
+\land^* c)\)</span>.</p></li>
+<li><p>Identité : <span class="math inline">\(a \lor^* 0^* = a\)</span>
+et <span class="math inline">\(a \land^* 1^* = a\)</span>.</p></li>
+<li><p>Complément : <span class="math inline">\(a \lor^* a^c =
+0^*\)</span> et <span class="math inline">\(a \land^* a^c =
+1^*\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant les algèbres de Boole duales est
+le suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(B\)</span> une algèbre de Boole et
+<span class="math inline">\(B^*\)</span> son dual. Alors, pour toute
+formule bien formée <span class="math inline">\(\phi\)</span> dans
+l’algèbre de Boole classique, il existe une formule bien formée <span
+class="math inline">\(\phi^*\)</span> dans l’algèbre de Boole duale
+telle que : <span class="math display">\[\phi \text{ est vraie dans } B
+\iff \phi^* \text{ est vraie dans } B^*.\]</span></p>
+</div>
+<p>Pour démontrer ce théorème, nous devons d’abord comprendre comment la
+dualité se traduit au niveau des formules. La formule duale <span
+class="math inline">\(\phi^*\)</span> est obtenue en échangeant les
+opérations <span class="math inline">\(\land\)</span> et <span
+class="math inline">\(\lor\)</span>, ainsi que les éléments <span
+class="math inline">\(0\)</span> et <span
+class="math inline">\(1\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de dualité, nous procédons par induction sur
+la complexité des formules.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\phi\)</span> une
+formule bien formée dans l’algèbre de Boole classique. Nous définissons
+<span class="math inline">\(\phi^*\)</span> comme suit :</p>
+<ol>
+<li><p>Si <span class="math inline">\(\phi\)</span> est une variable
+<span class="math inline">\(x\)</span>, alors <span
+class="math inline">\(\phi^* = x\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(0\)</span>, alors <span
+class="math inline">\(\phi^* = 1^*\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(1\)</span>, alors <span
+class="math inline">\(\phi^* = 0^*\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(\psi \land \chi\)</span>, alors <span
+class="math inline">\(\phi^* = \psi^* \lor^* \chi^*\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(\psi \lor \chi\)</span>, alors <span
+class="math inline">\(\phi^* = \psi^* \land^* \chi^*\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(\psi^c\)</span>, alors <span
+class="math inline">\(\phi^* = (\psi^*)^c\)</span>.</p></li>
+</ol>
+<p>Nous devons montrer que pour toute formule <span
+class="math inline">\(\phi\)</span>, <span
+class="math inline">\(\phi\)</span> est vraie dans <span
+class="math inline">\(B\)</span> si et seulement si <span
+class="math inline">\(\phi^*\)</span> est vraie dans <span
+class="math inline">\(B^*\)</span>.</p>
+<ol>
+<li><p>Si <span class="math inline">\(\phi\)</span> est une variable
+<span class="math inline">\(x\)</span>, alors <span
+class="math inline">\(\phi^* = x\)</span>. La vérité de <span
+class="math inline">\(x\)</span> dans <span
+class="math inline">\(B\)</span> est équivalente à la vérité de <span
+class="math inline">\(x\)</span> dans <span
+class="math inline">\(B^*\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(0\)</span>, alors <span
+class="math inline">\(\phi^* = 1^*\)</span>. La vérité de <span
+class="math inline">\(0\)</span> dans <span
+class="math inline">\(B\)</span> est équivalente à la fausseté de <span
+class="math inline">\(1^*\)</span> dans <span
+class="math inline">\(B^*\)</span>, et vice versa.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(1\)</span>, alors <span
+class="math inline">\(\phi^* = 0^*\)</span>. La vérité de <span
+class="math inline">\(1\)</span> dans <span
+class="math inline">\(B\)</span> est équivalente à la fausseté de <span
+class="math inline">\(0^*\)</span> dans <span
+class="math inline">\(B^*\)</span>, et vice versa.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(\psi \land \chi\)</span>, alors <span
+class="math inline">\(\phi^* = \psi^* \lor^* \chi^*\)</span>. La vérité
+de <span class="math inline">\(\psi \land \chi\)</span> dans <span
+class="math inline">\(B\)</span> est équivalente à la vérité de <span
+class="math inline">\(\psi^* \lor^* \chi^*\)</span> dans <span
+class="math inline">\(B^*\)</span>, par distributivité.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(\psi \lor \chi\)</span>, alors <span
+class="math inline">\(\phi^* = \psi^* \land^* \chi^*\)</span>. La vérité
+de <span class="math inline">\(\psi \lor \chi\)</span> dans <span
+class="math inline">\(B\)</span> est équivalente à la vérité de <span
+class="math inline">\(\psi^* \land^* \chi^*\)</span> dans <span
+class="math inline">\(B^*\)</span>, par distributivité.</p></li>
+<li><p>Si <span class="math inline">\(\phi\)</span> est <span
+class="math inline">\(\psi^c\)</span>, alors <span
+class="math inline">\(\phi^* = (\psi^*)^c\)</span>. La vérité de <span
+class="math inline">\(\psi^c\)</span> dans <span
+class="math inline">\(B\)</span> est équivalente à la fausseté de <span
+class="math inline">\(\psi^*\)</span> dans <span
+class="math inline">\(B^*\)</span>, et vice versa.</p></li>
+</ol>
+<p>Par induction, nous concluons que pour toute formule <span
+class="math inline">\(\phi\)</span>, <span
+class="math inline">\(\phi\)</span> est vraie dans <span
+class="math inline">\(B\)</span> si et seulement si <span
+class="math inline">\(\phi^*\)</span> est vraie dans <span
+class="math inline">\(B^*\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons quelques propriétés importantes des algèbres de Boole
+duales :</p>
+<ol>
+<li><p>Pour toute algèbre de Boole <span
+class="math inline">\(B\)</span>, il existe une algèbre de Boole duale
+<span class="math inline">\(B^*\)</span> telle que les opérations et les
+éléments sont échangés.</p></li>
+<li><p>La dualité préserve les relations de complémentation,
+c’est-à-dire que <span class="math inline">\(a^c\)</span> dans <span
+class="math inline">\(B\)</span> correspond à <span
+class="math inline">\((a^*)^c\)</span> dans <span
+class="math inline">\(B^*\)</span>.</p></li>
+<li><p>La dualité est une involution, c’est-à-dire que <span
+class="math inline">\((B^*)^* = B\)</span>.</p></li>
+</ol>
+<p>Nous développons ces propriétés une par une.</p>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>La construction de <span class="math inline">\(B^*\)</span> à
+partir de <span class="math inline">\(B\)</span> est directe en
+échangeant les opérations et les éléments. Les axiomes sont satisfaits
+par construction.</p></li>
+<li><p>La complémentation est préservée par dualité, car <span
+class="math inline">\(a^c\)</span> dans <span
+class="math inline">\(B\)</span> correspond à <span
+class="math inline">\((a^*)^c\)</span> dans <span
+class="math inline">\(B^*\)</span>, comme défini précédemment.</p></li>
+<li><p>L’involution de la dualité découle du fait que l’application de
+la dualité deux fois ramène à l’algèbre originale, car <span
+class="math inline">\((B^*)^*\)</span> est obtenu en échangeant à
+nouveau les opérations et les éléments.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’algèbre de Boole duale offre une perspective symétrique et
+enrichissante sur les structures algébriques classiques. Elle permet de
+mieux comprendre les propriétés fondamentales des algèbres de Boole et
+trouve des applications dans divers domaines des mathématiques et de
+l’informatique. En explorant la dualité, nous révélons des symétries
+profondes qui enrichissent notre compréhension des systèmes logiques et
+algébriques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

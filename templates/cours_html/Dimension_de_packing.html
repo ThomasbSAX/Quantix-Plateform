@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Dimension de Packing</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Dimension de Packing</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La notion de dimension de packing émerge naturellement dans le cadre
+des espaces métriques et des théories de l’emballage. Historiquement,
+cette idée trouve ses racines dans les travaux sur la dimension
+topologique et fractale, où l’on cherche à quantifier la capacité d’un
+espace à contenir des copies disjointes d’un ensemble donné. La
+dimension de packing, introduite par Tricot en 1982, offre une approche
+rigoureuse pour mesurer la complexité d’un ensemble en termes de sa
+capacité à être "emballé" par des boules disjointes.</p>
+<p>Cette notion est indispensable dans de nombreux domaines, notamment
+en analyse fractale, en théorie des probabilités et en géométrie
+différentielle. Elle permet de distinguer des ensembles qui peuvent
+sembler similaires à première vue, mais qui diffèrent par leur structure
+fine. Par exemple, la dimension de packing peut différer entre un
+ensemble de Cantor et une courbe de Koch, bien que ces deux ensembles
+aient la même dimension de Hausdorff.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la notion de dimension de packing, commençons par
+comprendre ce que nous cherchons à mesurer. Imaginons un ensemble <span
+class="math inline">\(E\)</span> dans un espace métrique <span
+class="math inline">\((X, d)\)</span>. Nous voulons quantifier la
+manière dont nous pouvons recouvrir <span
+class="math inline">\(E\)</span> par des boules disjointes de rayon
+<span class="math inline">\(r\)</span>. Plus précisément, nous cherchons
+à savoir combien de telles boules sont nécessaires pour couvrir <span
+class="math inline">\(E\)</span> lorsque <span
+class="math inline">\(r\)</span> tend vers zéro.</p>
+<p>Formellement, la dimension de packing <span
+class="math inline">\(\dim_{\text{pack}}(E)\)</span> d’un ensemble <span
+class="math inline">\(E\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((X, d)\)</span> un espace métrique
+et <span class="math inline">\(E \subset X\)</span>. Pour tout <span
+class="math inline">\(s \geq 0\)</span>, définissons : <span
+class="math display">\[\mathcal{P}^s_{\delta}(E) = \sup \left\{
+\sum_{i=1}^{\infty} |U_i|^s : \{ U_i \}_{i=1}^{\infty} \text{ est un }
+\delta\text{-packing de } E \right\},\]</span> où <span
+class="math inline">\(\{ U_i \}_{i=1}^{\infty}\)</span> est un <span
+class="math inline">\(\delta\)</span>-packing de <span
+class="math inline">\(E\)</span> si les boules <span
+class="math inline">\(U_i\)</span> sont disjointes, de rayon inférieur
+ou égal à <span class="math inline">\(\delta\)</span>, et si chaque
+<span class="math inline">\(U_i\)</span> intersecte <span
+class="math inline">\(E\)</span>. La mesure de packing <span
+class="math inline">\(\mathcal{P}^s(E)\)</span> est définie par : <span
+class="math display">\[\mathcal{P}^s(E) = \lim_{\delta \to 0}
+\mathcal{P}^s_{\delta}(E).\]</span> La dimension de packing <span
+class="math inline">\(\dim_{\text{pack}}(E)\)</span> est alors le plus
+petit <span class="math inline">\(s\)</span> pour lequel <span
+class="math inline">\(\mathcal{P}^s(E) = 0\)</span>.</p>
+</div>
+<p>Une autre formulation équivalente est la suivante :</p>
+<div class="definition">
+<p>La dimension de packing <span
+class="math inline">\(\dim_{\text{pack}}(E)\)</span> est le supremum des
+<span class="math inline">\(s\)</span> pour lesquels il existe une suite
+de boules disjointes <span class="math inline">\(\{ B(x_i, r_i)
+\}_{i=1}^{\infty}\)</span> centrée sur <span
+class="math inline">\(E\)</span> telle que : <span
+class="math display">\[\sum_{i=1}^{\infty} r_i^s = +\infty.\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la dimension de packing est le
+suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(E\)</span> un ensemble borélien dans
+un espace métrique complet. Alors : <span
+class="math display">\[\dim_{\text{Haus}}(E) \leq
+\dim_{\text{pack}}(E).\]</span></p>
+</div>
+<p>Pour comprendre ce théorème, commençons par rappeler que la dimension
+de Hausdorff est une mesure de la taille d’un ensemble qui prend en
+compte les recouvrements par des boules de rayon arbitrairement petit.
+La dimension de packing, en revanche, prend en compte uniquement les
+recouvrements par des boules disjointes. Le théorème de Tricot montre
+que la dimension de packing est toujours supérieure ou égale à la
+dimension de Hausdorff, ce qui signifie que la capacité d’un ensemble à
+être emballé par des boules disjointes est au moins aussi grande que sa
+capacité à être recouvré par des boules de rayon arbitrairement
+petit.</p>
+<p>La preuve de ce théorème repose sur plusieurs lemmes et propriétés.
+Voici une esquisse de la démonstration :</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(E\)</span> un
+ensemble borélien et supposons que <span
+class="math inline">\(\dim_{\text{Haus}}(E) = s\)</span>. Cela signifie
+qu’il existe une suite de recouvrements <span class="math inline">\(\{
+U_i^n \}_{i=1}^{\infty}\)</span> de <span
+class="math inline">\(E\)</span> par des boules de rayon inférieur ou
+égal à <span class="math inline">\(2^{-n}\)</span> telle que : <span
+class="math display">\[\sum_{i=1}^{\infty} |U_i^n|^s \leq 2^{-n
+s}.\]</span> Pour chaque <span class="math inline">\(n\)</span>,
+choisissons un sous-ensemble maximal de boules disjointes <span
+class="math inline">\(\{ V_i^n \}_{i=1}^{\infty}\)</span> parmi les
+<span class="math inline">\(U_i^n\)</span>. Alors, pour chaque <span
+class="math inline">\(x \in E\)</span>, il existe une boule <span
+class="math inline">\(U_i^n\)</span> contenant <span
+class="math inline">\(x\)</span> et intersectant l’une des boules <span
+class="math inline">\(V_j^n\)</span>. Par conséquent, chaque <span
+class="math inline">\(x \in E\)</span> est à une distance inférieure ou
+égale à <span class="math inline">\(2^{-n+1}\)</span> de l’une des
+boules <span class="math inline">\(V_j^n\)</span>.</p>
+<p>En utilisant le fait que les boules <span
+class="math inline">\(V_i^n\)</span> sont disjointes, nous avons : <span
+class="math display">\[\sum_{i=1}^{\infty} |V_i^n|^s \leq
+\sum_{i=1}^{\infty} |U_i^n|^s \leq 2^{-n s}.\]</span> En faisant tendre
+<span class="math inline">\(n\)</span> vers l’infini, nous obtenons que
+la mesure de packing <span class="math inline">\(\mathcal{P}^s(E) =
+0\)</span>, ce qui implique que <span
+class="math inline">\(\dim_{\text{pack}}(E) \leq s\)</span>. Puisque
+cela est vrai pour tout <span class="math inline">\(s &gt;
+\dim_{\text{Haus}}(E)\)</span>, nous concluons que <span
+class="math inline">\(\dim_{\text{pack}}(E) \leq
+\dim_{\text{Haus}}(E)\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+dimension de packing :</p>
+<ol>
+<li><p>La dimension de packing est monotone, c’est-à-dire que si <span
+class="math inline">\(E \subset F\)</span>, alors <span
+class="math inline">\(\dim_{\text{pack}}(E) \leq
+\dim_{\text{pack}}(F)\)</span>.</p></li>
+<li><p>La dimension de packing est stable par translation et isométrie.
+Plus précisément, si <span class="math inline">\(f : X \to Y\)</span>
+est une isométrie entre deux espaces métriques, alors <span
+class="math inline">\(\dim_{\text{pack}}(f(E)) =
+\dim_{\text{pack}}(E)\)</span>.</p></li>
+<li><p>La dimension de packing est semi-continue inférieurement. Cela
+signifie que si <span class="math inline">\(E_n\)</span> est une suite
+d’ensembles tels que <span class="math inline">\(E_n \to E\)</span> dans
+la topologie de Hausdorff, alors : <span
+class="math display">\[\dim_{\text{pack}}(E) \leq \liminf_{n \to \infty}
+\dim_{\text{pack}}(E_n).\]</span></p></li>
+</ol>
+<p>Pour prouver la propriété (iii), nous utilisons le fait que la mesure
+de packing est semi-continue inférieurement. Plus précisément, si <span
+class="math inline">\(E_n \to E\)</span>, alors pour tout <span
+class="math inline">\(s &gt; 0\)</span> et tout <span
+class="math inline">\(\delta &gt; 0\)</span>, il existe un <span
+class="math inline">\(n_0\)</span> tel que pour tout <span
+class="math inline">\(n \geq n_0\)</span>, nous avons : <span
+class="math display">\[\mathcal{P}^s_{\delta}(E) \leq \liminf_{n \to
+\infty} \mathcal{P}^s_{\delta}(E_n).\]</span> En faisant tendre <span
+class="math inline">\(\delta\)</span> vers zéro, nous obtenons que <span
+class="math inline">\(\mathcal{P}^s(E) \leq \liminf_{n \to \infty}
+\mathcal{P}^s(E_n)\)</span>. Par conséquent, si <span
+class="math inline">\(s &gt; \dim_{\text{pack}}(E)\)</span>, alors <span
+class="math inline">\(\mathcal{P}^s(E) = 0\)</span>, ce qui implique que
+: <span class="math display">\[0 &lt; \liminf_{n \to \infty}
+\mathcal{P}^s(E_n).\]</span> Cela montre que <span
+class="math inline">\(\dim_{\text{pack}}(E) \leq \liminf_{n \to \infty}
+\dim_{\text{pack}}(E_n)\)</span>.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

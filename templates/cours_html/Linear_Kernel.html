@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Linear Kernel: A Fundamental Concept in Machine Learning</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Linear Kernel: A Fundamental Concept in Machine
+Learning</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>The concept of the linear kernel emerges from the need to efficiently
+compute similarities between data points in a high-dimensional space. In
+machine learning, particularly in support vector machines (SVMs), the
+kernel trick allows us to operate in a transformed feature space without
+explicitly computing the coordinates of the data in that space. The
+linear kernel is one of the simplest and most widely used kernels due to
+its computational efficiency and interpretability.</p>
+<p>The linear kernel is indispensable in scenarios where the data is
+believed to be linearly separable or when the computational resources
+are limited. It provides a straightforward way to measure the similarity
+between data points, making it a fundamental tool in both theoretical
+and applied machine learning.</p>
+<h1 id="definitions">Definitions</h1>
+<p>Before formally defining the linear kernel, let us consider what we
+aim to achieve. Suppose we have two data points in a feature space, and
+we want to measure how similar they are. Intuitively, the similarity
+should be higher if the data points are closer to each other and lower
+if they are farther apart. Moreover, this similarity measure should be
+efficient to compute, especially in high-dimensional spaces.</p>
+<p>Given two vectors <span class="math inline">\(\mathbf{x}\)</span> and
+<span class="math inline">\(\mathbf{y}\)</span> in a feature space, the
+linear kernel <span class="math inline">\(K\)</span> is defined as their
+dot product:</p>
+<p><span class="math display">\[K(\mathbf{x}, \mathbf{y}) =
+\mathbf{x}^\top \mathbf{y}\]</span></p>
+<p>This can be expressed using quantifiers as follows: for all <span
+class="math inline">\(\mathbf{x}, \mathbf{y} \in \mathbb{R}^n\)</span>,
+the linear kernel <span class="math inline">\(K: \mathbb{R}^n \times
+\mathbb{R}^n \rightarrow \mathbb{R}\)</span> is given by:</p>
+<p><span class="math display">\[K(\mathbf{x}, \mathbf{y}) = \sum_{i=1}^n
+x_i y_i\]</span></p>
+<p>Here, <span class="math inline">\(x_i\)</span> and <span
+class="math inline">\(y_i\)</span> are the components of the vectors
+<span class="math inline">\(\mathbf{x}\)</span> and <span
+class="math inline">\(\mathbf{y}\)</span>, respectively.</p>
+<h1 id="theorems">Theorems</h1>
+<p>One of the key theorems related to the linear kernel is the Mercer’s
+theorem, which provides conditions under which a function can be
+considered a valid kernel. Although Mercer’s theorem is general and
+applies to any kernel, it is particularly relevant for the linear
+kernel.</p>
+<div class="theorem">
+<p>A symmetric function <span class="math inline">\(K(\mathbf{x},
+\mathbf{y})\)</span> is a valid kernel if and only if for any finite set
+of points <span class="math inline">\(\{\mathbf{x}_1, \mathbf{x}_2,
+\ldots, \mathbf{x}_n\}\)</span>, the Gram matrix <span
+class="math inline">\(G\)</span> defined by:</p>
+<p><span class="math display">\[G_{ij} = K(\mathbf{x}_i,
+\mathbf{x}_j)\]</span></p>
+<p>is positive semi-definite.</p>
+</div>
+<p>For the linear kernel, the Gram matrix <span
+class="math inline">\(G\)</span> is given by:</p>
+<p><span class="math display">\[G_{ij} = \mathbf{x}_i^\top
+\mathbf{x}_j\]</span></p>
+<p>Since the dot product is always positive semi-definite, the linear
+kernel satisfies Mercer’s theorem.</p>
+<h1 id="proofs">Proofs</h1>
+<p>To prove that the linear kernel is indeed a valid kernel, we need to
+show that it satisfies Mercer’s theorem. Let us consider any finite set
+of points <span class="math inline">\(\{\mathbf{x}_1, \mathbf{x}_2,
+\ldots, \mathbf{x}_n\}\)</span>. The Gram matrix <span
+class="math inline">\(G\)</span> is defined as:</p>
+<p><span class="math display">\[G_{ij} = \mathbf{x}_i^\top
+\mathbf{x}_j\]</span></p>
+<p>We need to show that <span class="math inline">\(G\)</span> is
+positive semi-definite. This means that for any vector <span
+class="math inline">\(\mathbf{c} \in \mathbb{R}^n\)</span>, the
+following holds:</p>
+<p><span class="math display">\[\mathbf{c}^\top G \mathbf{c} \geq
+0\]</span></p>
+<p>Substituting the definition of <span
+class="math inline">\(G\)</span>, we get:</p>
+<p><span class="math display">\[\mathbf{c}^\top G \mathbf{c} =
+\sum_{i,j=1}^n c_i c_j \mathbf{x}_i^\top \mathbf{x}_j\]</span></p>
+<p>This can be rewritten as:</p>
+<p><span class="math display">\[\mathbf{c}^\top G \mathbf{c} = \left(
+\sum_{i=1}^n c_i \mathbf{x}_i \right)^\top \left( \sum_{j=1}^n c_j
+\mathbf{x}_j \right) = \left\| \sum_{i=1}^n c_i \mathbf{x}_i \right\|^2
+\geq 0\]</span></p>
+<p>Since the norm of any vector is always non-negative, we have shown
+that <span class="math inline">\(G\)</span> is positive semi-definite.
+Therefore, the linear kernel satisfies Mercer’s theorem and is a valid
+kernel.</p>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<p>The linear kernel has several important properties that make it
+useful in various applications:</p>
+<ol>
+<li><p><strong>Linearity</strong>: The linear kernel is linear in its
+arguments. This means that for any scalars <span
+class="math inline">\(a, b \in \mathbb{R}\)</span> and vectors <span
+class="math inline">\(\mathbf{x}, \mathbf{y}, \mathbf{z} \in
+\mathbb{R}^n\)</span>, the following holds:</p>
+<p><span class="math display">\[K(a\mathbf{x} + b\mathbf{y}, \mathbf{z})
+= a K(\mathbf{x}, \mathbf{z}) + b K(\mathbf{y}, \mathbf{z})\]</span></p>
+<p>This property is a direct consequence of the linearity of the dot
+product.</p></li>
+<li><p><strong>Translation Invariance</strong>: The linear kernel is
+invariant under translations. Specifically, for any vector <span
+class="math inline">\(\mathbf{t} \in \mathbb{R}^n\)</span>, the
+following holds:</p>
+<p><span class="math display">\[K(\mathbf{x} + \mathbf{t}, \mathbf{y} +
+\mathbf{t}) = K(\mathbf{x}, \mathbf{y})\]</span></p>
+<p>This can be seen by expanding the dot product:</p>
+<p><span class="math display">\[K(\mathbf{x} + \mathbf{t}, \mathbf{y} +
+\mathbf{t}) = (\mathbf{x} + \mathbf{t})^\top (\mathbf{y} + \mathbf{t}) =
+\mathbf{x}^\top \mathbf{y} + \mathbf{x}^\top \mathbf{t} +
+\mathbf{t}^\top \mathbf{y} + \mathbf{t}^\top \mathbf{t}\]</span></p>
+<p>However, if we consider the centered data (i.e., <span
+class="math inline">\(\mathbf{x}\)</span> and <span
+class="math inline">\(\mathbf{y}\)</span> have zero mean), the cross
+terms vanish, and we are left with:</p>
+<p><span class="math display">\[K(\mathbf{x} + \mathbf{t}, \mathbf{y} +
+\mathbf{t}) = \mathbf{x}^\top \mathbf{y}\]</span></p></li>
+<li><p><strong>Computational Efficiency</strong>: The linear kernel is
+computationally efficient. The dot product between two vectors can be
+computed in <span class="math inline">\(O(n)\)</span> time, where <span
+class="math inline">\(n\)</span> is the dimensionality of the vectors.
+This makes the linear kernel particularly suitable for high-dimensional
+data.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>The linear kernel is a fundamental concept in machine learning,
+particularly in the context of support vector machines. Its simplicity
+and computational efficiency make it a popular choice for many
+applications. By understanding the properties and theoretical
+foundations of the linear kernel, we can better appreciate its role in
+modern machine learning algorithms.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

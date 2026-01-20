@@ -1,0 +1,340 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La Constante de Prouhet-Thue-Morse</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La Constante de Prouhet-Thue-Morse</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La constante de Prouhet-Thue-Morse, souvent désignée par <span
+class="math inline">\(t_n\)</span>, émerge comme une séquence binaire
+fascinante et profondément enracinée dans la théorie des nombres, les
+automates cellulaires, et même l’analyse combinatoire. Introduite
+initialement par Prouhet en 1851, puis explorée plus tard par Thue et
+Morse dans le contexte des suites sans carrés, cette constante se
+distingue par ses propriétés remarquables. Elle est définie de manière
+récursive et possède des liens étroits avec les problèmes de partition,
+la théorie des graphes, et même certaines questions en cryptographie.
+Son étude permet non seulement de résoudre des problèmes classiques mais
+aussi d’ouvrir des perspectives sur des questions contemporaines en
+mathématiques discrètes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la constante de Prouhet-Thue-Morse, commençons par
+explorer ce que nous cherchons à construire. Nous voulons une suite
+binaire <span class="math inline">\(t_n\)</span> qui alterne entre 0 et
+1 de manière à ce que chaque terme soit défini en fonction des termes
+précédents, créant ainsi une structure auto-similaire. Cette suite doit
+également satisfaire certaines conditions de symétrie et
+d’équilibrage.</p>
+<p>Formellement, la suite <span class="math inline">\(t_n\)</span> est
+définie par récurrence comme suit : <span
+class="math display">\[\begin{equation}
+    t_0 = 0
+\end{equation}\]</span> et pour tout entier naturel <span
+class="math inline">\(n\)</span>, <span
+class="math display">\[\begin{equation}
+    t_{2n} = t_n \quad \text{et} \quad t_{2n+1} = 1 - t_n.
+\end{equation}\]</span></p>
+<p>Une autre manière de formuler cette définition est d’utiliser
+l’expression binaire des entiers. Pour tout entier <span
+class="math inline">\(n\)</span>, <span
+class="math inline">\(t_n\)</span> est égal au nombre de 1 dans
+l’écriture binaire de <span class="math inline">\(n\)</span> modulo 2.
+En d’autres termes, pour tout entier naturel <span
+class="math inline">\(n\)</span>, on a : <span
+class="math display">\[\begin{equation}
+    t_n = \sum_{k=0}^{\infty} b_k \mod 2
+\end{equation}\]</span> où <span class="math inline">\(b_k\)</span> est
+le <span class="math inline">\(k\)</span>-ème bit de l’écriture binaire
+de <span class="math inline">\(n\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes les plus célèbres concernant la constante de
+Prouhet-Thue-Morse est celui de Thue lui-même, qui démontre que cette
+suite est cubique libre. Cela signifie qu’il n’existe pas trois indices
+<span class="math inline">\(i\)</span>, <span
+class="math inline">\(j\)</span>, et <span
+class="math inline">\(k\)</span> tels que la sous-suite <span
+class="math inline">\(t_i, t_{i+1}, \ldots, t_{i+j-1}\)</span> soit
+identique à la sous-suite <span class="math inline">\(t_k, t_{k+1},
+\ldots, t_{k+j-1}\)</span>.</p>
+<p>Formellement, le théorème de Thue s’énonce comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(t_n\)</span> la suite de
+Prouhet-Thue-Morse. Pour tout entier naturel <span
+class="math inline">\(j\)</span>, il n’existe pas d’entiers naturels
+<span class="math inline">\(i\)</span> et <span
+class="math inline">\(k\)</span> tels que : <span
+class="math display">\[\begin{equation}
+        t_i = t_k, \quad t_{i+1} = t_{k+1}, \quad \ldots, \quad
+t_{i+j-1} = t_{k+j-1}.
+\end{equation}\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Thue, nous devons montrer que la suite
+<span class="math inline">\(t_n\)</span> ne contient pas de carrés. Cela
+se fait en utilisant une approche combinatoire et des propriétés de la
+suite elle-même.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons par l’absurde qu’il existe des entiers
+<span class="math inline">\(i\)</span>, <span
+class="math inline">\(j\)</span>, et <span
+class="math inline">\(k\)</span> tels que la sous-suite <span
+class="math inline">\(t_i, t_{i+1}, \ldots, t_{i+j-1}\)</span> soit
+identique à la sous-suite <span class="math inline">\(t_k, t_{k+1},
+\ldots, t_{k+j-1}\)</span>. Cela signifie que pour tout <span
+class="math inline">\(l\)</span> de 0 à <span
+class="math inline">\(j-1\)</span>, on a : <span
+class="math display">\[\begin{equation}
+        t_{i+l} = t_{k+l}.
+\end{equation}\]</span></p>
+<p>En utilisant la définition récursive de <span
+class="math inline">\(t_n\)</span>, nous pouvons exprimer chaque terme
+en fonction des termes précédents. Cependant, cette approche devient
+rapidement complexe et nécessite une analyse détaillée des propriétés de
+la suite.</p>
+<p>Une autre méthode consiste à utiliser l’expression binaire et les
+propriétés du nombre de 1 dans cette écriture. En particulier, on peut
+montrer que pour tout entier <span class="math inline">\(n\)</span>, le
+terme <span class="math inline">\(t_n\)</span> est déterminé par la
+somme des bits de l’écriture binaire de <span
+class="math inline">\(n\)</span>. Cette propriété permet de démontrer
+que la suite est cubique libre en utilisant des arguments combinatoires
+et des techniques de comptage.</p>
+<p>En conclusion, la suite <span class="math inline">\(t_n\)</span> ne
+contient pas de carrés, ce qui prouve le théorème de Thue. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La constante de Prouhet-Thue-Morse possède plusieurs propriétés
+intéressantes, que nous allons énumérer et démontrer.</p>
+<ol>
+<li><p>La suite <span class="math inline">\(t_n\)</span> est périodique
+avec une période de 2. Cela signifie que pour tout entier naturel <span
+class="math inline">\(n\)</span>, on a : <span
+class="math display">\[\begin{equation}
+        t_{n+2} = t_n.
+\end{equation}\]</span></p></li>
+<li><p>La suite <span class="math inline">\(t_n\)</span> est
+auto-similaire. Cela signifie que pour tout entier naturel <span
+class="math inline">\(n\)</span>, on a : <span
+class="math display">\[\begin{equation}
+        t_{2n} = t_n \quad \text{et} \quad t_{2n+1} = 1 - t_n.
+\end{equation}\]</span></p></li>
+<li><p>La suite <span class="math inline">\(t_n\)</span> est cubique
+libre. Cela signifie qu’il n’existe pas trois indices <span
+class="math inline">\(i\)</span>, <span
+class="math inline">\(j\)</span>, et <span
+class="math inline">\(k\)</span> tels que la sous-suite <span
+class="math inline">\(t_i, t_{i+1}, \ldots, t_{i+j-1}\)</span> soit
+identique à la sous-suite <span class="math inline">\(t_k, t_{k+1},
+\ldots, t_{k+j-1}\)</span>.</p></li>
+</ol>
+<p>Chacune de ces propriétés peut être démontrée en utilisant les
+définitions et les théorèmes précédents, ainsi que des techniques
+combinatoires et d’analyse des suites.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La constante de Prouhet-Thue-Morse est une suite binaire fascinante
+avec des applications dans divers domaines des mathématiques. Ses
+propriétés remarquables, telles que sa périodicité, son auto-similarité,
+et sa liberté cubique, en font un sujet d’étude riche et complexe. Les
+théorèmes et les preuves associés à cette constante offrent des
+perspectives intéressantes pour la recherche future dans le domaine des
+suites et des automates cellulaires.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

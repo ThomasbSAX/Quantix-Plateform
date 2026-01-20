@@ -1,0 +1,396 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complémentarité des solutions primales-duales</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complémentarité des solutions primales-duales</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La théorie de la complémentarité des solutions primales-duales émerge
+dans le cadre de l’optimisation mathématique, particulièrement en
+programmation linéaire et non-linéaire. Cette notion est cruciale pour
+comprendre les relations profondes entre les solutions d’un problème et
+celles de son dual. Historiquement, cette théorie a été développée pour
+résoudre des problèmes d’optimisation où les contraintes sont complexes
+et où les méthodes classiques peinent à fournir des solutions
+efficaces.</p>
+<p>La complémentarité des solutions primales-duales permet de
+caractériser les conditions sous lesquelles une solution optimale du
+problème primal est également optimale pour le problème dual, et vice
+versa. Cette propriété est indispensable dans de nombreux domaines
+appliqués, tels que l’économie, la finance, et l’ingénierie, où les
+problèmes d’optimisation sont omniprésents.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la complémentarité des solutions primales-duales, il
+est essentiel de définir les concepts fondamentaux de problème primal et
+dual.</p>
+<h2 class="unnumbered" id="problème-primal">Problème Primal</h2>
+<p>Considérons un problème d’optimisation sous forme standard : <span
+class="math display">\[\begin{equation}
+    \begin{aligned}
+        \min_{x \in \mathbb{R}^n} &amp; \quad f(x) \\
+        \text{subject to} &amp; \quad g_i(x) \leq 0, \quad i = 1, \dots,
+m \\
+        &amp; \quad h_j(x) = 0, \quad j = 1, \dots, p
+    \end{aligned}
+\end{equation}\]</span></p>
+<p>Ici, <span class="math inline">\(f : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> est la fonction objectif à minimiser, et <span
+class="math inline">\(g_i, h_j : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> sont les contraintes.</p>
+<h2 class="unnumbered" id="problème-dual">Problème Dual</h2>
+<p>Le problème dual associé au problème primal est défini comme suit :
+<span class="math display">\[\begin{equation}
+    \begin{aligned}
+        \max_{\lambda \in \mathbb{R}^m, \mu \in \mathbb{R}^p} &amp;
+\quad -f^*(-\lambda, -\mu) \\
+        \text{subject to} &amp; \quad \lambda_i \geq 0, \quad i = 1,
+\dots, m
+    \end{aligned}
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(f^* : \mathbb{R}^m \times \mathbb{R}^p
+\rightarrow \mathbb{R}\)</span> est la fonction conjuguée de <span
+class="math inline">\(f\)</span>.</p>
+<h2 class="unnumbered" id="complémentarité">Complémentarité</h2>
+<p>La complémentarité des solutions primales-duales se manifeste lorsque
+les conditions de KKT (Karush-Kuhn-Tucker) sont satisfaites. Ces
+conditions sont nécessaires et suffisantes pour l’optimalité dans les
+problèmes de programmation non-linéaire convexes.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(x^*\)</span> une solution candidate
+pour le problème primal et <span class="math inline">\((\lambda^*,
+\mu^*)\)</span> une solution candidate pour le problème dual. Les
+conditions de KKT sont :</p>
+<ol>
+<li><p><span class="math inline">\(g_i(x^*) \leq 0\)</span> pour tout
+<span class="math inline">\(i = 1, \dots, m\)</span></p></li>
+<li><p><span class="math inline">\(h_j(x^*) = 0\)</span> pour tout <span
+class="math inline">\(j = 1, \dots, p\)</span></p></li>
+<li><p><span class="math inline">\(\lambda_i^* \geq 0\)</span> pour tout
+<span class="math inline">\(i = 1, \dots, m\)</span></p></li>
+<li><p><span class="math inline">\(\lambda_i^* g_i(x^*) = 0\)</span>
+pour tout <span class="math inline">\(i = 1, \dots, m\)</span>
+(complémentarité)</p></li>
+<li><p><span class="math inline">\(\nabla f(x^*) + \sum_{i=1}^m
+\lambda_i^* \nabla g_i(x^*) + \sum_{j=1}^p \mu_j^* \nabla h_j(x^*) =
+0\)</span></p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-la-complémentarité">Théorème de
+la Complémentarité</h2>
+<p>Le théorème de la complémentarité est un résultat fondamental qui
+établit une relation entre les solutions primales et duales.</p>
+<div class="theorem">
+<p>Supposons que <span class="math inline">\(x^*\)</span> soit une
+solution optimale du problème primal et que <span
+class="math inline">\((\lambda^*, \mu^*)\)</span> soit une solution
+optimale du problème dual. Alors, les conditions de KKT sont
+satisfaites, c’est-à-dire :</p>
+<ol>
+<li><p><span class="math inline">\(g_i(x^*) \leq 0\)</span> pour tout
+<span class="math inline">\(i = 1, \dots, m\)</span></p></li>
+<li><p><span class="math inline">\(h_j(x^*) = 0\)</span> pour tout <span
+class="math inline">\(j = 1, \dots, p\)</span></p></li>
+<li><p><span class="math inline">\(\lambda_i^* \geq 0\)</span> pour tout
+<span class="math inline">\(i = 1, \dots, m\)</span></p></li>
+<li><p><span class="math inline">\(\lambda_i^* g_i(x^*) = 0\)</span>
+pour tout <span class="math inline">\(i = 1, \dots, m\)</span></p></li>
+<li><p><span class="math inline">\(\nabla f(x^*) + \sum_{i=1}^m
+\lambda_i^* \nabla g_i(x^*) + \sum_{j=1}^p \mu_j^* \nabla h_j(x^*) =
+0\)</span></p></li>
+</ol>
+</div>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-la-complémentarité">Preuve du Théorème de la
+Complémentarité</h2>
+<p>La preuve du théorème de la complémentarité repose sur les conditions
+d’optimalité et la théorie des multiplicateurs de Lagrange.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(x^*\)</span> une
+solution optimale du problème primal et <span
+class="math inline">\((\lambda^*, \mu^*)\)</span> une solution optimale
+du problème dual. Par définition de l’optimalité, nous avons : <span
+class="math display">\[\begin{equation}
+        f(x^*) = -f^*(-\lambda^*, -\mu^*)
+\end{equation}\]</span></p>
+<p>En utilisant la définition de la fonction conjuguée, nous obtenons :
+<span class="math display">\[\begin{equation}
+        f(x^*) + \langle -\lambda^*, x^* \rangle + \langle -\mu^*,
+h(x^*) \rangle = f^*(-\lambda^*, -\mu^*)
+\end{equation}\]</span></p>
+<p>En combinant ces deux équations, nous obtenons : <span
+class="math display">\[\begin{equation}
+        f(x^*) = -f^*(-\lambda^*, -\mu^*)
+\end{equation}\]</span></p>
+<p>Ce qui implique que : <span class="math display">\[\begin{equation}
+        f(x^*) + \langle -\lambda^*, x^* \rangle + \langle -\mu^*,
+h(x^*) \rangle = -f^*(-\lambda^*, -\mu^*)
+\end{equation}\]</span></p>
+<p>En utilisant la condition d’optimalité pour le problème dual, nous
+avons : <span class="math display">\[\begin{equation}
+        f^*(-\lambda^*, -\mu^*) = -f(x^*)
+\end{equation}\]</span></p>
+<p>Ce qui montre que les conditions de KKT sont satisfaites. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-de-dualité-forte">Propriété de
+Dualité Forte</h2>
+<p>La propriété de dualité forte est une conséquence directe du théorème
+de la complémentarité.</p>
+<div class="proposition">
+<p>Si le problème primal et le problème dual ont des solutions optimales
+<span class="math inline">\(x^*\)</span> et <span
+class="math inline">\((\lambda^*, \mu^*)\)</span> respectivement, alors
+les valeurs optimales des deux problèmes sont égales : <span
+class="math display">\[\begin{equation}
+        f(x^*) = -f^*(-\lambda^*, -\mu^*)
+\end{equation}\]</span></p>
+</div>
+<h2 class="unnumbered" id="preuve-de-la-dualité-forte">Preuve de la
+Dualité Forte</h2>
+<p>La preuve de la dualité forte repose sur les conditions de KKT et le
+théorème de la complémentarité.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(x^*\)</span> une
+solution optimale du problème primal et <span
+class="math inline">\((\lambda^*, \mu^*)\)</span> une solution optimale
+du problème dual. Par le théorème de la complémentarité, les conditions
+de KKT sont satisfaites. En particulier, nous avons : <span
+class="math display">\[\begin{equation}
+        f(x^*) = -f^*(-\lambda^*, -\mu^*)
+\end{equation}\]</span></p>
+<p>Ce qui montre que les valeurs optimales des deux problèmes sont
+égales. ◻</p>
+</div>
+<h2 class="unnumbered"
+id="corollaire-de-lexistence-des-multiplicateurs">Corollaire de
+l’Existence des Multiplicateurs</h2>
+<p>Le corollaire de l’existence des multiplicateurs est une conséquence
+directe du théorème de la complémentarité.</p>
+<div class="corollary">
+<p>Si le problème primal a une solution optimale <span
+class="math inline">\(x^*\)</span> et si les contraintes sont
+qualifiées, alors il existe des multiplicateurs de Lagrange <span
+class="math inline">\((\lambda^*, \mu^*)\)</span> tels que les
+conditions de KKT sont satisfaites.</p>
+</div>
+<h2 class="unnumbered"
+id="preuve-du-corollaire-de-lexistence-des-multiplicateurs">Preuve du
+Corollaire de l’Existence des Multiplicateurs</h2>
+<p>La preuve du corollaire de l’existence des multiplicateurs repose sur
+le théorème de la complémentarité et les conditions de qualification des
+contraintes.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(x^*\)</span> une
+solution optimale du problème primal et supposons que les contraintes
+sont qualifiées. Par le théorème de la complémentarité, il existe des
+multiplicateurs de Lagrange <span class="math inline">\((\lambda^*,
+\mu^*)\)</span> tels que les conditions de KKT sont satisfaites. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La théorie de la complémentarité des solutions primales-duales est un
+outil puissant pour l’analyse des problèmes d’optimisation. Elle permet
+de caractériser les conditions sous lesquelles une solution optimale du
+problème primal est également optimale pour le problème dual, et vice
+versa. Cette théorie trouve des applications dans de nombreux domaines,
+tels que l’économie, la finance, et l’ingénierie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

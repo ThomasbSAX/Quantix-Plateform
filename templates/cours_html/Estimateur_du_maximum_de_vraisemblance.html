@@ -1,0 +1,457 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Estimateur du Maximum de Vraisemblance : Théorie et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Estimateur du Maximum de Vraisemblance : Théorie et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’estimation statistique est un pilier fondamental de l’analyse des
+données, permettant d’inférer des propriétés inconnues à partir
+d’observations. Parmi les méthodes d’estimation, l’estimateur du maximum
+de vraisemblance (EMV) se distingue par son élégance mathématique et sa
+large applicabilité. Introduit initialement par R.A. Fisher dans les
+années 1920, l’EMV a révolutionné la statistique inférentielle en
+fournissant un cadre rigoureux pour estimer les paramètres de modèles
+probabilistes.</p>
+<p>L’idée sous-jacente à l’EMV est simple mais puissante : trouver les
+valeurs des paramètres qui maximisent la probabilité d’observer les
+données disponibles. Cette approche est particulièrement attractive car
+elle ne nécessite pas de suppositions a priori sur la distribution des
+données, si ce n’est que celle-ci est paramétrée par un ensemble de
+paramètres inconnus. L’EMV est donc à la fois flexible et robuste, ce
+qui explique son adoption dans des domaines aussi variés que la
+biologie, l’économie, et l’ingénierie.</p>
+<p>Dans cet article, nous explorerons les fondements théoriques de
+l’EMV, en commençant par ses définitions formelles avant d’aborder les
+théorèmes clés qui garantissent ses propriétés asymptotiques. Nous
+discuterons également des méthodes pratiques pour calculer l’EMV, ainsi
+que ses extensions et applications dans des contextes modernes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire l’estimateur du maximum de vraisemblance, considérons
+un échantillon aléatoire <span class="math inline">\(X_1, X_2, \ldots,
+X_n\)</span> de variables aléatoires indépendantes et identiquement
+distribuées (i.i.d.), chacune suivant une loi de probabilité <span
+class="math inline">\(P_\theta\)</span> paramétrée par un vecteur <span
+class="math inline">\(\theta \in \Theta\)</span>, où <span
+class="math inline">\(\Theta\)</span> est l’espace des paramètres.</p>
+<h2 id="fonction-de-vraisemblance">Fonction de Vraisemblance</h2>
+<p>La fonction de vraisemblance <span class="math inline">\(L(\theta;
+X_1, \ldots, X_n)\)</span> est définie comme la probabilité jointe
+d’observer les données <span class="math inline">\(X_1, \ldots,
+X_n\)</span> sous le modèle paramétré par <span
+class="math inline">\(\theta\)</span>. Pour des variables discrètes,
+cette fonction est donnée par :</p>
+<p><span class="math display">\[L(\theta; X_1, \ldots, X_n) =
+\prod_{i=1}^n P_\theta(X_i)\]</span></p>
+<p>Pour des variables continues, on utilise la densité de probabilité
+<span class="math inline">\(f_\theta\)</span> :</p>
+<p><span class="math display">\[L(\theta; X_1, \ldots, X_n) =
+\prod_{i=1}^n f_\theta(X_i)\]</span></p>
+<p>En pratique, il est souvent plus commode de travailler avec le
+logarithme de la fonction de vraisemblance, appelé score :</p>
+<p><span class="math display">\[\ell(\theta; X_1, \ldots, X_n) = \log
+L(\theta; X_1, \ldots, X_n)\]</span></p>
+<h2 id="estimateur-du-maximum-de-vraisemblance">Estimateur du Maximum de
+Vraisemblance</h2>
+<p>L’estimateur du maximum de vraisemblance <span
+class="math inline">\(\hat{\theta}_n\)</span> est défini comme la valeur
+de <span class="math inline">\(\theta\)</span> qui maximise la fonction
+de vraisemblance (ou le score) :</p>
+<p><span class="math display">\[\hat{\theta}_n = \argmax_{\theta \in
+\Theta} L(\theta; X_1, \ldots, X_n)\]</span></p>
+<p>De manière équivalente :</p>
+<p><span class="math display">\[\hat{\theta}_n = \argmax_{\theta \in
+\Theta} \ell(\theta; X_1, \ldots, X_n)\]</span></p>
+<p>En d’autres termes, <span
+class="math inline">\(\hat{\theta}_n\)</span> est le paramètre qui rend
+les données observées les plus probables sous le modèle considéré.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="consistance-de-lemv">Consistance de l’EMV</h2>
+<p>Un des résultats fondamentaux concernant l’EMV est sa consistance.
+Sous certaines conditions régulières, l’estimateur du maximum de
+vraisemblance converge vers le vrai paramètre <span
+class="math inline">\(\theta_0\)</span> lorsque la taille de
+l’échantillon tend vers l’infini.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, \ldots, X_n\)</span> un
+échantillon i.i.d. de variables aléatoires suivant une loi <span
+class="math inline">\(P_{\theta_0}\)</span>, et soit <span
+class="math inline">\(\hat{\theta}_n\)</span> l’EMV. Supposons que les
+conditions suivantes soient satisfaites :</p>
+<ol>
+<li><p>L’espace des paramètres <span
+class="math inline">\(\Theta\)</span> est compact.</p></li>
+<li><p>La fonction de vraisemblance <span
+class="math inline">\(L(\theta; X_1, \ldots, X_n)\)</span> est continue
+en <span class="math inline">\(\theta\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(\epsilon &gt; 0\)</span>,
+il existe un <span class="math inline">\(n_0\)</span> tel que pour tout
+<span class="math inline">\(n \geq n_0\)</span>, la probabilité que
+<span class="math inline">\(L(\theta; X_1, \ldots, X_n) &lt; L(\theta_0;
+X_1, \ldots, X_n) - \epsilon\)</span> tend vers zéro lorsque <span
+class="math inline">\(n \to \infty\)</span>.</p></li>
+</ol>
+<p>Alors, <span class="math inline">\(\hat{\theta}_n\)</span> converge
+en probabilité vers <span class="math inline">\(\theta_0\)</span>.</p>
+</div>
+<h2 id="efficacité-de-lemv">Efficacité de l’EMV</h2>
+<p>Un autre résultat important est que, sous certaines conditions, l’EMV
+atteint la borne de Cramér-Rao, ce qui signifie qu’il est
+asymptotiquement efficace.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, \ldots, X_n\)</span> un
+échantillon i.i.d. de variables aléatoires suivant une loi <span
+class="math inline">\(P_{\theta_0}\)</span>, et soit <span
+class="math inline">\(\hat{\theta}_n\)</span> l’EMV. Supposons que les
+conditions suivantes soient satisfaites :</p>
+<ol>
+<li><p>La fonction de vraisemblance <span
+class="math inline">\(L(\theta; X_1, \ldots, X_n)\)</span> est deux fois
+différentiable en <span class="math inline">\(\theta\)</span>.</p></li>
+<li><p>L’information de Fisher <span
+class="math inline">\(I(\theta_0)\)</span> est finie et strictement
+positive.</p></li>
+<li><p>L’EMV <span class="math inline">\(\hat{\theta}_n\)</span> est
+asymptotiquement normal, i.e., <span
+class="math inline">\(\sqrt{n}(\hat{\theta}_n - \theta_0)
+\xrightarrow{d} N(0, I(\theta_0)^{-1})\)</span>.</p></li>
+</ol>
+<p>Alors, l’EMV est asymptotiquement efficace.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-de-la-consistance-de-lemv">Preuve de la Consistance de
+l’EMV</h2>
+<p>Pour prouver la consistance de l’EMV, nous utilisons le théorème de
+la convergence dominée et les propriétés de la fonction de
+vraisemblance.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\theta_0\)</span> le
+vrai paramètre. Par définition, <span
+class="math inline">\(\hat{\theta}_n\)</span> maximise la fonction de
+vraisemblance :</p>
+<p><span class="math display">\[L(\hat{\theta}_n; X_1, \ldots, X_n) \geq
+L(\theta_0; X_1, \ldots, X_n)\]</span></p>
+<p>En prenant le logarithme des deux côtés :</p>
+<p><span class="math display">\[\ell(\hat{\theta}_n; X_1, \ldots, X_n)
+\geq \ell(\theta_0; X_1, \ldots, X_n)\]</span></p>
+<p>Nous voulons montrer que <span
+class="math inline">\(\hat{\theta}_n\)</span> converge en probabilité
+vers <span class="math inline">\(\theta_0\)</span>. Pour cela,
+considérons la différence :</p>
+<p><span class="math display">\[\ell(\hat{\theta}_n; X_1, \ldots, X_n) -
+\ell(\theta_0; X_1, \ldots, X_n) \geq 0\]</span></p>
+<p>En utilisant le développement de Taylor du score autour de <span
+class="math inline">\(\theta_0\)</span>, nous avons :</p>
+<p><span class="math display">\[\ell(\hat{\theta}_n; X_1, \ldots, X_n) -
+\ell(\theta_0; X_1, \ldots, X_n) = (\hat{\theta}_n - \theta_0)^T \nabla
+\ell(\theta_0; X_1, \ldots, X_n) + o_P(1)\]</span></p>
+<p>où <span class="math inline">\(\nabla \ell(\theta_0; X_1, \ldots,
+X_n)\)</span> est le gradient du score évalué en <span
+class="math inline">\(\theta_0\)</span>. Par le théorème central-limite,
+nous savons que :</p>
+<p><span class="math display">\[\nabla \ell(\theta_0; X_1, \ldots, X_n)
+= \sum_{i=1}^n \nabla \log f_{\theta_0}(X_i)\]</span></p>
+<p>est asymptotiquement normal avec moyenne zéro et matrice de
+covariance <span class="math inline">\(I(\theta_0)\)</span>. Par
+conséquent, pour tout <span class="math inline">\(\epsilon &gt;
+0\)</span>, il existe un <span class="math inline">\(n_0\)</span> tel
+que pour tout <span class="math inline">\(n \geq n_0\)</span>, la
+probabilité que <span class="math inline">\((\hat{\theta}_n -
+\theta_0)^T \nabla \ell(\theta_0; X_1, \ldots, X_n) &lt;
+-\epsilon\)</span> tend vers zéro lorsque <span class="math inline">\(n
+\to \infty\)</span>. Cela prouve que <span
+class="math inline">\(\hat{\theta}_n\)</span> converge en probabilité
+vers <span class="math inline">\(\theta_0\)</span>. ◻</p>
+</div>
+<h2 id="preuve-de-lefficacité-de-lemv">Preuve de l’Efficacité de
+l’EMV</h2>
+<p>Pour prouver que l’EMV est asymptotiquement efficace, nous utilisons
+le développement de Taylor du score et les propriétés de l’information
+de Fisher.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\theta_0\)</span> le
+vrai paramètre. Nous voulons montrer que l’EMV atteint la borne de
+Cramér-Rao, c’est-à-dire que :</p>
+<p><span class="math display">\[\lim_{n \to \infty} n
+\text{Var}(\hat{\theta}_n) = I(\theta_0)^{-1}\]</span></p>
+<p>Par le théorème central-limite, nous savons que :</p>
+<p><span class="math display">\[\sqrt{n}(\hat{\theta}_n - \theta_0)
+\xrightarrow{d} N(0, I(\theta_0)^{-1})\]</span></p>
+<p>En utilisant le développement de Taylor du score autour de <span
+class="math inline">\(\theta_0\)</span>, nous avons :</p>
+<p><span class="math display">\[\nabla \ell(\hat{\theta}_n; X_1, \ldots,
+X_n) = \nabla \ell(\theta_0; X_1, \ldots, X_n) + H(\theta^*; X_1,
+\ldots, X_n)(\hat{\theta}_n - \theta_0)\]</span></p>
+<p>où <span class="math inline">\(H(\theta^*; X_1, \ldots, X_n)\)</span>
+est la matrice hessienne du score évaluée en un point <span
+class="math inline">\(\theta^*\)</span> entre <span
+class="math inline">\(\hat{\theta}_n\)</span> et <span
+class="math inline">\(\theta_0\)</span>. En prenant l’espérance
+conditionnelle, nous avons :</p>
+<p><span class="math display">\[E[\nabla \ell(\hat{\theta}_n; X_1,
+\ldots, X_n) | X_1, \ldots, X_n] = 0\]</span></p>
+<p>ce qui implique que :</p>
+<p><span class="math display">\[H(\theta^*; X_1, \ldots,
+X_n)(\hat{\theta}_n - \theta_0) = -\nabla \ell(\theta_0; X_1, \ldots,
+X_n)\]</span></p>
+<p>En multipliant les deux côtés par <span
+class="math inline">\((\hat{\theta}_n - \theta_0)^T\)</span>, nous
+obtenons :</p>
+<p><span class="math display">\[(\hat{\theta}_n - \theta_0)^T
+H(\theta^*; X_1, \ldots, X_n)(\hat{\theta}_n - \theta_0) =
+-(\hat{\theta}_n - \theta_0)^T \nabla \ell(\theta_0; X_1, \ldots,
+X_n)\]</span></p>
+<p>En divisant par <span class="math inline">\(n\)</span> et en prenant
+la limite lorsque <span class="math inline">\(n \to \infty\)</span>,
+nous avons :</p>
+<p><span class="math display">\[\lim_{n \to \infty} (\hat{\theta}_n -
+\theta_0)^T H(\theta^*; X_1, \ldots, X_n)(\hat{\theta}_n - \theta_0)/n =
+0\]</span></p>
+<p>ce qui prouve que l’EMV atteint la borne de Cramér-Rao. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-lemv-sous-modèles-exponentiels">Propriété de l’EMV
+sous Modèles Exponentiels</h2>
+<p>L’EMV possède des propriétés particulièrement favorables sous les
+modèles exponentiels. Considérons un modèle exponentiel de la forme
+:</p>
+<p><span class="math display">\[f_\theta(x) = h(x)
+\exp\left(\sum_{i=1}^k \eta_i(\theta) T_i(x) -
+A(\theta)\right)\]</span></p>
+<p>où <span class="math inline">\(h\)</span>, <span
+class="math inline">\(\eta_i\)</span>, et <span
+class="math inline">\(A\)</span> sont des fonctions connues.</p>
+<div class="proposition">
+<p>Sous un modèle exponentiel, l’EMV est donné par :</p>
+<p><span class="math display">\[\hat{\theta}_n = \argmax_{\theta \in
+\Theta} \sum_{i=1}^k \eta_i(\theta) \bar{T}_i\]</span></p>
+<p>où <span class="math inline">\(\bar{T}_i = \frac{1}{n} \sum_{j=1}^n
+T_i(X_j)\)</span>.</p>
+</div>
+<h2
+id="propriété-de-lemv-sous-modèles-linéaires-généralisés-glm">Propriété
+de l’EMV sous Modèles Linéaires Généralisés (GLM)</h2>
+<p>Les modèles linéaires généralisés (GLM) sont une extension des
+modèles exponentiels qui incluent les régressions logistique et de
+Poisson. Sous un GLM, l’EMV peut être calculé en résolvant une équation
+de score.</p>
+<div class="proposition">
+<p>Sous un GLM, l’EMV <span class="math inline">\(\hat{\beta}_n\)</span>
+satisfait l’équation de score :</p>
+<p><span class="math display">\[\sum_{i=1}^n (y_i - \mu_i) x_i =
+0\]</span></p>
+<p>où <span class="math inline">\(\mu_i = E[y_i | x_i]\)</span>.</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’estimateur du maximum de vraisemblance est une méthode puissante et
+flexible pour estimer les paramètres d’un modèle probabiliste. Ses
+propriétés théoriques, telles que la consistance et l’efficacité
+asymptotique, en font un outil indispensable dans l’analyse statistique.
+De plus, ses applications pratiques sont vastes, allant des modèles
+exponentiels aux modèles linéaires généralisés.</p>
+<p>Dans cet article, nous avons exploré les fondements théoriques de
+l’EMV, en fournissant des preuves détaillées de ses propriétés clés.
+Nous avons également discuté de ses applications dans divers contextes,
+soulignant son importance en statistique inférentielle. Pour les
+chercheurs et praticiens, l’EMV reste un sujet d’étude riche et
+prometteur, avec de nombreuses extensions et généralisations encore à
+explorer.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

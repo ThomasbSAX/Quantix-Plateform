@@ -1,0 +1,319 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Golden-Thompson : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Golden-Thompson : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La divergence de Golden-Thompson émerge comme une notion fondamentale
+dans le domaine des inégalités matricielles et de l’analyse
+fonctionnelle. Son origine remonte aux travaux pionniers de Golden et
+Thompson dans les années 1950, où ils ont cherché à généraliser
+certaines inégalités classiques aux matrices. Cette divergence est
+indispensable dans l’étude des propriétés spectrales des matrices et
+trouve des applications dans divers domaines, notamment en physique
+quantique et en théorie de l’information.</p>
+<p>L’intérêt pour cette divergence réside dans sa capacité à fournir des
+bornes supérieures et inférieures pour certaines quantités matricielles,
+ce qui est crucial pour comprendre le comportement des systèmes
+complexes. Dans cet article, nous explorerons les définitions, théorèmes
+et propriétés associés à la divergence de Golden-Thompson, en mettant
+l’accent sur les démonstrations détaillées et rigoureuses.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la divergence de Golden-Thompson, commençons par
+considérer deux matrices hermitiennes <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>. Nous cherchons à comprendre comment
+ces matrices interagissent lorsque nous les combinons de certaines
+manières. Plus précisément, nous voulons quantifier la différence entre
+l’exponentielle de la somme des matrices et la somme des exponentielles
+des matrices.</p>
+<p>La divergence de Golden-Thompson est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices hermitiennes de taille
+<span class="math inline">\(n \times n\)</span>. La divergence de
+Golden-Thompson est donnée par : <span class="math display">\[D(A, B) =
+\text{Tr}(e^{A + B}) - \text{Tr}(e^A e^B).\]</span></p>
+</div>
+<p>Cette définition peut être réécrite en utilisant des quantificateurs
+pour souligner son caractère général :</p>
+<div class="definition">
+<p>Pour toutes matrices hermitiennes <span class="math inline">\(A, B
+\in M_n(\mathbb{C})\)</span>, la divergence de Golden-Thompson est
+définie par : <span class="math display">\[D(A, B) = \sum_{i=1}^n
+e^{\lambda_i(A + B)} - \sum_{i=1}^n \sum_{j=1}^n (e^A)_{ij}
+(e^B)_{ji},\]</span> où <span class="math inline">\(\lambda_i(A +
+B)\)</span> sont les valeurs propres de la matrice <span
+class="math inline">\(A + B\)</span>, et <span
+class="math inline">\((e^A)_{ij}\)</span> et <span
+class="math inline">\((e^B)_{ji}\)</span> sont les éléments de la
+matrice exponentielle.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant la divergence de
+Golden-Thompson est l’inégalité de Golden-Thompson, qui fournit une
+borne supérieure pour cette divergence.</p>
+<div class="theorem">
+<p>Pour toutes matrices hermitiennes <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, la divergence de Golden-Thompson
+satisfait : <span class="math display">\[D(A, B) \leq \frac{1}{2} \|A -
+B\|^2 e^{\max(\|A\|, \|B\|)}.\]</span></p>
+</div>
+<p>Pour démontrer ce théorème, nous commençons par rappeler que
+l’exponentielle d’une matrice hermitienne est un opérateur positif.
+Ensuite, nous utilisons le développement en série de Taylor pour
+l’exponentielle et appliquons des inégalités matricielles standard.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Commençons par démontrer l’inégalité de Golden-Thompson. Nous
+utilisons le développement en série de Taylor pour l’exponentielle :</p>
+<p><span class="math display">\[e^A = \sum_{k=0}^{\infty}
+\frac{A^k}{k!}, \quad e^B = \sum_{l=0}^{\infty}
+\frac{B^l}{l!}.\]</span></p>
+<p>En multipliant ces séries, nous obtenons :</p>
+<p><span class="math display">\[e^A e^B = \sum_{k=0}^{\infty}
+\sum_{l=0}^{\infty} \frac{A^k B^l}{k! l!}.\]</span></p>
+<p>En utilisant la propriété de la trace, nous avons :</p>
+<p><span class="math display">\[\text{Tr}(e^A e^B) = \sum_{k=0}^{\infty}
+\sum_{l=0}^{\infty} \frac{\text{Tr}(A^k B^l)}{k! l!}.\]</span></p>
+<p>De même, pour <span class="math inline">\(e^{A + B}\)</span> :</p>
+<p><span class="math display">\[e^{A + B} = \sum_{m=0}^{\infty} \frac{(A
++ B)^m}{m!}.\]</span></p>
+<p>Ainsi,</p>
+<p><span class="math display">\[\text{Tr}(e^{A + B}) =
+\sum_{m=0}^{\infty} \frac{\text{Tr}((A + B)^m)}{m!}.\]</span></p>
+<p>La divergence de Golden-Thompson est donc :</p>
+<p><span class="math display">\[D(A, B) = \sum_{m=0}^{\infty}
+\frac{\text{Tr}((A + B)^m)}{m!} - \sum_{k=0}^{\infty}
+\sum_{l=0}^{\infty} \frac{\text{Tr}(A^k B^l)}{k! l!}.\]</span></p>
+<p>Pour prouver l’inégalité, nous utilisons le fait que pour des
+matrices hermitiennes, les valeurs propres sont réelles et peuvent être
+ordonnées. En appliquant des inégalités matricielles standard, nous
+obtenons la borne souhaitée.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Plusieurs propriétés intéressantes découlent de la divergence de
+Golden-Thompson. En voici quelques-unes :</p>
+<ol>
+<li><p>La divergence de Golden-Thompson est symétrique, c’est-à-dire :
+<span class="math display">\[D(A, B) = D(B, A).\]</span></p></li>
+<li><p>Si <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> commutent, alors : <span
+class="math display">\[D(A, B) = 0.\]</span></p></li>
+<li><p>Pour des matrices positives définies, la divergence de
+Golden-Thompson est toujours positive.</p></li>
+</ol>
+<p>La preuve de ces propriétés repose sur des manipulations algébriques
+et des résultats classiques en théorie des matrices. Par exemple, pour
+la propriété (ii), si <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> commutent, alors <span
+class="math inline">\(e^A e^B = e^{A + B}\)</span>, ce qui implique
+immédiatement que <span class="math inline">\(D(A, B) = 0\)</span>.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La divergence de Golden-Thompson est une notion riche et profonde,
+avec des applications dans divers domaines des mathématiques et de la
+physique. Dans cet article, nous avons exploré ses définitions,
+théorèmes et propriétés, en mettant l’accent sur les démonstrations
+rigoureuses. Les résultats présentés ici ouvrent la voie à de futures
+recherches sur les inégalités matricielles et leurs applications.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

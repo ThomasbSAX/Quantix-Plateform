@@ -1,0 +1,412 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La Distance de Embedding Cosine : Une Approche Géométrique pour la Similarité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La Distance de Embedding Cosine : Une Approche
+Géométrique pour la Similarité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’émergence des données massives et complexes a rendu indispensable
+le développement de méthodes efficaces pour mesurer la similarité entre
+vecteurs dans des espaces de haute dimension. Parmi ces méthodes,
+l’embedding cosinus se distingue par sa capacité à capturer les
+relations angulaires entre vecteurs, offrant ainsi une mesure de
+similarité robuste et interprétable.</p>
+<p>L’origine de cette notion remonte aux travaux pionniers en analyse
+des données et en traitement du signal, où la nécessité de comparer des
+vecteurs dans des espaces de grande dimension s’est imposée. L’embedding
+cosinus trouve ses racines dans le produit scalaire, une opération
+fondamentale en algèbre linéaire, qui permet de mesurer l’angle entre
+deux vecteurs. En normalisant ce produit scalaire, on obtient une mesure
+de similarité qui est indépendante de la magnitude des vecteurs, ce qui
+est particulièrement utile dans les applications où l’échelle des
+données n’est pas pertinente.</p>
+<p>L’embedding cosinus est indispensable dans de nombreux domaines, tels
+que le traitement du langage naturel, la vision par ordinateur et
+l’apprentissage automatique. Il permet de comparer des embeddings de
+mots, d’images ou de toute autre entité représentée par des vecteurs
+dans un espace de haute dimension. Cette mesure de similarité est
+particulièrement efficace pour capturer les relations sémantiques entre
+les entités, ce qui en fait un outil précieux pour les tâches de
+classification, de regroupement et de recherche d’informations.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’embedding cosinus, il est essentiel de définir
+d’abord le produit scalaire et la norme d’un vecteur. Le produit
+scalaire de deux vecteurs <span
+class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> dans un espace euclidien est
+une opération qui prend en compte la longueur des vecteurs et l’angle
+entre eux. La norme d’un vecteur est une mesure de sa longueur.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(\mathbf{u} = (u_1, u_2, \ldots,
+u_n)\)</span> et <span class="math inline">\(\mathbf{v} = (v_1, v_2,
+\ldots, v_n)\)</span> deux vecteurs dans <span
+class="math inline">\(\mathbb{R}^n\)</span>. Le produit scalaire de
+<span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> est défini par : <span
+class="math display">\[\mathbf{u} \cdot \mathbf{v} = \sum_{i=1}^n u_i
+v_i\]</span></p>
+</div>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathbf{u} = (u_1, u_2, \ldots,
+u_n)\)</span> un vecteur dans <span
+class="math inline">\(\mathbb{R}^n\)</span>. La norme de <span
+class="math inline">\(\mathbf{u}\)</span> est définie par : <span
+class="math display">\[\|\mathbf{u}\| = \sqrt{\sum_{i=1}^n
+u_i^2}\]</span></p>
+</div>
+<p>L’embedding cosinus est une mesure de similarité qui utilise le
+produit scalaire et les normes des vecteurs pour capturer l’angle entre
+eux. Elle est définie comme le produit scalaire des vecteurs
+normalisés.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(\mathbf{u} = (u_1, u_2, \ldots,
+u_n)\)</span> et <span class="math inline">\(\mathbf{v} = (v_1, v_2,
+\ldots, v_n)\)</span> deux vecteurs dans <span
+class="math inline">\(\mathbb{R}^n\)</span>. L’embedding cosinus de
+<span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> est défini par : <span
+class="math display">\[\cos(\theta) = \frac{\mathbf{u} \cdot
+\mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|}\]</span> où <span
+class="math inline">\(\theta\)</span> est l’angle entre les vecteurs
+<span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’embedding cosinus possède plusieurs propriétés intéressantes qui en
+font une mesure de similarité efficace. L’une des propriétés les plus
+importantes est que l’embedding cosinus est invariant sous la
+normalisation des vecteurs.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\mathbf{u} = (u_1, u_2, \ldots,
+u_n)\)</span> et <span class="math inline">\(\mathbf{v} = (v_1, v_2,
+\ldots, v_n)\)</span> deux vecteurs dans <span
+class="math inline">\(\mathbb{R}^n\)</span>. Si <span
+class="math inline">\(\mathbf{u}&#39; =
+\frac{\mathbf{u}}{\|\mathbf{u}\|}\)</span> et <span
+class="math inline">\(\mathbf{v}&#39; =
+\frac{\mathbf{v}}{\|\mathbf{v}\|}\)</span>, alors : <span
+class="math display">\[\cos(\theta) = \frac{\mathbf{u} \cdot
+\mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|} = \frac{\mathbf{u}&#39; \cdot
+\mathbf{v}&#39;}{\|\mathbf{u}&#39;\| \|\mathbf{v}&#39;\|} =
+\mathbf{u}&#39; \cdot \mathbf{v}&#39;\]</span></p>
+</div>
+<p>Une autre propriété importante de l’embedding cosinus est qu’il peut
+être utilisé pour mesurer la similarité entre des vecteurs dans des
+espaces de haute dimension. Cette propriété est particulièrement utile
+dans les applications où les données sont représentées par des vecteurs
+de haute dimension.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\mathbf{u} = (u_1, u_2, \ldots,
+u_n)\)</span> et <span class="math inline">\(\mathbf{v} = (v_1, v_2,
+\ldots, v_n)\)</span> deux vecteurs dans <span
+class="math inline">\(\mathbb{R}^n\)</span>. Si <span
+class="math inline">\(n\)</span> est grand, alors l’embedding cosinus de
+<span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> est une mesure efficace de
+leur similarité.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver l’invariance sous normalisation de l’embedding cosinus,
+nous commençons par définir les vecteurs normalisés <span
+class="math inline">\(\mathbf{u}&#39;\)</span> et <span
+class="math inline">\(\mathbf{v}&#39;\)</span>. Ensuite, nous calculons
+le produit scalaire de ces vecteurs normalisés et montrons qu’il est
+égal à l’embedding cosinus des vecteurs originaux.</p>
+<div class="proof">
+<p><em>Preuve de l’Invariance sous Normalisation.</em> Soient <span
+class="math inline">\(\mathbf{u} = (u_1, u_2, \ldots, u_n)\)</span> et
+<span class="math inline">\(\mathbf{v} = (v_1, v_2, \ldots,
+v_n)\)</span> deux vecteurs dans <span
+class="math inline">\(\mathbb{R}^n\)</span>. Nous définissons les
+vecteurs normalisés : <span class="math display">\[\mathbf{u}&#39; =
+\frac{\mathbf{u}}{\|\mathbf{u}\|}, \quad \mathbf{v}&#39; =
+\frac{\mathbf{v}}{\|\mathbf{v}\|}\]</span> Le produit scalaire des
+vecteurs normalisés est : <span class="math display">\[\mathbf{u}&#39;
+\cdot \mathbf{v}&#39; = \frac{\mathbf{u} \cdot
+\mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|}\]</span> Puisque <span
+class="math inline">\(\|\mathbf{u}&#39;\| = 1\)</span> et <span
+class="math inline">\(\|\mathbf{v}&#39;\| = 1\)</span>, nous avons :
+<span class="math display">\[\mathbf{u}&#39; \cdot \mathbf{v}&#39; =
+\frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|} =
+\cos(\theta)\]</span> Ainsi, l’embedding cosinus est invariant sous la
+normalisation des vecteurs. ◻</p>
+</div>
+<p>Pour prouver que l’embedding cosinus est une mesure efficace de
+similarité dans les espaces de haute dimension, nous utilisons le fait
+que l’embedding cosinus est une mesure de l’angle entre les vecteurs.
+Dans les espaces de haute dimension, les angles entre les vecteurs sont
+généralement bien distribués, ce qui permet à l’embedding cosinus de
+capturer efficacement les relations de similarité.</p>
+<div class="proof">
+<p><em>Preuve de la Similarité dans les Espaces de Haute Dimension.</em>
+Soient <span class="math inline">\(\mathbf{u} = (u_1, u_2, \ldots,
+u_n)\)</span> et <span class="math inline">\(\mathbf{v} = (v_1, v_2,
+\ldots, v_n)\)</span> deux vecteurs dans <span
+class="math inline">\(\mathbb{R}^n\)</span>. Si <span
+class="math inline">\(n\)</span> est grand, alors les angles entre les
+vecteurs sont généralement bien distribués. Par conséquent, l’embedding
+cosinus de <span class="math inline">\(\mathbf{u}\)</span> et <span
+class="math inline">\(\mathbf{v}\)</span> est une mesure efficace de
+leur similarité. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’embedding cosinus possède plusieurs propriétés intéressantes qui en
+font une mesure de similarité efficace. Nous listons ici quelques-unes
+de ces propriétés et fournissons des preuves détaillées pour chacune
+d’elles.</p>
+<ol>
+<li><p>L’embedding cosinus est une mesure de similarité comprise entre
+-1 et 1. Plus l’embedding cosinus est proche de 1, plus les vecteurs
+sont similaires.</p>
+<div class="proof">
+<p><em>Preuve.</em> Soient <span class="math inline">\(\mathbf{u} =
+(u_1, u_2, \ldots, u_n)\)</span> et <span
+class="math inline">\(\mathbf{v} = (v_1, v_2, \ldots, v_n)\)</span> deux
+vecteurs dans <span class="math inline">\(\mathbb{R}^n\)</span>.
+L’embedding cosinus de <span class="math inline">\(\mathbf{u}\)</span>
+et <span class="math inline">\(\mathbf{v}\)</span> est défini par :
+<span class="math display">\[\cos(\theta) = \frac{\mathbf{u} \cdot
+\mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|}\]</span> Puisque le produit
+scalaire <span class="math inline">\(\mathbf{u} \cdot
+\mathbf{v}\)</span> est compris entre <span
+class="math inline">\(-\|\mathbf{u}\| \|\mathbf{v}\|\)</span> et <span
+class="math inline">\(\|\mathbf{u}\| \|\mathbf{v}\|\)</span>,
+l’embedding cosinus est compris entre -1 et 1. ◻</p>
+</div></li>
+<li><p>L’embedding cosinus est invariant sous la multiplication des
+vecteurs par un scalaire positif.</p>
+<div class="proof">
+<p><em>Preuve.</em> Soient <span class="math inline">\(\mathbf{u} =
+(u_1, u_2, \ldots, u_n)\)</span> et <span
+class="math inline">\(\mathbf{v} = (v_1, v_2, \ldots, v_n)\)</span> deux
+vecteurs dans <span class="math inline">\(\mathbb{R}^n\)</span>, et soit
+<span class="math inline">\(c &gt; 0\)</span> un scalaire positif. Nous
+avons : <span class="math display">\[\cos(\theta) = \frac{\mathbf{u}
+\cdot \mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|} = \frac{c\mathbf{u}
+\cdot c\mathbf{v}}{c\|\mathbf{u}\| \cdot c\|\mathbf{v}\|} =
+\frac{\mathbf{u} \cdot \mathbf{v}}{\|\mathbf{u}\|
+\|\mathbf{v}\|}\]</span> Ainsi, l’embedding cosinus est invariant sous
+la multiplication des vecteurs par un scalaire positif. ◻</p>
+</div></li>
+<li><p>L’embedding cosinus est une mesure de similarité symétrique.</p>
+<div class="proof">
+<p><em>Preuve.</em> Soient <span class="math inline">\(\mathbf{u} =
+(u_1, u_2, \ldots, u_n)\)</span> et <span
+class="math inline">\(\mathbf{v} = (v_1, v_2, \ldots, v_n)\)</span> deux
+vecteurs dans <span class="math inline">\(\mathbb{R}^n\)</span>. Nous
+avons : <span class="math display">\[\cos(\theta) = \frac{\mathbf{u}
+\cdot \mathbf{v}}{\|\mathbf{u}\| \|\mathbf{v}\|} = \frac{\mathbf{v}
+\cdot \mathbf{u}}{\|\mathbf{v}\| \|\mathbf{u}\|} = \cos(\theta)\]</span>
+Ainsi, l’embedding cosinus est une mesure de similarité
+symétrique. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’embedding cosinus est une mesure de similarité puissante et
+efficace pour comparer des vecteurs dans des espaces de haute dimension.
+Ses propriétés d’invariance sous normalisation et de symétrie en font un
+outil précieux pour les tâches de classification, de regroupement et de
+recherche d’informations. Les preuves détaillées fournies dans cet
+article démontrent la robustesse et l’efficacité de cette mesure de
+similarité.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,333 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Power Divergence (Cressie-Read)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Power Divergence (Cressie-Read)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La divergence de Power Divergence, introduite par Cressie et Read en
+1984, est une mesure de la distance entre deux distributions de
+probabilité. Elle généralise plusieurs divergences bien connues, telles
+que la divergence de Kullback-Leibler et le chi-carré. Cette mesure est
+particulièrement utile en statistique pour comparer des modèles de
+distribution et évaluer leur adéquation aux données observées.</p>
+<p>La divergence de Power Divergence émerge comme une solution flexible
+pour mesurer la distance entre des distributions, permettant de capturer
+différentes caractéristiques selon le paramètre de puissance choisi.
+Elle est indispensable dans les contextes où l’on souhaite une mesure
+adaptable et robuste, capable de s’ajuster aux spécificités des données
+analysées.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la divergence de Power Divergence, commençons par
+comprendre ce que nous cherchons à mesurer. Supposons que nous avons
+deux distributions de probabilité, <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>, définies sur un ensemble fini ou
+dénombrable. Nous voulons quantifier la distance entre ces deux
+distributions.</p>
+<p>La divergence de Power Divergence est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(P = (p_1, p_2, \ldots,
+p_n)\)</span> et <span class="math inline">\(Q = (q_1, q_2, \ldots,
+q_n)\)</span> deux distributions de probabilité discrètes. La divergence
+de Power Divergence d’ordre <span class="math inline">\(\lambda\)</span>
+est définie par : <span class="math display">\[D_{\lambda}(P, Q) =
+\frac{1}{\lambda(\lambda - 1)} \sum_{i=1}^n q_i \left[ \left(
+\frac{p_i}{q_i} \right)^{\lambda} - 1 \right], \quad \lambda \in
+\mathbb{R} \setminus \{0, 1\}.\]</span></p>
+</div>
+<p>Pour les cas particuliers <span class="math inline">\(\lambda =
+0\)</span> et <span class="math inline">\(\lambda = 1\)</span>, nous
+avons les limites suivantes :</p>
+<div class="definition">
+<p>Pour <span class="math inline">\(\lambda = 0\)</span>, la divergence
+de Power Divergence est définie par : <span
+class="math display">\[D_{0}(P, Q) = \lim_{\lambda \to 0} D_{\lambda}(P,
+Q) = \sum_{i=1}^n p_i \log \left( \frac{p_i}{q_i} \right),\]</span> qui
+correspond à la divergence de Kullback-Leibler.</p>
+</div>
+<div class="definition">
+<p>Pour <span class="math inline">\(\lambda = 1\)</span>, la divergence
+de Power Divergence est définie par : <span
+class="math display">\[D_{1}(P, Q) = \lim_{\lambda \to 1} D_{\lambda}(P,
+Q) = -\sum_{i=1}^n p_i \log \left( \frac{q_i}{p_i} \right),\]</span> qui
+est également la divergence de Kullback-Leibler.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la divergence de Power Divergence
+est le suivant :</p>
+<div class="theorem">
+<p>Pour tout <span class="math inline">\(\lambda \in \mathbb{R}
+\setminus \{0, 1\}\)</span>, la fonction <span
+class="math inline">\(D_{\lambda}(P, Q)\)</span> est convexe en <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer la convexité, nous devons montrer que
+pour tout <span class="math inline">\(\theta \in [0, 1]\)</span> et pour
+toutes distributions <span class="math inline">\(P_1, P_2, Q_1,
+Q_2\)</span>, nous avons : <span
+class="math display">\[D_{\lambda}(\theta P_1 + (1 - \theta) P_2, \theta
+Q_1 + (1 - \theta) Q_2) \leq \theta D_{\lambda}(P_1, Q_1) + (1 - \theta)
+D_{\lambda}(P_2, Q_2).\]</span></p>
+<p>Commençons par développer le terme de gauche : <span
+class="math display">\[D_{\lambda}(\theta P_1 + (1 - \theta) P_2, \theta
+Q_1 + (1 - \theta) Q_2) = \frac{1}{\lambda(\lambda - 1)} \sum_{i=1}^n
+(\theta q_{1,i} + (1 - \theta) q_{2,i}) \left[ \left( \frac{\theta
+p_{1,i} + (1 - \theta) p_{2,i}}{\theta q_{1,i} + (1 - \theta) q_{2,i}}
+\right)^{\lambda} - 1 \right].\]</span></p>
+<p>En utilisant l’inégalité de Jensen pour la fonction <span
+class="math inline">\(f(x) = x^{\lambda}\)</span>, qui est convexe pour
+<span class="math inline">\(\lambda &gt; 1\)</span> ou concave pour
+<span class="math inline">\(\lambda &lt; 0\)</span>, nous obtenons :
+<span class="math display">\[\left( \frac{\theta p_{1,i} + (1 - \theta)
+p_{2,i}}{\theta q_{1,i} + (1 - \theta) q_{2,i}} \right)^{\lambda} \leq
+\theta \left( \frac{p_{1,i}}{q_{1,i}} \right)^{\lambda} + (1 - \theta)
+\left( \frac{p_{2,i}}{q_{2,i}} \right)^{\lambda}.\]</span></p>
+<p>En substituant cette inégalité dans l’expression précédente, nous
+obtenons : <span class="math display">\[D_{\lambda}(\theta P_1 + (1 -
+\theta) P_2, \theta Q_1 + (1 - \theta) Q_2) \leq
+\frac{1}{\lambda(\lambda - 1)} \sum_{i=1}^n (\theta q_{1,i} + (1 -
+\theta) q_{2,i}) \left[ \theta \left( \frac{p_{1,i}}{q_{1,i}}
+\right)^{\lambda} + (1 - \theta) \left( \frac{p_{2,i}}{q_{2,i}}
+\right)^{\lambda} - 1 \right].\]</span></p>
+<p>En distribuant les termes, nous avons : <span
+class="math display">\[D_{\lambda}(\theta P_1 + (1 - \theta) P_2, \theta
+Q_1 + (1 - \theta) Q_2) \leq \frac{1}{\lambda(\lambda - 1)} \left[
+\theta \sum_{i=1}^n q_{1,i} \left( \frac{p_{1,i}}{q_{1,i}}
+\right)^{\lambda} + (1 - \theta) \sum_{i=1}^n q_{2,i} \left(
+\frac{p_{2,i}}{q_{2,i}} \right)^{\lambda} - \sum_{i=1}^n (\theta q_{1,i}
++ (1 - \theta) q_{2,i}) \right].\]</span></p>
+<p>Enfin, en utilisant la normalisation des distributions <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>, nous obtenons : <span
+class="math display">\[D_{\lambda}(\theta P_1 + (1 - \theta) P_2, \theta
+Q_1 + (1 - \theta) Q_2) \leq \theta D_{\lambda}(P_1, Q_1) + (1 - \theta)
+D_{\lambda}(P_2, Q_2).\]</span></p>
+<p>Ceci prouve la convexité de <span
+class="math inline">\(D_{\lambda}(P, Q)\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La divergence de Power Divergence possède plusieurs propriétés
+intéressantes :</p>
+<ol>
+<li><p>Pour <span class="math inline">\(\lambda = 2\)</span>, la
+divergence de Power Divergence est proportionnelle au chi-carré : <span
+class="math display">\[D_{2}(P, Q) = \frac{1}{2} \sum_{i=1}^n \frac{(p_i
+- q_i)^2}{q_i}.\]</span></p></li>
+<li><p>Pour <span class="math inline">\(\lambda = -2\)</span>, la
+divergence de Power Divergence est proportionnelle à la distance de
+Hellinger : <span class="math display">\[D_{-2}(P, Q) = 2 \left(
+\sum_{i=1}^n (\sqrt{p_i} - \sqrt{q_i})^2 \right).\]</span></p></li>
+<li><p>La divergence de Power Divergence est invariante sous les
+transformations affines des distributions <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La divergence de Power Divergence offre une mesure flexible et
+puissante pour comparer des distributions de probabilité. Son
+adaptabilité grâce au paramètre <span
+class="math inline">\(\lambda\)</span> en fait un outil précieux dans de
+nombreuses applications statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

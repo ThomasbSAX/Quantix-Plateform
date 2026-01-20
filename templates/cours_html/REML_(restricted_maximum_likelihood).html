@@ -1,0 +1,360 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Restricted Maximum Likelihood (REML)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Restricted Maximum Likelihood (REML)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le Restricted Maximum Likelihood (REML), ou maximum de vraisemblance
+restreint, est une méthode d’estimation paramétrique introduite pour
+pallier les limitations de la méthode classique du maximum de
+vraisemblance (ML) dans le cadre des modèles linéaires mixtes.
+L’émergence de REML est motivée par la nécessité d’obtenir des
+estimateurs non biaisés pour les paramètres de variance dans ces
+modèles.</p>
+<p>Les modèles linéaires mixtes sont omniprésents en statistique
+appliquée, notamment en biologie, en économie et en sciences sociales.
+Ils permettent de modéliser des données hiérarchiques ou corrélées, où
+les observations peuvent être regroupées en clusters. Cependant,
+l’estimation des paramètres de variance dans ces modèles pose un défi
+majeur.</p>
+<p>La méthode du maximum de vraisemblance classique conduit à des
+estimateurs biaisés pour les paramètres de variance. REML a été
+développé pour résoudre ce problème en éliminant les paramètres fixes du
+modèle, ce qui permet d’obtenir des estimateurs non biaisés pour les
+paramètres de variance.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre REML, commençons par définir quelques concepts clés.
+Supposons que nous avons un modèle linéaire mixte de la forme suivante
+:</p>
+<p><span class="math display">\[\mathbf{y} =
+\mathbf{X}\boldsymbol{\beta} + \mathbf{Z}\boldsymbol{u} +
+\boldsymbol{\epsilon}\]</span></p>
+<p>où : - <span class="math inline">\(\mathbf{y}\)</span> est le vecteur
+des observations, - <span class="math inline">\(\mathbf{X}\)</span> et
+<span class="math inline">\(\mathbf{Z}\)</span> sont les matrices de
+conception pour les effets fixes et aléatoires, respectivement, - <span
+class="math inline">\(\boldsymbol{\beta}\)</span> est le vecteur des
+paramètres fixes, - <span class="math inline">\(\boldsymbol{u}\)</span>
+est le vecteur des effets aléatoires, supposé suivre une distribution
+normale multivariée <span class="math inline">\(\mathcal{N}(\mathbf{0},
+\mathbf{G})\)</span>, - <span
+class="math inline">\(\boldsymbol{\epsilon}\)</span> est le vecteur des
+erreurs, supposé suivre une distribution normale multivariée <span
+class="math inline">\(\mathcal{N}(\mathbf{0}, \mathbf{R})\)</span>.</p>
+<p>L’objectif de REML est d’estimer les paramètres de variance <span
+class="math inline">\(\mathbf{G}\)</span> et <span
+class="math inline">\(\mathbf{R}\)</span>. Pour ce faire, nous devons
+d’abord définir la fonction de vraisemblance restreinte.</p>
+<p>La fonction de vraisemblance restreinte est obtenue en éliminant les
+paramètres fixes <span class="math inline">\(\boldsymbol{\beta}\)</span>
+du modèle. Cela se fait en utilisant une transformation linéaire de
+<span class="math inline">\(\mathbf{y}\)</span>, notée <span
+class="math inline">\(\mathbf{K}\mathbf{y}\)</span>, où <span
+class="math inline">\(\mathbf{K}\)</span> est une matrice de projection
+orthogonale à <span class="math inline">\(\mathbf{X}\)</span>. La
+fonction de vraisemblance restreinte est alors définie comme :</p>
+<p><span class="math display">\[L_R(\boldsymbol{\theta}) =
+f_{\mathbf{K}\mathbf{y}}(\mathbf{K}\mathbf{y};
+\boldsymbol{\theta})\]</span></p>
+<p>où <span class="math inline">\(\boldsymbol{\theta}\)</span>
+représente les paramètres de variance à estimer.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le théorème central de REML est le suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{y}\)</span> un vecteur
+d’observations suivant un modèle linéaire mixte, et soit <span
+class="math inline">\(\mathbf{K}\)</span> une matrice de projection
+orthogonale à la matrice de conception des effets fixes <span
+class="math inline">\(\mathbf{X}\)</span>. Alors, l’estimateur REML des
+paramètres de variance <span
+class="math inline">\(\boldsymbol{\theta}\)</span> est obtenu en
+maximisant la fonction de vraisemblance restreinte <span
+class="math inline">\(L_R(\boldsymbol{\theta})\)</span>.</p>
+</div>
+<p>La preuve de ce théorème repose sur plusieurs lemmes et propriétés.
+Tout d’abord, nous avons besoin du lemme suivant :</p>
+<div class="lemma">
+<p>Soit <span class="math inline">\(\mathbf{X}\)</span> une matrice de
+conception des effets fixes et soit <span
+class="math inline">\(\mathbf{K}\)</span> une matrice de projection
+orthogonale à <span class="math inline">\(\mathbf{X}\)</span>. Alors, la
+distribution de <span
+class="math inline">\(\mathbf{K}\mathbf{y}\)</span> ne dépend pas des
+paramètres fixes <span
+class="math inline">\(\boldsymbol{\beta}\)</span>.</p>
+</div>
+<p>La preuve de ce lemme est une conséquence directe des propriétés des
+matrices de projection. En effet, <span
+class="math inline">\(\mathbf{K}\mathbf{y}\)</span> est une combinaison
+linéaire de <span class="math inline">\(\mathbf{y}\)</span> qui élimine
+les effets des paramètres fixes. Ainsi, la distribution de <span
+class="math inline">\(\mathbf{K}\mathbf{y}\)</span> ne dépend que des
+paramètres de variance.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de REML, nous devons montrer que
+l’estimateur obtenu en maximisant la fonction de vraisemblance
+restreinte est non biaisé pour les paramètres de variance. Cela se fait
+en utilisant le lemme de projection et les propriétés des modèles
+linéaires mixtes.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la fonction de vraisemblance restreinte
+<span class="math inline">\(L_R(\boldsymbol{\theta})\)</span>. En
+utilisant le lemme de projection, nous savons que la distribution de
+<span class="math inline">\(\mathbf{K}\mathbf{y}\)</span> ne dépend pas
+des paramètres fixes <span
+class="math inline">\(\boldsymbol{\beta}\)</span>. Par conséquent, la
+fonction de vraisemblance restreinte ne dépend que des paramètres de
+variance <span class="math inline">\(\boldsymbol{\theta}\)</span>.</p>
+<p>Pour maximiser <span
+class="math inline">\(L_R(\boldsymbol{\theta})\)</span>, nous pouvons
+utiliser des méthodes numériques standard, telles que l’algorithme de
+Fisher scoring ou la méthode de Newton-Raphson. L’estimateur obtenu en
+maximisant <span class="math inline">\(L_R(\boldsymbol{\theta})\)</span>
+est noté <span
+class="math inline">\(\hat{\boldsymbol{\theta}}_{REML}\)</span>.</p>
+<p>Pour montrer que <span
+class="math inline">\(\hat{\boldsymbol{\theta}}_{REML}\)</span> est non
+biaisé, nous devons démontrer que <span
+class="math inline">\(\mathbb{E}[\hat{\boldsymbol{\theta}}_{REML}] =
+\boldsymbol{\theta}\)</span>. Cela se fait en utilisant les propriétés
+des estimateurs du maximum de vraisemblance et en appliquant le lemme de
+projection. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>REML possède plusieurs propriétés importantes qui en font une méthode
+d’estimation préférable à la méthode classique du maximum de
+vraisemblance dans le cadre des modèles linéaires mixtes. Voici
+quelques-unes de ces propriétés :</p>
+<ol>
+<li><p><strong>Non-biais</strong> : L’estimateur REML est non biaisé
+pour les paramètres de variance. Cela signifie que <span
+class="math inline">\(\mathbb{E}[\hat{\boldsymbol{\theta}}_{REML}] =
+\boldsymbol{\theta}\)</span>.</p></li>
+<li><p><strong>Efficacité</strong> : Sous certaines conditions,
+l’estimateur REML est efficace, c’est-à-dire qu’il atteint la borne de
+Cramér-Rao.</p></li>
+<li><p><strong>Consistance</strong> : L’estimateur REML est consistant,
+ce qui signifie que <span
+class="math inline">\(\hat{\boldsymbol{\theta}}_{REML}\)</span> converge
+en probabilité vers <span
+class="math inline">\(\boldsymbol{\theta}\)</span> lorsque la taille de
+l’échantillon tend vers l’infini.</p></li>
+</ol>
+<p>La preuve de ces propriétés repose sur des résultats théoriques
+avancés en statistique, notamment les théorèmes de convergence et les
+inégalités de Cramér-Rao. Ces propriétés font de REML une méthode
+d’estimation robuste et fiable pour les modèles linéaires mixtes.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Restricted Maximum Likelihood (REML) est une méthode d’estimation
+paramétrique puissante et flexible pour les modèles linéaires mixtes. En
+éliminant les paramètres fixes du modèle, REML permet d’obtenir des
+estimateurs non biaisés pour les paramètres de variance. Les propriétés
+de non-biais, d’efficacité et de consistance font de REML une méthode
+préférable à la méthode classique du maximum de vraisemblance dans de
+nombreuses applications.</p>
+<p>Les développements futurs de REML pourraient inclure l’extension à
+des modèles plus complexes, tels que les modèles non linéaires mixtes ou
+les modèles à effets aléatoires hiérarchiques. Ces extensions
+ouvriraient de nouvelles perspectives pour l’analyse des données dans
+divers domaines scientifiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,346 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>F1 Score Loss: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">F1 Score Loss: A Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>The F1 score is a widely used metric in machine learning and
+information retrieval, particularly for binary classification tasks. It
+is the harmonic mean of precision and recall, providing a balanced
+measure of a model’s performance. The F1 score loss, therefore, is a
+natural extension that quantifies the cost associated with deviations
+from an optimal F1 score.</p>
+<p>The concept of F1 score loss emerges from the need to optimize
+classification models directly for the F1 metric. Traditional loss
+functions, such as cross-entropy, do not inherently account for
+precision and recall, leading to potential mismatches between the
+optimization objective and the evaluation metric. By introducing a loss
+function specifically tailored to the F1 score, we can align the
+optimization process more closely with the desired evaluation
+criteria.</p>
+<p>This notion is indispensable in scenarios where precision and recall
+are of paramount importance, such as medical diagnosis, fraud detection,
+and information retrieval. In these contexts, the F1 score provides a
+more nuanced understanding of model performance than accuracy alone.</p>
+<h1 id="définitions">Définitions</h1>
+<p>To understand the F1 score loss, we first need to define the
+components that constitute it: precision, recall, and the F1 score
+itself.</p>
+<h2 id="precision">Precision</h2>
+<p>Consider a binary classification problem where we have a set of true
+labels <span class="math inline">\(y_i \in \{0, 1\}\)</span> and
+predicted probabilities <span class="math inline">\(\hat{y}_i\)</span>.
+Precision measures the proportion of true positive predictions among all
+positive predictions.</p>
+<p>We seek a metric that captures the accuracy of positive predictions.
+Intuitively, this should be the ratio of correctly predicted positives
+to all predicted positives.</p>
+<p>Formally, precision <span class="math inline">\(P\)</span> is defined
+as: <span class="math display">\[P = \frac{\sum_{i=1}^n y_i \cdot
+\mathbb{I}(\hat{y}_i \geq 0.5)}{\sum_{i=1}^n \mathbb{I}(\hat{y}_i \geq
+0.5)}\]</span> where <span class="math inline">\(\mathbb{I}\)</span> is
+the indicator function.</p>
+<h2 id="recall">Recall</h2>
+<p>Recall, also known as sensitivity or true positive rate, measures the
+proportion of actual positives that are correctly identified by the
+model.</p>
+<p>We seek a metric that captures the ability of the model to identify
+all positive instances. Intuitively, this should be the ratio of
+correctly predicted positives to all actual positives.</p>
+<p>Formally, recall <span class="math inline">\(R\)</span> is defined
+as: <span class="math display">\[R = \frac{\sum_{i=1}^n y_i \cdot
+\mathbb{I}(\hat{y}_i \geq 0.5)}{\sum_{i=1}^n y_i}\]</span></p>
+<h2 id="f1-score">F1 Score</h2>
+<p>The F1 score is the harmonic mean of precision and recall, providing
+a single metric that balances both concerns.</p>
+<p>We seek a metric that combines precision and recall in a way that
+reflects their harmonic relationship. Intuitively, this should be the
+weighted average of precision and recall where the weights are inversely
+proportional to their values.</p>
+<p>Formally, the F1 score <span class="math inline">\(F_1\)</span> is
+defined as: <span class="math display">\[F_1 = 2 \cdot \frac{P \cdot
+R}{P + R}\]</span></p>
+<h2 id="f1-score-loss">F1 Score Loss</h2>
+<p>The F1 score loss quantifies the deviation of a model’s predicted
+probabilities from an optimal F1 score.</p>
+<p>We seek a loss function that penalizes deviations from the optimal F1
+score. Intuitively, this should be a function that decreases as the
+predicted probabilities lead to higher F1 scores.</p>
+<p>Formally, the F1 score loss <span
+class="math inline">\(\mathcal{L}\)</span> is defined as: <span
+class="math display">\[\mathcal{L} = 1 - F_1\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="theorem-monotonicity-of-f1-score-loss">Theorem: Monotonicity of
+F1 Score Loss</h2>
+<p>The F1 score loss is a monotonically decreasing function with respect
+to the F1 score.</p>
+<p>We seek to show that as the F1 score increases, the loss decreases.
+Intuitively, this should hold because a higher F1 score indicates better
+model performance.</p>
+<p>Formally, we have: <span class="math display">\[\forall F_1&#39;,
+F_1&#39;&#39;: \text{if } F_1&#39; &gt; F_1&#39;&#39; \text{ then }
+\mathcal{L}(F_1&#39;) &lt; \mathcal{L}(F_1&#39;&#39;)\]</span></p>
+<p>Proof: <span class="math display">\[\mathcal{L}(F_1&#39;) = 1 -
+F_1&#39; &lt; 1 - F_1&#39;&#39; = \mathcal{L}(F_1&#39;&#39;)\]</span>
+since <span class="math inline">\(F_1&#39; &gt;
+F_1&#39;&#39;\)</span>.</p>
+<h2 id="theorem-convexity-of-f1-score-loss">Theorem: Convexity of F1
+Score Loss</h2>
+<p>The F1 score loss is a convex function with respect to the predicted
+probabilities.</p>
+<p>We seek to show that the F1 score loss is convex, which implies that
+any local minimum is a global minimum. Intuitively, this should hold
+because the F1 score itself is a concave function.</p>
+<p>Formally, we have: <span class="math display">\[\mathcal{L}(\hat{y})
+= 1 - F_1(\hat{y})\]</span> and <span class="math inline">\(F_1\)</span>
+is concave, so <span class="math inline">\(-\mathcal{L}\)</span> is
+convex, making <span class="math inline">\(\mathcal{L}\)</span> concave.
+However, since we are minimizing the loss, the concavity of <span
+class="math inline">\(F_1\)</span> implies convexity of the loss
+function.</p>
+<p>Proof: The proof follows from the concavity of the F1 score, as shown
+in previous works (e.g., Chinchor 1992).</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="proof-of-monotonicity">Proof of Monotonicity</h2>
+<p>To prove the monotonicity of the F1 score loss, we need to show that
+as the F1 score increases, the loss decreases.</p>
+<p>Consider two F1 scores <span class="math inline">\(F_1&#39;\)</span>
+and <span class="math inline">\(F_1&#39;&#39;\)</span> such that <span
+class="math inline">\(F_1&#39; &gt; F_1&#39;&#39;\)</span>. Then: <span
+class="math display">\[\mathcal{L}(F_1&#39;) = 1 - F_1&#39; &lt; 1 -
+F_1&#39;&#39; = \mathcal{L}(F_1&#39;&#39;)\]</span> This shows that the
+loss decreases as the F1 score increases.</p>
+<h2 id="proof-of-convexity">Proof of Convexity</h2>
+<p>To prove the convexity of the F1 score loss, we need to show that the
+second derivative of the loss with respect to the predicted
+probabilities is non-negative.</p>
+<p>The F1 score <span class="math inline">\(F_1\)</span> is a concave
+function, as shown in previous works (e.g., Chinchor 1992). Therefore,
+the negative of <span class="math inline">\(F_1\)</span>, which is the
+loss <span class="math inline">\(\mathcal{L}\)</span>, is convex.</p>
+<p>Thus, the F1 score loss <span
+class="math inline">\(\mathcal{L}\)</span> is a convex function with
+respect to the predicted probabilities.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="property-i-relationship-with-cross-entropy-loss">Property (i):
+Relationship with Cross-Entropy Loss</h2>
+<p>The F1 score loss is not directly related to the cross-entropy loss,
+but it can be used in conjunction with it for optimization purposes.</p>
+<h2 id="property-ii-differentiability">Property (ii):
+Differentiability</h2>
+<p>The F1 score loss is differentiable almost everywhere, which allows
+for the use of gradient-based optimization techniques.</p>
+<h2 id="property-iii-scale-invariance">Property (iii): Scale
+Invariance</h2>
+<p>The F1 score loss is scale-invariant, meaning that it does not depend
+on the absolute values of the predicted probabilities but rather on
+their relative ordering.</p>
+<h2 id="corollary-optimization">Corollary: Optimization</h2>
+<p>Since the F1 score loss is convex, any local minimum found during
+optimization is guaranteed to be a global minimum.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>The F1 score loss provides a valuable tool for optimizing
+classification models directly for the F1 metric. Its properties,
+including monotonicity and convexity, make it a suitable choice for
+gradient-based optimization techniques. By aligning the optimization
+objective with the evaluation metric, we can improve model performance
+in scenarios where precision and recall are of paramount importance.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

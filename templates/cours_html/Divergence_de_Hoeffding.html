@@ -1,0 +1,324 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Hoeffding : Un outil fondamental en théorie des probabilités</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Hoeffding : Un outil fondamental en
+théorie des probabilités</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La divergence de Hoeffding émerge comme un concept central dans
+l’étude des inégalités de concentration, un domaine crucial en théorie
+des probabilités et en statistique. Son origine remonte aux travaux
+pionniers d’Erich L. Hoeffding dans les années 1960, où il a introduit
+des inégalités permettant de borner la probabilité que la somme de
+variables aléatoires indépendantes s’éloigne significativement de son
+espérance. Ces inégalités ont trouvé des applications vastes et
+profondes, allant de l’apprentissage automatique à la théorie de
+l’information.</p>
+<p>La divergence de Hoeffding est indispensable dans le cadre de
+l’analyse des algorithmes stochastiques, où elle permet de garantir des
+performances avec une haute probabilité. Elle est également un outil clé
+pour l’étude des propriétés asymptotiques des estimateurs statistiques.
+Son importance réside dans sa capacité à fournir des bornes explicites
+et quantifiables, ce qui en fait un instrument précieux pour les
+mathématiciens et les statisticiens.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la divergence de Hoeffding, commençons par considérer
+un cadre probabiliste simple. Supposons que nous ayons une suite de
+variables aléatoires indépendantes <span class="math inline">\(X_1, X_2,
+\ldots, X_n\)</span> prenant leurs valeurs dans un ensemble fini <span
+class="math inline">\(\mathcal{X}\)</span>. Nous cherchons à comprendre
+comment la somme <span class="math inline">\(S_n = X_1 + X_2 + \ldots +
+X_n\)</span> se comporte par rapport à son espérance <span
+class="math inline">\(\mathbb{E}[S_n]\)</span>.</p>
+<p>La divergence de Hoeffding mesure la probabilité que <span
+class="math inline">\(S_n\)</span> s’écarte significativement de son
+espérance. Formellement, pour un réel <span class="math inline">\(t &gt;
+0\)</span>, la divergence de Hoeffding est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> des
+variables aléatoires indépendantes à valeurs dans <span
+class="math inline">\(\mathcal{X}\)</span>, et soit <span
+class="math inline">\(S_n = X_1 + X_2 + \ldots + X_n\)</span>. La
+divergence de Hoeffding est donnée par : <span
+class="math display">\[D(t) = \mathbb{P}\left( S_n - \mathbb{E}[S_n]
+\geq t \right).\]</span></p>
+</div>
+<p>Une autre formulation équivalente est : <span
+class="math display">\[D(t) = \sup_{n \geq 1} \mathbb{P}\left( S_n -
+\mathbb{E}[S_n] \geq t \right).\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>L’inégalité de Hoeffding est un résultat fondamental qui borne la
+divergence de Hoeffding. Pour l’énoncer, nous avons besoin de quelques
+hypothèses supplémentaires. Supposons que chaque variable aléatoire
+<span class="math inline">\(X_i\)</span> soit bornée, c’est-à-dire qu’il
+existe des constantes <span class="math inline">\(a_i\)</span> et <span
+class="math inline">\(b_i\)</span> telles que <span
+class="math inline">\(a_i \leq X_i \leq b_i\)</span> presque
+sûrement.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> des
+variables aléatoires indépendantes telles que <span
+class="math inline">\(a_i \leq X_i \leq b_i\)</span> presque sûrement
+pour tout <span class="math inline">\(i\)</span>. Alors, pour tout <span
+class="math inline">\(t &gt; 0\)</span>, nous avons : <span
+class="math display">\[\mathbb{P}\left( S_n - \mathbb{E}[S_n] \geq t
+\right) \leq \exp\left( -\frac{2t^2}{\sum_{i=1}^n (b_i - a_i)^2}
+\right).\]</span></p>
+</div>
+<p>Une formulation alternative est : <span
+class="math display">\[\mathbb{P}\left( |S_n - \mathbb{E}[S_n]| \geq t
+\right) \leq 2 \exp\left( -\frac{2t^2}{\sum_{i=1}^n (b_i - a_i)^2}
+\right).\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver l’inégalité de Hoeffding, nous allons utiliser la
+fonction génératrice des moments. Considérons d’abord une seule variable
+aléatoire <span class="math inline">\(X\)</span> bornée par <span
+class="math inline">\(a \leq X \leq b\)</span>. La fonction génératrice
+des moments de <span class="math inline">\(X\)</span> est définie par :
+<span class="math display">\[M_X(\lambda) = \mathbb{E}[e^{\lambda
+X}].\]</span></p>
+<p>En utilisant le fait que <span class="math inline">\(e^x\)</span> est
+une fonction convexe, nous pouvons appliquer l’inégalité de Jensen pour
+obtenir : <span class="math display">\[M_X(\lambda) \leq e^{\lambda a}
+(b - a) + e^{\lambda b} (1 - (b - a)).\]</span></p>
+<p>En simplifiant, nous obtenons : <span
+class="math display">\[M_X(\lambda) \leq e^{\frac{\lambda^2 (b -
+a)^2}{8}}.\]</span></p>
+<p>Ensuite, en utilisant la propriété de la fonction génératrice des
+moments pour la somme <span class="math inline">\(S_n\)</span>, nous
+avons : <span class="math display">\[M_{S_n}(\lambda) = \prod_{i=1}^n
+M_{X_i}(\lambda) \leq \exp\left( \frac{\lambda^2 \sum_{i=1}^n (b_i -
+a_i)^2}{8} \right).\]</span></p>
+<p>Enfin, en appliquant le théorème de Chernoff, nous obtenons
+l’inégalité de Hoeffding.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’inégalité de Hoeffding possède plusieurs propriétés intéressantes
+et corollaires. En voici quelques-uns :</p>
+<ol>
+<li><p><strong>Corollaire de l’inégalité de Hoeffding</strong> : Pour
+tout <span class="math inline">\(t &gt; 0\)</span>, nous avons : <span
+class="math display">\[\mathbb{P}\left( |S_n - \mathbb{E}[S_n]| \geq t
+\right) \leq 2 \exp\left( -\frac{2t^2}{\sum_{i=1}^n (b_i - a_i)^2}
+\right).\]</span></p></li>
+<li><p><strong>Propriété de la décroissance exponentielle</strong> : La
+probabilité que <span class="math inline">\(S_n\)</span> s’écarte de son
+espérance décroît exponentiellement avec <span
+class="math inline">\(t^2\)</span>.</p></li>
+<li><p><strong>Corollaire pour les variables centrées</strong> : Si
+<span class="math inline">\(\mathbb{E}[X_i] = 0\)</span> pour tout <span
+class="math inline">\(i\)</span>, alors : <span
+class="math display">\[\mathbb{P}\left( S_n \geq t \right) \leq
+\exp\left( -\frac{2t^2}{\sum_{i=1}^n (b_i - a_i)^2}
+\right).\]</span></p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La divergence de Hoeffding et l’inégalité associée sont des outils
+puissants en théorie des probabilités et en statistique. Elles
+permettent de borner la probabilité que la somme de variables aléatoires
+indépendantes s’écarte significativement de son espérance. Ces résultats
+ont des applications vastes et profondes, allant de l’apprentissage
+automatique à la théorie de l’information. La preuve de l’inégalité de
+Hoeffding repose sur des techniques avancées telles que la fonction
+génératrice des moments et le théorème de Chernoff. Les propriétés et
+corollaires de cette inégalité enrichissent notre compréhension des
+phénomènes stochastiques et fournissent des garanties robustes pour les
+algorithmes stochastiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

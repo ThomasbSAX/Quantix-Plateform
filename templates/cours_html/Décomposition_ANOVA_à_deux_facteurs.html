@@ -1,0 +1,311 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Décomposition ANOVA à deux facteurs</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Décomposition ANOVA à deux facteurs</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse de la variance (ANOVA) est une méthode statistique
+fondamentale pour comparer les moyennes de plusieurs groupes. La
+décomposition ANOVA à deux facteurs permet d’étudier l’effet de deux
+variables catégorielles sur une variable réponse. Cette approche est
+indispensable dans les sciences expérimentales pour identifier les
+sources de variation et comprendre leurs interactions.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Considérons un modèle linéaire général à deux facteurs avec
+interactions : <span class="math display">\[Y_{ijk} = \mu + \alpha_i +
+\beta_j + (\alpha\beta)_{ij} + \epsilon_{ijk}\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(Y_{ijk}\)</span> est la réponse pour
+le niveau <span class="math inline">\(i\)</span> du facteur A, le niveau
+<span class="math inline">\(j\)</span> du facteur B et la réplique <span
+class="math inline">\(k\)</span>.</p></li>
+<li><p><span class="math inline">\(\mu\)</span> est la moyenne
+globale.</p></li>
+<li><p><span class="math inline">\(\alpha_i\)</span> est l’effet du
+niveau <span class="math inline">\(i\)</span> du facteur A.</p></li>
+<li><p><span class="math inline">\(\beta_j\)</span> est l’effet du
+niveau <span class="math inline">\(j\)</span> du facteur B. <span
+class="math display">\[\alpha_i = \mu_Ai - \mu, \quad \beta_j = \mu_Bj -
+\mu\]</span> où <span class="math inline">\(\mu_Ai\)</span> et <span
+class="math inline">\(\mu_Bj\)</span> sont les moyennes
+marginales.</p></li>
+<li><p><span class="math inline">\((\alpha\beta)_{ij}\)</span> est
+l’effet d’interaction entre les niveaux <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>. <span
+class="math display">\[(\alpha\beta)_{ij} = \mu_{ABij} - \mu_Ai - \mu_Bj
++ \mu\]</span> où <span class="math inline">\(\mu_{ABij}\)</span> est la
+moyenne pour le couple <span
+class="math inline">\((i,j)\)</span>.</p></li>
+<li><p><span class="math inline">\(\epsilon_{ijk}\)</span> est l’erreur
+aléatoire, supposée normale et indépendante.</p></li>
+</ul>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<div class="theorem">
+<p>La somme totale des carrés (SST) peut être décomposée en : <span
+class="math display">\[SST = SSC_A + SSC_B + SSC_{AB} + SSE\]</span> où
+:</p>
+<ul>
+<li><p><span class="math inline">\(SSC_A = n \sum_{i=1}^{a}
+(\bar{Y}_{i..} - \bar{Y}_{...})^2\)</span> est la somme des carrés pour
+le facteur A.</p></li>
+<li><p><span class="math inline">\(SSC_B = bn \sum_{j=1}^{b}
+(\bar{Y}_{.j.} - \bar{Y}_{...})^2\)</span> est la somme des carrés pour
+le facteur B.</p></li>
+<li><p><span class="math inline">\(SSC_{AB} = n \sum_{i=1}^{a}
+\sum_{j=1}^{b} (\bar{Y}_{ij.} - \bar{Y}_{i..} - \bar{Y}_{.j.} +
+\bar{Y}_{...})^2\)</span> est la somme des carrés pour
+l’interaction.</p></li>
+<li><p><span class="math inline">\(SSE = \sum_{i=1}^{a} \sum_{j=1}^{b}
+\sum_{k=1}^{n} (Y_{ijk} - \bar{Y}_{ij.})^2\)</span> est la somme des
+carrés des erreurs.</p></li>
+</ul>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<div class="proof">
+<p><em>Preuve du théorème de décomposition.</em> La preuve repose sur
+l’orthogonalité des effets dans le modèle ANOVA. Nous avons : <span
+class="math display">\[SST = \sum_{i=1}^{a} \sum_{j=1}^{b}
+\sum_{k=1}^{n} (Y_{ijk} - \bar{Y}_{...})^2\]</span> En utilisant les
+identités suivantes : <span class="math display">\[Y_{ijk} -
+\bar{Y}_{...} = (Y_{ijk} - \bar{Y}_{ij.}) + (\bar{Y}_{ij.} -
+\bar{Y}_{i..}) + (\bar{Y}_{i..} - \bar{Y}_{...})\]</span> et en
+développant les carrés, nous obtenons la décomposition souhaitée. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<div class="corollary">
+<p>Les hypothèses principales sont :</p>
+<ol>
+<li><p>Les effets des facteurs et leurs interactions sont additifs.
+<span class="math display">\[Y_{ijk} = \mu + \alpha_i + \beta_j +
+(\alpha\beta)_{ij} + \epsilon_{ijk}\]</span></p></li>
+<li><p>Les erreurs <span class="math inline">\(\epsilon_{ijk}\)</span>
+sont indépendantes et normalement distribuées avec moyenne zéro et
+variance constante. <span class="math display">\[\epsilon_{ijk} \sim
+N(0, \sigma^2)\]</span></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Preuve des hypothèses.</em> L’additivité des effets est une
+conséquence du modèle linéaire général. La normalité et l’homogénéité
+des variances sont des hypothèses standard en ANOVA, nécessaires pour la
+validité des tests statistiques. ◻</p>
+</div>
+<div class="corollary">
+<p>Les tests F pour les effets principaux et l’interaction sont donnés
+par : <span class="math display">\[F_A = \frac{SSC_A / (a-1)}{SSE /
+(ab(n-1))}, \quad F_B = \frac{SSC_B / (b-1)}{SSE / (ab(n-1))}, \quad
+F_{AB} = \frac{SSC_{AB} / ((a-1)(b-1))}{SSE / (ab(n-1))}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Preuve des tests F.</em> Ces tests sont basés sur le rapport des
+carrés moyens. Sous les hypothèses nulles, ces rapports suivent une loi
+F de Satterthwaite. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La décomposition ANOVA à deux facteurs est un outil puissant pour
+analyser les effets de plusieurs variables catégorielles sur une
+réponse. Elle permet de comprendre les interactions complexes et
+d’identifier les sources de variation dans les données
+expérimentales.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

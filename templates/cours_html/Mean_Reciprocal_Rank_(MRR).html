@@ -1,0 +1,333 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Mean Reciprocal Rank (MRR): A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Mean Reciprocal Rank (MRR): A Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>The Mean Reciprocal Rank (MRR) is a popular evaluation metric used in
+information retrieval and natural language processing tasks,
+particularly in question-answering systems. The concept of MRR emerged
+from the need to assess the effectiveness of retrieval models in
+returning relevant information at the top of their ranked lists.
+Historically, MRR has been instrumental in benchmarking various models
+and algorithms, providing a concise yet informative measure of
+performance.</p>
+<p>MRR is indispensable in scenarios where the order of retrieved items
+significantly impacts user satisfaction. For instance, in a
+question-answering system, the first few answers returned by the model
+are crucial as users typically focus on these top-ranked responses. MRR
+captures this intuition by considering the reciprocal of the rank
+position of the first relevant item, thereby emphasizing the importance
+of top-ranked results.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To understand MRR, let us first consider a scenario where we have a
+set of queries and for each query, there is a list of retrieved items
+ranked by their relevance. Our goal is to measure the effectiveness of
+this retrieval process.</p>
+<p>Suppose we have a set of queries <span class="math inline">\(Q =
+\{q_1, q_2, \ldots, q_n\}\)</span>. For each query <span
+class="math inline">\(q_i\)</span>, we have a list of retrieved items
+<span class="math inline">\(R_i = \{r_{i1}, r_{i2}, \ldots,
+r_{ik}\}\)</span> ranked by their relevance. The relevant items for
+query <span class="math inline">\(q_i\)</span> are denoted by a set
+<span class="math inline">\(S_i = \{s_{i1}, s_{i2}, \ldots,
+s_{im}\}\)</span>, where <span class="math inline">\(m \leq
+k\)</span>.</p>
+<p>The Reciprocal Rank (RR) for query <span
+class="math inline">\(q_i\)</span> is defined as the reciprocal of the
+rank position of the first relevant item in the retrieved list <span
+class="math inline">\(R_i\)</span>. Formally, we can express this
+as:</p>
+<p><span class="math display">\[\text{RR}(q_i) =
+\frac{1}{\text{rank}_i(s_{i1})}\]</span></p>
+<p>where <span class="math inline">\(\text{rank}_i(s_{i1})\)</span> is
+the rank position of the first relevant item <span
+class="math inline">\(s_{i1}\)</span> in the list <span
+class="math inline">\(R_i\)</span>.</p>
+<p>The Mean Reciprocal Rank (MRR) is then the average of the reciprocal
+ranks over all queries. Mathematically, this can be written as:</p>
+<p><span class="math display">\[\text{MRR} = \frac{1}{n} \sum_{i=1}^{n}
+\text{RR}(q_i) = \frac{1}{n} \sum_{i=1}^{n}
+\frac{1}{\text{rank}_i(s_{i1})}\]</span></p>
+<h1 id="theorems">Theorems</h1>
+<p>One of the key properties of MRR is its ability to capture the
+effectiveness of retrieval models in a single metric. Let us explore
+some theorems related to MRR.</p>
+<p><strong>Theorem 1:</strong> The MRR is maximized when the first
+retrieved item for every query is relevant.</p>
+<p><em>Proof:</em> Consider a set of queries <span
+class="math inline">\(Q = \{q_1, q_2, \ldots, q_n\}\)</span>. For each
+query <span class="math inline">\(q_i\)</span>, if the first retrieved
+item is relevant, then <span class="math inline">\(\text{RR}(q_i) =
+1\)</span>. Therefore, the MRR becomes:</p>
+<p><span class="math display">\[\text{MRR} = \frac{1}{n} \sum_{i=1}^{n}
+1 = 1\]</span></p>
+<p>This is the maximum possible value of MRR, as the reciprocal rank
+cannot exceed 1.</p>
+<p><strong>Theorem 2:</strong> The MRR is minimized when the first
+relevant item for every query is at the last position in the retrieved
+list.</p>
+<p><em>Proof:</em> Consider a set of queries <span
+class="math inline">\(Q = \{q_1, q_2, \ldots, q_n\}\)</span>. For each
+query <span class="math inline">\(q_i\)</span>, if the first relevant
+item is at the last position in the retrieved list, then <span
+class="math inline">\(\text{RR}(q_i) = \frac{1}{k}\)</span>, where <span
+class="math inline">\(k\)</span> is the total number of retrieved items.
+Therefore, the MRR becomes:</p>
+<p><span class="math display">\[\text{MRR} = \frac{1}{n} \sum_{i=1}^{n}
+\frac{1}{k} = \frac{1}{k}\]</span></p>
+<p>This is the minimum possible value of MRR, as the reciprocal rank
+cannot be less than <span
+class="math inline">\(\frac{1}{k}\)</span>.</p>
+<h1 id="proofs">Proofs</h1>
+<p>Let us delve deeper into the proofs of some key properties related to
+MRR.</p>
+<p><strong>Property 1:</strong> The MRR is a monotonic function of the
+rank positions of relevant items.</p>
+<p><em>Proof:</em> Consider two queries <span
+class="math inline">\(q_i\)</span> and <span
+class="math inline">\(q_j\)</span> with relevant items at ranks <span
+class="math inline">\(r_i\)</span> and <span
+class="math inline">\(r_j\)</span> respectively. If <span
+class="math inline">\(r_i &lt; r_j\)</span>, then <span
+class="math inline">\(\text{RR}(q_i) = \frac{1}{r_i} &gt; \frac{1}{r_j}
+= \text{RR}(q_j)\)</span>. Therefore, the MRR will be higher when
+relevant items are ranked higher.</p>
+<p><strong>Property 2:</strong> The MRR is sensitive to the distribution
+of relevant items across different rank positions.</p>
+<p><em>Proof:</em> Consider a set of queries <span
+class="math inline">\(Q = \{q_1, q_2, \ldots, q_n\}\)</span>. The MRR
+will vary based on how the relevant items are distributed across
+different rank positions. For instance, if most queries have their first
+relevant item at the top of the list, the MRR will be high. Conversely,
+if most queries have their first relevant item at lower ranks, the MRR
+will be low.</p>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<p>Let us list some important properties and corollaries related to
+MRR.</p>
+<p><strong>Property 1:</strong> The MRR is a measure of the average
+effectiveness of a retrieval model.</p>
+<p><em>Proof:</em> The MRR captures the average reciprocal rank of
+relevant items across all queries. Therefore, it provides a measure of
+how effectively the retrieval model is performing on average.</p>
+<p><strong>Property 2:</strong> The MRR is not affected by the number of
+relevant items for each query.</p>
+<p><em>Proof:</em> The MRR only considers the rank position of the first
+relevant item for each query. Therefore, it does not take into account
+the total number of relevant items or their distribution beyond the
+first one.</p>
+<p><strong>Property 3:</strong> The MRR is a non-negative metric with a
+maximum value of 1.</p>
+<p><em>Proof:</em> Since the reciprocal rank is always non-negative and
+cannot exceed 1, the MRR is also non-negative with a maximum value of
+1.</p>
+<p><strong>Corollary 1:</strong> The MRR is particularly useful for
+evaluating retrieval models where the top-ranked items are of primary
+importance.</p>
+<p><em>Proof:</em> The MRR emphasizes the rank position of the first
+relevant item, making it an ideal metric for evaluating models where
+top-ranked results are crucial.</p>
+<p><strong>Corollary 2:</strong> The MRR can be used to compare the
+performance of different retrieval models.</p>
+<p><em>Proof:</em> By comparing the MRR values of different models, one
+can assess their relative effectiveness in retrieving relevant items at
+the top of the ranked lists.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

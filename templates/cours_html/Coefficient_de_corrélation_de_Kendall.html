@@ -1,0 +1,322 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Coefficient de corrélation de Kendall</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Coefficient de corrélation de Kendall</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le coefficient de corrélation de Kendall, introduit par Maurice
+George Kendall en 1938, est une mesure non paramétrique de la dépendance
+entre deux variables quantitatives. Contrairement au coefficient de
+corrélation de Pearson, qui mesure la relation linéaire entre deux
+variables, le coefficient de Kendall évalue l’ordre des données. Il est
+particulièrement utile lorsque les relations entre les variables ne sont
+pas linéaires ou lorsque les données présentent des valeurs
+aberrantes.</p>
+<p>L’origine historique de ce coefficient remonte aux travaux de Kendall
+sur les statistiques ordinales. Il émerge comme une réponse aux
+limitations des mesures de corrélation traditionnelles dans les
+contextes où l’ordre des données est plus pertinent que leur valeur
+exacte. Ce coefficient est indispensable dans les domaines où l’analyse
+des rangs et des ordres est cruciale, tels que la psychométrie, la
+biostatistique, et l’économie.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir le coefficient de corrélation de Kendall, commençons par
+comprendre ce que nous cherchons à mesurer. Imaginons deux variables
+<span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Nous voulons quantifier à quel point
+l’ordre des valeurs de <span class="math inline">\(X\)</span> correspond
+à l’ordre des valeurs de <span class="math inline">\(Y\)</span>. Si les
+ordres sont similaires, nous attendons une corrélation positive. Si les
+ordres sont inverses, nous attendons une corrélation négative.</p>
+<p>Formellement, le coefficient de corrélation de Kendall <span
+class="math inline">\(\tau\)</span> entre deux variables <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> est défini comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\((X_1, Y_1), (X_2, Y_2), \ldots,
+(X_n, Y_n)\)</span> <span class="math inline">\(n\)</span> paires de
+données. Le coefficient de corrélation de Kendall <span
+class="math inline">\(\tau\)</span> est donné par : <span
+class="math display">\[\tau = \frac{C - D}{\binom{n}{2}}\]</span> où
+<span class="math inline">\(C\)</span> est le nombre de concordances et
+<span class="math inline">\(D\)</span> est le nombre de
+discordances.</p>
+</div>
+<p>Une paire <span class="math inline">\((X_i, Y_i)\)</span> et <span
+class="math inline">\((X_j, Y_j)\)</span> est concordante si les ordres
+des deux variables sont identiques, c’est-à-dire : <span
+class="math display">\[(X_i - X_j)(Y_i - Y_j) &gt; 0\]</span> Une paire
+est discordante si les ordres sont inverses : <span
+class="math display">\[(X_i - X_j)(Y_i - Y_j) &lt; 0\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié au coefficient de corrélation de Kendall
+est le théorème suivant, qui donne une interprétation probabiliste du
+coefficient :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables aléatoires. Le
+coefficient de corrélation de Kendall <span
+class="math inline">\(\tau\)</span> peut être exprimé comme : <span
+class="math display">\[\tau = P((X_1 - X_2)(Y_1 - Y_2) &gt; 0) - P((X_1
+- X_2)(Y_1 - Y_2) &lt; 0)\]</span> où <span class="math inline">\((X_1,
+Y_1)\)</span> et <span class="math inline">\((X_2, Y_2)\)</span> sont
+deux paires indépendantes et identiquement distribuées.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Kendall, commençons par considérer deux
+paires indépendantes et identiquement distribuées <span
+class="math inline">\((X_1, Y_1)\)</span> et <span
+class="math inline">\((X_2, Y_2)\)</span>. Nous voulons montrer que :
+<span class="math display">\[\tau = P((X_1 - X_2)(Y_1 - Y_2) &gt; 0) -
+P((X_1 - X_2)(Y_1 - Y_2) &lt; 0)\]</span></p>
+<p>Considérons d’abord le cas où <span class="math inline">\(X_1 &gt;
+X_2\)</span>. Alors, <span class="math inline">\((X_1 - X_2)(Y_1 - Y_2)
+&gt; 0\)</span> si et seulement si <span class="math inline">\(Y_1 &gt;
+Y_2\)</span>. De même, <span class="math inline">\((X_1 - X_2)(Y_1 -
+Y_2) &lt; 0\)</span> si et seulement si <span class="math inline">\(Y_1
+&lt; Y_2\)</span>. Par symétrie, le cas où <span
+class="math inline">\(X_1 &lt; X_2\)</span> donne des résultats
+similaires.</p>
+<p>Ainsi, nous avons : <span class="math display">\[P((X_1 - X_2)(Y_1 -
+Y_2) &gt; 0) = P(Y_1 &gt; Y_2 \mid X_1 &gt; X_2) + P(Y_1 &lt; Y_2 \mid
+X_1 &lt; X_2)\]</span> et <span class="math display">\[P((X_1 - X_2)(Y_1
+- Y_2) &lt; 0) = P(Y_1 &lt; Y_2 \mid X_1 &gt; X_2) + P(Y_1 &gt; Y_2 \mid
+X_1 &lt; X_2)\]</span></p>
+<p>En utilisant la définition du coefficient de corrélation de Kendall,
+nous obtenons : <span class="math display">\[\tau = \frac{C -
+D}{\binom{n}{2}} = P(Y_1 &gt; Y_2 \mid X_1 &gt; X_2) - P(Y_1 &lt; Y_2
+\mid X_1 &gt; X_2)\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le coefficient de corrélation de Kendall possède plusieurs propriétés
+intéressantes :</p>
+<ol>
+<li><p>Le coefficient <span class="math inline">\(\tau\)</span> est
+toujours compris entre -1 et 1 : <span class="math display">\[-1 \leq
+\tau \leq 1\]</span></p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendantes, alors <span
+class="math inline">\(\tau = 0\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont parfaitement corrélées
+positivement, alors <span class="math inline">\(\tau =
+1\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont parfaitement corrélées
+négativement, alors <span class="math inline">\(\tau =
+-1\)</span>.</p></li>
+</ol>
+<p>Pour prouver la propriété (i), considérons que le nombre total de
+paires est <span class="math inline">\(\binom{n}{2}\)</span>. Le nombre
+maximum de concordances est <span
+class="math inline">\(\binom{n}{2}\)</span>, et le nombre minimum est 0.
+Par conséquent, <span class="math inline">\(C\)</span> et <span
+class="math inline">\(D\)</span> sont bornés par : <span
+class="math display">\[0 \leq C, D \leq \binom{n}{2}\]</span> Ainsi,
+<span class="math display">\[-1 \leq \tau = \frac{C - D}{\binom{n}{2}}
+\leq 1\]</span></p>
+<p>Pour la propriété (ii), si <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> sont indépendantes, alors les
+probabilités conditionnelles <span class="math inline">\(P(Y_1 &gt; Y_2
+\mid X_1 &gt; X_2)\)</span> et <span class="math inline">\(P(Y_1 &lt;
+Y_2 \mid X_1 &gt; X_2)\)</span> sont égales à <span
+class="math inline">\(0.5\)</span>. Par conséquent, <span
+class="math inline">\(\tau = 0\)</span>.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

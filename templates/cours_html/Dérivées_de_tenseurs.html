@@ -1,0 +1,339 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Dérivées de tenseurs : Un cadre rigoureux pour l’analyse tensorielle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Dérivées de tenseurs : Un cadre rigoureux pour
+l’analyse tensorielle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse tensorielle est un outil puissant pour modéliser des
+phénomènes physiques complexes, notamment en mécanique des milieux
+continus et en relativité générale. Les tenseurs permettent de
+généraliser les concepts de scalaires et vecteurs à des objets
+mathématiques plus riches, capables de capturer des propriétés
+directionnelles et géométriques. Cependant, pour exploiter pleinement
+leur potentiel, il est essentiel de définir des opérations
+différentielles adaptées. Les dérivées de tenseurs émergent comme une
+nécessité pour étudier les variations locales des champs tensoriels,
+offrant ainsi un cadre rigoureux pour l’analyse des déformations, des
+contraintes et des courbures.</p>
+<p>L’origine historique des dérivées de tenseurs remonte aux travaux
+d’Albert Einstein sur la relativité générale, où les tenseurs jouent un
+rôle central dans la description de l’espace-temps. Les dérivées
+covariantes, introduites par Christoffel et Levi-Civita, permettent de
+différencier des tenseurs tout en préservant leur nature tensorielle. Ce
+concept est indispensable pour formuler les équations du champ
+d’Einstein et pour étudier la géométrie différentielle des variétés.</p>
+<p>Dans ce chapitre, nous explorerons les fondements mathématiques des
+dérivées de tenseurs, en mettant l’accent sur leur définition formelle
+et leurs propriétés fondamentales. Nous présenterons également des
+théorèmes clés et des applications pratiques pour illustrer leur
+importance dans divers domaines scientifiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la notion de dérivée tensorielle, commençons par
+comprendre ce que nous cherchons à capturer. Supposons que nous ayons un
+champ tensoriel <span class="math inline">\(T\)</span> défini sur une
+variété différentielle <span class="math inline">\(M\)</span>. Nous
+voulons mesurer comment ce tenseur varie localement, c’est-à-dire
+comment il change lorsqu’on se déplace le long d’une courbe sur <span
+class="math inline">\(M\)</span>. Cette variation doit être exprimée de
+manière cohérente avec la structure géométrique de <span
+class="math inline">\(M\)</span>, ce qui nécessite une définition
+rigoureuse de la dérivée.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(M\)</span> une variété
+différentielle munie d’une connexion affine <span
+class="math inline">\(\nabla\)</span>. La dérivée covariante de <span
+class="math inline">\(T\)</span> le long d’un vecteur <span
+class="math inline">\(X\)</span> est définie par : <span
+class="math display">\[\nabla_X T = \lim_{t \to 0} \frac{T_{\gamma(t)} -
+\mathcal{T}_{\gamma(0)}}{t}\]</span> où <span
+class="math inline">\(\gamma\)</span> est une courbe différentielle
+telle que <span class="math inline">\(\gamma(0) = p\)</span> et <span
+class="math inline">\(\dot{\gamma}(0) = X_p\)</span>, et <span
+class="math inline">\(\mathcal{T}_{\gamma(0)}\)</span> est le tenseur
+<span class="math inline">\(T_{\gamma(0)}\)</span> transporté
+parallèlement le long de <span class="math inline">\(\gamma\)</span>
+jusqu’à <span class="math inline">\(p\)</span>.</p>
+</div>
+<p>La dérivée covariante peut également être exprimée en termes de
+composantes. Si <span class="math inline">\(T\)</span> est un tenseur de
+type <span class="math inline">\((r, s)\)</span>, alors ses composantes
+<span class="math inline">\(T^{i_1 \dots i_r}_{j_1 \dots j_s}\)</span>
+satisfont : <span class="math display">\[\nabla_k T^{i_1 \dots i_r}_{j_1
+\dots j_s} = \partial_k T^{i_1 \dots i_r}_{j_1 \dots j_s} + \sum_{l=1}^r
+\Gamma^k_{i_l m} T^{i_1 \dots m \dots i_r}_{j_1 \dots j_s} -
+\sum_{l=1}^s \Gamma^m_{j_l k} T^{i_1 \dots i_r}_{j_1 \dots m \dots
+j_s}\]</span> où <span class="math inline">\(\Gamma^k_{ij}\)</span> sont
+les symboles de Christoffel associés à la connexion <span
+class="math inline">\(\nabla\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en analyse tensorielle est le théorème de
+Ricci, qui établit une relation entre la dérivée covariante et la
+courbure d’une variété. Ce théorème est crucial pour comprendre comment
+les tenseurs interagissent avec la géométrie sous-jacente.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(R\)</span> le tenseur de courbure de
+Riemann associé à la connexion <span
+class="math inline">\(\nabla\)</span>. Alors, pour tout tenseur <span
+class="math inline">\(T\)</span> et vecteurs <span
+class="math inline">\(X, Y, Z\)</span>, on a : <span
+class="math display">\[R(X, Y)T = [\nabla_X, \nabla_Y]T - \nabla_{[X,
+Y]}T\]</span> où <span class="math inline">\([\cdot, \cdot]\)</span>
+désigne le crochet de Lie.</p>
+</div>
+<p>Pour démontrer ce théorème, commençons par exprimer la dérivée
+covariante en termes de composantes. En utilisant les propriétés des
+symboles de Christoffel et la définition du crochet de Lie, nous pouvons
+montrer que : <span class="math display">\[[\nabla_X, \nabla_Y]T^{i_1
+\dots i_r}_{j_1 \dots j_s} = R^i_{k i_1} T^{k \dots i_r}_{j_1 \dots j_s}
++ \dots + R^i_{k i_r} T^{i_1 \dots k}_{j_1 \dots j_s} - R^k_{j_1 l}
+T^{i_1 \dots i_r}_{k \dots j_s} - \dots - R^k_{j_s l} T^{i_1 \dots
+i_r}_{j_1 \dots k}\]</span> En comparant cette expression avec la
+définition du tenseur de courbure, nous obtenons le résultat
+souhaité.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer la puissance des dérivées de tenseurs, considérons un
+exemple simple : le transport parallèle d’un vecteur le long d’une
+géodésique. Soit <span class="math inline">\(\gamma\)</span> une
+géodésique paramétrée par <span class="math inline">\(t\)</span>, et
+soit <span class="math inline">\(V(t)\)</span> un champ de vecteurs le
+long de <span class="math inline">\(\gamma\)</span>. Le transport
+parallèle de <span class="math inline">\(V\)</span> implique que sa
+dérivée covariante le long de <span
+class="math inline">\(\gamma\)</span> est nulle : <span
+class="math display">\[\nabla_{\dot{\gamma}} V = 0\]</span> En termes de
+composantes, cette condition s’écrit : <span
+class="math display">\[\frac{dV^i}{dt} + \Gamma^i_{jk} V^j
+\dot{\gamma}^k = 0\]</span> Cette équation différentielle permet de
+déterminer l’évolution du vecteur <span class="math inline">\(V\)</span>
+le long de la géodésique, en tenant compte de la courbure de
+l’espace.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les dérivées de tenseurs possèdent plusieurs propriétés importantes,
+que nous énumérons ci-dessous :</p>
+<ol>
+<li><p><strong>Additivité</strong> : Pour tout tenseur <span
+class="math inline">\(T\)</span> et <span
+class="math inline">\(S\)</span>, on a : <span
+class="math display">\[\nabla_X (T + S) = \nabla_X T + \nabla_X
+S\]</span></p></li>
+<li><p><strong>Homogénéité</strong> : Pour tout scalaire <span
+class="math inline">\(f\)</span> et tenseur <span
+class="math inline">\(T\)</span>, on a : <span
+class="math display">\[\nabla_X (fT) = X(f) T + f \nabla_X
+T\]</span></p></li>
+<li><p><strong>Compatibilité avec le produit tensoriel</strong> : Pour
+tout tenseurs <span class="math inline">\(T\)</span> et <span
+class="math inline">\(S\)</span>, on a : <span
+class="math display">\[\nabla_X (T \otimes S) = (\nabla_X T) \otimes S +
+T \otimes (\nabla_X S)\]</span></p></li>
+</ol>
+<p>La preuve de ces propriétés découle directement des définitions et
+des règles de calcul tensoriel. Par exemple, pour démontrer
+l’additivité, il suffit d’appliquer la définition de la dérivée
+covariante à la somme <span class="math inline">\(T + S\)</span> et
+d’utiliser la linéarité du transport parallèle.</p>
+<p>En conclusion, les dérivées de tenseurs offrent un cadre rigoureux
+pour l’analyse des champs tensoriels sur des variétés différentielles.
+Leur étude permet de comprendre les interactions entre la géométrie et
+les propriétés physiques des systèmes, ouvrant ainsi de nouvelles
+perspectives dans divers domaines scientifiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

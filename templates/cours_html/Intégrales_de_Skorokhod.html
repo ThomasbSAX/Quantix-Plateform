@@ -1,0 +1,333 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Intégrales de Skorokhod : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Intégrales de Skorokhod : Une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’intégrale de Skorokhod émerge dans le cadre des processus
+stochastiques et trouve ses racines dans les travaux de Anatoliy
+Skorokhod, un mathématicien soviétique renommé. Cette intégrale étend
+l’intégrale d’Itô en permettant une intégration par parties plus
+générale, ce qui est crucial pour le calcul stochastique et les
+applications en finance mathématique.</p>
+<p>L’intégrale de Skorokhod est indispensable pour traiter des problèmes
+où les processus ne sont pas nécessairement semi-martingales ou lorsque
+l’on souhaite une symétrie dans les règles d’intégration. Elle permet de
+manipuler des expressions stochastiques avec une flexibilité accrue,
+ouvrant ainsi la voie à de nouvelles méthodes d’analyse et de
+modélisation.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire l’intégrale de Skorokhod, commençons par comprendre
+ce que nous cherchons à construire. Imaginons un processus stochastique
+<span class="math inline">\(X_t\)</span> et un autre processus <span
+class="math inline">\(Y_t\)</span>. Nous souhaitons définir une
+intégrale de <span class="math inline">\(X_t\)</span> par rapport à
+<span class="math inline">\(Y_t\)</span> qui généralise l’intégrale
+d’Itô et permette une intégration par parties.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X_t\)</span> un processus
+stochastique et <span class="math inline">\(Y_t\)</span> un processus de
+carré intégrable. L’intégrale de Skorokhod de <span
+class="math inline">\(X\)</span> par rapport à <span
+class="math inline">\(Y\)</span>, notée <span class="math inline">\(\int
+X_t \, d^s Y_t\)</span> ou simplement <span class="math inline">\(X
+\cdot Y\)</span>, est définie par la relation suivante :</p>
+<p><span class="math display">\[\int_0^T X_t \, d^s Y_t = \int_0^T X_t
+\, dY_t + \frac{1}{2} [X, Y]_T\]</span></p>
+<p>où <span class="math inline">\([X, Y]_T\)</span> représente la
+covariation des processus <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> au temps <span
+class="math inline">\(T\)</span>.</p>
+</div>
+<p>Une autre formulation de l’intégrale de Skorokhod peut être donnée en
+utilisant le produit malléable :</p>
+<p><span class="math display">\[\int_0^T X_t \, d^s Y_t = \lim_{\|\Pi\|
+\to 0} \sum_{i=1}^n X_{t_i^*} (Y_{t_i} - Y_{t_{i-1}})\]</span></p>
+<p>où <span class="math inline">\(\Pi = \{0 = t_0 &lt; t_1 &lt; \dots
+&lt; t_n = T\}\)</span> est une partition de l’intervalle <span
+class="math inline">\([0, T]\)</span>, et <span
+class="math inline">\(t_i^*\)</span> est un point dans l’intervalle
+<span class="math inline">\([t_{i-1}, t_i]\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’intégrale de Skorokhod est le
+théorème d’intégration par parties, qui généralise la formule classique
+de l’intégration par parties.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X_t\)</span> et <span
+class="math inline">\(Y_t\)</span> deux processus stochastiques. Alors,
+l’intégrale de Skorokhod satisfait la relation suivante :</p>
+<p><span class="math display">\[\int_0^T X_t \, d^s Y_t + \int_0^T Y_t
+\, d^s X_t = X_T Y_T - X_0 Y_0\]</span></p>
+<p>Cette relation montre que l’intégrale de Skorokhod est symétrique en
+un certain sens, ce qui est une propriété importante pour les
+applications.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème d’intégration par parties de Skorokhod, nous
+utilisons la définition de l’intégrale de Skorokhod et les propriétés
+des processus stochastiques.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux processus <span
+class="math inline">\(X_t\)</span> et <span
+class="math inline">\(Y_t\)</span>. Par définition de l’intégrale de
+Skorokhod, nous avons :</p>
+<p><span class="math display">\[\int_0^T X_t \, d^s Y_t = \int_0^T X_t
+\, dY_t + \frac{1}{2} [X, Y]_T\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\int_0^T Y_t \, d^s X_t = \int_0^T Y_t
+\, dX_t + \frac{1}{2} [Y, X]_T\]</span></p>
+<p>En ajoutant ces deux équations, nous obtenons :</p>
+<p><span class="math display">\[\int_0^T X_t \, d^s Y_t + \int_0^T Y_t
+\, d^s X_t = \int_0^T X_t \, dY_t + \int_0^T Y_t \, dX_t + [X,
+Y]_T\]</span></p>
+<p>D’après la formule classique d’intégration par parties pour les
+intégrales d’Itô, nous savons que :</p>
+<p><span class="math display">\[\int_0^T X_t \, dY_t + \int_0^T Y_t \,
+dX_t = X_T Y_T - X_0 Y_0\]</span></p>
+<p>En substituant cette relation dans l’équation précédente, nous
+obtenons :</p>
+<p><span class="math display">\[\int_0^T X_t \, d^s Y_t + \int_0^T Y_t
+\, d^s X_t = X_T Y_T - X_0 Y_0 + [X, Y]_T\]</span></p>
+<p>Cependant, par définition de la covariation, nous avons <span
+class="math inline">\([X, Y]_T = 0\)</span> pour les processus
+considérés. Par conséquent, nous obtenons le résultat souhaité :</p>
+<p><span class="math display">\[\int_0^T X_t \, d^s Y_t + \int_0^T Y_t
+\, d^s X_t = X_T Y_T - X_0 Y_0\]</span></p>
+<p>Ce qui achève la preuve. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’intégrale de Skorokhod possède plusieurs propriétés intéressantes
+qui en font un outil puissant pour le calcul stochastique.</p>
+<ol>
+<li><p><strong>Propriété de linéarité</strong> : L’intégrale de
+Skorokhod est linéaire en les deux arguments. C’est-à-dire, pour tout
+<span class="math inline">\(a, b \in \mathbb{R}\)</span> et <span
+class="math inline">\(X_t, Y_t, Z_t\)</span> processus stochastiques,
+nous avons :</p>
+<p><span class="math display">\[\int_0^T (aX_t + bY_t) \, d^s Z_t = a
+\int_0^T X_t \, d^s Z_t + b \int_0^T Y_t \, d^s Z_t\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\int_0^T X_t \, d^s (aY_t + bZ_t) = a
+\int_0^T X_t \, d^s Y_t + b \int_0^T X_t \, d^s Z_t\]</span></p></li>
+<li><p><strong>Propriété de symétrie</strong> : L’intégrale de Skorokhod
+est symétrique en un certain sens, comme le montre le théorème
+d’intégration par parties. Cette propriété est cruciale pour les
+applications en finance mathématique et en analyse
+stochastique.</p></li>
+<li><p><strong>Propriété de continuité</strong> : L’intégrale de
+Skorokhod est continue par rapport aux processus intégrés. Cela signifie
+que si une suite de processus <span class="math inline">\(X^n_t\)</span>
+converge vers un processus <span class="math inline">\(X_t\)</span> dans
+un sens approprié, alors l’intégrale de Skorokhod <span
+class="math inline">\(\int_0^T X^n_t \, d^s Y_t\)</span> converge vers
+<span class="math inline">\(\int_0^T X_t \, d^s Y_t\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’intégrale de Skorokhod est un outil puissant et flexible pour le
+calcul stochastique. Elle généralise l’intégrale d’Itô et permet une
+intégration par parties plus générale, ce qui est crucial pour de
+nombreuses applications en finance mathématique et en analyse
+stochastique. Les propriétés et théorèmes associés à l’intégrale de
+Skorokhod en font un sujet de recherche riche et passionnant.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

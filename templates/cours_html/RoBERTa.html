@@ -1,0 +1,329 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>RoBERTa: A Robustly Optimized BERT Approach</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">RoBERTa: A Robustly Optimized BERT Approach</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>The landscape of natural language processing (NLP) has been
+profoundly transformed by the advent of transformer-based models,
+particularly those leveraging self-attention mechanisms. Among these,
+BERT (Bidirectional Encoder Representations from Transformers) has
+emerged as a cornerstone, setting new benchmarks across various NLP
+tasks. However, the quest for optimization and robustness in these
+models continues unabated.</p>
+<p>RoBERTa, an acronym for Robustly Optimized BERT Approach, represents
+a significant evolution in this domain. Introduced by Liu et al.,
+RoBERTa builds upon the foundational architecture of BERT but introduces
+critical modifications that enhance its performance and versatility. The
+motivations behind RoBERTa are multifaceted, rooted in the desire to
+address limitations inherent in BERT and to push the boundaries of what
+is achievable with transformer models.</p>
+<p>Historically, BERT was trained on a specific corpus and with certain
+hyperparameters that, while effective, left room for improvement.
+RoBERTa’s development was driven by a systematic exploration of these
+parameters, leading to a more robust and efficient model. The
+enhancements in RoBERTa not only improve performance on standard
+benchmarks but also demonstrate greater adaptability to a wider range of
+NLP tasks.</p>
+<p>In this article, we delve into the intricacies of RoBERTa, exploring
+its architectural nuances, training methodologies, and the theoretical
+underpinnings that set it apart from its predecessors. We will also
+examine the empirical evidence supporting RoBERTa’s superiority and
+discuss its implications for the future of NLP.</p>
+<h1 id="définitions">Définitions</h1>
+<p>To understand RoBERTa, it is essential to first grasp the concept of
+transformer models and their role in NLP. Transformer models, introduced
+by Vaswani et al., rely on self-attention mechanisms to process
+sequential data. These models have proven highly effective in capturing
+long-range dependencies and contextual information within text.</p>
+<p>Consider a sequence of tokens <span class="math inline">\(X = (x_1,
+x_2, \ldots, x_n)\)</span>. The goal is to learn a representation <span
+class="math inline">\(H = (h_1, h_2, \ldots, h_n)\)</span> such that
+each <span class="math inline">\(h_i\)</span> encapsulates the
+contextual information of <span class="math inline">\(x_i\)</span>
+within the sequence. This is achieved through a series of transformer
+layers, each comprising self-attention and feed-forward networks.</p>
+<p>Formally, the self-attention mechanism can be defined as:</p>
+<p><span class="math display">\[\text{Attention}(Q, K, V) =
+\text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V\]</span></p>
+<p>where <span class="math inline">\(Q, K, V\)</span> are the query,
+key, and value matrices derived from the input embeddings, and <span
+class="math inline">\(d_k\)</span> is the dimension of the key
+vectors.</p>
+<p>RoBERTa extends this foundational architecture by introducing several
+key modifications. These include:</p>
+<ul>
+<li><p>Dynamic changing of the masking pattern applied to the training
+data.</p></li>
+<li><p>Training with much larger mini-batch sizes and learning
+rates.</p></li>
+<li><p>Incorporating a new sentence delimiter, &lt;/s&gt;, rather than
+[SEP].</p></li>
+</ul>
+<p>These modifications are designed to enhance the model’s ability to
+learn from the training data more effectively and robustly.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>One of the critical aspects of RoBERTa is its training methodology.
+The model employs a dynamic masking pattern, which means that the tokens
+masked during training are not fixed but vary across epochs. This
+approach ensures that the model does not become overly reliant on
+specific masking patterns, leading to more robust representations.</p>
+<p>Formally, let <span class="math inline">\(M\)</span> be a binary mask
+applied to the input sequence <span class="math inline">\(X\)</span>,
+where <span class="math inline">\(M_i = 1\)</span> indicates that the
+token <span class="math inline">\(x_i\)</span> is masked. The dynamic
+masking pattern can be defined as:</p>
+<p><span class="math display">\[M^{(t)} = \text{Mask}(X, p) \quad
+\forall t \in \{1, 2, \ldots, T\}\]</span></p>
+<p>where <span class="math inline">\(p\)</span> is the probability of
+masking a token, and <span class="math inline">\(T\)</span> is the total
+number of training epochs. The function <span
+class="math inline">\(\text{Mask}(X, p)\)</span> generates a new masking
+pattern for each epoch.</p>
+<p>This dynamic approach ensures that the model is exposed to a diverse
+range of masked sequences, enhancing its ability to generalize.</p>
+<h1 id="preuves">Preuves</h1>
+<p>To validate the effectiveness of dynamic masking, consider the
+following theorem:</p>
+<p><strong>Theorem:</strong> Dynamic masking improves the model’s
+ability to learn robust representations.</p>
+<p><strong>Proof:</strong></p>
+<p>1. **Variance in Training Data:** Dynamic masking introduces variance
+in the training data by presenting different masked sequences to the
+model. This variance helps the model avoid overfitting to specific
+patterns.</p>
+<p>2. **Generalization:** By exposing the model to a wider range of
+masked sequences, dynamic masking enhances its ability to generalize to
+unseen data. This is because the model learns to rely on contextual
+information rather than specific masking patterns.</p>
+<p>3. **Empirical Evidence:** Empirical studies have shown that models
+trained with dynamic masking achieve higher accuracy on benchmark
+datasets compared to those trained with static masking.</p>
+<p>Thus, the use of dynamic masking in RoBERTa contributes significantly
+to its robust performance.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>RoBERTa’s enhancements lead to several notable properties and
+corollaries:</p>
+<ol>
+<li><p>**Improved Performance on Downstream Tasks:** RoBERTa achieves
+state-of-the-art performance on a wide range of NLP tasks, including
+question answering, named entity recognition, and text
+classification.</p></li>
+<li><p>**Efficiency in Training:** The use of larger mini-batch sizes
+and learning rates in RoBERTa’s training process results in more
+efficient convergence, reducing the overall training time.</p></li>
+<li><p>**Adaptability:** RoBERTa’s dynamic masking and other
+modifications make it highly adaptable to different types of text data,
+enhancing its versatility across various applications.</p></li>
+</ol>
+<p>Each of these properties is supported by extensive empirical
+evidence, demonstrating the superiority of RoBERTa over its
+predecessors.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>RoBERTa represents a significant advancement in the field of NLP,
+building upon the foundational architecture of BERT and introducing
+critical modifications that enhance its performance and robustness.
+Through dynamic masking, larger mini-batch sizes, and other
+optimizations, RoBERTa achieves state-of-the-art results on a wide range
+of NLP tasks. Its development underscores the ongoing quest for
+optimization and innovation in transformer models, paving the way for
+future advancements in the field.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,347 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Stabilité des systèmes à commande par modèle interne</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Stabilité des systèmes à commande par modèle
+interne</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La théorie du contrôle des systèmes dynamiques a connu un
+développement considérable au cours du XXe siècle, avec des applications
+allant de l’aéronautique à la robotique en passant par les réseaux de
+communication. Parmi les nombreuses approches développées, la commande
+par modèle interne (CMMI) occupe une place centrale en raison de sa
+capacité à assurer le rejet des perturbations et la poursuite de
+références pour les systèmes linéaires.</p>
+<p>L’idée fondamentale derrière la CMMI est d’intégrer un modèle
+dynamique du système à contrôler dans le correcteur lui-même. Cette
+approche permet de compenser les perturbations et de suivre des
+références en utilisant la structure interne du système. La stabilité de
+tels systèmes est un sujet crucial, car elle garantit que le
+comportement du système reste borné et converge vers un état désiré
+malgré les perturbations externes.</p>
+<p>Dans cet article, nous explorerons les concepts de base de la CMMI et
+nous nous concentrerons sur l’analyse de la stabilité des systèmes
+commandés par ce type de correcteur. Nous présenterons les définitions
+fondamentales, les théorèmes clés et les preuves détaillées pour
+comprendre comment la stabilité peut être assurée dans le cadre de la
+CMMI.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’aborder la stabilité, il est essentiel de définir les
+concepts fondamentaux liés à la commande par modèle interne.</p>
+<h2 id="système-linéaire-invariant-dans-le-temps">Système linéaire
+invariant dans le temps</h2>
+<p>Considérons un système linéaire invariant dans le temps (LTI) décrit
+par les équations différentielles suivantes :</p>
+<p><span class="math display">\[\dot{x}(t) = Ax(t) + Bu(t)\]</span></p>
+<p><span class="math display">\[y(t) = Cx(t) + Du(t)\]</span></p>
+<p>où <span class="math inline">\(x(t) \in \mathbb{R}^n\)</span> est
+l’état du système, <span class="math inline">\(u(t) \in
+\mathbb{R}^m\)</span> est l’entrée de commande, et <span
+class="math inline">\(y(t) \in \mathbb{R}^p\)</span> est la sortie. Les
+matrices <span class="math inline">\(A, B, C, D\)</span> sont de
+dimensions appropriées.</p>
+<h2 id="commande-par-modèle-interne">Commande par modèle interne</h2>
+<p>La commande par modèle interne consiste à intégrer un modèle
+dynamique du système dans le correcteur. Le correcteur CMMI est
+généralement de la forme :</p>
+<p><span class="math display">\[\dot{x}_c(t) = A_cx_c(t) +
+B_cy(t)\]</span></p>
+<p><span class="math display">\[u(t) = C_cx_c(t) + D_cy(t)\]</span></p>
+<p>où <span class="math inline">\(x_c(t) \in \mathbb{R}^{n_c}\)</span>
+est l’état du correcteur, et <span class="math inline">\(A_c, B_c, C_c,
+D_c\)</span> sont les matrices du correcteur.</p>
+<h2 id="stabilité-interne">Stabilité interne</h2>
+<p>Un système est dit stable au sens de Lyapunov si, pour toute
+condition initiale <span class="math inline">\(x(0)\)</span>, l’état
+<span class="math inline">\(x(t)\)</span> reste borné pour tout <span
+class="math inline">\(t \geq 0\)</span>. La stabilité interne signifie
+que le système global, composé du système et du correcteur, est
+stable.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-stabilité-interne">Théorème de stabilité
+interne</h2>
+<p>Pour analyser la stabilité des systèmes à commande par modèle
+interne, nous utilisons le théorème suivant :</p>
+<div class="theorem">
+<p>Soit un système LTI décrit par <span class="math inline">\(\dot{x} =
+Ax + Bu\)</span> et <span class="math inline">\(y = Cx + Du\)</span>,
+avec un correcteur CMMI décrit par <span class="math inline">\(\dot{x}_c
+= A_cx_c + B_cy\)</span> et <span class="math inline">\(u = C_cx_c +
+D_cy\)</span>. Le système global est stable au sens de Lyapunov si et
+seulement si les pôles du système en boucle fermée sont dans le
+demi-plan gauche du plan complexe.</p>
+</div>
+<h2 id="démonstration-du-théorème-de-stabilité-interne">Démonstration du
+théorème de stabilité interne</h2>
+<p>Pour démontrer ce théorème, nous devons analyser les pôles du système
+en boucle fermée. Le système global peut être écrit sous la forme :</p>
+<p><span class="math display">\[\begin{pmatrix}
+\dot{x} \\
+\dot{x}_c
+\end{pmatrix}
+=
+\begin{pmatrix}
+A + B D_c C &amp; B C_c \\
+B_c C &amp; A_c
+\end{pmatrix}
+\begin{pmatrix}
+x \\
+x_c
+\end{pmatrix}\]</span></p>
+<p>Les pôles du système en boucle fermée sont les valeurs propres de la
+matrice :</p>
+<p><span class="math display">\[\begin{pmatrix}
+A + B D_c C &amp; B C_c \\
+B_c C &amp; A_c
+\end{pmatrix}\]</span></p>
+<p>Pour que le système soit stable, toutes les valeurs propres de cette
+matrice doivent avoir une partie réelle négative. Cela garantit que le
+système global est stable au sens de Lyapunov.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-rejet-des-perturbations">Propriété de rejet des
+perturbations</h2>
+<div class="property">
+<p>Un système à commande par modèle interne peut rejeter les
+perturbations si le modèle du correcteur inclut un modèle dynamique des
+perturbations.</p>
+</div>
+<h2
+id="démonstration-de-la-propriété-de-rejet-des-perturbations">Démonstration
+de la propriété de rejet des perturbations</h2>
+<p>Considérons un système soumis à une perturbation <span
+class="math inline">\(d(t)\)</span>. Le système peut être écrit comme
+:</p>
+<p><span class="math display">\[\dot{x} = Ax + Bu + Ed\]</span></p>
+<p><span class="math display">\[y = Cx + Du\]</span></p>
+<p>Si le correcteur CMMI inclut un modèle dynamique des perturbations,
+alors il peut générer une commande <span
+class="math inline">\(u(t)\)</span> qui annule l’effet de la
+perturbation sur le système.</p>
+<h2 id="corollaire-de-poursuite-des-références">Corollaire de poursuite
+des références</h2>
+<div class="corollary">
+<p>Un système à commande par modèle interne peut suivre une référence
+<span class="math inline">\(r(t)\)</span> si le modèle du correcteur
+inclut un modèle dynamique de la référence.</p>
+</div>
+<h2
+id="démonstration-du-corollaire-de-poursuite-des-références">Démonstration
+du corollaire de poursuite des références</h2>
+<p>De manière similaire au rejet des perturbations, si le correcteur
+CMMI inclut un modèle dynamique de la référence <span
+class="math inline">\(r(t)\)</span>, alors il peut générer une commande
+<span class="math inline">\(u(t)\)</span> qui permet au système de
+suivre la référence.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Dans cet article, nous avons exploré les concepts fondamentaux de la
+commande par modèle interne et analysé la stabilité des systèmes
+commandés par ce type de correcteur. Nous avons présenté les définitions
+clés, les théorèmes de stabilité et les preuves détaillées pour
+comprendre comment la stabilité peut être assurée dans le cadre de la
+CMMI. Les propriétés et corollaires supplémentaires ont également été
+discutés pour illustrer les capacités de rejet des perturbations et de
+poursuite des références.</p>
+<p>La commande par modèle interne reste un domaine actif de recherche,
+avec des applications potentielles dans de nombreux domaines. Les
+futures recherches pourraient explorer des extensions à des systèmes non
+linéaires ou des systèmes avec des retards, ainsi que des méthodes
+avancées pour le design des correcteurs CMMI.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

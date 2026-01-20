@@ -1,0 +1,312 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode de Jacobi pour les valeurs propres</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode de Jacobi pour les valeurs propres</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La méthode de Jacobi est une technique itérative pour déterminer les
+valeurs propres d’une matrice carrée. Elle trouve son origine dans le
+besoin de calculer numériquement les valeurs propres, une tâche non
+triviale pour les matrices de grande taille. Cette méthode est
+particulièrement utile lorsque la matrice en question n’est pas
+symétrique, ou lorsque les méthodes analytiques classiques sont
+inefficaces.</p>
+<p>L’idée sous-jacente à la méthode de Jacobi est d’annuler
+itérativement les éléments hors diagonale d’une matrice, transformant
+ainsi progressivement la matrice en une forme diagonale. Cette approche
+est inspirée par le fait que les matrices diagonales ont des valeurs
+propres égales à leurs éléments diagonaux.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la méthode de Jacobi, il est essentiel de définir
+quelques concepts clés.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée
+d’ordre <span class="math inline">\(n\)</span>. On appelle <em>vecteur
+propre</em> de <span class="math inline">\(A\)</span> tout vecteur non
+nul <span class="math inline">\(v \in \mathbb{R}^n\)</span> tel que :
+<span class="math display">\[A v = \lambda v\]</span> pour un certain
+scalaire <span class="math inline">\(\lambda\)</span>, appelé <em>valeur
+propre</em> associée à <span class="math inline">\(v\)</span>.</p>
+</div>
+<div class="definition">
+<p>Une matrice <span class="math inline">\(A\)</span> est dite
+<em>symétrique</em> si elle vérifie : <span class="math display">\[A =
+A^T\]</span> où <span class="math inline">\(A^T\)</span> désigne la
+transposée de <span class="math inline">\(A\)</span>.</p>
+</div>
+<h1 id="méthode-de-jacobi">Méthode de Jacobi</h1>
+<p>La méthode de Jacobi consiste à transformer une matrice <span
+class="math inline">\(A\)</span> en une matrice diagonale <span
+class="math inline">\(D\)</span> par une série de rotations
+élémentaires. Chaque rotation est choisie pour annuler un élément hors
+diagonale spécifique.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> une matrice symétrique
+réelle d’ordre <span class="math inline">\(n\)</span>. Il existe une
+suite de matrices de rotation <span class="math inline">\(R_k\)</span>
+telles que : <span class="math display">\[R_{m} R_{m-1} \cdots R_1 A
+R_1^T \cdots R_{m-1}^T R_m^T = D\]</span> où <span
+class="math inline">\(D\)</span> est une matrice diagonale. Les éléments
+diagonaux de <span class="math inline">\(D\)</span> sont les valeurs
+propres de <span class="math inline">\(A\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Jacobi, nous devons montrer que pour
+chaque élément hors diagonale <span
+class="math inline">\(a_{ij}\)</span> de la matrice <span
+class="math inline">\(A\)</span>, il existe une rotation <span
+class="math inline">\(R_k\)</span> qui annule cet élément.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons une matrice de rotation <span
+class="math inline">\(R_k\)</span> agissant sur les lignes <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> de la matrice <span
+class="math inline">\(A\)</span>. La rotation est définie par : <span
+class="math display">\[R_k = I + (\cos \theta - 1) e_i e_i^T - \sin
+\theta (e_i e_j^T - e_j e_i^T) + (\cos \theta - 1) e_j e_j^T\]</span> où
+<span class="math inline">\(e_i\)</span> et <span
+class="math inline">\(e_j\)</span> sont les vecteurs de la base
+canonique, et <span class="math inline">\(\theta\)</span> est l’angle de
+rotation.</p>
+<p>L’effet de cette rotation sur la matrice <span
+class="math inline">\(A\)</span> est donné par : <span
+class="math display">\[R_k^T A R_k = A - \sin 2\theta (a_{ij} e_i e_j^T
++ a_{ji} e_j e_i^T) + (\cos 2\theta - 1)(a_{ij} e_i e_i^T + a_{ji} e_j
+e_j^T - (a_{ij} + a_{ji}) e_i e_j^T)\]</span></p>
+<p>Pour annuler l’élément <span class="math inline">\(a_{ij}\)</span>,
+nous choisissons <span class="math inline">\(\theta\)</span> tel que :
+<span class="math display">\[\sin 2\theta = -\frac{a_{ij}}{a_{ji} +
+a_{ij}}\]</span> Cette condition garantit que l’élément <span
+class="math inline">\(a_{ij}\)</span> est annulé après la
+rotation. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La méthode de Jacobi possède plusieurs propriétés intéressantes :</p>
+<ol>
+<li><p>La méthode converge vers une matrice diagonale pour toute matrice
+symétrique réelle.</p></li>
+<li><p>Les valeurs propres obtenues sont exactes, mais l’ordre des
+valeurs propres n’est pas garanti.</p></li>
+<li><p>La méthode est particulièrement efficace pour les matrices de
+petite taille ou faiblement remplies.</p></li>
+</ol>
+<div class="corollary">
+<p>Pour une matrice symétrique <span class="math inline">\(A\)</span>,
+la méthode de Jacobi produit une suite de matrices <span
+class="math inline">\(A_k\)</span> telles que : <span
+class="math display">\[\lim_{k \to \infty} A_k = D\]</span> où <span
+class="math inline">\(D\)</span> est une matrice diagonale contenant les
+valeurs propres de <span class="math inline">\(A\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La convergence de la méthode de Jacobi découle du
+fait que chaque rotation réduit l’erreur quadratique moyenne des
+éléments hors diagonale. En itérant ce processus, l’erreur tend vers
+zéro, et la matrice converge vers une forme diagonale. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La méthode de Jacobi est une technique puissante pour le calcul des
+valeurs propres, particulièrement adaptée aux matrices symétriques. Son
+approche itérative et sa capacité à transformer une matrice en une forme
+diagonale en font un outil précieux en analyse numérique. Bien que la
+méthode puisse être lente pour les grandes matrices, elle reste une
+référence dans le domaine du calcul des valeurs propres.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

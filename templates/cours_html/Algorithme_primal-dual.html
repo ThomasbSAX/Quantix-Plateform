@@ -1,0 +1,343 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’algorithme primal-dual : Une approche unifiée pour l’optimisation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’algorithme primal-dual : Une approche unifiée pour
+l’optimisation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’optimisation mathématique est un domaine central en mathématiques
+appliquées, en sciences de l’ingénieur et en économie. Les problèmes
+d’optimisation peuvent souvent être formulés sous la forme d’un problème
+primal et de son dual associé. L’algorithme primal-dual est une méthode
+puissante qui exploite cette dualité pour résoudre des problèmes
+d’optimisation de manière efficace.</p>
+<p>L’idée sous-jacente à l’algorithme primal-dual est d’itérer
+simultanément sur les variables du problème primal et celles du problème
+dual, en exploitant leurs relations pour accélérer la convergence. Cette
+approche est particulièrement utile lorsque les problèmes primal et dual
+ont des structures complémentaires qui peuvent être exploitées pour
+simplifier les calculs.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir formellement l’algorithme primal-dual, il est
+essentiel de comprendre les concepts fondamentaux de dualité en
+optimisation.</p>
+<h2 class="unnumbered" id="problème-primal-et-dual">Problème Primal et
+Dual</h2>
+<p>Considérons un problème d’optimisation convexe standard :</p>
+<p><span class="math display">\[\begin{align*}
+\min_{x \in \mathbb{R}^n} &amp; \quad f(x) \\
+\text{tel que} &amp; \quad g_i(x) \leq 0, \quad i = 1, \ldots, m \\
+&amp; \quad h_j(x) = 0, \quad j = 1, \ldots, p
+\end{align*}\]</span></p>
+<p>où <span class="math inline">\(f : \mathbb{R}^n \to
+\mathbb{R}\)</span> est une fonction convexe, et <span
+class="math inline">\(g_i : \mathbb{R}^n \to \mathbb{R}\)</span> et
+<span class="math inline">\(h_j : \mathbb{R}^n \to \mathbb{R}\)</span>
+sont des fonctions convexes.</p>
+<p>Le problème dual associé est défini comme suit :</p>
+<p><span class="math display">\[\begin{align*}
+\max_{\lambda \in \mathbb{R}^m, \nu \in \mathbb{R}^p} &amp; \quad
+-f^*(-\lambda, -\nu) \\
+\text{tel que} &amp; \quad \sum_{i=1}^m \lambda_i g_i(x) + \sum_{j=1}^p
+\nu_j h_j(x) = f(x), \quad \forall x \in \mathbb{R}^n \\
+&amp; \quad \lambda_i \geq 0, \quad i = 1, \ldots, m
+\end{align*}\]</span></p>
+<p>où <span class="math inline">\(f^*\)</span> est la fonction conjuguée
+de Fenchel de <span class="math inline">\(f\)</span>.</p>
+<h2 class="unnumbered" id="algorithme-primal-dual">Algorithme
+Primal-Dual</h2>
+<p>L’algorithme primal-dual est une méthode itérative qui met à jour
+simultanément les variables du problème primal <span
+class="math inline">\(x\)</span> et celles du problème dual <span
+class="math inline">\((\lambda, \nu)\)</span>. L’idée est d’exploiter la
+structure du problème pour accélérer la convergence vers une solution
+optimale.</p>
+<div class="algorithm">
+<div class="algorithmic">
+<p><strong>Initialisation</strong> : Choisir <span
+class="math inline">\(x^0 \in \mathbb{R}^n\)</span>, <span
+class="math inline">\(\lambda^0 \in \mathbb{R}^m\)</span> avec <span
+class="math inline">\(\lambda_i^0 \geq 0\)</span>, <span
+class="math inline">\(\nu^0 \in \mathbb{R}^p\)</span> Calculer le
+gradient de la fonction objectif et des contraintes Mettre à jour les
+variables primales <span class="math inline">\(x^{k+1}\)</span> Mettre à
+jour les variables duales <span class="math inline">\((\lambda^{k+1},
+\nu^{k+1})\)</span> Vérifier la convergence</p>
+</div>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered"
+id="convergence-de-lalgorithme-primal-dual">Convergence de l’Algorithme
+Primal-Dual</h2>
+<p>Pour établir la convergence de l’algorithme primal-dual, nous avons
+besoin des hypothèses suivantes :</p>
+<ul>
+<li><p>Les fonctions <span class="math inline">\(f\)</span>, <span
+class="math inline">\(g_i\)</span> et <span
+class="math inline">\(h_j\)</span> sont convexes et
+différentiables.</p></li>
+<li><p>Le problème primal admet une solution optimale <span
+class="math inline">\(x^*\)</span>.</p></li>
+<li><p>Les variables duales sont bornées.</p></li>
+</ul>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\{x^k\}\)</span> et <span
+class="math inline">\(\{(\lambda^k, \nu^k)\}\)</span> les suites
+générées par l’algorithme primal-dual. Sous les hypothèses ci-dessus, on
+a :</p>
+<p><span class="math display">\[\lim_{k \to \infty} x^k = x^*\]</span>
+<span class="math display">\[\lim_{k \to \infty} (\lambda^k, \nu^k) =
+(\lambda^*, \nu^*)\]</span></p>
+<p>où <span class="math inline">\(x^*\)</span> est une solution optimale
+du problème primal, et <span class="math inline">\((\lambda^*,
+\nu^*)\)</span> est une solution optimale du problème dual.</p>
+</div>
+<h2 class="unnumbered" id="preuves">Preuves</h2>
+<p>Pour prouver la convergence de l’algorithme primal-dual, nous
+utilisons les concepts de dualité et de convexité.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la fonction de Lagrange associée au
+problème primal :</p>
+<p><span class="math display">\[L(x, \lambda, \nu) = f(x) + \sum_{i=1}^m
+\lambda_i g_i(x) + \sum_{j=1}^p \nu_j h_j(x)\]</span></p>
+<p>En utilisant les conditions de KKT, nous savons que <span
+class="math inline">\(x^*\)</span> est une solution optimale du problème
+primal si et seulement si il existe <span
+class="math inline">\((\lambda^*, \nu^*)\)</span> tels que :</p>
+<p><span class="math display">\[\nabla_x L(x^*, \lambda^*, \nu^*) =
+0\]</span> <span class="math display">\[g_i(x^*) \leq 0, \quad
+\lambda_i^* \geq 0, \quad \lambda_i^* g_i(x^*) = 0\]</span> <span
+class="math display">\[h_j(x^*) = 0\]</span></p>
+<p>L’algorithme primal-dual met à jour les variables <span
+class="math inline">\(x\)</span>, <span
+class="math inline">\(\lambda\)</span> et <span
+class="math inline">\(\nu\)</span> de manière à satisfaire ces
+conditions. En utilisant les propriétés de convexité et la théorie des
+points fixes, on peut montrer que les suites <span
+class="math inline">\(\{x^k\}\)</span> et <span
+class="math inline">\(\{(\lambda^k, \nu^k)\}\)</span> convergent vers
+des solutions optimales. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-de-dualité-forte">Propriété de
+Dualité Forte</h2>
+<div class="corollary">
+<p>Si le problème primal admet une solution optimale et que la
+contrainte de qualification de Slater est satisfaite, alors :</p>
+<p><span class="math display">\[\min_{x} f(x) = \max_{\lambda, \nu}
+-f^*(\lambda, \nu)\]</span></p>
+</div>
+<h2 class="unnumbered" id="propriété-de-convergence-linéaire">Propriété
+de Convergence Linéaire</h2>
+<div class="corollary">
+<p>Sous des hypothèses supplémentaires de régularité, l’algorithme
+primal-dual converge linéairement vers la solution optimale.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’algorithme primal-dual est une méthode puissante et flexible pour
+résoudre des problèmes d’optimisation convexe. En exploitant la dualité
+entre le problème primal et le problème dual, cette méthode permet
+d’obtenir des solutions optimales de manière efficace. Les propriétés de
+convergence et les résultats théoriques établis dans cet article
+montrent la robustesse et l’efficacité de cette approche.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

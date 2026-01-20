@@ -1,0 +1,341 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’espace H^k : Une introduction aux espaces de Sobolev</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’espace <span class="math inline">\(H^k\)</span> :
+Une introduction aux espaces de Sobolev</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse fonctionnelle moderne, particulièrement dans le cadre des
+équations aux dérivées partielles (EDP), a vu émerger une classe
+d’espaces fonctionnels d’une richesse inégalée : les espaces de Sobolev.
+Parmi ceux-ci, l’espace <span class="math inline">\(H^k\)</span> occupe
+une place centrale, tant par sa simplicité conceptuelle que par son
+utilité pratique. Historiquement, ces espaces ont été introduits pour
+donner un sens rigoureux à des solutions d’EDP qui ne sont pas
+nécessairement régulières au sens classique. Prenons l’exemple de
+l’équation de la chaleur : dans certains cas, les solutions peuvent être
+discontinues ou même non dérivables au sens classique. Les espaces de
+Sobolev permettent de donner un cadre mathématique solide pour traiter
+de telles situations.</p>
+<p>L’espace <span class="math inline">\(H^k\)</span> est
+particulièrement intéressant car il généralise les notions classiques de
+régularité. En effet, un fonction appartenant à <span
+class="math inline">\(H^k\)</span> possède des dérivées faibles jusqu’à
+l’ordre <span class="math inline">\(k\)</span>, ce qui permet de traiter
+des problèmes où les solutions ne sont pas suffisamment régulières pour
+appartenir à un espace classique comme <span
+class="math inline">\(C^k\)</span>.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire l’espace <span class="math inline">\(H^k\)</span>,
+commençons par rappeler quelques notions préliminaires. Supposons que
+nous ayons une fonction <span class="math inline">\(f\)</span> définie
+sur un ouvert <span class="math inline">\(\Omega \subset
+\mathbb{R}^n\)</span>. Nous cherchons à donner un sens aux dérivées de
+<span class="math inline">\(f\)</span> même si celles-ci ne sont pas
+définies au sens classique. Pour cela, nous introduisons la notion de
+dérivée faible.</p>
+<p>Une fonction <span class="math inline">\(g \in L^2(\Omega)\)</span>
+est une dérivée faible de <span class="math inline">\(f\)</span> si pour
+toute fonction test <span class="math inline">\(\phi \in
+C_c^\infty(\Omega)\)</span>, nous avons : <span
+class="math display">\[\int_\Omega f(x) \frac{\partial \phi}{\partial
+x_i}(x) \, dx = - \int_\Omega g(x) \phi(x) \, dx.\]</span> Cette notion
+permet de définir les dérivées faibles d’ordre supérieur. Par exemple,
+la dérivée faible d’ordre 2 <span class="math inline">\(\frac{\partial^2
+f}{\partial x_i \partial x_j}\)</span> est définie par la relation :
+<span class="math display">\[\int_\Omega f(x) \frac{\partial^2
+\phi}{\partial x_i \partial x_j}(x) \, dx = (-1)^2 \int_\Omega
+\frac{\partial^2 f}{\partial x_i \partial x_j}(x) \phi(x) \,
+dx.\]</span></p>
+<p>Nous sommes maintenant prêts à définir l’espace <span
+class="math inline">\(H^k\)</span>. Intuitivement, nous cherchons un
+espace de fonctions dont les dérivées faibles jusqu’à l’ordre <span
+class="math inline">\(k\)</span> sont dans <span
+class="math inline">\(L^2\)</span>. Formellement, nous avons la
+définition suivante :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\Omega \subset \mathbb{R}^n\)</span>
+un ouvert et <span class="math inline">\(k \in \mathbb{N}\)</span>.
+L’espace <span class="math inline">\(H^k(\Omega)\)</span> est défini
+comme l’ensemble des fonctions <span class="math inline">\(f \in
+L^2(\Omega)\)</span> telles que toutes les dérivées faibles de <span
+class="math inline">\(f\)</span> d’ordre jusqu’à <span
+class="math inline">\(k\)</span> appartiennent également à <span
+class="math inline">\(L^2(\Omega)\)</span>. On munit cet espace de la
+norme : <span class="math display">\[\|f\|_{H^k(\Omega)} = \left(
+\sum_{|\alpha| \leq k} \int_\Omega \left| D^\alpha f(x) \right|^2 \, dx
+\right)^{1/2},\]</span> où <span class="math inline">\(\alpha\)</span>
+est un multi-indice et <span class="math inline">\(D^\alpha f\)</span>
+désigne la dérivée partielle d’ordre <span
+class="math inline">\(\alpha\)</span>.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>L’espace <span class="math inline">\(H^k\)</span> possède de
+nombreuses propriétés intéressantes. Nous en présentons quelques-unes
+sous forme de théorèmes.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\Omega \subset \mathbb{R}^n\)</span>
+un ouvert borné à frontière Lipschitzienne. Pour tout <span
+class="math inline">\(k \in \mathbb{N}\)</span>, l’injection de <span
+class="math inline">\(H^k(\Omega)\)</span> dans <span
+class="math inline">\(L^2(\Omega)\)</span> est compacte.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ce théorème repose sur des techniques
+d’analyse fonctionnelle avancées. Elle utilise notamment le théorème de
+Banach-Alaoglu et des propriétés de compacité dans les espaces de
+Sobolev. Pour une démonstration détaillée, nous renvoyons le lecteur à
+des ouvrages spécialisés en analyse fonctionnelle. ◻</p>
+</div>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\Omega \subset \mathbb{R}^n\)</span>
+un ouvert borné. Il existe une constante <span class="math inline">\(C
+&gt; 0\)</span> telle que pour toute fonction <span
+class="math inline">\(f \in H^1_0(\Omega)\)</span>, nous avons : <span
+class="math display">\[\|f\|_{L^2(\Omega)} \leq C \|\nabla
+f\|_{L^2(\Omega)}.\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cette inégalité est une conséquence directe du
+théorème de Rellich-Kondrachov et des propriétés de l’espace <span
+class="math inline">\(H^1_0(\Omega)\)</span>. La preuve repose sur une
+analyse fine des propriétés de compacité et de régularité des fonctions
+dans cet espace. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de l’espace
+<span class="math inline">\(H^k\)</span>.</p>
+<ol>
+<li><p><strong>Inclusion des espaces</strong> : Pour tout <span
+class="math inline">\(k, l \in \mathbb{N}\)</span> avec <span
+class="math inline">\(k \leq l\)</span>, nous avons une inclusion
+continue de <span class="math inline">\(H^l(\Omega)\)</span> dans <span
+class="math inline">\(H^k(\Omega)\)</span>. Cette propriété est une
+conséquence directe des définitions et des normes associées.</p></li>
+<li><p><strong>Densité des fonctions régulières</strong> : L’espace
+<span class="math inline">\(C_c^\infty(\Omega)\)</span> est dense dans
+<span class="math inline">\(H^k(\Omega)\)</span>. Cela signifie que
+toute fonction dans <span class="math inline">\(H^k(\Omega)\)</span>
+peut être approchée par des fonctions régulières à support
+compact.</p></li>
+<li><p><strong>Inégalité de Sobolev</strong> : Pour tout <span
+class="math inline">\(k \in \mathbb{N}\)</span> et pour tout <span
+class="math inline">\(p\)</span> tel que <span
+class="math inline">\(\frac{1}{p} = \frac{1}{n} - \frac{k}{n}\)</span>,
+il existe une constante <span class="math inline">\(C &gt; 0\)</span>
+telle que pour toute fonction <span class="math inline">\(f \in
+H^k(\Omega)\)</span>, nous avons : <span
+class="math display">\[\|f\|_{L^p(\Omega)} \leq C
+\|f\|_{H^k(\Omega)}.\]</span> Cette inégalité est fondamentale en
+analyse fonctionnelle et trouve de nombreuses applications dans la
+théorie des EDP.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’espace <span class="math inline">\(H^k\)</span> est un outil
+puissant et flexible pour traiter des problèmes d’analyse fonctionnelle
+et d’équations aux dérivées partielles. Sa richesse conceptuelle et ses
+nombreuses propriétés en font un objet d’étude central dans de nombreux
+domaines des mathématiques appliquées. Les théorèmes et propriétés
+présentés dans cet article ne représentent qu’une infime partie des
+résultats disponibles sur ces espaces. Pour une étude plus approfondie,
+le lecteur est invité à consulter des ouvrages spécialisés en analyse
+fonctionnelle et en théorie des espaces de Sobolev.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

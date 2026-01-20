@@ -1,0 +1,377 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes d’optimisation combinatoire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes d’optimisation
+combinatoire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’optimisation combinatoire est un domaine mathématique qui se situe
+à l’intersection de plusieurs disciplines, notamment les mathématiques
+discrètes, la théorie des graphes et l’informatique théorique. Son
+origine remonte aux années 1960, avec les travaux pionniers de
+chercheurs comme Jack Edmonds et Ellis Johnson. Ces problèmes sont
+caractérisés par la nécessité d’optimiser une fonction objectif sur un
+ensemble discret, souvent fini mais de taille exponentielle.</p>
+<p>L’émergence de ces problèmes est intimement liée au développement des
+ordinateurs et à la nécessité de résoudre des problèmes pratiques
+complexes. Par exemple, le problème du voyageur de commerce (TSP)
+cherche à minimiser la distance parcourue pour visiter un ensemble de
+villes et revenir au point de départ. Ce problème, bien que simple à
+énoncer, est d’une complexité redoutable et illustre parfaitement les
+défis posés par l’optimisation combinatoire.</p>
+<p>Ces problèmes sont indispensables dans de nombreux domaines
+appliqués, tels que la logistique, la planification des réseaux, la
+bioinformatique et bien d’autres. Leur résolution efficace peut conduire
+à des économies significatives en termes de temps, de coûts et de
+ressources.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Commençons par comprendre ce que nous cherchons à optimiser.
+Imaginons un ensemble fini de solutions possibles, chacune associée à
+une valeur numérique que nous souhaitons minimiser ou maximiser. Par
+exemple, dans le problème du sac à dos, nous avons un ensemble d’objets
+avec des poids et des valeurs, et nous cherchons à maximiser la valeur
+totale sans dépasser un certain poids maximal.</p>
+<p>Formellement, un problème d’optimisation combinatoire peut être
+défini comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(S\)</span> un ensemble fini,
+appelé ensemble des solutions, et <span class="math inline">\(f: S
+\rightarrow \mathbb{R}\)</span> une fonction objectif. Un problème
+d’optimisation combinatoire consiste à trouver un élément <span
+class="math inline">\(s^* \in S\)</span> tel que : <span
+class="math display">\[f(s^*) = \min_{s \in S} f(s)\]</span> ou <span
+class="math display">\[f(s^*) = \max_{s \in S} f(s).\]</span></p>
+</div>
+<p>De manière plus générale, nous pouvons définir un problème
+d’optimisation combinatoire comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(S\)</span> un ensemble fini et
+<span class="math inline">\(f: S \rightarrow \mathbb{R}\)</span>. Le
+problème d’optimisation combinatoire associé à <span
+class="math inline">\((S, f)\)</span> est de trouver : <span
+class="math display">\[s^* \in \argmin_{s \in S} f(s)\]</span> ou <span
+class="math display">\[s^* \in \argmax_{s \ in S} f(s).\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>L’un des théorèmes fondamentaux en optimisation combinatoire est le
+théorème de la complexité NP-complet. Ce théorème, dû à Stephen Cook et
+Leonid Levin, caractérise une classe de problèmes pour lesquels il est
+facile de vérifier une solution proposée, mais difficile de trouver une
+solution optimale.</p>
+<p>Commençons par comprendre ce que signifie NP-complet. Imaginons un
+problème pour lequel, si nous avons une solution candidate, nous pouvons
+rapidement vérifier si elle est optimale. Cependant, trouver cette
+solution optimale parmi toutes les solutions possibles peut être
+extrêmement difficile.</p>
+<p>Formellement, le théorème de la complexité NP-complet peut être
+énoncé comme suit :</p>
+<div class="theorem">
+<p>Un problème est NP-complet s’il est dans la classe NP et s’il est
+NP-difficile. Un problème est NP-difficile si tout problème dans la
+classe NP peut être réduit à ce problème en temps polynomial.</p>
+</div>
+<p>Une autre formulation du théorème est la suivante :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\Pi\)</span> un problème de
+décision. <span class="math inline">\(\Pi\)</span> est NP-complet si et
+seulement si :</p>
+<ol>
+<li><p><span class="math inline">\(\Pi \in \text{NP}\)</span>,</p></li>
+<li><p>Pour tout problème <span class="math inline">\(\Pi&#39; \in
+\text{NP}\)</span>, il existe une réduction polynomialement
+parcimonieuse de <span class="math inline">\(\Pi&#39;\)</span> à <span
+class="math inline">\(\Pi\)</span>.</p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Cook-Levin, nous devons montrer que tout
+problème dans la classe NP peut être réduit à un problème NP-complet en
+temps polynomial. Nous allons illustrer cela avec le problème du circuit
+satisfiable (SAT), qui est l’un des problèmes NP-complets les plus
+célèbres.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un problème <span
+class="math inline">\(\Pi&#39; \in \text{NP}\)</span>. Par définition,
+il existe une machine de Turing non déterministique <span
+class="math inline">\(M\)</span> qui décide <span
+class="math inline">\(\Pi&#39;\)</span> en temps polynomial. Nous devons
+montrer qu’il existe une réduction polynomialement parcimonieuse de
+<span class="math inline">\(\Pi&#39;\)</span> à SAT.</p>
+<p>1. **Construction du circuit** : Pour une instance <span
+class="math inline">\(x\)</span> de <span
+class="math inline">\(\Pi&#39;\)</span>, nous construisons un circuit
+booléen <span class="math inline">\(C_x\)</span> qui simule la machine
+de Turing <span class="math inline">\(M\)</span> sur l’entrée <span
+class="math inline">\(x\)</span>. Ce circuit doit avoir une sortie qui
+est vraie si et seulement si <span class="math inline">\(M\)</span>
+accepte <span class="math inline">\(x\)</span>.</p>
+<p>2. **Réduction** : Nous montrons que <span class="math inline">\(x
+\in \Pi&#39;\)</span> si et seulement si <span
+class="math inline">\(C_x\)</span> est satisfiable. Si <span
+class="math inline">\(x \in \Pi&#39;\)</span>, alors il existe un chemin
+d’acceptation dans la machine de Turing <span
+class="math inline">\(M\)</span>, ce qui implique que le circuit <span
+class="math inline">\(C_x\)</span> a une affectation de variables qui le
+rend satisfiable. Réciproquement, si <span
+class="math inline">\(C_x\)</span> est satisfiable, alors il existe un
+chemin d’acceptation dans la machine de Turing <span
+class="math inline">\(M\)</span>, ce qui implique que <span
+class="math inline">\(x \in \Pi&#39;\)</span>.</p>
+<p>3. **Complexité** : La construction du circuit <span
+class="math inline">\(C_x\)</span> peut être effectuée en temps
+polynomial par rapport à la taille de l’entrée <span
+class="math inline">\(x\)</span>. Par conséquent, la réduction est
+polynomialement parcimonieuse. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés et corollaires importants
+liés à la complexité des problèmes d’optimisation combinatoire.</p>
+<ol>
+<li><p><strong>Propriété de NP-difficulté</strong> : Tout problème
+NP-complet est NP-difficile. Cela signifie que si nous pouvons résoudre
+un problème NP-complet en temps polynomial, alors nous pouvons résoudre
+tous les problèmes dans la classe NP en temps polynomial.</p></li>
+<li><p><strong>Propriété de réduction</strong> : Si un problème <span
+class="math inline">\(\Pi\)</span> peut être réduit en temps polynomial
+à un problème NP-complet <span class="math inline">\(\Pi&#39;\)</span>,
+alors <span class="math inline">\(\Pi\)</span> est également
+NP-difficile.</p></li>
+<li><p><strong>Corollaire de l’existence</strong> : Si un problème est
+NP-complet, alors il existe une preuve non constructive qu’il est
+NP-difficile. Cela signifie que nous pouvons montrer qu’un problème est
+NP-complet sans nécessairement connaître une réduction explicite à
+partir de tous les autres problèmes dans la classe NP.</p></li>
+</ol>
+<p>Pour prouver ces propriétés, nous utilisons des arguments de
+réduction et des résultats fondamentaux en théorie de la complexité
+computationnelle.</p>
+<div class="proof">
+<p><em>Proof.</em> 1. **Propriété de NP-difficulté** : Par définition,
+un problème est NP-complet s’il est dans la classe NP et s’il est
+NP-difficile. Par conséquent, tout problème NP-complet est
+NP-difficile.</p>
+<p>2. **Propriété de réduction** : Supposons que <span
+class="math inline">\(\Pi\)</span> peut être réduit en temps polynomial
+à un problème NP-complet <span class="math inline">\(\Pi&#39;\)</span>.
+Puisque <span class="math inline">\(\Pi&#39;\)</span> est NP-difficile,
+il existe une réduction polynomialement parcimonieuse de tout problème
+<span class="math inline">\(\Pi&#39;&#39; \in \text{NP}\)</span> à <span
+class="math inline">\(\Pi&#39;\)</span>. En composant ces réductions,
+nous obtenons une réduction polynomialement parcimonieuse de <span
+class="math inline">\(\Pi&#39;&#39;\)</span> à <span
+class="math inline">\(\Pi\)</span>, ce qui implique que <span
+class="math inline">\(\Pi\)</span> est NP-difficile.</p>
+<p>3. **Corollaire de l’existence** : Si un problème <span
+class="math inline">\(\Pi\)</span> est NP-complet, alors il existe une
+preuve non constructive qu’il est NP-difficile. Cela découle du fait que
+la NP-difficulté peut être établie en montrant qu’un problème connu pour
+être NP-complet peut être réduit à <span
+class="math inline">\(\Pi\)</span> en temps polynomial. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’optimisation combinatoire est un domaine riche et complexe, avec
+des applications pratiques importantes. Les théorèmes de complexité,
+tels que le théorème de Cook-Levin, fournissent des outils fondamentaux
+pour comprendre et classer les problèmes d’optimisation combinatoire.
+Les preuves et propriétés associées à ces théorèmes illustrent la
+profondeur mathématique de ce domaine et ouvrent des perspectives pour
+de futures recherches.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,308 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Réseaux bayésiens : Modélisation probabiliste et inférence</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Réseaux bayésiens : Modélisation probabiliste et
+inférence</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les réseaux bayésiens émergent comme un formalisme puissant pour la
+modélisation de systèmes complexes caractérisés par des incertitudes.
+Leur origine remonte aux travaux fondateurs de Judea Pearl dans les
+années 1980, où l’objectif était de fusionner la théorie des graphes et
+les principes bayésiens pour représenter des relations causales entre
+variables aléatoires.</p>
+<p>Ces modèles sont indispensables dans des domaines variés tels que la
+médecine, la finance ou l’intelligence artificielle. Ils permettent de
+capturer des dépendances conditionnelles tout en offrant un cadre
+rigoureux pour l’inférence probabiliste. Leur capacité à intégrer des
+connaissances expertes sous forme de graphes orientés en fait un outil
+privilégié pour la prise de décision sous incertitude.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire les réseaux bayésiens, considérons un ensemble de
+variables aléatoires <span class="math inline">\(V = \{V_1, V_2, \ldots,
+V_n\}\)</span>. L’idée est de représenter les dépendances entre ces
+variables par un graphe acyclique orienté (DAG).</p>
+<div class="definition">
+<p>Un réseau bayésien <span class="math inline">\(\mathcal{B}\)</span>
+est un couple <span class="math inline">\((\mathcal{G},
+\mathcal{P})\)</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(\mathcal{G} = (V, E)\)</span> est un
+graphe acyclique orienté avec <span class="math inline">\(V\)</span>
+comme ensemble de sommets et <span class="math inline">\(E\)</span>
+comme ensemble d’arêtes.</p></li>
+<li><p><span class="math inline">\(\mathcal{P}\)</span> est un ensemble
+de distributions de probabilité conditionnelles associées à chaque
+variable <span class="math inline">\(V_i\)</span> donné ses parents dans
+<span class="math inline">\(\mathcal{G}\)</span>.</p></li>
+</ul>
+<p>Formellement, pour chaque <span class="math inline">\(V_i \in
+V\)</span>, notons <span class="math inline">\(\text{Pa}(V_i)\)</span>
+l’ensemble des parents de <span class="math inline">\(V_i\)</span> dans
+<span class="math inline">\(\mathcal{G}\)</span>. Alors, la distribution
+jointe sur <span class="math inline">\(V\)</span> est donnée par : <span
+class="math display">\[P(V_1, V_2, \ldots, V_n) = \prod_{i=1}^n P(V_i |
+\text{Pa}(V_i))\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en théorie des réseaux bayésiens est celui de
+l’équivalence Markov.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(\mathcal{B} = (\mathcal{G},
+\mathcal{P})\)</span> un réseau bayésien. La structure du graphe <span
+class="math inline">\(\mathcal{G}\)</span> encode des relations
+d’indépendance conditionnelle entre les variables. Plus précisément,
+pour tout ensemble de variables <span class="math inline">\(X, Y, Z
+\subseteq V\)</span>, si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont conditionnellement indépendants
+donné <span class="math inline">\(Z\)</span> dans <span
+class="math inline">\(\mathcal{G}\)</span>, alors : <span
+class="math display">\[P(X, Y | Z) = P(X | Z) P(Y | Z)\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème d’équivalence Markov, nous utilisons la
+factorisation de la distribution jointe.</p>
+<div class="proof">
+<p><em>Proof.</em> Par définition du réseau bayésien, nous avons : <span
+class="math display">\[P(V_1, V_2, \ldots, V_n) = \prod_{i=1}^n P(V_i |
+\text{Pa}(V_i))\]</span></p>
+<p>Supposons que <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont conditionnellement indépendants
+donné <span class="math inline">\(Z\)</span> dans <span
+class="math inline">\(\mathcal{G}\)</span>. Cela signifie qu’il n’y a
+pas de chemin non bloqué entre <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> dans <span
+class="math inline">\(\mathcal{G}\)</span> conditionnellement à <span
+class="math inline">\(Z\)</span>.</p>
+<p>En utilisant la factorisation, nous pouvons écrire : <span
+class="math display">\[P(X, Y | Z) = \frac{P(X, Y, Z)}{P(Z)} =
+\frac{\prod_{i=1}^n P(V_i | \text{Pa}(V_i))}{\prod_{i: V_i \in Z} P(V_i
+| \text{Pa}(V_i))}\]</span></p>
+<p>En raison de l’indépendance conditionnelle, les termes impliquant
+<span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont séparés : <span
+class="math display">\[P(X, Y | Z) = P(X | Z) P(Y | Z)\]</span></p>
+<p>Ceci conclut la preuve. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les réseaux bayésiens possèdent plusieurs propriétés intéressantes
+:</p>
+<ol>
+<li><p><strong>Localité</strong> : La distribution conditionnelle de
+chaque variable dépend uniquement de ses parents dans le
+graphe.</p></li>
+<li><p><strong>Modularité</strong> : Les réseaux bayésiens peuvent être
+construits de manière modulaire en combinant des sous-réseaux.</p></li>
+<li><p><strong>Efficacité computationnelle</strong> : L’inférence dans
+les réseaux bayésiens peut être effectuée de manière efficace en
+utilisant des algorithmes comme l’élimination de variables.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les réseaux bayésiens offrent un cadre puissant pour la modélisation
+et l’inférence probabiliste. Leur capacité à représenter des relations
+causales et à intégrer des connaissances expertes en fait un outil
+indispensable dans de nombreux domaines. Les avancées récentes en
+apprentissage automatique et en théorie des graphes continuent
+d’enrichir ce domaine, ouvrant de nouvelles perspectives pour l’analyse
+de données complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

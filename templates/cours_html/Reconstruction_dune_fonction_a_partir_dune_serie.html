@@ -1,0 +1,399 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Réconstruction d’une fonction à partir d’une série</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Réconstruction d’une fonction à partir d’une
+série</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La reconstruction d’une fonction à partir d’une série est un problème
+fondamental en analyse mathématique, particulièrement dans le domaine
+des séries de Fourier et des développements en séries entières. L’idée
+centrale est de pouvoir représenter une fonction, éventuellement
+discontinue ou non régulière, par une somme infinie de termes plus
+simples. Cette approche permet non seulement de comprendre le
+comportement local et global des fonctions, mais aussi d’ouvrir la voie
+à des applications pratiques en traitement du signal, en physique et en
+ingénierie.</p>
+<p>L’origine historique de cette notion remonte aux travaux de Joseph
+Fourier au début du XIXe siècle, qui a montré que toute fonction
+périodique pouvait être exprimée comme une somme de sinus et de cosinus.
+Depuis, cette idée a été généralisée et approfondie, menant à des
+résultats profonds en analyse fonctionnelle et en théorie de
+l’approximation.</p>
+<p>Dans cet article, nous explorerons les différentes méthodes pour
+reconstruire une fonction à partir de sa série, en mettant l’accent sur
+les séries de Fourier et les séries entières. Nous fournirons des
+définitions précises, énoncerons des théorèmes importants et donnerons
+des preuves détaillées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans les théorèmes et les preuves, il est essentiel
+de définir clairement les concepts clés.</p>
+<h2 id="série-de-fourier">Série de Fourier</h2>
+<p>Considérons une fonction <span class="math inline">\(f\)</span>
+périodique de période <span class="math inline">\(2\pi\)</span>,
+c’est-à-dire une fonction telle que pour tout <span
+class="math inline">\(x \in \mathbb{R}\)</span>, on a : <span
+class="math display">\[f(x + 2\pi) = f(x).\]</span></p>
+<p>Nous cherchons à exprimer <span class="math inline">\(f\)</span>
+comme une somme infinie de sinus et de cosinus. Pour cela, nous
+introduisons les coefficients de Fourier : <span
+class="math display">\[a_n = \frac{1}{\pi} \int_{-\pi}^{\pi} f(x)
+\cos(nx) \, dx,\]</span> <span class="math display">\[b_n =
+\frac{1}{\pi} \int_{-\pi}^{\pi} f(x) \sin(nx) \, dx,\]</span> où <span
+class="math inline">\(n\)</span> est un entier naturel.</p>
+<p>La série de Fourier de <span class="math inline">\(f\)</span> est
+alors définie par : <span class="math display">\[S[f](x) = \frac{a_0}{2}
++ \sum_{n=1}^{\infty} \left( a_n \cos(nx) + b_n \sin(nx)
+\right).\]</span></p>
+<h2 id="série-entière">Série entière</h2>
+<p>Une série entière est une série de la forme : <span
+class="math display">\[\sum_{n=0}^{\infty} c_n (x - a)^n,\]</span> où
+<span class="math inline">\(c_n\)</span> sont des coefficients complexes
+et <span class="math inline">\(a\)</span> est un point de
+convergence.</p>
+<p>La série entière converge si la somme des termes reste finie pour
+certaines valeurs de <span class="math inline">\(x\)</span>. Le rayon de
+convergence <span class="math inline">\(R\)</span> est défini comme :
+<span class="math display">\[R = \frac{1}{\limsup_{n \to \infty}
+|c_n|^{1/n}}.\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-dirichlet">Théorème de Dirichlet</h2>
+<p>Le théorème de Dirichlet est un résultat fondamental concernant la
+convergence des séries de Fourier. Il énonce les conditions sous
+lesquelles une série de Fourier converge vers la fonction d’origine.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> une fonction périodique
+de période <span class="math inline">\(2\pi\)</span>, continue par
+morceaux sur <span class="math inline">\([-\pi, \pi]\)</span> et
+dérivable par morceaux. Alors, la série de Fourier de <span
+class="math inline">\(f\)</span> converge vers <span
+class="math inline">\(f(x)\)</span> en tout point <span
+class="math inline">\(x\)</span> où <span
+class="math inline">\(f\)</span> est continue. De plus, si <span
+class="math inline">\(f\)</span> présente une discontinuité en <span
+class="math inline">\(x\)</span>, la série de Fourier converge vers la
+demi-somme des limites à gauche et à droite : <span
+class="math display">\[S[f](x) = \frac{f(x^+) + f(x^-)}{2}.\]</span></p>
+</div>
+<h2 id="théorème-de-cauchy-hadamard">Théorème de Cauchy-Hadamard</h2>
+<p>Le théorème de Cauchy-Hadamard donne une condition nécessaire et
+suffisante pour la convergence d’une série entière.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\sum_{n=0}^{\infty} c_n (x -
+a)^n\)</span> une série entière. Le rayon de convergence <span
+class="math inline">\(R\)</span> est donné par : <span
+class="math display">\[R = \frac{1}{\limsup_{n \to \infty}
+|c_n|^{1/n}}.\]</span> La série converge absolument pour <span
+class="math inline">\(|x - a| &lt; R\)</span> et diverge pour <span
+class="math inline">\(|x - a| &gt; R\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-dirichlet">Preuve du théorème de
+Dirichlet</h2>
+<p>Pour démontrer le théorème de Dirichlet, nous utilisons plusieurs
+outils d’analyse, notamment les sommes de Riemann et les propriétés des
+fonctions continues par morceaux.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la série de Fourier partielle : <span
+class="math display">\[S_N[f](x) = \frac{a_0}{2} + \sum_{n=1}^{N} \left(
+a_n \cos(nx) + b_n \sin(nx) \right).\]</span></p>
+<p>Nous voulons montrer que <span
+class="math inline">\(S_N[f](x)\)</span> converge vers <span
+class="math inline">\(f(x)\)</span> lorsque <span
+class="math inline">\(N \to \infty\)</span>, sous les conditions
+données.</p>
+<p>Utilisons l’intégrale de Dirichlet pour exprimer <span
+class="math inline">\(S_N[f](x)\)</span> : <span
+class="math display">\[S_N[f](x) = \frac{1}{2\pi} \int_{-\pi}^{\pi} f(t)
+D_N(x - t) \, dt,\]</span> où <span class="math inline">\(D_N\)</span>
+est le noyau de Dirichlet : <span class="math display">\[D_N(x) =
+\frac{\sin\left( (N + \frac{1}{2})x \right)}{\sin\left( \frac{x}{2}
+\right)}.\]</span></p>
+<p>En utilisant les propriétés du noyau de Dirichlet et la continuité
+par morceaux de <span class="math inline">\(f\)</span>, nous pouvons
+montrer que : <span class="math display">\[\lim_{N \to \infty} S_N[f](x)
+= f(x),\]</span> quand <span class="math inline">\(f\)</span> est
+continue en <span class="math inline">\(x\)</span>. Si <span
+class="math inline">\(f\)</span> présente une discontinuité en <span
+class="math inline">\(x\)</span>, nous avons : <span
+class="math display">\[\lim_{N \to \infty} S_N[f](x) = \frac{f(x^+) +
+f(x^-)}{2}.\]</span> ◻</p>
+</div>
+<h2 id="preuve-du-théorème-de-cauchy-hadamard">Preuve du théorème de
+Cauchy-Hadamard</h2>
+<p>La preuve du théorème de Cauchy-Hadamard repose sur le critère de
+convergence de Cauchy.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la série entière <span
+class="math inline">\(\sum_{n=0}^{\infty} c_n (x - a)^n\)</span>. Nous
+voulons déterminer le rayon de convergence <span
+class="math inline">\(R\)</span>.</p>
+<p>Pour tout <span class="math inline">\(r &lt; R\)</span>, il existe un
+entier <span class="math inline">\(N\)</span> tel que pour tout <span
+class="math inline">\(n \geq N\)</span>, on a : <span
+class="math display">\[|c_n|^{1/n} &lt; \frac{1}{r}.\]</span></p>
+<p>Cela implique que pour tout <span class="math inline">\(n \geq
+N\)</span>, on a : <span class="math display">\[|c_n r^n| = |c_n|^{1/n}
+n |c_n r^{n-1}| &lt; \frac{n}{r}.\]</span></p>
+<p>Par le critère de convergence de Cauchy, la série <span
+class="math inline">\(\sum_{n=0}^{\infty} c_n r^n\)</span> converge
+absolument pour tout <span class="math inline">\(r &lt; R\)</span>.</p>
+<p>De même, pour tout <span class="math inline">\(r &gt; R\)</span>, il
+existe une suite infinie d’entiers <span
+class="math inline">\(n_k\)</span> tels que : <span
+class="math display">\[|c_{n_k}|^{1/n_k} &gt; \frac{1}{r}.\]</span></p>
+<p>Cela implique que pour tout <span class="math inline">\(k\)</span>
+suffisamment grand, on a : <span class="math display">\[|c_{n_k}
+r^{n_k}| = |c_{n_k}|^{1/n_k} n_k |c_{n_k} r^{n_k - 1}| &gt;
+\frac{n_k}{r}.\]</span></p>
+<p>Par le critère de divergence de Cauchy, la série <span
+class="math inline">\(\sum_{n=0}^{\infty} c_n r^n\)</span> diverge pour
+tout <span class="math inline">\(r &gt; R\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriétés-des-séries-de-fourier">Propriétés des séries de
+Fourier</h2>
+<ol>
+<li><p>Si <span class="math inline">\(f\)</span> est une fonction paire,
+alors tous les coefficients <span class="math inline">\(b_n\)</span>
+sont nuls. La série de Fourier se réduit à : <span
+class="math display">\[S[f](x) = \frac{a_0}{2} + \sum_{n=1}^{\infty} a_n
+\cos(nx).\]</span></p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est une fonction
+impaire, alors tous les coefficients <span
+class="math inline">\(a_n\)</span> sont nuls. La série de Fourier se
+réduit à : <span class="math display">\[S[f](x) = \sum_{n=1}^{\infty}
+b_n \sin(nx).\]</span></p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est une fonction
+périodique de période <span class="math inline">\(T\)</span>, alors la
+série de Fourier peut être généralisée en utilisant des fonctions
+trigonométriques de période <span
+class="math inline">\(T\)</span>.</p></li>
+</ol>
+<h2 id="corollaires-du-théorème-de-cauchy-hadamard">Corollaires du
+théorème de Cauchy-Hadamard</h2>
+<ol>
+<li><p>Si <span class="math inline">\(|c_n| \leq M\)</span> pour tout
+<span class="math inline">\(n\)</span>, alors le rayon de convergence
+<span class="math inline">\(R\)</span> est au moins 1.</p></li>
+<li><p>Si <span class="math inline">\(|c_n| \leq M r^n\)</span> pour
+tout <span class="math inline">\(n\)</span>, alors le rayon de
+convergence <span class="math inline">\(R\)</span> est au moins <span
+class="math inline">\(r\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(c_n = 0\)</span> pour tout <span
+class="math inline">\(n \geq N\)</span>, alors le rayon de convergence
+est infini.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La reconstruction d’une fonction à partir d’une série est un sujet
+riche et fascinant, avec des applications dans de nombreux domaines. Les
+séries de Fourier et les séries entières sont des outils puissants pour
+représenter et analyser des fonctions complexes. Les théorèmes de
+Dirichlet et Cauchy-Hadamard fournissent des conditions précises pour la
+convergence de ces séries, permettant une compréhension profonde du
+comportement des fonctions.</p>
+<p>En explorant ces concepts, nous avons non seulement approfondi notre
+compréhension de l’analyse mathématique, mais aussi ouvert la voie à des
+applications pratiques en traitement du signal et en physique. Les
+propriétés et corollaires discutés offrent des insights supplémentaires
+sur la nature des séries et leur convergence, enrichissant ainsi notre
+outil mathématique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

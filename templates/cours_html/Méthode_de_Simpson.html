@@ -1,0 +1,371 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode de Simpson</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode de Simpson</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La méthode de Simpson, du nom du mathématicien anglais Thomas Simpson
+(1710-1761), est une technique de quadrature numérique utilisée pour
+approcher l’intégrale d’une fonction. Cette méthode est particulièrement
+utile lorsque la fonction à intégrer ne possède pas de primitive simple
+ou analytique. Historiquement, Simpson a développé cette méthode pour
+résoudre des problèmes pratiques en physique et en ingénierie, où le
+calcul exact d’intégrales était souvent impraticable.</p>
+<p>L’intérêt principal de la méthode de Simpson réside dans sa précision
+et sa simplicité. Elle est basée sur l’approximation des fonctions par
+des polynômes de degré deux, ce qui permet d’obtenir une meilleure
+approximation que les méthodes basées sur des polynômes de degré un,
+comme la méthode des rectangles ou la méthode des trapèzes. La méthode
+de Simpson est donc indispensable dans le cadre du calcul numérique, où
+elle permet d’obtenir des résultats précis avec un nombre limité
+d’évaluations de la fonction.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la méthode de Simpson, nous devons d’abord comprendre
+ce que nous cherchons à faire. Supposons que nous voulions calculer
+l’intégrale d’une fonction <span class="math inline">\(f\)</span> sur un
+intervalle <span class="math inline">\([a, b]\)</span>. Si la primitive
+de <span class="math inline">\(f\)</span> n’est pas connue ou difficile
+à calculer, nous devons trouver une méthode pour approcher cette
+intégrale.</p>
+<p>Une idée naturelle est d’approximer la fonction <span
+class="math inline">\(f\)</span> par une droite (polynôme de degré un),
+ce qui conduit à la méthode des trapèzes. Cependant, cette approximation
+peut être insuffisante pour certaines fonctions. Pour améliorer cette
+approximation, nous pouvons utiliser un polynôme de degré deux,
+c’est-à-dire une parabole. Cela conduit à la méthode de Simpson.</p>
+<p>Formellement, la méthode de Simpson consiste à diviser l’intervalle
+<span class="math inline">\([a, b]\)</span> en un nombre pair <span
+class="math inline">\(n\)</span> de sous-intervalles de longueur égale
+<span class="math inline">\(h = \frac{b - a}{n}\)</span>. Nous notons
+les points de division <span class="math inline">\(x_0 = a, x_1 = a + h,
+\ldots, x_n = b\)</span>. Ensuite, nous approximons la fonction <span
+class="math inline">\(f\)</span> par une parabole passant par les points
+<span class="math inline">\((x_0, f(x_0)), (x_1, f(x_1)), (x_2,
+f(x_2))\)</span> sur chaque ensemble de trois points consécutifs.</p>
+<p>La formule de Simpson pour l’intégrale <span
+class="math inline">\(\int_a^b f(x) \, dx\)</span> est alors donnée par
+:</p>
+<p><span class="math display">\[\int_a^b f(x) \, dx \approx \frac{h}{3}
+\left[ f(x_0) + 4f(x_1) + 2f(x_2) + 4f(x_3) + \cdots + 2f(x_{n-2}) +
+4f(x_{n-1}) + f(x_n) \right]\]</span></p>
+<p>où <span class="math inline">\(h = \frac{b - a}{n}\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour justifier la méthode de Simpson, nous devons montrer qu’elle est
+exacte pour les polynômes de degré jusqu’à deux. Cela signifie que si
+<span class="math inline">\(f\)</span> est un polynôme de degré deux ou
+moins, alors la méthode de Simpson donne le résultat exact.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> un polynôme de degré deux
+ou moins. Alors, pour tout intervalle <span class="math inline">\([a,
+b]\)</span> et tout entier pair <span class="math inline">\(n\)</span>,
+la méthode de Simpson donne :</p>
+<p><span class="math display">\[\int_a^b f(x) \, dx = \frac{h}{3} \left[
+f(x_0) + 4f(x_1) + 2f(x_2) + \cdots + 2f(x_{n-2}) + 4f(x_{n-1}) + f(x_n)
+\right]\]</span></p>
+<p>où <span class="math inline">\(h = \frac{b - a}{n}\)</span> et <span
+class="math inline">\(x_i = a + ih\)</span> pour <span
+class="math inline">\(i = 0, \ldots, n\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous utilisons le fait
+que tout polynôme de degré deux ou moins peut être écrit sous la forme
+<span class="math inline">\(f(x) = ax^2 + bx + c\)</span>. Nous
+calculons alors l’intégrale exacte de <span
+class="math inline">\(f\)</span> sur <span class="math inline">\([a,
+b]\)</span> et montrons qu’elle est égale à l’approximation donnée par
+la méthode de Simpson.</p>
+<p>L’intégrale exacte de <span class="math inline">\(f\)</span> sur
+<span class="math inline">\([a, b]\)</span> est :</p>
+<p><span class="math display">\[\int_a^b (ax^2 + bx + c) \, dx = \left[
+\frac{a}{3}x^3 + \frac{b}{2}x^2 + cx \right]_a^b = \frac{a}{3}(b^3 -
+a^3) + \frac{b}{2}(b^2 - a^2) + c(b - a)\]</span></p>
+<p>D’autre part, l’approximation de Simpson est :</p>
+<p><span class="math display">\[\frac{h}{3} \left[ f(x_0) + 4f(x_1) +
+2f(x_2) + \cdots + 2f(x_{n-2}) + 4f(x_{n-1}) + f(x_n)
+\right]\]</span></p>
+<p>En développant cette expression et en utilisant le fait que <span
+class="math inline">\(h = \frac{b - a}{n}\)</span>, nous pouvons montrer
+que les deux expressions sont égales. Cela prouve l’exactitude de la
+méthode de Simpson pour les polynômes de degré deux ou moins. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer l’exactitude de la méthode de Simpson, nous devons
+montrer que l’erreur d’approximation est nulle pour les polynômes de
+degré deux ou moins. Cela signifie que si <span
+class="math inline">\(f\)</span> est un polynôme de degré deux ou moins,
+alors la méthode de Simpson donne le résultat exact.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> une fonction quatre fois
+dérivable sur <span class="math inline">\([a, b]\)</span>. Alors,
+l’erreur <span class="math inline">\(E\)</span> de la méthode de Simpson
+est donnée par :</p>
+<p><span class="math display">\[E = -\frac{(b - a)^5}{180n^4}
+f^{(4)}(\xi)\]</span></p>
+<p>pour un certain <span class="math inline">\(\xi \in [a,
+b]\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer ce théorème, nous utilisons le
+théorème de Taylor. Nous savons que tout polynôme de degré quatre ou
+moins peut être écrit sous la forme <span class="math inline">\(f(x) = a
++ bx + cx^2 + dx^3 + ex^4\)</span>. Nous calculons alors l’intégrale
+exacte de <span class="math inline">\(f\)</span> sur <span
+class="math inline">\([a, b]\)</span> et montrons que l’erreur
+d’approximation est donnée par la formule ci-dessus.</p>
+<p>L’intégrale exacte de <span class="math inline">\(f\)</span> sur
+<span class="math inline">\([a, b]\)</span> est :</p>
+<p><span class="math display">\[\int_a^b (a + bx + cx^2 + dx^3 + ex^4)
+\, dx = \left[ ax + \frac{b}{2}x^2 + \frac{c}{3}x^3 + \frac{d}{4}x^4 +
+\frac{e}{5}x^5 \right]_a^b\]</span></p>
+<p>D’autre part, l’approximation de Simpson est :</p>
+<p><span class="math display">\[\frac{h}{3} \left[ f(x_0) + 4f(x_1) +
+2f(x_2) + \cdots + 2f(x_{n-2}) + 4f(x_{n-1}) + f(x_n)
+\right]\]</span></p>
+<p>En développant cette expression et en utilisant le fait que <span
+class="math inline">\(h = \frac{b - a}{n}\)</span>, nous pouvons montrer
+que l’erreur d’approximation est donnée par la formule ci-dessus. Cela
+prouve le théorème. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la méthode
+de Simpson.</p>
+<ol>
+<li><p>La méthode de Simpson est exacte pour les polynômes de degré deux
+ou moins.</p></li>
+<li><p>L’erreur de la méthode de Simpson est proportionnelle à <span
+class="math inline">\(h^4\)</span>, où <span
+class="math inline">\(h\)</span> est la longueur des sous-intervalles.
+Cela signifie que la méthode de Simpson est plus précise que les
+méthodes basées sur des polynômes de degré un, comme la méthode des
+rectangles ou la méthode des trapèzes.</p></li>
+<li><p>La méthode de Simpson peut être généralisée à des intervalles non
+uniformes et à des fonctions de plusieurs variables.</p></li>
+</ol>
+<p>Nous développons ci-dessous chacune de ces propriétés.</p>
+<h2
+id="propriété-i-exactitude-pour-les-polynômes-de-degré-deux-ou-moins">Propriété
+(i) : Exactitude pour les polynômes de degré deux ou moins</h2>
+<p>Nous avons déjà démontré cette propriété dans la section précédente.
+Nous savons que si <span class="math inline">\(f\)</span> est un
+polynôme de degré deux ou moins, alors la méthode de Simpson donne le
+résultat exact.</p>
+<h2 id="propriété-ii-erreur-proportionnelle-à-h4">Propriété (ii) :
+Erreur proportionnelle à <span class="math inline">\(h^4\)</span></h2>
+<p>Nous avons également démontré cette propriété dans la section
+précédente. Nous savons que l’erreur de la méthode de Simpson est
+proportionnelle à <span class="math inline">\(h^4\)</span>, où <span
+class="math inline">\(h\)</span> est la longueur des sous-intervalles.
+Cela signifie que la méthode de Simpson est plus précise que les
+méthodes basées sur des polynômes de degré un, comme la méthode des
+rectangles ou la méthode des trapèzes.</p>
+<h2
+id="propriété-iii-généralisation-à-des-intervalles-non-uniformes-et-à-des-fonctions-de-plusieurs-variables">Propriété
+(iii) : Généralisation à des intervalles non uniformes et à des
+fonctions de plusieurs variables</h2>
+<p>La méthode de Simpson peut être généralisée à des intervalles non
+uniformes et à des fonctions de plusieurs variables. Pour les
+intervalles non uniformes, nous pouvons utiliser une version pondérée de
+la méthode de Simpson, où les poids sont déterminés par la longueur des
+sous-intervalles. Pour les fonctions de plusieurs variables, nous
+pouvons utiliser une version multidimensionnelle de la méthode de
+Simpson, où nous approximons la fonction par un polynôme de degré deux
+dans chaque direction.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

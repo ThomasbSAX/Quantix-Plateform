@@ -1,0 +1,283 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Test de Goldfeld-Quandt : Une Approche Robuste pour l’Hétéroscédasticité</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Test de Goldfeld-Quandt : Une Approche Robuste pour
+l’Hétéroscédasticité</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des données économiques et financières est souvent
+confrontée à des problèmes d’hétéroscédasticité, où la variance des
+erreurs n’est pas constante à travers les observations. Le test de
+Goldfeld-Quandt, développé par Stephen Goldfeld et Richard E. Quandt en
+1965, est une méthode robuste pour détecter cette hétéroscédasticité. Ce
+test est particulièrement utile dans les modèles de régression linéaire,
+où l’hypothèse de variance constante des erreurs est cruciale pour la
+validité des tests statistiques et des intervalles de confiance.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre le test de Goldfeld-Quandt, il est essentiel de
+définir quelques concepts clés. Supposons que nous avons un modèle de
+régression linéaire général :</p>
+<p><span class="math display">\[y_i = \beta_0 + \beta_1 x_{i1} + \dots +
+\beta_k x_{ik} + \epsilon_i\]</span></p>
+<p>où <span class="math inline">\(y_i\)</span> est la variable
+dépendante, <span class="math inline">\(x_{i1}, \dots, x_{ik}\)</span>
+sont les variables indépendantes, <span class="math inline">\(\beta_0,
+\dots, \beta_k\)</span> sont les coefficients de régression, et <span
+class="math inline">\(\epsilon_i\)</span> est le terme d’erreur.</p>
+<p>L’hypothèse nulle <span class="math inline">\(H_0\)</span> du test de
+Goldfeld-Quandt est que les erreurs <span
+class="math inline">\(\epsilon_i\)</span> sont homoscédastiques,
+c’est-à-dire que leur variance est constante. L’hypothèse alternative
+<span class="math inline">\(H_1\)</span> est que les erreurs sont
+hétéroscédastiques.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le test de Goldfeld-Quandt repose sur la division de l’échantillon en
+deux sous-échantillons. Supposons que nous avons <span
+class="math inline">\(n\)</span> observations ordonnées selon une
+variable suspecte d’induire de l’hétéroscédasticité. Nous divisons les
+données en deux parties : les <span class="math inline">\(h\)</span>
+premières observations et les <span class="math inline">\(n - h\)</span>
+dernières observations.</p>
+<p>Le test statistique est basé sur le rapport des sommes des carrés des
+résidus (RSS) des deux régressions séparées :</p>
+<p><span class="math display">\[F = \frac{RSS_1 / (n - 2k)}{RSS_2 / (n -
+h - k)}\]</span></p>
+<p>où <span class="math inline">\(RSS_1\)</span> est la somme des carrés
+des résidus pour les <span class="math inline">\(h\)</span> premières
+observations, et <span class="math inline">\(RSS_2\)</span> est la somme
+des carrés des résidus pour les <span class="math inline">\(n -
+h\)</span> dernières observations. Sous l’hypothèse nulle
+d’homoscédasticité, ce rapport suit une distribution F de Snedecor avec
+<span class="math inline">\(n - 2k\)</span> et <span
+class="math inline">\(n - h - k\)</span> degrés de liberté.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer la validité du test, nous devons montrer que sous
+l’hypothèse nulle, le rapport <span class="math inline">\(F\)</span>
+suit une distribution F. Cela repose sur le théorème de Cochran, qui
+stipule que si les erreurs sont indépendantes et identiquement
+distribuées (i.i.d.), alors la somme des carrés des résidus suit une
+distribution du chi-deux.</p>
+<p>En divisant les données en deux sous-échantillons, nous pouvons
+appliquer ce théorème à chaque sous-échantillon. Le rapport des sommes
+des carrés des résidus normalisées par leurs degrés de liberté suit
+alors une distribution F.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le test de Goldfeld-Quandt possède plusieurs propriétés importantes
+:</p>
+<ol>
+<li><p>**Robustesse** : Le test est robuste aux violations de
+l’hypothèse de normalité des erreurs.</p></li>
+<li><p>**Puissance** : Le test est puissant pour détecter
+l’hétéroscédasticité, surtout lorsque la variance des erreurs change de
+manière significative entre les sous-échantillons.</p></li>
+<li><p>**Flexibilité** : Le test peut être appliqué à différents types
+de modèles de régression, y compris les modèles avec variables
+qualitatives.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le test de Goldfeld-Quandt est un outil précieux pour les économètres
+et les statisticiens confrontés à des problèmes d’hétéroscédasticité. Sa
+simplicité et sa robustesse en font une méthode de choix pour valider
+l’hypothèse de variance constante des erreurs dans les modèles de
+régression linéaire.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

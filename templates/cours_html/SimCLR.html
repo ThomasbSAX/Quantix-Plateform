@@ -1,0 +1,375 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>SimCLR: A Framework for Contrastive Learning of Visual Representations</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">SimCLR: A Framework for Contrastive Learning of Visual
+Representations</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-and-motivations">Introduction
+and Motivations</h1>
+<p>The field of self-supervised learning has witnessed remarkable
+advancements in recent years, with contrastive learning emerging as a
+powerful paradigm. SimCLR (Simple Framework for Contrastive Learning of
+Visual Representations) stands out as a seminal work in this domain,
+revolutionizing how we approach unsupervised representation
+learning.</p>
+<p>The motivation behind SimCLR is rooted in the desire to learn
+effective visual representations without relying on extensive labeled
+datasets. By leveraging contrastive learning, SimCLR aims to maximize
+agreement between differently augmented views of the same data example
+while minimizing agreement for views of different examples. This
+approach not only reduces the dependency on labeled data but also
+enhances the model’s ability to generalize across various tasks.</p>
+<h1 class="unnumbered" id="definitions">Definitions</h1>
+<p>Before delving into the intricacies of SimCLR, it is essential to
+understand some foundational concepts.</p>
+<h2 class="unnumbered" id="contrastive-learning">Contrastive
+Learning</h2>
+<p>Imagine you are given a set of images, and your goal is to learn a
+representation that captures the underlying structure of these images.
+You want this representation to be such that similar images are close to
+each other in the representation space, while dissimilar images are far
+apart. This is precisely what contrastive learning aims to achieve.</p>
+<p>Formally, let <span class="math inline">\(\mathcal{X}\)</span> be a
+dataset of images. For any two images <span class="math inline">\(x_i,
+x_j \in \mathcal{X}\)</span>, we define a contrastive loss that
+encourages the representations of <span
+class="math inline">\(x_i\)</span> and <span
+class="math inline">\(x_j\)</span> to be similar if they are from the
+same class, and dissimilar otherwise.</p>
+<p>Mathematically, this can be expressed as: <span
+class="math display">\[\mathcal{L}(x_i, x_j) =
+\begin{cases}
+\|f(x_i) - f(x_j)\|^2 &amp; \text{if } y_i = y_j \\
+\max(0, m - \|f(x_i) - f(x_j)\|)^2 &amp; \text{if } y_i \neq y_j
+\end{cases}\]</span> where <span class="math inline">\(f\)</span> is the
+representation function, <span class="math inline">\(y_i\)</span> and
+<span class="math inline">\(y_j\)</span> are the class labels of <span
+class="math inline">\(x_i\)</span> and <span
+class="math inline">\(x_j\)</span> respectively, and <span
+class="math inline">\(m\)</span> is a margin parameter.</p>
+<h2 class="unnumbered" id="data-augmentation">Data Augmentation</h2>
+<p>Data augmentation plays a crucial role in contrastive learning. The
+idea is to create multiple augmented views of the same image, which are
+then treated as positive pairs. This helps the model learn invariant
+representations that are robust to various transformations.</p>
+<p>Let <span class="math inline">\(\mathcal{A}\)</span> be a set of
+augmentation functions. For any image <span class="math inline">\(x \in
+\mathcal{X}\)</span>, we can generate an augmented view <span
+class="math inline">\(\tilde{x} = \mathcal{A}(x)\)</span>. The goal is
+to ensure that the representation of <span
+class="math inline">\(\tilde{x}\)</span> is close to that of <span
+class="math inline">\(x\)</span>.</p>
+<h1 class="unnumbered" id="the-simclr-framework">The SimCLR
+Framework</h1>
+<p>SimCLR builds upon the principles of contrastive learning and data
+augmentation to create a simple yet powerful framework for unsupervised
+representation learning.</p>
+<h2 class="unnumbered" id="architecture">Architecture</h2>
+<p>The SimCLR architecture consists of three main components:</p>
+<ol>
+<li><p>An encoder network <span class="math inline">\(f_\theta\)</span>
+that maps an input image to a representation.</p></li>
+<li><p>A projection head <span class="math inline">\(g_\phi\)</span>
+that maps the representation to a lower-dimensional space.</p></li>
+<li><p>A contrastive loss function that encourages the representations
+of augmented views of the same image to be similar.</p></li>
+</ol>
+<p>Mathematically, the representation of an image <span
+class="math inline">\(x\)</span> is given by: <span
+class="math display">\[z = g_\phi(f_\theta(x))\]</span></p>
+<h2 class="unnumbered" id="contrastive-loss">Contrastive Loss</h2>
+<p>The contrastive loss used in SimCLR is known as the NT-Xent
+(Normalized Temperature-scaled Cross Entropy) loss. For any two
+augmented views <span class="math inline">\(\tilde{x}_i\)</span> and
+<span class="math inline">\(\tilde{x}_j\)</span> of the same image, the
+loss is defined as: <span class="math display">\[\mathcal{L}_{i,j} =
+-\log \frac{\exp(\text{sim}(z_i, z_j)/\tau)}{\sum_{k=1}^{2N}
+\mathbb{1}_{[k \neq i]} \exp(\text{sim}(z_i, z_k)/\tau)}\]</span> where
+<span class="math inline">\(\text{sim}(z_i, z_j)\)</span> is the
+similarity between <span class="math inline">\(z_i\)</span> and <span
+class="math inline">\(z_j\)</span>, <span
+class="math inline">\(\tau\)</span> is a temperature parameter, and
+<span class="math inline">\(N\)</span> is the batch size.</p>
+<h1 class="unnumbered" id="theorems">Theorems</h1>
+<h2 class="unnumbered"
+id="theorem-1-contrastive-learning-maximizes-mutual-information">Theorem
+1: Contrastive Learning Maximizes Mutual Information</h2>
+<p>One of the key theoretical insights behind contrastive learning is
+that it maximizes the mutual information between different views of the
+same data example.</p>
+<p>Let <span class="math inline">\(X\)</span> and <span
+class="math inline">\(\tilde{X}\)</span> be two random variables
+representing an image and its augmented view, respectively. The mutual
+information between <span class="math inline">\(X\)</span> and <span
+class="math inline">\(\tilde{X}\)</span> is given by: <span
+class="math display">\[I(X; \tilde{X}) = \mathbb{E}_{x \sim X, \tilde{x}
+\sim \tilde{X}} [\log \frac{p(x,
+\tilde{x})}{p(x)p(\tilde{x})}]\]</span></p>
+<p>The contrastive loss can be seen as a lower bound on the mutual
+information, up to a constant factor. Specifically, we have: <span
+class="math display">\[\mathcal{L} \geq -I(X; \tilde{X}) + C\]</span>
+where <span class="math inline">\(C\)</span> is a constant.</p>
+<h2 class="unnumbered" id="proof">Proof</h2>
+<p>The proof of this theorem relies on the concept of variational bounds
+for mutual information. The idea is to introduce a variational
+distribution <span class="math inline">\(q(z|x)\)</span> that
+approximates the true posterior <span
+class="math inline">\(p(z|x)\)</span>. The mutual information can then
+be lower bounded as: <span class="math display">\[I(X; \tilde{X}) \geq
+\mathbb{E}_{x, \tilde{x}} [\log q(z|\tilde{x})] - \mathbb{E}_{x} [\log
+p(z)]\]</span></p>
+<p>By choosing <span class="math inline">\(q(z|\tilde{x})\)</span> to be
+a Gaussian distribution centered at the representation of <span
+class="math inline">\(\tilde{x}\)</span>, and <span
+class="math inline">\(p(z)\)</span> to be a standard Gaussian, we can
+show that the contrastive loss is proportional to this lower bound.</p>
+<h1 class="unnumbered" id="properties-and-corollaries">Properties and
+Corollaries</h1>
+<h2 class="unnumbered"
+id="property-1-invariance-to-data-augmentation">Property 1: Invariance
+to Data Augmentation</h2>
+<p>One of the key properties of SimCLR is that it learns representations
+that are invariant to data augmentation. This means that the
+representation of an image should be similar to the representations of
+its augmented views.</p>
+<p>Formally, for any image <span class="math inline">\(x \in
+\mathcal{X}\)</span> and any augmentation function <span
+class="math inline">\(\mathcal{A} \in \mathcal{A}\)</span>, we have:
+<span class="math display">\[\|f_\theta(x) -
+f_\theta(\mathcal{A}(x))\|^2 \leq \epsilon\]</span> where <span
+class="math inline">\(\epsilon\)</span> is a small constant.</p>
+<h2 class="unnumbered" id="proof-1">Proof</h2>
+<p>The proof of this property follows directly from the contrastive
+loss. Since the loss encourages the representations of augmented views
+to be similar, it is natural that the representation of an image should
+be close to the representations of its augmented views.</p>
+<h2 class="unnumbered"
+id="corollary-1-generalization-to-downstream-tasks">Corollary 1:
+Generalization to Downstream Tasks</h2>
+<p>The invariance property of SimCLR has important implications for
+generalization to downstream tasks. Since the learned representations
+are robust to various transformations, they can be effectively used for
+tasks such as classification, detection, and segmentation.</p>
+<p>Formally, let <span class="math inline">\(T\)</span> be a downstream
+task and <span class="math inline">\(\mathcal{D}_T\)</span> be the
+corresponding dataset. The performance of a model trained on <span
+class="math inline">\(T\)</span> using SimCLR representations can be
+lower bounded as: <span class="math display">\[P(T) \geq P_0 -
+\delta\]</span> where <span class="math inline">\(P_0\)</span> is the
+performance of a model trained on labeled data, and <span
+class="math inline">\(\delta\)</span> is a small constant.</p>
+<h2 class="unnumbered" id="proof-2">Proof</h2>
+<p>The proof of this corollary relies on the concept of domain
+adaptation. Since SimCLR representations are invariant to data
+augmentation, they can be seen as lying in a common representation space
+that is robust to domain shifts. This allows the model to generalize
+well to downstream tasks, even when the distribution of <span
+class="math inline">\(\mathcal{D}_T\)</span> is different from that of
+<span class="math inline">\(\mathcal{X}\)</span>.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>SimCLR represents a significant advancement in the field of
+self-supervised learning. By leveraging contrastive learning and data
+augmentation, it enables the learning of effective visual
+representations without relying on extensive labeled datasets. The
+theoretical insights and practical results presented in this article
+highlight the potential of SimCLR to revolutionize various computer
+vision tasks.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

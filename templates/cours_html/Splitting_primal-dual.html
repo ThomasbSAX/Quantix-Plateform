@@ -1,0 +1,364 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Splitting Primal-Dual: Une Approche Unifiée pour l’Optimisation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Splitting Primal-Dual: Une Approche Unifiée pour
+l’Optimisation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’optimisation est un domaine central en mathématiques appliquées,
+avec des applications allant de la théorie du contrôle à l’apprentissage
+automatique. Les méthodes primales et duales sont deux approches
+fondamentales pour résoudre les problèmes d’optimisation. Cependant, ces
+méthodes présentent des limitations lorsqu’elles sont appliquées
+séparément.</p>
+<p>L’approche splitting primal-dual émerge comme une solution unifiée
+pour surmonter ces limitations. Cette méthode combine les avantages des
+approches primales et duales, permettant de résoudre des problèmes
+d’optimisation complexes de manière efficace. L’origine historique de
+cette approche remonte aux travaux pionniers sur les méthodes de
+décomposition, mais c’est seulement récemment que des avancées
+significatives ont été réalisées.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’approche splitting primal-dual, il est essentiel de
+définir les concepts clés.</p>
+<h2 class="unnumbered" id="problème-doptimisation-primal">Problème
+d’Optimisation Primal</h2>
+<p>Considérons un problème d’optimisation primal de la forme suivante
+:</p>
+<p><span class="math display">\[\begin{equation}
+    \min_{x \in X} f(x) + g(Ax)
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> et <span class="math inline">\(g: \mathbb{R}^m
+\rightarrow \mathbb{R}\)</span> sont des fonctions convexes, <span
+class="math inline">\(A: \mathbb{R}^n \rightarrow \mathbb{R}^m\)</span>
+est un opérateur linéaire, et <span class="math inline">\(X \subseteq
+\mathbb{R}^n\)</span> est un ensemble convexe fermé.</p>
+<h2 class="unnumbered" id="problème-doptimisation-dual">Problème
+d’Optimisation Dual</h2>
+<p>Le problème dual associé est donné par :</p>
+<p><span class="math display">\[\begin{equation}
+    \max_{y \in Y} -f^*(A^*y) - g^*(y)
+\end{equation}\]</span></p>
+<p>où <span class="math inline">\(f^*: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> et <span class="math inline">\(g^*: \mathbb{R}^m
+\rightarrow \mathbb{R}\)</span> sont les conjuguées de Fenchel des
+fonctions <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span>, respectivement, et <span
+class="math inline">\(Y \subseteq \mathbb{R}^m\)</span> est un ensemble
+convexe fermé.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-dualité-forte">Théorème de
+Dualité Forte</h2>
+<p>Un résultat fondamental en optimisation est le théorème de dualité
+forte, qui établit une condition sous laquelle les valeurs optimales des
+problèmes primal et dual sont égales.</p>
+<div class="theorem">
+<p>Supposons que <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> soient des fonctions convexes propres
+et semi-continues inférieurement, et que l’une des conditions suivantes
+soit satisfaite :</p>
+<ol>
+<li><p>Le problème primal admette une solution et <span
+class="math inline">\(\text{dom}(f^*) \cap A(\text{dom}(g)) \neq
+\emptyset\)</span>.</p></li>
+<li><p>Le problème dual admette une solution et <span
+class="math inline">\(\text{dom}(g^*) \cap A^*(\text{dom}(f)) \neq
+\emptyset\)</span>.</p></li>
+</ol>
+<p>Alors, les valeurs optimales des problèmes primal et dual sont
+égales.</p>
+</div>
+<h2 class="unnumbered"
+id="théorème-de-convergence-du-splitting-primal-dual">Théorème de
+Convergence du Splitting Primal-Dual</h2>
+<p>Le théorème suivant garantit la convergence de l’approche splitting
+primal-dual sous certaines conditions.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((x^k, y^k)\)</span> la suite générée
+par l’algorithme splitting primal-dual. Supposons que <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> soient des fonctions convexes propres
+et semi-continues inférieurement, et que l’opérateur <span
+class="math inline">\(A\)</span> soit Lipschitz continu. Alors, la suite
+<span class="math inline">\((x^k, y^k)\)</span> converge vers un point
+selle du Lagrangien associé au problème d’optimisation.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered" id="preuve-du-théorème-de-dualité-forte">Preuve
+du Théorème de Dualité Forte</h2>
+<p>Pour prouver le théorème de dualité forte, nous utilisons les
+propriétés des fonctions convexes et leurs conjuguées de Fenchel.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que le problème primal admette une solution
+<span class="math inline">\(x^*\)</span> et que <span
+class="math inline">\(\text{dom}(f^*) \cap A(\text{dom}(g)) \neq
+\emptyset\)</span>. Par la définition de la conjuguée de Fenchel, nous
+avons :</p>
+<p><span class="math display">\[f(x) + g(Ax) = \sup_{y} \{ \langle Ax, y
+\rangle - f^*(y) - g^*(y) \}\]</span></p>
+<p>En évaluant cette expression en <span class="math inline">\(x =
+x^*\)</span>, nous obtenons :</p>
+<p><span class="math display">\[f(x^*) + g(Ax^*) = \sup_{y} \{ \langle
+Ax^*, y \rangle - f^*(y) - g^*(y) \}\]</span></p>
+<p>Puisque <span class="math inline">\(x^*\)</span> est une solution du
+problème primal, nous avons :</p>
+<p><span class="math display">\[f(x^*) + g(Ax^*) = \inf_{x} \{ f(x) +
+g(Ax) \}\]</span></p>
+<p>En combinant ces résultats, nous concluons que la valeur optimale du
+problème dual est égale à celle du problème primal. ◻</p>
+</div>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-convergence-du-splitting-primal-dual">Preuve
+du Théorème de Convergence du Splitting Primal-Dual</h2>
+<p>La preuve de ce théorème repose sur les propriétés de convergence des
+algorithmes de splitting et la théorie de la dualité.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons l’algorithme splitting primal-dual défini
+par :</p>
+<p><span class="math display">\[x^{k+1} = \text{prox}_{\tau f}(x^k -
+\tau A^* y^k)\]</span></p>
+<p><span class="math display">\[y^{k+1} = \text{prox}_{\sigma g^*}(y^k +
+\sigma A (2x^{k+1} - x^k))\]</span></p>
+<p>où <span class="math inline">\(\text{prox}_{\tau f}\)</span> et <span
+class="math inline">\(\text{prox}_{\sigma g^*}\)</span> sont les
+opérateurs de proximité associés aux fonctions <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g^*\)</span>, respectivement.</p>
+<p>En utilisant les propriétés de l’opérateur de proximité et la théorie
+de la dualité, nous pouvons montrer que la suite <span
+class="math inline">\((x^k, y^k)\)</span> converge vers un point selle
+du Lagrangien associé. Les détails de cette preuve sont complexes et
+nécessitent une analyse approfondie des propriétés de convergence des
+algorithmes de splitting. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-de-convergence-linéaire">Propriété
+de Convergence Linéaire</h2>
+<p>Sous certaines conditions supplémentaires, l’algorithme splitting
+primal-dual peut converger linéairement.</p>
+<div class="corollary">
+<p>Supposons que <span class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> soient fortement convexes avec des
+constantes de convexité <span class="math inline">\(\mu_f\)</span> et
+<span class="math inline">\(\mu_g\)</span>, respectivement. Alors,
+l’algorithme splitting primal-dual converge linéairement vers la
+solution optimale.</p>
+</div>
+<h2 class="unnumbered" id="propriété-de-robustesse">Propriété de
+Robustesse</h2>
+<p>L’approche splitting primal-dual est robuste aux perturbations et aux
+erreurs de calcul.</p>
+<div class="corollary">
+<p>L’algorithme splitting primal-dual reste convergent même en présence
+de perturbations et d’erreurs de calcul, sous réserve que ces erreurs
+soient suffisamment petites.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’approche splitting primal-dual représente une avancée significative
+dans le domaine de l’optimisation. En combinant les avantages des
+méthodes primales et duales, cette approche permet de résoudre des
+problèmes d’optimisation complexes de manière efficace. Les théorèmes et
+propriétés présentés dans cet article fournissent une base solide pour
+l’analyse et l’application de cette méthode.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

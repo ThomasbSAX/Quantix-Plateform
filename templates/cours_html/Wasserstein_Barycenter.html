@@ -1,0 +1,370 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Les Barycentres de Wasserstein : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Les Barycentres de Wasserstein : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les barycentres de Wasserstein émergent comme une généralisation
+naturelle des barycentres dans l’espace des mesures de probabilité.
+Cette notion, introduite par Kantorovich en 1942 et développée par
+Wassserstein dans les années 70, trouve ses racines dans la théorie de
+l’optimisation et des transports optimaux. L’idée fondamentale est de
+définir un point moyen dans un espace métrique, où les points sont des
+mesures de probabilité.</p>
+<p>Le problème du barycentre de Wasserstein consiste à trouver une
+mesure qui minimise la somme pondérée des distances de Wasserstein entre
+elle et un ensemble donné de mesures. Cette notion est indispensable
+dans divers domaines tels que l’apprentissage automatique, la
+statistique, et la science des données, où il est crucial de synthétiser
+des informations provenant de différentes distributions.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les barycentres de Wasserstein, commençons par
+définir les concepts fondamentaux.</p>
+<h2 id="distance-de-wasserstein">Distance de Wasserstein</h2>
+<p>Considérons un espace métrique <span class="math inline">\((X,
+d)\)</span>. Nous cherchons à mesurer la distance entre deux mesures de
+probabilité <span class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span> sur <span
+class="math inline">\(X\)</span>. Intuitivement, cette distance devrait
+capturer le coût minimal de transport d’une mesure vers l’autre.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span> deux mesures de probabilité sur un
+espace métrique <span class="math inline">\((X, d)\)</span>. La distance
+de Wasserstein d’ordre <span class="math inline">\(p\)</span> entre
+<span class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span> est définie par : <span
+class="math display">\[W_p(\mu, \nu) = \left( \inf_{\gamma \in
+\Gamma(\mu, \nu)} \int_{X \times X} d(x, y)^p \, d\gamma(x, y)
+\right)^{1/p}\]</span> où <span class="math inline">\(\Gamma(\mu,
+\nu)\)</span> est l’ensemble des mesures couplées <span
+class="math inline">\(\gamma\)</span> sur <span class="math inline">\(X
+\times X\)</span> dont les marginales sont respectivement <span
+class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span>.</p>
+</div>
+<h2 id="barycentre-de-wasserstein">Barycentre de Wasserstein</h2>
+<p>Maintenant, nous voulons généraliser cette notion pour définir un
+barycentre dans l’espace des mesures de probabilité.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(\mu_1, \ldots, \mu_n\)</span> des
+mesures de probabilité sur un espace métrique <span
+class="math inline">\((X, d)\)</span> et <span
+class="math inline">\(\lambda_1, \ldots, \lambda_n\)</span> des poids
+positifs tels que <span class="math inline">\(\sum_{i=1}^n \lambda_i =
+1\)</span>. Le barycentre de Wasserstein <span
+class="math inline">\(\bar{\mu}\)</span> est une mesure de probabilité
+qui minimise la somme pondérée des distances de Wasserstein : <span
+class="math display">\[\bar{\mu} = \arg\min_{\mu} \sum_{i=1}^n \lambda_i
+W_p(\mu, \mu_i)\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="existence-et-unicité-du-barycentre-de-wasserstein">Existence et
+Unicité du Barycentre de Wasserstein</h2>
+<p>Un résultat fondamental est l’existence et l’unicité du barycentre de
+Wasserstein sous certaines conditions.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\mu_1, \ldots, \mu_n\)</span> des
+mesures de probabilité sur un espace métrique compact <span
+class="math inline">\((X, d)\)</span> et <span
+class="math inline">\(\lambda_1, \ldots, \lambda_n\)</span> des poids
+positifs tels que <span class="math inline">\(\sum_{i=1}^n \lambda_i =
+1\)</span>. Alors, il existe une unique mesure de probabilité <span
+class="math inline">\(\bar{\mu}\)</span> qui minimise la somme pondérée
+des distances de Wasserstein : <span class="math display">\[\bar{\mu} =
+\arg\min_{\mu} \sum_{i=1}^n \lambda_i W_p(\mu, \mu_i)\]</span></p>
+</div>
+<h2 id="dualité-et-optimisation">Dualité et Optimisation</h2>
+<p>La dualité de Kantorovich-Rubinstein joue un rôle crucial dans la
+compréhension des barycentres de Wasserstein.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\mu\)</span> et <span
+class="math inline">\(\nu\)</span> deux mesures de probabilité sur un
+espace métrique compact <span class="math inline">\((X, d)\)</span>. La
+distance de Wasserstein <span class="math inline">\(W_1(\mu,
+\nu)\)</span> peut être exprimée comme : <span
+class="math display">\[W_1(\mu, \nu) = \sup_{f \in \text{Lip}_1(X)}
+\left( \int_X f \, d\mu - \int_X f \, d\nu \right)\]</span> où <span
+class="math inline">\(\text{Lip}_1(X)\)</span> est l’ensemble des
+fonctions <span class="math inline">\(f: X \to \mathbb{R}\)</span>
+Lipschitziennes avec une constante de Lipschitz inférieure ou égale à
+1.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2
+id="preuve-de-lexistence-et-de-lunicité-du-barycentre-de-wasserstein">Preuve
+de l’Existence et de l’Unicité du Barycentre de Wasserstein</h2>
+<p>Pour prouver l’existence, nous utilisons le théorème de compacité de
+Prokhorov.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span
+class="math inline">\(\mathcal{P}(X)\)</span> l’ensemble des mesures de
+probabilité sur <span class="math inline">\(X\)</span>. Par le théorème
+de Prokhorov, <span class="math inline">\(\mathcal{P}(X)\)</span> est
+compact pour la topologie faible-<span
+class="math inline">\(\ast\)</span>. La fonction <span
+class="math inline">\(F(\mu) = \sum_{i=1}^n \lambda_i W_p(\mu,
+\mu_i)\)</span> est continue sur <span
+class="math inline">\(\mathcal{P}(X)\)</span>. Par le théorème de
+Weierstrass, <span class="math inline">\(F\)</span> atteint son minimum
+sur <span class="math inline">\(\mathcal{P}(X)\)</span>, prouvant
+l’existence de <span class="math inline">\(\bar{\mu}\)</span>.</p>
+<p>Pour l’unicité, supposons qu’il existe deux barycentres <span
+class="math inline">\(\bar{\mu}_1\)</span> et <span
+class="math inline">\(\bar{\mu}_2\)</span>. Alors, par l’inégalité
+triangulaire de Wasserstein : <span
+class="math display">\[W_p(\bar{\mu}_1, \bar{\mu}_2) \leq \sum_{i=1}^n
+\lambda_i (W_p(\bar{\mu}_1, \mu_i) + W_p(\mu_i, \bar{\mu}_2))\]</span>
+Puisque <span class="math inline">\(\bar{\mu}_1\)</span> et <span
+class="math inline">\(\bar{\mu}_2\)</span> minimisent <span
+class="math inline">\(F\)</span>, nous avons <span
+class="math inline">\(W_p(\bar{\mu}_1, \mu_i) = W_p(\bar{\mu}_2,
+\mu_i)\)</span> pour tout <span class="math inline">\(i\)</span>. Ainsi,
+<span class="math inline">\(W_p(\bar{\mu}_1, \bar{\mu}_2) = 0\)</span>,
+ce qui implique <span class="math inline">\(\bar{\mu}_1 =
+\bar{\mu}_2\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriétés-des-barycentres-de-wasserstein">Propriétés des
+Barycentres de Wasserstein</h2>
+<ol>
+<li><p><strong>Linéarité</strong> : Si <span
+class="math inline">\(\lambda_1 + \lambda_2 = 1\)</span>, alors le
+barycentre de Wasserstein <span class="math inline">\(\bar{\mu}\)</span>
+est une combinaison convexe des barycentres individuels : <span
+class="math display">\[\bar{\mu} = \lambda_1 \bar{\mu}_1 + \lambda_2
+\bar{\mu}_2\]</span></p></li>
+<li><p><strong>Invariance par Isométrie</strong> : Si <span
+class="math inline">\(T: X \to Y\)</span> est une isométrie, alors le
+barycentre de Wasserstein est invariant sous l’action de <span
+class="math inline">\(T\)</span> : <span class="math display">\[W_p(T_\#
+\mu, T_\# \nu) = W_p(\mu, \nu)\]</span> où <span
+class="math inline">\(T_\#\)</span> désigne le pushforward de la mesure
+par <span class="math inline">\(T\)</span>.</p></li>
+<li><p><strong>Stabilité</strong> : Les barycentres de Wasserstein sont
+stables sous des perturbations faibles des mesures initiales.</p></li>
+</ol>
+<h2 id="corollaires">Corollaires</h2>
+<div class="corollary">
+<p>Si les mesures <span class="math inline">\(\mu_1, \ldots,
+\mu_n\)</span> sont des masses de Dirac en <span
+class="math inline">\(x_1, \ldots, x_n\)</span>, alors le barycentre de
+Wasserstein est la masse de Dirac en la moyenne pondérée : <span
+class="math display">\[\bar{\mu} = \delta_{\sum_{i=1}^n \lambda_i
+x_i}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Par définition, le barycentre de Wasserstein minimise
+la somme pondérée des distances euclidiennes : <span
+class="math display">\[\bar{\mu} = \arg\min_{\mu} \sum_{i=1}^n \lambda_i
+\|x - x_i\|^p\]</span> La solution de ce problème est bien connue et
+correspond à la moyenne pondérée. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les barycentres de Wasserstein offrent une généralisation puissante
+des notions classiques de moyenne et de barycentre dans l’espace des
+mesures de probabilité. Leur étude ouvre des perspectives fascinantes en
+théorie des transports optimaux, en apprentissage automatique, et en
+statistique. Les propriétés d’existence, d’unicité, et de stabilité
+rendent ces objets indispensables pour la modélisation et l’analyse des
+données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

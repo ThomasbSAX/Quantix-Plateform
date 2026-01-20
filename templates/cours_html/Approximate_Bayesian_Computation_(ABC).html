@@ -1,0 +1,388 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Approximate Bayesian Computation (ABC) : Une Révolution en Inférence Statistique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Approximate Bayesian Computation (ABC) : Une
+Révolution en Inférence Statistique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’inférence bayésienne est un pilier fondamental de la statistique
+moderne, permettant d’incorporer des informations a priori dans
+l’estimation de paramètres. Cependant, lorsque les modèles deviennent
+complexes et que les distributions postérieures n’ont pas de forme
+analytique connue, l’inférence bayésienne traditionnelle se heurte à des
+difficultés computationnelles insurmontables. C’est dans ce contexte que
+l’Approximate Bayesian Computation (ABC) émerge comme une méthode
+révolutionnaire, permettant de contourner ces obstacles en utilisant des
+simulations et des comparaisons de distances.</p>
+<p>L’ABC trouve ses racines dans les travaux pionniers de Rubin (1984)
+et Tavaré et al. (1997), qui ont introduit cette approche pour résoudre
+des problèmes en génétique des populations. Depuis lors, l’ABC a connu
+un essor spectaculaire, s’étendant à une multitude de domaines tels que
+l’écologie, la finance, et les sciences sociales. Son principe
+fondamental repose sur l’idée de remplacer le calcul explicite de la
+vraisemblance par une comparaison entre les données observées et des
+données simulées à partir d’un modèle.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’ABC, il est essentiel de définir les concepts clés
+qui sous-tendent cette méthode.</p>
+<h2 class="unnumbered" id="modèle-statistique-et-vraisemblance">Modèle
+Statistique et Vraisemblance</h2>
+<p>Considérons un modèle statistique paramétré par un vecteur <span
+class="math inline">\(\theta \in \Theta\)</span>, où <span
+class="math inline">\(\Theta\)</span> est l’espace des paramètres. Soit
+<span class="math inline">\(X\)</span> une variable aléatoire suivant la
+distribution <span class="math inline">\(P(X|\theta)\)</span>. La
+vraisemblance d’un échantillon observé <span
+class="math inline">\(x\)</span> est donnée par : <span
+class="math display">\[L(\theta|x) = P(x|\theta).\]</span></p>
+<p>Cependant, dans de nombreux cas, le calcul explicite de cette
+vraisemblance est intraitable.</p>
+<h2 class="unnumbered" id="distribution-postérieure">Distribution
+Postérieure</h2>
+<p>En inférence bayésienne, la distribution postérieure de <span
+class="math inline">\(\theta\)</span> est proportionnelle au produit de
+la vraisemblance et de la distribution a priori <span
+class="math inline">\(P(\theta)\)</span> : <span
+class="math display">\[P(\theta|x) \propto
+L(\theta|x)P(\theta).\]</span></p>
+<p>L’objectif de l’ABC est d’approximer cette distribution postérieure
+lorsque le calcul direct est impossible.</p>
+<h2 class="unnumbered" id="fonction-de-distance">Fonction de
+Distance</h2>
+<p>L’ABC repose sur la comparaison entre les données observées <span
+class="math inline">\(x\)</span> et des données simulées <span
+class="math inline">\(x&#39;\)</span> à partir du modèle. Cette
+comparaison est effectuée au moyen d’une fonction de distance <span
+class="math inline">\(\rho(x, x&#39;)\)</span> qui mesure la
+dissimilarité entre les deux ensembles de données. La fonction de
+distance doit être choisie avec soin pour capturer les aspects
+essentiels du modèle.</p>
+<h2 class="unnumbered" id="seuil-de-tolérance">Seuil de Tolérance</h2>
+<p>Un seuil de tolérance <span class="math inline">\(\epsilon &gt;
+0\)</span> est introduit pour définir une région d’acceptation autour
+des données observées. Les simulations <span
+class="math inline">\(x&#39;\)</span> dont la distance <span
+class="math inline">\(\rho(x, x&#39;)\)</span> est inférieure à <span
+class="math inline">\(\epsilon\)</span> sont considérées comme
+acceptables.</p>
+<h2 class="unnumbered"
+id="distribution-postérieure-approximée">Distribution Postérieure
+Approximée</h2>
+<p>La distribution postérieure approximée <span
+class="math inline">\(P_{\text{ABC}}(\theta|x)\)</span> est obtenue en
+conditionnant sur l’ensemble des simulations acceptables. Formellement,
+pour un échantillon <span class="math inline">\(\theta_1, \ldots,
+\theta_n\)</span> simulé à partir de <span
+class="math inline">\(P(\theta)\)</span>, la distribution postérieure
+approximée est définie par : <span
+class="math display">\[P_{\text{ABC}}(\theta|x) \propto \sum_{i=1}^n
+P(\theta|\theta_i) \mathbb{I}(\rho(x, x&#39;_i) &lt; \epsilon),\]</span>
+où <span class="math inline">\(x&#39;_i\)</span> sont les données
+simulées correspondant à <span
+class="math inline">\(\theta_i\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-convergence-de-labc">Théorème de
+Convergence de l’ABC</h2>
+<p>Un résultat fondamental en ABC est le théorème de convergence, qui
+établit que la distribution postérieure approximée converge vers la
+véritable distribution postérieure lorsque le seuil de tolérance <span
+class="math inline">\(\epsilon\)</span> tend vers zéro.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(P(\theta|x)\)</span> la distribution
+postérieure exacte et <span
+class="math inline">\(P_{\text{ABC}}(\theta|x)\)</span> la distribution
+postérieure approximée. Alors, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe une constante
+<span class="math inline">\(C(\epsilon)\)</span> telle que : <span
+class="math display">\[\sup_{\theta \in \Theta} |P(\theta|x) -
+P_{\text{ABC}}(\theta|x)| \leq C(\epsilon).\]</span> De plus, lorsque
+<span class="math inline">\(\epsilon \to 0\)</span>, on a : <span
+class="math display">\[P_{\text{ABC}}(\theta|x) \to
+P(\theta|x).\]</span></p>
+</div>
+<h2 class="unnumbered" id="preuve-du-théorème-de-convergence">Preuve du
+Théorème de Convergence</h2>
+<p>La preuve de ce théorème repose sur des résultats classiques en
+théorie de l’approximation et en analyse statistique. Elle utilise
+notamment le théorème de la limite centrale pour les chaînes de Markov,
+ainsi que des inégalités de concentration.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un échantillon <span
+class="math inline">\(\theta_1, \ldots, \theta_n\)</span> simulé à
+partir de <span class="math inline">\(P(\theta)\)</span>. Pour chaque
+<span class="math inline">\(\theta_i\)</span>, simulons des données
+<span class="math inline">\(x&#39;_i\)</span> à partir de <span
+class="math inline">\(P(x|\theta_i)\)</span>. La distribution
+postérieure approximée est alors donnée par : <span
+class="math display">\[P_{\text{ABC}}(\theta|x) \propto \sum_{i=1}^n
+P(\theta|\theta_i) \mathbb{I}(\rho(x, x&#39;_i) &lt;
+\epsilon).\]</span></p>
+<p>En utilisant le théorème de la limite centrale pour les chaînes de
+Markov, on peut montrer que : <span class="math display">\[\frac{1}{n}
+\sum_{i=1}^n P(\theta|\theta_i) \mathbb{I}(\rho(x, x&#39;_i) &lt;
+\epsilon) \to \mathbb{E}[P(\theta|\Theta)\mathbb{I}(\rho(X, x) &lt;
+\epsilon)],\]</span> où <span class="math inline">\(\Theta\)</span> et
+<span class="math inline">\(X\)</span> sont des variables aléatoires
+indépendantes suivant respectivement <span
+class="math inline">\(P(\theta)\)</span> et <span
+class="math inline">\(P(x|\Theta)\)</span>.</p>
+<p>Ensuite, en utilisant des inégalités de concentration, on peut
+établir que : <span
+class="math display">\[\mathbb{E}[P(\theta|\Theta)\mathbb{I}(\rho(X, x)
+&lt; \epsilon)] \to P(\theta|x),\]</span> lorsque <span
+class="math inline">\(\epsilon \to 0\)</span>.</p>
+<p>Ainsi, on obtient la convergence de <span
+class="math inline">\(P_{\text{ABC}}(\theta|x)\)</span> vers <span
+class="math inline">\(P(\theta|x)\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-de-consistance">Propriété de
+Consistance</h2>
+<p>L’ABC est une méthode consistante, c’est-à-dire que les estimateurs
+obtenus à partir de la distribution postérieure approximée convergent
+vers les vrais paramètres lorsque le nombre de simulations tend vers
+l’infini et que le seuil de tolérance <span
+class="math inline">\(\epsilon\)</span> tend vers zéro.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\hat{\theta}_{\text{ABC}}\)</span>
+un estimateur obtenu à partir de <span
+class="math inline">\(P_{\text{ABC}}(\theta|x)\)</span>. Alors, sous des
+conditions régulières : <span
+class="math display">\[\hat{\theta}_{\text{ABC}} \to \theta \quad
+\text{en probabilité},\]</span> lorsque <span class="math inline">\(n
+\to \infty\)</span> et <span class="math inline">\(\epsilon \to
+0\)</span>.</p>
+</div>
+<h2 class="unnumbered" id="propriété-de-robustesse">Propriété de
+Robustesse</h2>
+<p>L’ABC est robuste au choix de la fonction de distance <span
+class="math inline">\(\rho(x, x&#39;)\)</span>, dans le sens où
+différentes fonctions de distance peuvent conduire à des distributions
+postérieures approximées similaires, à condition que <span
+class="math inline">\(\epsilon\)</span> soit suffisamment petit.</p>
+<div class="corollary">
+<p>Soient <span class="math inline">\(\rho_1(x, x&#39;)\)</span> et
+<span class="math inline">\(\rho_2(x, x&#39;)\)</span> deux fonctions de
+distance. Alors, pour tout <span class="math inline">\(\epsilon &gt;
+0\)</span>, il existe une constante <span
+class="math inline">\(C(\epsilon)\)</span> telle que : <span
+class="math display">\[\sup_{\theta \in \Theta}
+|P_{\text{ABC},1}(\theta|x) - P_{\text{ABC},2}(\theta|x)| \leq
+C(\epsilon),\]</span> où <span
+class="math inline">\(P_{\text{ABC},1}(\theta|x)\)</span> et <span
+class="math inline">\(P_{\text{ABC},2}(\theta|x)\)</span> sont les
+distributions postérieures approximées obtenues respectivement avec
+<span class="math inline">\(\rho_1\)</span> et <span
+class="math inline">\(\rho_2\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’Approximate Bayesian Computation (ABC) représente une avancée
+majeure en inférence statistique, permettant de traiter des modèles
+complexes pour lesquels les méthodes traditionnelles sont inefficaces.
+Grâce à son approche basée sur la simulation et la comparaison de
+distances, l’ABC offre une alternative puissante et flexible pour
+l’estimation des paramètres en contexte bayésien. Les théorèmes de
+convergence et les propriétés de consistance et de robustesse
+établissent une base solide pour l’utilisation de cette méthode dans
+divers domaines d’application.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

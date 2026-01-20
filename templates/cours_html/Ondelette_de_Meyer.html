@@ -1,0 +1,358 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Ondelette de Meyer : Une analyse multi-résolution du signal</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Ondelette de Meyer : Une analyse multi-résolution du
+signal</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des signaux et des images a toujours été un champ fertile
+pour les mathématiciens. Parmi les outils développés, l’analyse en
+ondelettes a révolutionné le traitement du signal en offrant une
+représentation multi-résolution. Parmi les ondelettes, celles de Meyer
+se distinguent par leur régularité et leurs propriétés remarquables dans
+le domaine fréquentiel.</p>
+<p>Les ondelettes de Meyer émergent d’un besoin crucial : représenter
+des signaux avec une résolution adaptative, c’est-à-dire une résolution
+fine aux hautes fréquences et une résolution plus grossière aux basses
+fréquences. Cette propriété est indispensable dans de nombreuses
+applications, allant du traitement d’images à la compression de
+données.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire les ondelettes de Meyer, commençons par comprendre ce
+que nous cherchons à construire. Nous voulons une fonction <span
+class="math inline">\(\psi \in L^2(\mathbb{R})\)</span> dont la
+transformée de Fourier <span class="math inline">\(\hat{\psi}\)</span>
+est localisée dans une bande fréquentielle spécifique, avec une
+décroissance rapide aux bornes de cette bande.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\psi \in L^2(\mathbb{R})\)</span>.
+On dit que <span class="math inline">\(\psi\)</span> est une ondelette
+de Meyer si sa transformée de Fourier <span
+class="math inline">\(\hat{\psi}\)</span> satisfait les conditions
+suivantes :</p>
+<ol>
+<li><p>Supposons qu’il existe une fonction <span
+class="math inline">\(\chi \in C^\infty(\mathbb{R})\)</span> telle que :
+<span class="math display">\[0 \leq \chi(t) \leq 1, \quad \forall t \in
+\mathbb{R}\]</span> <span class="math display">\[\chi(t) = 0, \quad
+\forall |t| \leq \frac{1}{3} \text{ ou } |t| \geq \frac{2}{3}\]</span>
+<span class="math display">\[\chi(t) + \chi(1 - t) = 1, \quad \forall t
+\in \left[\frac{1}{3}, \frac{2}{3}\right]\]</span></p></li>
+<li><p>La transformée de Fourier <span
+class="math inline">\(\hat{\psi}\)</span> est définie par : <span
+class="math display">\[\hat{\psi}(\xi) = e^{i\xi/2} \chi(\xi), \quad
+\forall \xi \in \mathbb{R}\]</span></p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant les ondelettes de Meyer est
+celui de la décomposition multi-résolution. Ce théorème garantit que
+toute fonction dans <span class="math inline">\(L^2(\mathbb{R})\)</span>
+peut être représentée comme une somme infinie de projections sur des
+espaces engendrés par les ondelettes de Meyer.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\psi\)</span> une ondelette de Meyer
+et soit <span class="math inline">\(\{V_j\}_{j \in \mathbb{Z}}\)</span>
+une décomposition multi-résolution associée. Alors, pour toute fonction
+<span class="math inline">\(f \in L^2(\mathbb{R})\)</span>, il existe
+une suite <span class="math inline">\(\{c_j(k)\}_{j,k \in
+\mathbb{Z}}\)</span> telle que : <span class="math display">\[f =
+\sum_{j \in \mathbb{Z}} \sum_{k \in \mathbb{Z}} c_j(k) 2^{j/2} \psi(2^j
+t - k)\]</span> où la convergence est au sens <span
+class="math inline">\(L^2\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de décomposition multi-résolution, nous
+devons d’abord établir que les ondelettes de Meyer forment une base
+orthonormale de <span class="math inline">\(L^2(\mathbb{R})\)</span>.
+Cela repose sur les propriétés de localisation fréquentielle et
+temporelle des ondelettes.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la fonction <span
+class="math inline">\(\psi\)</span> définie par sa transformée de
+Fourier : <span class="math display">\[\hat{\psi}(\xi) = e^{i\xi/2}
+\chi(\xi)\]</span> où <span class="math inline">\(\chi\)</span> est
+définie comme dans la définition précédente. Nous devons montrer que les
+fonctions <span class="math inline">\(\psi_{j,k}(t) = 2^{j/2} \psi(2^j t
+- k)\)</span> forment une base orthonormale de <span
+class="math inline">\(L^2(\mathbb{R})\)</span>.</p>
+<p>Tout d’abord, montrons que les <span
+class="math inline">\(\psi_{j,k}\)</span> sont orthonormales. Pour <span
+class="math inline">\(j_1, j_2, k_1, k_2 \in \mathbb{Z}\)</span>, nous
+avons : <span class="math display">\[\langle \psi_{j_1,k_1},
+\psi_{j_2,k_2} \rangle = 2^{(j_1 + j_2)/2} \int_{\mathbb{R}}
+\psi(2^{j_1} t - k_1) \overline{\psi(2^{j_2} t - k_2)} \, dt\]</span> En
+utilisant le changement de variable <span class="math inline">\(u =
+2^{j_1} t\)</span>, nous obtenons : <span class="math display">\[\langle
+\psi_{j_1,k_1}, \psi_{j_2,k_2} \rangle = 2^{-(j_1 - j_2)/2}
+\int_{\mathbb{R}} \psi(u - k_1) \overline{\psi(2^{j_1 - j_2} u - k_2)}
+\, du\]</span> Par le théorème de Plancherel, cela équivaut à : <span
+class="math display">\[\langle \psi_{j_1,k_1}, \psi_{j_2,k_2} \rangle =
+2^{-(j_1 - j_2)/2} \int_{\mathbb{R}} \hat{\psi}(\xi)
+\overline{\hat{\psi}(2^{j_1 - j_2} \xi)} e^{-i\xi(k_1 - 2^{j_1 - j_2}
+k_2)} \, d\xi\]</span> En utilisant la définition de <span
+class="math inline">\(\hat{\psi}\)</span>, nous avons : <span
+class="math display">\[\langle \psi_{j_1,k_1}, \psi_{j_2,k_2} \rangle =
+2^{-(j_1 - j_2)/2} \int_{\mathbb{R}} e^{i\xi/2} \chi(\xi)
+\overline{e^{i2^{j_1 - j_2}\xi/2} \chi(2^{j_1 - j_2} \xi)} e^{-i\xi(k_1
+- 2^{j_1 - j_2} k_2)} \, d\xi\]</span> Simplifions l’exponentielle :
+<span class="math display">\[\langle \psi_{j_1,k_1}, \psi_{j_2,k_2}
+\rangle = 2^{-(j_1 - j_2)/2} \int_{\mathbb{R}} e^{i\xi/2 (1 - 2^{j_1 -
+j_2})} \chi(\xi) \overline{\chi(2^{j_1 - j_2} \xi)} e^{-i\xi(k_1 -
+2^{j_1 - j_2} k_2)} \, d\xi\]</span> Pour que cette intégrale soit non
+nulle, il faut que <span class="math inline">\(j_1 = j_2\)</span> et
+<span class="math inline">\(k_1 = k_2\)</span>, ce qui prouve
+l’orthonormalité.</p>
+<p>Ensuite, nous devons montrer que les <span
+class="math inline">\(\psi_{j,k}\)</span> engendrent <span
+class="math inline">\(L^2(\mathbb{R})\)</span>. Cela découle du fait que
+les ondelettes de Meyer forment une base de Riesz, ce qui est une
+conséquence de leurs propriétés de localisation fréquentielle et
+temporelle. Par le théorème de Calderón, toute fonction dans <span
+class="math inline">\(L^2(\mathbb{R})\)</span> peut être exprimée comme
+une somme infinie de projections sur les espaces engendrés par les
+ondelettes de Meyer. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les ondelettes de Meyer possèdent plusieurs propriétés remarquables,
+notamment en ce qui concerne leur régularité et leurs applications
+pratiques.</p>
+<div class="corollary">
+<p>Les ondelettes de Meyer sont infiniment dérivables. Plus précisément,
+pour toute <span class="math inline">\(n \in \mathbb{N}\)</span>, il
+existe une constante <span class="math inline">\(C_n &gt; 0\)</span>
+telle que : <span class="math display">\[|\psi^{(n)}(t)| \leq C_n (1 +
+|t|)^{-n - 1}, \quad \forall t \in \mathbb{R}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La régularité des ondelettes de Meyer découle
+directement de la régularité de la fonction <span
+class="math inline">\(\chi\)</span>. Puisque <span
+class="math inline">\(\chi \in C^\infty(\mathbb{R})\)</span>, sa
+transformée de Fourier inverse <span class="math inline">\(\psi\)</span>
+est également infiniment dérivable. De plus, la décroissance rapide de
+<span class="math inline">\(\hat{\psi}\)</span> implique que les
+dérivées de <span class="math inline">\(\psi\)</span> décroissent
+rapidement à l’infini. ◻</p>
+</div>
+<div class="corollary">
+<p>Les ondelettes de Meyer sont largement utilisées dans le traitement
+du signal et la compression d’images en raison de leur capacité à
+capturer les caractéristiques locales des signaux tout en offrant une
+représentation compacte.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La capacité des ondelettes de Meyer à capturer les
+caractéristiques locales des signaux découle de leur localisation
+fréquentielle et temporelle. En particulier, elles permettent de
+représenter les signaux avec une résolution adaptative, ce qui est
+crucial pour la compression d’images et le traitement du signal. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les ondelettes de Meyer représentent un outil puissant pour l’analyse
+multi-résolution des signaux. Leur régularité et leurs propriétés
+remarquables en font un choix privilégié pour de nombreuses applications
+pratiques. L’étude des ondelettes de Meyer continue d’être un domaine
+actif de recherche, avec des applications potentielles dans divers
+domaines scientifiques et techniques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

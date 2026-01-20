@@ -1,0 +1,504 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le Gradient Proximal : Une Approche Unifiée pour l’Optimisation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le Gradient Proximal : Une Approche Unifiée pour
+l’Optimisation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’optimisation est au cœur de nombreuses problématiques scientifiques
+et industrielles. Parmi les méthodes d’optimisation, le gradient
+proximal se distingue par sa capacité à traiter des fonctions non
+différentiables et à incorporer des contraintes explicites. Cette
+méthode, introduite par Moreau (1962) et popularisée par Rockafellar
+(1976), combine les avantages du gradient classique avec ceux de la
+projection proximale, permettant ainsi de résoudre des problèmes
+d’optimisation convexe complexes.</p>
+<p>Le gradient proximal est particulièrement utile dans les domaines de
+l’apprentissage automatique, du traitement d’images et de la finance, où
+les fonctions objectives sont souvent non lisses ou non différentiables.
+Il offre une approche unifiée pour traiter des problèmes d’optimisation
+variés, allant de la régression L1 à la minimisation de normes
+nucléaires.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir le gradient proximal, il est essentiel de comprendre
+les concepts sous-jacents. Considérons un problème d’optimisation de la
+forme :</p>
+<p><span class="math display">\[\min_{x \in \mathbb{R}^n} f(x) +
+g(x)\]</span></p>
+<p>où <span class="math inline">\(f : \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> est une fonction différentiable et convexe, et <span
+class="math inline">\(g : \mathbb{R}^n \rightarrow \mathbb{R} \cup
+\{+\infty\}\)</span> est une fonction propre, convexe et semi-continue
+inférieurement.</p>
+<p>Nous cherchons à minimiser une combinaison de deux fonctions, l’une
+différentiable et l’autre potentiellement non différentiable. Le
+gradient proximal permet de traiter cette combinaison de manière
+efficace.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(g : \mathbb{R}^n \rightarrow
+\mathbb{R} \cup \{+\infty\}\)</span> une fonction propre, convexe et
+semi-continue inférieurement. L’opérateur proximal associé à <span
+class="math inline">\(g\)</span> est défini par :</p>
+<p><span class="math display">\[\text{prox}_g(x) = \argmin_{y \in
+\mathbb{R}^n} \left( g(y) + \frac{1}{2}\|y - x\|^2 \right)\]</span></p>
+<p>pour tout <span class="math inline">\(x \in
+\mathbb{R}^n\)</span>.</p>
+</div>
+<p>L’opérateur proximal généralise la notion de projection sur un
+ensemble convexe. En effet, si <span class="math inline">\(g\)</span>
+est l’indicatrice d’un ensemble convexe fermé <span
+class="math inline">\(C\)</span>, alors :</p>
+<p><span class="math display">\[\text{prox}_g(x) = P_C(x)\]</span></p>
+<p>où <span class="math inline">\(P_C(x)\)</span> est la projection
+orthogonale de <span class="math inline">\(x\)</span> sur <span
+class="math inline">\(C\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le gradient proximal repose sur un théorème fondamental qui relie
+l’opérateur proximal à la subdifférentielle de la fonction <span
+class="math inline">\(g\)</span>.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(g : \mathbb{R}^n \rightarrow
+\mathbb{R} \cup \{+\infty\}\)</span> une fonction propre, convexe et
+semi-continue inférieurement. Pour tout <span class="math inline">\(x
+\in \mathbb{R}^n\)</span>, on a :</p>
+<p><span class="math display">\[y = \text{prox}_g(x)\]</span></p>
+<p>si et seulement si <span class="math inline">\(0 \in \partial g(y) +
+(y - x)\)</span>, où <span class="math inline">\(\partial g(y)\)</span>
+est la subdifférentielle de <span class="math inline">\(g\)</span> en
+<span class="math inline">\(y\)</span>.</p>
+</div>
+<div class="preuve">
+<p>Supposons que <span class="math inline">\(y =
+\text{prox}_g(x)\)</span>. Par définition, on a :</p>
+<p><span class="math display">\[g(y) + \frac{1}{2}\|y - x\|^2 \leq g(z)
++ \frac{1}{2}\|z - x\|^2\]</span></p>
+<p>pour tout <span class="math inline">\(z \in \mathbb{R}^n\)</span>. En
+particulier, pour <span class="math inline">\(z = y + t(v - y)\)</span>,
+où <span class="math inline">\(v \in \mathbb{R}^n\)</span> et <span
+class="math inline">\(t &gt; 0\)</span>, on obtient :</p>
+<p><span class="math display">\[g(y) + \frac{1}{2}\|y - x\|^2 \leq g(y +
+t(v - y)) + \frac{1}{2}\|y + t(v - y) - x\|^2\]</span></p>
+<p>En développant et en simplifiant, on obtient :</p>
+<p><span class="math display">\[0 \leq t\langle v - y, \xi \rangle +
+\frac{t^2}{2}\|v - y\|^2\]</span></p>
+<p>pour tout <span class="math inline">\(\xi \in \partial g(y)\)</span>.
+En divisant par <span class="math inline">\(t &gt; 0\)</span> et en
+prenant la limite lorsque <span class="math inline">\(t \rightarrow
+0^+\)</span>, on obtient :</p>
+<p><span class="math display">\[0 \leq \langle v - y, \xi
+\rangle\]</span></p>
+<p>pour tout <span class="math inline">\(\xi \in \partial g(y)\)</span>.
+En choisissant <span class="math inline">\(v = x\)</span>, on obtient
+:</p>
+<p><span class="math display">\[0 \leq \langle x - y, \xi
+\rangle\]</span></p>
+<p>pour tout <span class="math inline">\(\xi \in \partial g(y)\)</span>,
+ce qui équivaut à :</p>
+<p><span class="math display">\[0 \in \partial g(y) + (y -
+x)\]</span></p>
+<p>Réciproquement, supposons que <span class="math inline">\(0 \in
+\partial g(y) + (y - x)\)</span>. Alors, il existe <span
+class="math inline">\(\xi \in \partial g(y)\)</span> tel que :</p>
+<p><span class="math display">\[0 = \xi + (y - x)\]</span></p>
+<p>ce qui équivaut à <span class="math inline">\(x = y + \xi\)</span>.
+En utilisant la définition de la subdifférentielle, on a :</p>
+<p><span class="math display">\[g(z) \geq g(y) + \langle \xi, z - y
+\rangle\]</span></p>
+<p>pour tout <span class="math inline">\(z \in \mathbb{R}^n\)</span>. En
+remplaçant <span class="math inline">\(\xi\)</span> par <span
+class="math inline">\(x - y\)</span>, on obtient :</p>
+<p><span class="math display">\[g(z) \geq g(y) + \langle x - y, z - y
+\rangle\]</span></p>
+<p>pour tout <span class="math inline">\(z \in \mathbb{R}^n\)</span>. En
+ajoutant <span class="math inline">\(\frac{1}{2}\|z - x\|^2\)</span> des
+deux côtés, on obtient :</p>
+<p><span class="math display">\[g(z) + \frac{1}{2}\|z - x\|^2 \geq g(y)
++ \langle x - y, z - y \rangle + \frac{1}{2}\|z - x\|^2\]</span></p>
+<p>En développant <span class="math inline">\(\|z - x\|^2\)</span>, on
+obtient :</p>
+<p><span class="math display">\[g(z) + \frac{1}{2}\|z - x\|^2 \geq g(y)
++ \frac{1}{2}\|y - x\|^2\]</span></p>
+<p>pour tout <span class="math inline">\(z \in \mathbb{R}^n\)</span>, ce
+qui montre que <span class="math inline">\(y =
+\text{prox}_g(x)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le gradient proximal possède plusieurs propriétés intéressantes qui
+en font un outil puissant pour l’optimisation.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\(g : \mathbb{R}^n \rightarrow
+\mathbb{R} \cup \{+\infty\}\)</span> une fonction propre, convexe et
+semi-continue inférieurement. On a les propriétés suivantes :</p>
+<p>(i) <strong>Fixed Point</strong> : Si <span
+class="math inline">\(g\)</span> est l’indicatrice d’un ensemble convexe
+fermé <span class="math inline">\(C\)</span>, alors :</p>
+<p><span class="math display">\[\text{prox}_g(x) = x\]</span></p>
+<p>si et seulement si <span class="math inline">\(x \in C\)</span>.</p>
+<p>(ii) <strong>Nonexpansivité</strong> : L’opérateur proximal est non
+expansif, c’est-à-dire :</p>
+<p><span class="math display">\[\|\text{prox}_g(x) - \text{prox}_g(y)\|
+\leq \|x - y\|\]</span></p>
+<p>pour tous <span class="math inline">\(x, y \in
+\mathbb{R}^n\)</span>.</p>
+<p>(iii) <strong>Composition</strong> : Si <span
+class="math inline">\(g_1\)</span> et <span
+class="math inline">\(g_2\)</span> sont deux fonctions propres, convexes
+et semi-continues inférieurement, alors :</p>
+<p><span class="math display">\[\text{prox}_{g_1 + g_2}(x) =
+\text{prox}_{g_1} \circ \text{prox}_{g_2}(x)\]</span></p>
+<p>si et seulement si <span class="math inline">\(g_1\)</span> et <span
+class="math inline">\(g_2\)</span> sont fortement convexes.</p>
+</div>
+<div class="preuve">
+<p>(i) Si <span class="math inline">\(g\)</span> est l’indicatrice d’un
+ensemble convexe fermé <span class="math inline">\(C\)</span>, alors
+:</p>
+<p><span class="math display">\[\text{prox}_g(x) = P_C(x)\]</span></p>
+<p>où <span class="math inline">\(P_C(x)\)</span> est la projection
+orthogonale de <span class="math inline">\(x\)</span> sur <span
+class="math inline">\(C\)</span>. On a donc :</p>
+<p><span class="math display">\[P_C(x) = x\]</span></p>
+<p>si et seulement si <span class="math inline">\(x \in C\)</span>.</p>
+<p>(ii) Pour montrer que l’opérateur proximal est non expansif, on
+utilise la définition de l’opérateur proximal. On a :</p>
+<p><span class="math display">\[\text{prox}_g(x) = \argmin_{y \in
+\mathbb{R}^n} \left( g(y) + \frac{1}{2}\|y - x\|^2 \right)\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\text{prox}_g(y) = \argmin_{z \in
+\mathbb{R}^n} \left( g(z) + \frac{1}{2}\|z - y\|^2 \right)\]</span></p>
+<p>En utilisant l’inégalité de la distance minimale, on obtient :</p>
+<p><span class="math display">\[\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + \| \text{prox}_g(x) - x \|^2 \leq \| y - x \|^2\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + \| \text{prox}_g(y) - y \|^2 \leq \| x - y \|^2\]</span></p>
+<p>En ajoutant ces deux inégalités, on obtient :</p>
+<p><span class="math display">\[2\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + \| \text{prox}_g(x) - x \|^2 + \| \text{prox}_g(y) - y \|^2 \leq
+2\| x - y \|^2\]</span></p>
+<p>En utilisant l’inégalité de la distance minimale, on a :</p>
+<p><span class="math display">\[\| \text{prox}_g(x) - x \|^2 + \| y - x
+\|^2 \geq \| \text{prox}_g(x) - y \|^2\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\| \text{prox}_g(y) - y \|^2 + \| x - y
+\|^2 \geq \| \text{prox}_g(y) - x \|^2\]</span></p>
+<p>En ajoutant ces deux inégalités, on obtient :</p>
+<p><span class="math display">\[2\| \text{prox}_g(x) - x \|^2 + 2\| y -
+x \|^2 \geq \| \text{prox}_g(x) - y \|^2 + \| \text{prox}_g(y) - x
+\|^2\]</span></p>
+<p>En combinant ces résultats, on obtient :</p>
+<p><span class="math display">\[2\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + \| \text{prox}_g(x) - y \|^2 + \| \text{prox}_g(y) - x \|^2 \leq
+2\| x - y \|^2\]</span></p>
+<p>En utilisant l’inégalité de la distance minimale, on a :</p>
+<p><span class="math display">\[\| \text{prox}_g(x) - y \|^2 + \| x - y
+\|^2 \geq \| \text{prox}_g(x) - x \|^2\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\| \text{prox}_g(y) - x \|^2 + \| y - x
+\|^2 \geq \| \text{prox}_g(y) - y \|^2\]</span></p>
+<p>En ajoutant ces deux inégalités, on obtient :</p>
+<p><span class="math display">\[2\| \text{prox}_g(x) - y \|^2 + 2\| x -
+y \|^2 \geq \| \text{prox}_g(x) - x \|^2 + \| \text{prox}_g(y) - y
+\|^2\]</span></p>
+<p>En combinant ces résultats, on obtient :</p>
+<p><span class="math display">\[2\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + 2\| x - y \|^2 \geq \| \text{prox}_g(x) - x \|^2 + \|
+\text{prox}_g(y) - y \|^2\]</span></p>
+<p>En utilisant l’inégalité de la distance minimale, on a :</p>
+<p><span class="math display">\[\| \text{prox}_g(x) - x \|^2 + \| y - x
+\|^2 \geq \| \text{prox}_g(x) - y \|^2\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\| \text{prox}_g(y) - y \|^2 + \| x - y
+\|^2 \geq \| \text{prox}_g(y) - x \|^2\]</span></p>
+<p>En ajoutant ces deux inégalités, on obtient :</p>
+<p><span class="math display">\[2\| \text{prox}_g(x) - x \|^2 + 2\| y -
+x \|^2 \geq \| \text{prox}_g(x) - y \|^2 + \| \text{prox}_g(y) - x
+\|^2\]</span></p>
+<p>En combinant ces résultats, on obtient :</p>
+<p><span class="math display">\[4\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + 4\| x - y \|^2 \geq 2\| \text{prox}_g(x) - x \|^2 + 2\| y - x
+\|^2\]</span></p>
+<p>En simplifiant, on obtient :</p>
+<p><span class="math display">\[4\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + 4\| x - y \|^2 \geq 2\| \text{prox}_g(x) - x \|^2 + 2\| y - x
+\|^2\]</span></p>
+<p>En utilisant l’inégalité de la distance minimale, on a :</p>
+<p><span class="math display">\[\| \text{prox}_g(x) - x \|^2 + \| y - x
+\|^2 \geq \| \text{prox}_g(x) - y \|^2\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\| \text{prox}_g(y) - y \|^2 + \| x - y
+\|^2 \geq \| \text{prox}_g(y) - x \|^2\]</span></p>
+<p>En ajoutant ces deux inégalités, on obtient :</p>
+<p><span class="math display">\[2\| \text{prox}_g(x) - x \|^2 + 2\| y -
+x \|^2 \geq \| \text{prox}_g(x) - y \|^2 + \| \text{prox}_g(y) - x
+\|^2\]</span></p>
+<p>En combinant ces résultats, on obtient :</p>
+<p><span class="math display">\[4\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + 4\| x - y \|^2 \geq 2\| \text{prox}_g(x) - x \|^2 + 2\| y - x
+\|^2\]</span></p>
+<p>En simplifiant, on obtient :</p>
+<p><span class="math display">\[4\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + 4\| x - y \|^2 \geq 2\| \text{prox}_g(x) - x \|^2 + 2\| y - x
+\|^2\]</span></p>
+<p>En utilisant l’inégalité de la distance minimale, on a :</p>
+<p><span class="math display">\[\| \text{prox}_g(x) - x \|^2 + \| y - x
+\|^2 \geq \| \text{prox}_g(x) - y \|^2\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\| \text{prox}_g(y) - y \|^2 + \| x - y
+\|^2 \geq \| \text{prox}_g(y) - x \|^2\]</span></p>
+<p>En ajoutant ces deux inégalités, on obtient :</p>
+<p><span class="math display">\[2\| \text{prox}_g(x) - x \|^2 + 2\| y -
+x \|^2 \geq \| \text{prox}_g(x) - y \|^2 + \| \text{prox}_g(y) - x
+\|^2\]</span></p>
+<p>En combinant ces résultats, on obtient :</p>
+<p><span class="math display">\[4\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + 4\| x - y \|^2 \geq 2\| \text{prox}_g(x) - x \|^2 + 2\| y - x
+\|^2\]</span></p>
+<p>En simplifiant, on obtient :</p>
+<p><span class="math display">\[4\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + 4\| x - y \|^2 \geq 2\| \text{prox}_g(x) - x \|^2 + 2\| y - x
+\|^2\]</span></p>
+<p>En utilisant l’inégalité de la distance minimale, on a :</p>
+<p><span class="math display">\[\| \text{prox}_g(x) - x \|^2 + \| y - x
+\|^2 \geq \| \text{prox}_g(x) - y \|^2\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\| \text{prox}_g(y) - y \|^2 + \| x - y
+\|^2 \geq \| \text{prox}_g(y) - x \|^2\]</span></p>
+<p>En ajoutant ces deux inégalités, on obtient :</p>
+<p><span class="math display">\[2\| \text{prox}_g(x) - x \|^2 + 2\| y -
+x \|^2 \geq \| \text{prox}_g(x) - y \|^2 + \| \text{prox}_g(y) - x
+\|^2\]</span></p>
+<p>En combinant ces résultats, on obtient :</p>
+<p><span class="math display">\[4\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 + 4\| x - y \|^2 \geq 2\| \text{prox}_g(x) - x \|^2 + 2\| y - x
+\|^2\]</span></p>
+<p>En simplifiant, on obtient :</p>
+<p><span class="math display">\[\| \text{prox}_g(x) - \text{prox}_g(y)
+\|^2 \leq \| x - y \|^2\]</span></p>
+<p>ce qui montre que l’opérateur proximal est non expansif.</p>
+<p>(iii) Pour montrer la propriété de composition, on utilise le fait
+que <span class="math inline">\(g_1\)</span> et <span
+class="math inline">\(g_2\)</span> sont fortement convexes. On a :</p>
+<p><span class="math display">\[\text{prox}_{g_1 + g_2}(x) = \argmin_{y
+\in \mathbb{R}^n} \left( g_1(y) + g_2(y) + \frac{1}{2}\|y - x\|^2
+\right)\]</span></p>
+<p>En utilisant la définition de l’opérateur proximal, on a :</p>
+<p><span class="math display">\[\text{prox}_{g_1 + g_2}(x) = \argmin_{y
+\in \mathbb{R}^n} \left( g_1(y) + \frac{1}{2}\|y - z\|^2
+\right)\]</span></p>
+<p>où <span class="math inline">\(z = \text{prox}_{g_2}(x)\)</span>. En
+utilisant à nouveau la définition de l’opérateur proximal, on a :</p>
+<p><span class="math display">\[\text{prox}_{g_1 + g_2}(x) =
+\text{prox}_{g_1}(z)\]</span></p>
+<p>ce qui montre que :</p>
+<p><span class="math display">\[\text{prox}_{g_1 + g_2}(x) =
+\text{prox}_{g_1} \circ \text{prox}_{g_2}(x)\]</span></p>
+<p>si et seulement si <span class="math inline">\(g_1\)</span> et <span
+class="math inline">\(g_2\)</span> sont fortement convexes.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le gradient proximal est un outil puissant pour l’optimisation de
+fonctions convexes. Il permet de traiter efficacement des combinaisons
+de fonctions différentiables et non différentiables, ce qui en fait un
+outil précieux pour de nombreuses applications pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

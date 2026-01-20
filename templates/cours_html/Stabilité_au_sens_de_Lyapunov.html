@@ -1,0 +1,412 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Stabilité au sens de Lyapunov</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Stabilité au sens de Lyapunov</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La théorie de la stabilité au sens de Lyapunov est une branche
+fondamentale des mathématiques appliquées et de l’ingénierie,
+particulièrement dans le domaine du contrôle automatique. Elle trouve
+son origine dans les travaux d’Alexandre Lyapunov, un mathématicien
+russe du XIXe siècle. L’étude de la stabilité des systèmes dynamiques
+est cruciale pour comprendre le comportement à long terme des solutions
+d’équations différentielles, que ce soit en physique, en biologie ou en
+économie.</p>
+<p>La notion de stabilité émerge comme une réponse à la question
+suivante : sous quelles conditions un système dynamique, lorsqu’il est
+légèrement perturbé, reste-t-il proche de son état initial ? Cette
+question est indispensable pour garantir la robustesse des systèmes dans
+des environnements réels, où les perturbations sont inévitables.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour aborder la stabilité au sens de Lyapunov, commençons par définir
+les concepts fondamentaux. Considérons un système dynamique donné par
+une équation différentielle ordinaire :</p>
+<p><span class="math display">\[\dot{x} = f(t, x),\]</span></p>
+<p>où <span class="math inline">\(x \in \mathbb{R}^n\)</span> et <span
+class="math inline">\(f : \mathbb{R} \times \mathbb{R}^n \rightarrow
+\mathbb{R}^n\)</span> est une fonction continue.</p>
+<h2 id="équilibre">Équilibre</h2>
+<p>Un point d’équilibre <span class="math inline">\(x_e\)</span> est une
+solution constante du système, c’est-à-dire qu’il satisfait :</p>
+<p><span class="math display">\[f(t, x_e) = 0 \quad \forall t \geq
+0.\]</span></p>
+<p>En d’autres termes, si <span class="math inline">\(x(t) =
+x_e\)</span>, alors <span class="math inline">\(\dot{x}(t) =
+0\)</span>.</p>
+<h2 id="stabilité-de-lyapunov">Stabilité de Lyapunov</h2>
+<p>La stabilité de Lyapunov est une notion locale qui caractérise le
+comportement du système autour d’un point d’équilibre. Pour formaliser
+cette idée, nous introduisons les définitions suivantes.</p>
+<div class="definition">
+<p>Un point d’équilibre <span class="math inline">\(x_e\)</span> est dit
+stable au sens de Lyapunov si, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe un <span
+class="math inline">\(\delta(\epsilon) &gt; 0\)</span> tel que :</p>
+<p><span class="math display">\[\|x(0) - x_e\| &lt; \delta \implies
+\|x(t) - x_e\| &lt; \epsilon \quad \forall t \geq 0.\]</span></p>
+<p>En d’autres termes, pour toute sphère de rayon <span
+class="math inline">\(\epsilon\)</span> centrée sur <span
+class="math inline">\(x_e\)</span>, il existe une sphère de rayon <span
+class="math inline">\(\delta\)</span> telle que toute solution initiale
+dans cette sphère reste à tout instant dans la première sphère.</p>
+</div>
+<h2 id="instabilité">Instabilité</h2>
+<p>Un point d’équilibre <span class="math inline">\(x_e\)</span> est
+instable si, pour tout <span class="math inline">\(\delta &gt;
+0\)</span>, il existe un <span class="math inline">\(\epsilon(\delta)
+&gt; 0\)</span> et une solution initiale <span
+class="math inline">\(x(0)\)</span> telle que :</p>
+<p><span class="math display">\[\|x(0) - x_e\| &lt; \delta \quad
+\text{et} \quad \|x(t) - x_e\| \geq \epsilon \quad \text{pour un
+certain} \quad t \geq 0.\]</span></p>
+<h2 id="attractivité">Attractivité</h2>
+<p>Un point d’équilibre <span class="math inline">\(x_e\)</span> est dit
+attractif si, pour tout <span class="math inline">\(\epsilon &gt;
+0\)</span>, il existe un <span class="math inline">\(\delta(\epsilon)
+&gt; 0\)</span> tel que :</p>
+<p><span class="math display">\[\|x(0) - x_e\| &lt; \delta \implies
+\lim_{t \to \infty} \|x(t) - x_e\| = 0.\]</span></p>
+<h2 id="stabilité-asymptotique">Stabilité asymptotique</h2>
+<p>Un point d’équilibre <span class="math inline">\(x_e\)</span> est dit
+asymptotiquement stable si :</p>
+<ol>
+<li><p>Il est stable au sens de Lyapunov.</p></li>
+<li><p>Il est attractif.</p></li>
+</ol>
+<h1 id="théorèmes-de-lyapunov">Théorèmes de Lyapunov</h1>
+<p>Les théorèmes de Lyapunov fournissent des critères pour déterminer la
+stabilité d’un point d’équilibre sans avoir à résoudre explicitement les
+équations différentielles. Ces théorèmes sont basés sur la construction
+d’une fonction de Lyapunov, qui joue un rôle analogue à celui d’une
+énergie.</p>
+<h2 id="théorème-de-stabilité">Théorème de stabilité</h2>
+<div class="theorem">
+<p>Soit <span class="math inline">\(x_e\)</span> un point d’équilibre du
+système <span class="math inline">\(\dot{x} = f(t, x)\)</span>.
+Supposons qu’il existe une fonction <span class="math inline">\(V :
+\mathbb{R}^n \rightarrow \mathbb{R}\)</span> telle que :</p>
+<ol>
+<li><p><span class="math inline">\(V(x)\)</span> est continue et
+différentiable.</p></li>
+<li><p><span class="math inline">\(V(x_e) = 0\)</span>.</p></li>
+<li><p><span class="math inline">\(V(x) &gt; 0\)</span> pour tout <span
+class="math inline">\(x \neq x_e\)</span>.</p></li>
+<li><p>La dérivée de <span class="math inline">\(V\)</span> le long des
+trajectoires du système est négative semi-définie, c’est-à-dire :</p>
+<p><span class="math display">\[\dot{V}(x) = \frac{dV}{dt}
+\bigg|_{(\ref{eq:system})} \leq 0.\]</span></p></li>
+</ol>
+<p>Alors, le point d’équilibre <span class="math inline">\(x_e\)</span>
+est stable au sens de Lyapunov.</p>
+</div>
+<h2 id="démonstration-du-théorème-de-stabilité">Démonstration du
+théorème de stabilité</h2>
+<p>Pour démontrer ce théorème, nous procédons comme suit :</p>
+<p>1. **Construction de la fonction <span
+class="math inline">\(V\)</span>** : La fonction <span
+class="math inline">\(V\)</span> est choisie pour être positive définie
+autour de <span class="math inline">\(x_e\)</span>, ce qui signifie que
+<span class="math inline">\(V(x) &gt; 0\)</span> pour tout <span
+class="math inline">\(x \neq x_e\)</span>.</p>
+<p>2. **Dérivée de <span class="math inline">\(V\)</span>** : La dérivée
+de <span class="math inline">\(V\)</span> le long des trajectoires du
+système est donnée par :</p>
+<p><span class="math display">\[\dot{V}(x) = \frac{\partial V}{\partial
+x} f(t, x).\]</span></p>
+<p>3. **Négativité semi-définie** : La condition <span
+class="math inline">\(\dot{V}(x) \leq 0\)</span> implique que <span
+class="math inline">\(V(x(t))\)</span> est une fonction décroissante ou
+constante le long des trajectoires du système.</p>
+<p>4. **Stabilité** : Supposons que <span class="math inline">\(\|x(0) -
+x_e\| &lt; \delta\)</span>. Alors, <span class="math inline">\(V(x(t))
+\leq V(x(0))\)</span> pour tout <span class="math inline">\(t \geq
+0\)</span>. Comme <span class="math inline">\(V\)</span> est positive
+définie, cela implique que <span class="math inline">\(x(t)\)</span>
+reste dans un voisinage de <span class="math inline">\(x_e\)</span>.</p>
+<h2 id="théorème-dinstabilité">Théorème d’instabilité</h2>
+<div class="theorem">
+<p>Soit <span class="math inline">\(x_e\)</span> un point d’équilibre du
+système <span class="math inline">\(\dot{x} = f(t, x)\)</span>.
+Supposons qu’il existe une fonction <span class="math inline">\(V :
+\mathbb{R}^n \rightarrow \mathbb{R}\)</span> telle que :</p>
+<ol>
+<li><p><span class="math inline">\(V(x)\)</span> est continue et
+différentiable.</p></li>
+<li><p><span class="math inline">\(V(x_e) = 0\)</span>.</p></li>
+<li><p><span class="math inline">\(V(x) &gt; 0\)</span> pour tout <span
+class="math inline">\(x \neq x_e\)</span>.</p></li>
+<li><p>La dérivée de <span class="math inline">\(V\)</span> le long des
+trajectoires du système est positive définie, c’est-à-dire :</p>
+<p><span class="math display">\[\dot{V}(x) = \frac{dV}{dt}
+\bigg|_{(\ref{eq:system})} &gt; 0.\]</span></p></li>
+</ol>
+<p>Alors, le point d’équilibre <span class="math inline">\(x_e\)</span>
+est instable.</p>
+</div>
+<h2 id="démonstration-du-théorème-dinstabilité">Démonstration du
+théorème d’instabilité</h2>
+<p>Pour démontrer ce théorème, nous procédons comme suit :</p>
+<p>1. **Construction de la fonction <span
+class="math inline">\(V\)</span>** : La fonction <span
+class="math inline">\(V\)</span> est choisie pour être positive définie
+autour de <span class="math inline">\(x_e\)</span>.</p>
+<p>2. **Dérivée de <span class="math inline">\(V\)</span>** : La dérivée
+de <span class="math inline">\(V\)</span> le long des trajectoires du
+système est donnée par :</p>
+<p><span class="math display">\[\dot{V}(x) = \frac{\partial V}{\partial
+x} f(t, x).\]</span></p>
+<p>3. **Positivité définie** : La condition <span
+class="math inline">\(\dot{V}(x) &gt; 0\)</span> implique que <span
+class="math inline">\(V(x(t))\)</span> est une fonction strictement
+croissante le long des trajectoires du système.</p>
+<p>4. **Instabilité** : Comme <span class="math inline">\(V\)</span> est
+positive définie et strictement croissante, cela implique que <span
+class="math inline">\(x(t)\)</span> s’éloigne de <span
+class="math inline">\(x_e\)</span> au fil du temps.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="stabilité-asymptotique-1">Stabilité asymptotique</h2>
+<div class="corollary">
+<p>Si, dans le théorème de stabilité, la dérivée <span
+class="math inline">\(\dot{V}(x)\)</span> est négative définie,
+c’est-à-dire :</p>
+<p><span class="math display">\[\dot{V}(x) = \frac{dV}{dt}
+\bigg|_{(\ref{eq:system})} &lt; 0,\]</span></p>
+<p>alors le point d’équilibre <span class="math inline">\(x_e\)</span>
+est asymptotiquement stable.</p>
+</div>
+<h2 id="démonstration-de-la-stabilité-asymptotique">Démonstration de la
+stabilité asymptotique</h2>
+<p>Pour démontrer ce corollaire, nous procédons comme suit :</p>
+<p>1. **Stabilité** : D’après le théorème de stabilité, <span
+class="math inline">\(x_e\)</span> est stable.</p>
+<p>2. **Attractivité** : La condition <span
+class="math inline">\(\dot{V}(x) &lt; 0\)</span> implique que <span
+class="math inline">\(V(x(t))\)</span> est strictement décroissante.
+Comme <span class="math inline">\(V\)</span> est positive définie, cela
+implique que <span class="math inline">\(x(t)\)</span> converge vers
+<span class="math inline">\(x_e\)</span>.</p>
+<h2 id="exemple">Exemple</h2>
+<p>Considérons le système linéaire :</p>
+<p><span class="math display">\[\dot{x} = Ax,\]</span></p>
+<p>où <span class="math inline">\(A\)</span> est une matrice carrée. Une
+fonction de Lyapunov couramment utilisée pour ce système est :</p>
+<p><span class="math display">\[V(x) = x^T P x,\]</span></p>
+<p>où <span class="math inline">\(P\)</span> est une matrice symétrique
+définie positive. La dérivée de <span class="math inline">\(V\)</span>
+le long des trajectoires du système est donnée par :</p>
+<p><span class="math display">\[\dot{V}(x) = x^T (A^T P + PA)
+x.\]</span></p>
+<p>Si <span class="math inline">\(A\)</span> est une matrice stable,
+c’est-à-dire que toutes ses valeurs propres ont une partie réelle
+négative, alors il existe une matrice <span
+class="math inline">\(P\)</span> telle que <span
+class="math inline">\(A^T P + PA\)</span> est négative définie. Dans ce
+cas, le point d’équilibre <span class="math inline">\(x_e = 0\)</span>
+est asymptotiquement stable.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La théorie de la stabilité au sens de Lyapunov fournit des outils
+puissants pour analyser le comportement des systèmes dynamiques. Les
+théorèmes de Lyapunov permettent de déterminer la stabilité d’un point
+d’équilibre sans avoir à résoudre explicitement les équations
+différentielles, en utilisant des fonctions de Lyapunov appropriées. Ces
+concepts sont essentiels pour le contrôle automatique, la robotique et
+de nombreuses autres applications en ingénierie et en sciences.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

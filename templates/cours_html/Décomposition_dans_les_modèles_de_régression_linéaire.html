@@ -1,0 +1,417 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Décomposition dans les modèles de régression linéaire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Décomposition dans les modèles de régression
+linéaire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La régression linéaire est un outil fondamental en statistique et en
+apprentissage automatique, permettant de modéliser la relation entre une
+variable dépendante et une ou plusieurs variables indépendantes. La
+décomposition dans les modèles de régression linéaire est une technique
+puissante qui permet de séparer les effets des différentes variables
+explicatives sur la variable réponse. Cette approche est indispensable
+pour comprendre les mécanismes sous-jacents des données, identifier les
+facteurs clés et interpréter les résultats de manière plus fine.</p>
+<p>L’origine historique de la régression linéaire remonte au XIXe siècle
+avec les travaux de Legendre et Gauss. Cependant, la décomposition des
+effets dans ces modèles a été développée plus tard pour répondre à des
+besoins d’interprétation et d’analyse plus poussées. Aujourd’hui, cette
+technique est largement utilisée dans divers domaines tels que
+l’économie, la biologie, et les sciences sociales.</p>
+<p>Dans cet article, nous explorerons les différentes méthodes de
+décomposition dans les modèles de régression linéaire, en mettant
+l’accent sur leur formalisation mathématique et leurs applications
+pratiques.</p>
+<h1 id="définitions">Définitions</h1>
+<h2 id="modèle-de-régression-linéaire">Modèle de régression
+linéaire</h2>
+<p>Considérons un ensemble de données <span class="math inline">\((y_i,
+\mathbf{x}_i)\)</span> pour <span class="math inline">\(i = 1, \ldots,
+n\)</span>, où <span class="math inline">\(y_i\)</span> est la variable
+dépendante et <span class="math inline">\(\mathbf{x}_i = (x_{i1},
+\ldots, x_{ip})\)</span> est le vecteur des variables indépendantes. Le
+modèle de régression linéaire suppose que :</p>
+<p><span class="math display">\[y_i = \mathbf{x}_i^T \boldsymbol{\beta}
++ \epsilon_i\]</span></p>
+<p>où <span class="math inline">\(\boldsymbol{\beta} = (\beta_1, \ldots,
+\beta_p)\)</span> est le vecteur des coefficients de régression et <span
+class="math inline">\(\epsilon_i\)</span> est le terme d’erreur, supposé
+indépendant et identiquement distribué selon une loi normale de moyenne
+zéro et de variance <span class="math inline">\(\sigma^2\)</span>.</p>
+<h2 id="décomposition-des-effets">Décomposition des effets</h2>
+<p>La décomposition des effets dans un modèle de régression linéaire
+permet de séparer l’effet total d’une variable explicative en plusieurs
+composantes. Par exemple, pour une variable <span
+class="math inline">\(x_j\)</span>, l’effet total peut être décomposé en
+un effet direct et un effet indirect via d’autres variables.</p>
+<p>Formellement, soit <span class="math inline">\(\mathbf{x}_i =
+(x_{i1}, \ldots, x_{ip})\)</span>. L’effet total de <span
+class="math inline">\(x_j\)</span> sur <span
+class="math inline">\(y_i\)</span> est donné par :</p>
+<p><span class="math display">\[\text{Effet total}_j =
+\beta_j\]</span></p>
+<p>Pour décomposer cet effet, nous introduisons les concepts d’effet
+direct et d’effet indirect. L’effet direct de <span
+class="math inline">\(x_j\)</span> sur <span
+class="math inline">\(y_i\)</span> est l’effet de <span
+class="math inline">\(x_j\)</span> sur <span
+class="math inline">\(y_i\)</span> lorsque toutes les autres variables
+sont maintenues constantes. L’effet indirect de <span
+class="math inline">\(x_j\)</span> sur <span
+class="math inline">\(y_i\)</span> est l’effet de <span
+class="math inline">\(x_j\)</span> sur <span
+class="math inline">\(y_i\)</span> via d’autres variables.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-décomposition-de-blinder-oaxaca">Théorème de
+décomposition de Blinder-Oaxaca</h2>
+<p>Le théorème de Blinder-Oaxaca est une méthode de décomposition
+utilisée pour analyser les différences entre deux groupes en termes de
+caractéristiques observables et non observables. Soit deux groupes <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> avec des vecteurs de caractéristiques
+<span class="math inline">\(\mathbf{x}_A\)</span> et <span
+class="math inline">\(\mathbf{x}_B\)</span>, et des coefficients de
+régression <span class="math inline">\(\boldsymbol{\beta}_A\)</span> et
+<span class="math inline">\(\boldsymbol{\beta}_B\)</span>.</p>
+<p>Le théorème de Blinder-Oaxaca stipule que la différence moyenne entre
+les deux groupes peut être décomposée comme suit :</p>
+<p><span class="math display">\[\bar{y}_A - \bar{y}_B =
+(\bar{\mathbf{x}}_A - \bar{\mathbf{x}}_B)^T \boldsymbol{\beta}_B +
+\bar{\mathbf{x}}_A^T (\boldsymbol{\beta}_A - \boldsymbol{\beta}_B) +
+\epsilon\]</span></p>
+<p>où <span class="math inline">\(\bar{y}_A\)</span> et <span
+class="math inline">\(\bar{y}_B\)</span> sont les moyennes des variables
+dépendantes pour les groupes <span class="math inline">\(A\)</span> et
+<span class="math inline">\(B\)</span>, <span
+class="math inline">\(\bar{\mathbf{x}}_A\)</span> et <span
+class="math inline">\(\bar{\mathbf{x}}_B\)</span> sont les moyennes des
+variables indépendantes pour les groupes <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, et <span
+class="math inline">\(\epsilon\)</span> est le terme d’erreur.</p>
+<h2 id="théorème-de-décomposition-de-fairlie">Théorème de décomposition
+de Fairlie</h2>
+<p>Le théorème de Fairlie est une extension du théorème de
+Blinder-Oaxaca pour les modèles non linéaires. Il permet de décomposer
+les différences entre deux groupes en utilisant des poids basés sur la
+distribution conjointe des caractéristiques.</p>
+<p>Formellement, soit <span class="math inline">\(F_A\)</span> et <span
+class="math inline">\(F_B\)</span> les distributions conjointes des
+caractéristiques pour les groupes <span class="math inline">\(A\)</span>
+et <span class="math inline">\(B\)</span>. Le théorème de Fairlie
+stipule que :</p>
+<p><span class="math display">\[\bar{y}_A - \bar{y}_B =
+\int_{\mathbf{x}} [F_A(\mathbf{x}) - F_B(\mathbf{x})] f(\mathbf{x};
+\boldsymbol{\theta}_A) d\mathbf{x} + \int_{\mathbf{x}} F_B(\mathbf{x})
+[f(\mathbf{x}; \boldsymbol{\theta}_A) - f(\mathbf{x};
+\boldsymbol{\theta}_B)] d\mathbf{x}\]</span></p>
+<p>où <span class="math inline">\(f(\mathbf{x};
+\boldsymbol{\theta})\)</span> est la fonction de densité de probabilité
+conditionnelle.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-blinder-oaxaca">Preuve du théorème de
+Blinder-Oaxaca</h2>
+<p>Considérons les modèles de régression linéaire pour les groupes <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> :</p>
+<p><span class="math display">\[y_{Ai} = \mathbf{x}_{Ai}^T
+\boldsymbol{\beta}_A + \epsilon_{Ai}\]</span> <span
+class="math display">\[y_{Bi} = \mathbf{x}_{Bi}^T \boldsymbol{\beta}_B +
+\epsilon_{Bi}\]</span></p>
+<p>La différence moyenne entre les deux groupes est donnée par :</p>
+<p><span class="math display">\[\bar{y}_A - \bar{y}_B =
+\bar{\mathbf{x}}_A^T \boldsymbol{\beta}_A - \bar{\mathbf{x}}_B^T
+\boldsymbol{\beta}_B\]</span></p>
+<p>En utilisant les propriétés des moyennes, nous pouvons réécrire cette
+expression comme :</p>
+<p><span class="math display">\[\bar{y}_A - \bar{y}_B =
+(\bar{\mathbf{x}}_A - \bar{\mathbf{x}}_B)^T \boldsymbol{\beta}_B +
+\bar{\mathbf{x}}_A^T (\boldsymbol{\beta}_A - \boldsymbol{\beta}_B) +
+\epsilon\]</span></p>
+<p>Cette décomposition montre que la différence moyenne peut être
+attribuée à des différences dans les caractéristiques observables (<span
+class="math inline">\(\bar{\mathbf{x}}_A - \bar{\mathbf{x}}_B\)</span>)
+et à des différences dans les coefficients de régression (<span
+class="math inline">\(\boldsymbol{\beta}_A -
+\boldsymbol{\beta}_B\)</span>).</p>
+<h2 id="preuve-du-théorème-de-fairlie">Preuve du théorème de
+Fairlie</h2>
+<p>Considérons les modèles non linéaires pour les groupes <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> :</p>
+<p><span class="math display">\[y_{Ai} = f(\mathbf{x}_{Ai};
+\boldsymbol{\theta}_A) + \epsilon_{Ai}\]</span> <span
+class="math display">\[y_{Bi} = f(\mathbf{x}_{Bi};
+\boldsymbol{\theta}_B) + \epsilon_{Bi}\]</span></p>
+<p>La différence moyenne entre les deux groupes est donnée par :</p>
+<p><span class="math display">\[\bar{y}_A - \bar{y}_B =
+\int_{\mathbf{x}} F_A(\mathbf{x}) f(\mathbf{x}; \boldsymbol{\theta}_A)
+d\mathbf{x} - \int_{\mathbf{x}} F_B(\mathbf{x}) f(\mathbf{x};
+\boldsymbol{\theta}_B) d\mathbf{x}\]</span></p>
+<p>En utilisant les propriétés des intégrales, nous pouvons réécrire
+cette expression comme :</p>
+<p><span class="math display">\[\bar{y}_A - \bar{y}_B =
+\int_{\mathbf{x}} [F_A(\mathbf{x}) - F_B(\mathbf{x})] f(\mathbf{x};
+\boldsymbol{\theta}_A) d\mathbf{x} + \int_{\mathbf{x}} F_B(\mathbf{x})
+[f(\mathbf{x}; \boldsymbol{\theta}_A) - f(\mathbf{x};
+\boldsymbol{\theta}_B)] d\mathbf{x}\]</span></p>
+<p>Cette décomposition montre que la différence moyenne peut être
+attribuée à des différences dans les distributions conjointes des
+caractéristiques (<span class="math inline">\(F_A(\mathbf{x}) -
+F_B(\mathbf{x})\)</span>) et à des différences dans les paramètres des
+modèles (<span class="math inline">\(f(\mathbf{x};
+\boldsymbol{\theta}_A) - f(\mathbf{x};
+\boldsymbol{\theta}_B)\)</span>).</p>
+<h1 id="propriétés-et-corollaires">Propriétés et corollaires</h1>
+<h2 id="propriété-de-linéarité">Propriété de linéarité</h2>
+<p>La décomposition dans les modèles de régression linéaire est linéaire
+par rapport aux coefficients de régression. Cela signifie que si nous
+avons deux décompositions valides, leur combinaison linéaire est
+également une décomposition valide.</p>
+<p>Formellement, soit <span
+class="math inline">\(\boldsymbol{\beta}_1\)</span> et <span
+class="math inline">\(\boldsymbol{\beta}_2\)</span> deux vecteurs de
+coefficients de régression, et <span
+class="math inline">\(\alpha_1\)</span> et <span
+class="math inline">\(\alpha_2\)</span> deux scalaires. La combinaison
+linéaire <span class="math inline">\(\alpha_1 \boldsymbol{\beta}_1 +
+\alpha_2 \boldsymbol{\beta}_2\)</span> est également un vecteur de
+coefficients de régression valide.</p>
+<h2 id="corollaire-de-la-décomposition-de-blinder-oaxaca">Corollaire de
+la décomposition de Blinder-Oaxaca</h2>
+<p>Le corollaire de la décomposition de Blinder-Oaxaca stipule que si
+les coefficients de régression sont égaux pour les deux groupes (<span
+class="math inline">\(\boldsymbol{\beta}_A =
+\boldsymbol{\beta}_B\)</span>), alors la différence moyenne entre les
+deux groupes est entièrement attribuable aux différences dans les
+caractéristiques observables.</p>
+<p>Formellement, si <span class="math inline">\(\boldsymbol{\beta}_A =
+\boldsymbol{\beta}_B\)</span>, alors :</p>
+<p><span class="math display">\[\bar{y}_A - \bar{y}_B =
+(\bar{\mathbf{x}}_A - \bar{\mathbf{x}}_B)^T
+\boldsymbol{\beta}_B\]</span></p>
+<h2 id="corollaire-de-la-décomposition-de-fairlie">Corollaire de la
+décomposition de Fairlie</h2>
+<p>Le corollaire de la décomposition de Fairlie stipule que si les
+distributions conjointes des caractéristiques sont égales pour les deux
+groupes (<span class="math inline">\(F_A(\mathbf{x}) =
+F_B(\mathbf{x})\)</span>), alors la différence moyenne entre les deux
+groupes est entièrement attribuable aux différences dans les paramètres
+des modèles.</p>
+<p>Formellement, si <span class="math inline">\(F_A(\mathbf{x}) =
+F_B(\mathbf{x})\)</span>, alors :</p>
+<p><span class="math display">\[\bar{y}_A - \bar{y}_B =
+\int_{\mathbf{x}} F_B(\mathbf{x}) [f(\mathbf{x}; \boldsymbol{\theta}_A)
+- f(\mathbf{x}; \boldsymbol{\theta}_B)] d\mathbf{x}\]</span></p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La décomposition dans les modèles de régression linéaire est une
+technique puissante pour analyser les effets des variables explicatives
+sur la variable réponse. Les théorèmes de Blinder-Oaxaca et Fairlie
+fournissent des cadres formels pour cette décomposition, permettant une
+interprétation plus fine des résultats. Les propriétés et corollaires
+associés à ces théorèmes offrent des insights supplémentaires sur les
+mécanismes sous-jacents des données.</p>
+<p>En conclusion, la décomposition dans les modèles de régression
+linéaire est un outil indispensable pour toute analyse statistique ou
+d’apprentissage automatique, offrant des perspectives riches et nuancées
+sur les relations entre variables.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quantix — Dashboard </title>
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-light-overrides.css') }}">
+</head>
+
+<body class="dashboard-body">
+  {% include 'header.html' %}
+
+  <!-- Main Dashboard Container -->
+  <div class="dashboard-container">
+    
+    <!-- Sidebar avec outils -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3><i class="fas fa-tools"></i> Outils de Nettoyage</h3>
+        <p>Interface</p>
+      </div>
+
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <div class="upload-label">Dataset principal</div>
+        <div class="upload-area" id="uploadArea">
+          <input type="file" id="fileInput" accept=".csv,.xlsx,.json,.txt" style="display: none;">
+          <div class="upload-content">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Charger un fichier</span>
+          </div>
+        </div>
+        <div class="file-info" id="fileInfo" style="display: none;">
+          <div class="file-details">
+            <i class="fas fa-file-alt"></i>
+            <span id="fileName"></span>
+          </div>
+        </div>
+
+        <div class="upload-divider"></div>
+
+        <div class="upload-label">Dataset à fusionner (drag & drop)</div>
+        <div class="upload-area secondary" id="uploadAreaRight">
+          <input type="file" id="fileInputRight" accept=".csv,.xlsx,.json,.txt" style="display: none;">
+          <div class="upload-content">
+            <i class="fas fa-layer-group"></i>
+            <span>Glisser un 2ᵉ fichier</span>
+          </div>
+        </div>
+        <div class="file-info" id="fileInfoRight" style="display: none;">
+          <div class="file-details">
+            <i class="fas fa-file-import"></i>
+            <span id="fileNameRight"></span>
+          </div>
+        </div>
+
+        <div class="merge-panel" id="mergePanel" style="display: none;">
+          <div class="merge-title"><i class="fas fa-code-branch"></i> Fusion (Merge)</div>
+          <div class="merge-row">
+            <label for="mergeHow">Type</label>
+            <select id="mergeHow">
+              <option value="left">Left</option>
+              <option value="inner">Inner</option>
+              <option value="outer">Outer</option>
+              <option value="right">Right</option>
+            </select>
+          </div>
+          <div class="merge-row">
+            <label for="mergeLeftKey">Clé (gauche)</label>
+            <select id="mergeLeftKey"></select>
+          </div>
+          <div class="merge-row">
+            <label for="mergeRightKey">Clé (droite)</label>
+            <select id="mergeRightKey"></select>
+          </div>
+          <button class="btn-merge" id="mergeBtn" disabled>
+            <i class="fas fa-random"></i> Fusionner
+          </button>
+        </div>
+      </div>
+
+      <!-- Categories d'opérations -->
+      <div class="operations-categories">
+
+        <!-- Colonnes / Style Excel -->
+        <div class="category-section" data-category="excel">
+          <div class="category-header" onclick="toggleCategory('excel')">
+            <h4><i class="fas fa-table-cells"></i> Colonnes (style Excel)</h4>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="category-content">
+            <button class="excel-action-btn" type="button" data-action="rename-column">
+              <i class="fas fa-i-cursor"></i>
+              <span>Renommer une colonne</span>
+            </button>
+            <button class="excel-action-btn" type="button" data-action="replace-regex">
+              <i class="fas fa-wand-magic-sparkles"></i>
+              <span>Remplacer (regex)</span>
+            </button>
+            <button class="excel-action-btn" type="button" data-action="derive-column">
+              <i class="fas fa-plus"></i>
+              <span>Créer colonne (à partir d’autres)</span>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Nettoyage de base -->
+        <div class="category-section" data-category="basic">
+          <div class="category-header" onclick="toggleCategory('basic')">
+            <h4><i class="fas fa-broom"></i> Nettoyage de base</h4>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="category-content">
+            <div class="operation-btn" data-operation="remove_duplicates">
+              <i class="fas fa-copy"></i>
+              <span>Supprimer doublons</span>
+            </div>
+            <div class="operation-btn" data-operation="remove_empty_rows">
+              <i class="fas fa-minus-circle"></i>
+              <span>Lignes vides</span>
+            </div>
+            <div class="operation-btn" data-operation="remove_empty_cols">
+              <i class="fas fa-columns"></i>
+              <span>Colonnes vides</span>
+            </div>
+            <div class="operation-btn" data-operation="normalize_column_names">
+              <i class="fas fa-text-width"></i>
+              <span>Noms colonnes</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Valeurs manquantes -->
+        <div class="category-section" data-category="missing">
+          <div class="category-header" onclick="toggleCategory('missing')">
+            <h4><i class="fas fa-question-circle"></i> Valeurs manquantes</h4>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="category-content">
+            <div class="operation-btn" data-operation="fill_numeric_median">
+              <i class="fas fa-calculator"></i>
+              <span>Remplir médiane</span>
+            </div>
+            <div class="operation-btn" data-operation="fill_numeric_mean">
+              <i class="fas fa-chart-line"></i>
+              <span>Remplir moyenne</span>
+            </div>
+            <div class="operation-btn" data-operation="fill_categorical_mode">
+              <i class="fas fa-tags"></i>
+              <span>Remplir mode</span>
+            </div>
+            <div class="operation-btn" data-operation="drop_rows_with_na">
+              <i class="fas fa-trash"></i>
+              <span>Supprimer lignes</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nettoyage numérique -->
+        <div class="category-section" data-category="numeric">
+          <div class="category-header" onclick="toggleCategory('numeric')">
+            <h4><i class="fas fa-hashtag"></i> Données numériques</h4>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="category-content">
+            <div class="operation-btn" data-operation="convert_to_numeric">
+              <i class="fas fa-exchange-alt"></i>
+              <span>Convertir nombres</span>
+            </div>
+            <div class="operation-btn" data-operation="remove_numeric_outliers">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span>Supprimer aberrants</span>
+            </div>
+            <div class="operation-btn" data-operation="normalize_numeric_values">
+              <i class="fas fa-balance-scale"></i>
+              <span>Normaliser</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nettoyage texte -->
+        <div class="category-section" data-category="text">
+          <div class="category-header" onclick="toggleCategory('text')">
+            <h4><i class="fas fa-font"></i> Données texte</h4>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="category-content">
+            <div class="operation-btn" data-operation="clean_text_basic">
+              <i class="fas fa-eraser"></i>
+              <span>Nettoyage de base</span>
+            </div>
+            <div class="operation-btn" data-operation="remove_html_tags">
+              <i class="fas fa-code"></i>
+              <span>Supprimer HTML</span>
+            </div>
+            <div class="operation-btn" data-operation="standardize_text_case">
+              <i class="fas fa-text-height"></i>
+              <span>Casse standard</span>
+            </div>
+            <div class="operation-btn" data-operation="remove_extra_spaces">
+              <i class="fas fa-space-shuttle"></i>
+              <span>Espaces extra</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="category-section" data-category="dates">
+          <div class="category-header" onclick="toggleCategory('dates')">
+            <h4><i class="fas fa-calendar"></i> Dates & Temps</h4>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+          </div>
+          <div class="category-content">
+            <div class="operation-btn" data-operation="parse_dates">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Parser dates</span>
+            </div>
+            <div class="operation-btn" data-operation="standardize_date_format">
+              <i class="fas fa-calendar-check"></i>
+              <span>Format standard</span>
+            </div>
+            <div class="operation-btn" data-operation="extract_date_components">
+              <i class="fas fa-calendar-plus"></i>
+              <span>Extraire composants</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Scope d'exécution (optionnel) -->
+      <div class="sidebar-scope" id="operationsScope">
+        <label class="scope-check">
+          <input type="checkbox" id="applyFilteredRows">
+          Appliquer sur les lignes filtrées (aperçu)
+        </label>
+        <input type="text" id="targetColumns" class="scope-columns" placeholder="Colonnes (optionnel, ex: amount, city)">
+        <div class="scope-hint">Si activé, les opérations modifient uniquement les lignes visibles après recherche/filtre.</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="sidebar-actions">
+        <button class="btn-execute" id="executeBtn" disabled>
+          <i class="fas fa-play"></i>
+          Exécuter les opérations
+        </button>
+        <button class="btn-reset" id="resetBtn">
+          <i class="fas fa-refresh"></i>
+          Réinitialiser
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <div class="file-breadcrumb">
+          <i class="fas fa-folder"></i>
+          <span id="currentFileName">Aucun fichier chargé</span>
+        </div>
+        <div class="data-stats" id="dataStats">
+          <span class="stat-item">
+            <i class="fas fa-table"></i>
+            <span id="rowCount">0</span> lignes
+          </span>
+          <span class="stat-item">
+            <i class="fas fa-columns"></i>
+            <span id="colCount">0</span> colonnes
+          </span>
+          <span class="stat-item">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span id="issueCount">0</span> problèmes
+          </span>
+        </div>
+      </div>
+
+      <!-- Data Preview -->
+      <div class="data-preview-container">
+        <div class="preview-header">
+          <h3>Aperçu des données</h3>
+          <div class="preview-controls">
+            <button class="btn-secondary" id="btnDescriptiveStats" type="button" disabled title="Moyenne, médiane, quantiles, min/max…">
+              <i class="fas fa-chart-bar"></i>
+              Stats descriptives
+            </button>
+            <div class="preview-search" title="Rechercher (aperçu)">
+              <i class="fas fa-search"></i>
+              <input id="tableSearch" type="text" placeholder="Rechercher…" autocomplete="off" />
+            </div>
+          </div>
+        </div>
+        
+        <div class="preview-content" id="previewContent">
+          <div class="preview-placeholder">
+            <i class="fas fa-table"></i>
+            <h4>Chargez un fichier pour voir vos données</h4>
+            <p>Supporté: CSV, Excel, JSON</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operations Queue -->
+      <div class="operations-queue" id="operationsQueue" style="display: none;">
+        <div class="queue-header">
+          <h4><i class="fas fa-list-ol"></i> File d'opérations</h4>
+          <span class="queue-count">0 opérations</span>
+        </div>
+        <div class="queue-content" id="queueContent"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+    <div class="loading-content">
+      <i class="fas fa-cog fa-spin"></i>
+      <h3>Traitement en cours...</h3>
+      <p id="loadingMessage">Veuillez patienter</p>
+    </div>
+  </div>
+
+  <!-- Results Modal -->
+  <div class="results-modal" id="resultsModal" style="display: none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 id="resultsTitle"><i class="fas fa-check-circle"></i> Opérations terminées</h3>
+        <button class="modal-close" onclick="closeResultsModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body" id="resultsContent"></div>
+      <div class="modal-footer">
+        <button class="btn-primary" id="downloadResult">
+          <i class="fas fa-download"></i> Télécharger
+        </button>
+        <button class="btn-secondary" onclick="closeResultsModal()">
+          Continuer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popover filtre colonne -->
+  <div id="columnFilterPopover" class="filter-popover" style="display:none;"></div>
+
+  <!-- Modal Outils Excel (dynamic) -->
+  <div class="excel-modal" id="excelModal" style="display:none;">
+    <div class="excel-modal-content">
+      <div class="excel-modal-header">
+        <h3 id="excelModalTitle">Outil</h3>
+        <button class="excel-modal-close" type="button" onclick="window.closeExcelModal && window.closeExcelModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="excel-modal-body" id="excelModalBody"></div>
+      <div class="excel-modal-footer">
+        <button class="btn-secondary" type="button" onclick="window.closeExcelModal && window.closeExcelModal()">Annuler</button>
+        <button class="btn-primary" id="excelModalSubmit" type="button">Appliquer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

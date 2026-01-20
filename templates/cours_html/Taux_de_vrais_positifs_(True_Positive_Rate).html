@@ -1,0 +1,298 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Taux de vrais positifs (True Positive Rate)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Taux de vrais positifs (True Positive Rate)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le Taux de vrais positifs (True Positive Rate, ou TPR) est une mesure
+fondamentale en statistique et en apprentissage automatique,
+particulièrement dans le cadre de la classification binaire. Il émerge
+comme une réponse à la nécessité d’évaluer la performance des modèles
+prédictifs, en fournissant une métrique qui capture leur capacité à
+identifier correctement les instances positives.</p>
+<p>Historiquement, le TPR trouve ses racines dans la théorie des tests
+statistiques et des fonctions de décision. Il est indispensable dans les
+domaines où les faux négatifs sont coûteux, comme le diagnostic médical
+ou la détection de fraudes. Le TPR permet de quantifier l’efficacité
+d’un modèle à minimiser ces erreurs critiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire le Taux de vrais positifs, considérons un modèle de
+classification binaire qui prédit si une instance appartient à la classe
+positive ou négative. Nous cherchons à mesurer la proportion d’instances
+positives correctement identifiées par le modèle.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{D}\)</span>
+un ensemble de données étiquetées, où chaque instance <span
+class="math inline">\(x_i \in \mathcal{D}\)</span> est associée à une
+étiquette <span class="math inline">\(y_i \in \{0, 1\}\)</span>, avec
+<span class="math inline">\(y_i = 1\)</span> pour la classe positive et
+<span class="math inline">\(y_i = 0\)</span> pour la classe négative.
+Soit <span class="math inline">\(\hat{y}_i\)</span> la prédiction du
+modèle pour l’instance <span class="math inline">\(x_i\)</span>.</p>
+<p>Le Taux de vrais positifs est défini comme la proportion d’instances
+positives correctement prédites :</p>
+<div class="definition">
+<p>Le Taux de vrais positifs (TPR) est donné par : <span
+class="math display">\[\text{TPR} = \frac{\text{VP}}{\text{VP} +
+\text{FN}}\]</span> où VP (Vrais Positifs) est le nombre d’instances
+positives correctement prédites, et FN (Faux Négatifs) est le nombre
+d’instances positives incorrectement prédites.</p>
+<p>En termes quantifiés : <span class="math display">\[\text{TPR} =
+\frac{\sum_{i=1}^{N} \mathbb{I}(\hat{y}_i = 1 \text{ et } y_i =
+1)}{\sum_{i=1}^{N} \mathbb{I}(y_i = 1)}\]</span> où <span
+class="math inline">\(\mathbb{I}\)</span> est la fonction indicatrice et
+<span class="math inline">\(N\)</span> est le nombre total
+d’instances.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes-et-propriétés">Théorèmes et
+Propriétés</h1>
+<p>Le TPR est lié à d’autres métriques de performance, telles que la
+sensibilité et le rappel. En effet, le TPR est souvent utilisé de
+manière interchangeable avec ces termes.</p>
+<div class="theorem">
+<p>Le Taux de vrais positifs est équivalent à la sensibilité d’un modèle
+de classification binaire. La sensibilité mesure la capacité du modèle à
+identifier les instances positives.</p>
+<p>Formellement, si <span
+class="math inline">\(\text{Sensibilité}\)</span> est définie comme :
+<span class="math display">\[\text{Sensibilité} =
+\frac{\text{VP}}{\text{VP} + \text{FN}}\]</span> alors : <span
+class="math display">\[\text{TPR} = \text{Sensibilité}\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve découle directement des définitions. La
+sensibilité est calculée comme la proportion d’instances positives
+correctement prédites par rapport au nombre total d’instances positives.
+Le TPR est défini de manière identique, ce qui établit l’égalité. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le TPR possède plusieurs propriétés importantes qui en font une
+métrique clé dans l’évaluation des modèles de classification.</p>
+<div class="proposition">
+<p>Le TPR est une mesure comprise entre 0 et 1, où :</p>
+<ul>
+<li><p>Un TPR de 1 indique que toutes les instances positives sont
+correctement identifiées.</p></li>
+<li><p>Un TPR de 0 indique que aucune instance positive n’est
+correctement identifiée.</p></li>
+</ul>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Par définition, le TPR est le rapport entre deux
+quantités positives ou nulles. Le numérateur (VP) et le dénominateur (VP
++ FN) sont tous deux non négatifs. De plus, si VP = 0, alors TPR = 0, et
+si FN = 0, alors TPR = 1. ◻</p>
+</div>
+<div class="corollaire">
+<p>Le TPR est maximisé lorsque le nombre de faux négatifs (FN) est
+minimisé. Cela signifie que pour améliorer le TPR, il est crucial de
+réduire les erreurs de classification des instances positives.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Taux de vrais positifs est une métrique essentielle pour évaluer
+la performance des modèles de classification binaire. Il capture la
+capacité d’un modèle à identifier correctement les instances positives,
+ce qui est crucial dans de nombreuses applications pratiques. En
+comprenant et en optimisant le TPR, les chercheurs et les praticiens
+peuvent améliorer la fiabilité et l’efficacité de leurs modèles
+prédictifs.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

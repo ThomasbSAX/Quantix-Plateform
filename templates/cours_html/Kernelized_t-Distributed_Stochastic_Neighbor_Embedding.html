@@ -1,0 +1,364 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized t-Distributed Stochastic Neighbor Embedding</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized t-Distributed Stochastic Neighbor
+Embedding</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>The field of dimensionality reduction has seen significant
+advancements with the introduction of t-Distributed Stochastic Neighbor
+Embedding (t-SNE). This technique, developed by van der Maaten and
+Hinton in 2008, has revolutionized the way we visualize high-dimensional
+data by converting it into a lower-dimensional space while preserving
+local structures.</p>
+<p>Kernelized t-SNE extends this powerful method by incorporating kernel
+functions, which allow for more flexible and nuanced representations of
+the data. The motivation behind this extension arises from the need to
+handle complex, non-linear relationships in high-dimensional datasets.
+Traditional linear methods often fail to capture these intricate
+patterns, making kernelized t-SNE an indispensable tool in modern data
+analysis.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To understand Kernelized t-SNE, we first need to grasp the concept of
+t-SNE and kernel functions.</p>
+<h2 id="t-distributed-stochastic-neighbor-embedding-t-sne">t-Distributed
+Stochastic Neighbor Embedding (t-SNE)</h2>
+<p>Consider a high-dimensional dataset <span class="math inline">\(X =
+\{x_1, x_2, \ldots, x_n\}\)</span> where each <span
+class="math inline">\(x_i \in \mathbb{R}^d\)</span>. The goal of t-SNE
+is to find a low-dimensional representation <span
+class="math inline">\(Y = \{y_1, y_2, \ldots, y_n\}\)</span> where each
+<span class="math inline">\(y_i \in \mathbb{R}^2\)</span> or <span
+class="math inline">\(\mathbb{R}^3\)</span>, such that the local
+structures of <span class="math inline">\(X\)</span> are preserved in
+<span class="math inline">\(Y\)</span>.</p>
+<div class="definition">
+<p>The t-SNE algorithm minimizes the following cost function: <span
+class="math display">\[C = \sum_{i \neq j} p_{ij} \log
+\frac{p_{ij}}{q_{ij}}\]</span> where <span
+class="math inline">\(p_{ij}\)</span> is the probability that <span
+class="math inline">\(x_i\)</span> and <span
+class="math inline">\(x_j\)</span> are neighbors in the high-dimensional
+space, and <span class="math inline">\(q_{ij}\)</span> is the
+probability that <span class="math inline">\(y_i\)</span> and <span
+class="math inline">\(y_j\)</span> are neighbors in the low-dimensional
+space.</p>
+</div>
+<p>The probabilities <span class="math inline">\(p_{ij}\)</span> and
+<span class="math inline">\(q_{ij}\)</span> are defined as follows:
+<span class="math display">\[p_{ij} = \frac{p_j | i}{\sum_{k \neq l} p_k
+| l}, \quad q_{ij} = \frac{1 + \|y_i - y_j\|^2)^{-1}}{\sum_{k \neq l} (1
++ \|y_k - y_l\|^2)^{-1}}\]</span> where <span class="math inline">\(p_j
+| i\)</span> is the conditional probability that <span
+class="math inline">\(x_i\)</span> would pick <span
+class="math inline">\(x_j\)</span> as its neighbor if neighbors were
+chosen based on some Gaussian distribution centered at <span
+class="math inline">\(x_i\)</span>.</p>
+<h2 id="kernel-functions">Kernel Functions</h2>
+<p>Kernel functions are used to compute the inner products of data
+points in a high-dimensional feature space without explicitly
+transforming the data. A kernel function <span
+class="math inline">\(K\)</span> satisfies: <span
+class="math display">\[K(x_i, x_j) = \langle \phi(x_i), \phi(x_j)
+\rangle\]</span> where <span class="math inline">\(\phi\)</span> is a
+mapping from the input space to the feature space.</p>
+<div class="definition">
+<p>A kernel function <span class="math inline">\(K: \mathbb{R}^d \times
+\mathbb{R}^d \rightarrow \mathbb{R}\)</span> is a symmetric, positive
+semi-definite function that satisfies Mercer’s condition.</p>
+</div>
+<p>Common examples of kernel functions include the linear kernel,
+polynomial kernel, and Gaussian Radial Basis Function (RBF) kernel.</p>
+<h1 id="theorems">Theorems</h1>
+<h2 id="kernelized-t-sne-theorem">Kernelized t-SNE Theorem</h2>
+<p>The kernelized version of t-SNE incorporates the kernel function into
+the probability distributions <span
+class="math inline">\(p_{ij}\)</span> and <span
+class="math inline">\(q_{ij}\)</span>.</p>
+<div class="theorem">
+<p>Given a kernel function <span class="math inline">\(K\)</span>, the
+kernelized t-SNE cost function is: <span class="math display">\[C =
+\sum_{i \neq j} p_{ij}^K \log \frac{p_{ij}^K}{q_{ij}}\]</span> where
+<span class="math inline">\(p_{ij}^K\)</span> is the kernelized
+probability distribution defined as: <span
+class="math display">\[p_{ij}^K = \frac{K(x_i, x_j)}{\sum_{k \neq l}
+K(x_k, x_l)}\]</span></p>
+</div>
+<h2 id="proof-of-kernelized-t-sne-theorem">Proof of Kernelized t-SNE
+Theorem</h2>
+<p>The proof involves showing that the kernelized probability
+distribution <span class="math inline">\(p_{ij}^K\)</span> preserves the
+local structures of the high-dimensional data.</p>
+<div class="proof">
+<p><em>Proof.</em> We start by defining the kernelized probability
+distribution <span class="math inline">\(p_{ij}^K\)</span> as: <span
+class="math display">\[p_{ij}^K = \frac{K(x_i, x_j)}{\sum_{k \neq l}
+K(x_k, x_l)}\]</span></p>
+<p>This distribution ensures that the local structures are preserved
+because the kernel function <span class="math inline">\(K\)</span>
+captures the similarities between data points. The cost function <span
+class="math inline">\(C\)</span> is then minimized to find the
+low-dimensional representation <span
+class="math inline">\(Y\)</span>.</p>
+<p>The minimization of <span class="math inline">\(C\)</span> can be
+performed using gradient descent, where the gradients are computed with
+respect to the low-dimensional coordinates <span
+class="math inline">\(y_i\)</span>.</p>
+<p>The gradient of the cost function with respect to <span
+class="math inline">\(y_i\)</span> is given by: <span
+class="math display">\[\frac{\partial C}{\partial y_i} = 4 \sum_{j}
+(p_{ij}^K - q_{ij}) (1 + \|y_i - y_j\|^2)^{-1} (y_i - y_j)\]</span></p>
+<p>This gradient is used to update the coordinates <span
+class="math inline">\(y_i\)</span> iteratively until convergence. ◻</p>
+</div>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<h2 id="properties-of-kernelized-t-sne">Properties of Kernelized
+t-SNE</h2>
+<ol>
+<li><p>Kernelized t-SNE preserves local structures more effectively than
+traditional t-SNE, especially for non-linear relationships.</p></li>
+<li><p>The choice of kernel function significantly impacts the
+performance of Kernelized t-SNE. Different kernels may be suitable for
+different types of data.</p></li>
+<li><p>Kernelized t-SNE can handle large datasets more efficiently by
+leveraging the kernel trick, which avoids explicit transformation into a
+high-dimensional feature space.</p></li>
+</ol>
+<h2 id="corollaries-of-kernelized-t-sne-theorem">Corollaries of
+Kernelized t-SNE Theorem</h2>
+<div class="corollary">
+<p>The kernelized probability distribution <span
+class="math inline">\(p_{ij}^K\)</span> ensures that the local
+structures of the high-dimensional data are preserved in the
+low-dimensional representation.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The kernel function <span
+class="math inline">\(K\)</span> captures the similarities between data
+points, ensuring that nearby points in the high-dimensional space remain
+close in the low-dimensional representation. This preservation of local
+structures is a direct consequence of the kernelized probability
+distribution. ◻</p>
+</div>
+<div class="corollary">
+<p>The minimization of the kernelized t-SNE cost function can be
+performed using gradient descent, where the gradients are computed with
+respect to the low-dimensional coordinates.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The gradient of the cost function with respect to
+<span class="math inline">\(y_i\)</span> is given by: <span
+class="math display">\[\frac{\partial C}{\partial y_i} = 4 \sum_{j}
+(p_{ij}^K - q_{ij}) (1 + \|y_i - y_j\|^2)^{-1} (y_i - y_j)\]</span></p>
+<p>This gradient is used to update the coordinates <span
+class="math inline">\(y_i\)</span> iteratively until convergence,
+ensuring that the low-dimensional representation preserves the local
+structures of the high-dimensional data. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Kernelized t-SNE represents a significant advancement in the field of
+dimensionality reduction. By incorporating kernel functions, it provides
+a more flexible and nuanced approach to preserving local structures in
+high-dimensional data. The theorems, properties, and corollaries
+presented in this article highlight the mathematical foundations and
+practical implications of Kernelized t-SNE, making it an indispensable
+tool for modern data analysis.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

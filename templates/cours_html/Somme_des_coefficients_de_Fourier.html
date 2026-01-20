@@ -1,0 +1,372 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Somme des coefficients de Fourier</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Somme des coefficients de Fourier</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse de Fourier est un outil fondamental en mathématiques
+appliquées, permettant de décomposer des fonctions périodiques en séries
+trigonométriques. Les coefficients de Fourier jouent un rôle central
+dans cette décomposition, et leur somme est une question naturelle qui
+émerge lorsque l’on s’intéresse aux propriétés globales de la série.</p>
+<p>La somme des coefficients de Fourier est particulièrement
+intéressante car elle fournit une mesure de l’amplitude moyenne de la
+fonction. Elle est également liée à des concepts importants en analyse
+harmonique, tels que les opérateurs de projection et les propriétés de
+convergence des séries de Fourier.</p>
+<p>Dans cet article, nous explorerons la définition formelle des
+coefficients de Fourier, puis nous aborderons la question de leur somme.
+Nous présenterons plusieurs théorèmes et propriétés liés à ce sujet,
+accompagnés de preuves détaillées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de parler de la somme des coefficients de Fourier, il est
+essentiel de définir ce que sont les coefficients de Fourier
+eux-mêmes.</p>
+<h2 id="définition-des-coefficients-de-fourier">Définition des
+coefficients de Fourier</h2>
+<p>Considérons une fonction <span class="math inline">\(f\)</span>
+périodique de période <span class="math inline">\(2\pi\)</span>,
+c’est-à-dire une fonction telle que pour tout <span
+class="math inline">\(x \in \mathbb{R}\)</span>, <span
+class="math display">\[f(x + 2\pi) = f(x).\]</span></p>
+<p>On cherche à décomposer cette fonction en une série trigonométrique
+de la forme : <span class="math display">\[f(x) = \frac{a_0}{2} +
+\sum_{n=1}^{\infty} \left( a_n \cos(nx) + b_n \sin(nx)
+\right).\]</span></p>
+<p>Les coefficients <span class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span> sont appelés les coefficients de
+Fourier de la fonction <span class="math inline">\(f\)</span>. Ils sont
+définis par les formules suivantes :</p>
+<div class="definition">
+<p>Les coefficients <span class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span> sont donnés par : <span
+class="math display">\[a_n = \frac{1}{\pi} \int_{-\pi}^{\pi} f(x)
+\cos(nx) \, dx,\]</span> <span class="math display">\[b_n =
+\frac{1}{\pi} \int_{-\pi}^{\pi} f(x) \sin(nx) \, dx.\]</span></p>
+</div>
+<h2 id="somme-des-coefficients-de-fourier">Somme des coefficients de
+Fourier</h2>
+<p>La somme des coefficients de Fourier est simplement la somme des
+valeurs absolues des coefficients <span
+class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span>. Formellement, on peut la définir
+comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f\)</span> une fonction périodique
+de période <span class="math inline">\(2\pi\)</span>. La somme des
+coefficients de Fourier de <span class="math inline">\(f\)</span> est
+définie par : <span class="math display">\[S(f) = \frac{|a_0|}{2} +
+\sum_{n=1}^{\infty} \left( |a_n| + |b_n| \right).\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons quelques théorèmes importants
+concernant la somme des coefficients de Fourier.</p>
+<h2 id="théorème-de-bessel">Théorème de Bessel</h2>
+<p>Le théorème de Bessel est un résultat fondamental en analyse de
+Fourier. Il fournit une majoration de la somme des carrés des
+coefficients de Fourier.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> une fonction périodique
+de période <span class="math inline">\(2\pi\)</span>, intégrable sur
+<span class="math inline">\([-\pi, \pi]\)</span>. Alors, <span
+class="math display">\[\frac{a_0^2}{2} + \sum_{n=1}^{\infty} \left(
+a_n^2 + b_n^2 \right) \leq \frac{1}{\pi} \int_{-\pi}^{\pi} |f(x)|^2 \,
+dx.\]</span></p>
+</div>
+<h2 id="théorème-de-parseval">Théorème de Parseval</h2>
+<p>Le théorème de Parseval est une généralisation du théorème de Bessel.
+Il stipule que la somme des carrés des coefficients de Fourier est égale
+à l’intégrale de la fonction au carré.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> une fonction périodique
+de période <span class="math inline">\(2\pi\)</span>, intégrable sur
+<span class="math inline">\([-\pi, \pi]\)</span>. Si la série de Fourier
+de <span class="math inline">\(f\)</span> converge en norme <span
+class="math inline">\(L^2\)</span>, alors <span
+class="math display">\[\frac{a_0^2}{2} + \sum_{n=1}^{\infty} \left(
+a_n^2 + b_n^2 \right) = \frac{1}{\pi} \int_{-\pi}^{\pi} |f(x)|^2 \,
+dx.\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Dans cette section, nous fournissons des preuves détaillées pour les
+théorèmes présentés.</p>
+<h2 id="preuve-du-théorème-de-bessel">Preuve du théorème de Bessel</h2>
+<p>Pour prouver le théorème de Bessel, nous utilisons l’inégalité de
+Cauchy-Schwarz et les propriétés des séries de Fourier.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la série de Fourier de <span
+class="math inline">\(f\)</span> : <span class="math display">\[f(x) =
+\frac{a_0}{2} + \sum_{n=1}^{\infty} \left( a_n \cos(nx) + b_n \sin(nx)
+\right).\]</span></p>
+<p>En appliquant l’inégalité de Cauchy-Schwarz, nous avons : <span
+class="math display">\[\left( \frac{a_0^2}{2} + \sum_{n=1}^{\infty}
+\left( a_n^2 + b_n^2 \right) \right) \left( 1 + \sum_{n=1}^{\infty}
+\left( \int_{-\pi}^{\pi} \cos^2(nx) \, dx + \int_{-\pi}^{\pi} \sin^2(nx)
+\, dx \right) \right) \geq \left( \int_{-\pi}^{\pi} f(x)^2 \, dx
+\right)^2.\]</span></p>
+<p>En simplifiant les intégrales, nous obtenons : <span
+class="math display">\[\int_{-\pi}^{\pi} \cos^2(nx) \, dx =
+\pi,\]</span> <span class="math display">\[\int_{-\pi}^{\pi} \sin^2(nx)
+\, dx = \pi.\]</span></p>
+<p>Ainsi, l’inégalité devient : <span class="math display">\[\left(
+\frac{a_0^2}{2} + \sum_{n=1}^{\infty} \left( a_n^2 + b_n^2 \right)
+\right) (1 + 2\pi) \geq \left( \int_{-\pi}^{\pi} f(x)^2 \, dx
+\right)^2.\]</span></p>
+<p>En divisant par <span class="math inline">\((1 + 2\pi)\)</span>, nous
+obtenons le résultat souhaité : <span
+class="math display">\[\frac{a_0^2}{2} + \sum_{n=1}^{\infty} \left(
+a_n^2 + b_n^2 \right) \leq \frac{1}{\pi} \int_{-\pi}^{\pi} |f(x)|^2 \,
+dx.\]</span> ◻</p>
+</div>
+<h2 id="preuve-du-théorème-de-parseval">Preuve du théorème de
+Parseval</h2>
+<p>Pour prouver le théorème de Parseval, nous utilisons la convergence
+en norme <span class="math inline">\(L^2\)</span> et les propriétés des
+séries de Fourier.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que la série de Fourier de <span
+class="math inline">\(f\)</span> converge en norme <span
+class="math inline">\(L^2\)</span>. Alors, nous avons : <span
+class="math display">\[\lim_{N \to \infty} \int_{-\pi}^{\pi} \left| f(x)
+- \frac{a_0}{2} - \sum_{n=1}^{N} \left( a_n \cos(nx) + b_n \sin(nx)
+\right) \right|^2 \, dx = 0.\]</span></p>
+<p>En développant l’intégrale, nous obtenons : <span
+class="math display">\[\int_{-\pi}^{\pi} f(x)^2 \, dx = \frac{a_0^2}{2}
++ \sum_{n=1}^{\infty} \left( a_n^2 + b_n^2 \right).\]</span></p>
+<p>Ainsi, nous avons : <span class="math display">\[\frac{a_0^2}{2} +
+\sum_{n=1}^{\infty} \left( a_n^2 + b_n^2 \right) = \frac{1}{\pi}
+\int_{-\pi}^{\pi} |f(x)|^2 \, dx.\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et corollaires</h1>
+<p>Dans cette section, nous présentons quelques propriétés et
+corollaires liés à la somme des coefficients de Fourier.</p>
+<h2 id="propriétés">Propriétés</h2>
+<ol>
+<li><p>La somme des coefficients de Fourier est toujours finie pour les
+fonctions intégrables au sens de Lebesgue.</p></li>
+<li><p>La somme des coefficients de Fourier est invariante par
+translation de la fonction.</p></li>
+<li><p>La somme des coefficients de Fourier est nulle pour les fonctions
+impaires.</p></li>
+</ol>
+<h2 id="corollaires">Corollaires</h2>
+<ol>
+<li><p>Si <span class="math inline">\(f\)</span> est une fonction paire,
+alors <span class="math inline">\(b_n = 0\)</span> pour tout <span
+class="math inline">\(n \geq 1\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est une fonction
+impaire, alors <span class="math inline">\(a_n = 0\)</span> pour tout
+<span class="math inline">\(n \geq 0\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est une fonction
+périodique de période <span class="math inline">\(2\pi\)</span> et
+intégrable sur <span class="math inline">\([-\pi, \pi]\)</span>, alors
+la somme des coefficients de Fourier est finie.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>Dans cet article, nous avons exploré la notion de somme des
+coefficients de Fourier. Nous avons présenté les définitions formelles,
+les théorèmes importants et leurs preuves détaillées. Enfin, nous avons
+discuté quelques propriétés et corollaires liés à ce sujet.</p>
+<p>La somme des coefficients de Fourier est un outil puissant en analyse
+harmonique, et elle trouve des applications dans divers domaines des
+mathématiques appliquées. Nous espérons que cet article aura fourni une
+compréhension approfondie de ce concept fascinant.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

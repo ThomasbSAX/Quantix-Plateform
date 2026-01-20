@@ -1,0 +1,355 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’inégalité de Sperner : Une exploration combinatoire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’inégalité de Sperner : Une exploration
+combinatoire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’inégalité de Sperner, nommée en l’honneur du mathématicien allemand
+Emanuel Sperner (1893-1980), est un résultat fondamental en
+combinatoire. Elle émerge dans le cadre de l’étude des familles de
+ensembles et de leurs propriétés d’intersection. Cette inégalité est
+indispensable pour comprendre les limites des familles de ensembles qui
+ne contiennent pas deux éléments en relation d’inclusion stricte.</p>
+<p>L’origine historique de cette inégalité remonte aux années 1920,
+lorsque Sperner a cherché à répondre à des questions sur les familles de
+ensembles maximales ne contenant pas deux ensembles en inclusion l’un de
+l’autre. Cette notion est cruciale dans divers domaines, notamment en
+théorie des graphes, en algèbre booléenne et en informatique
+théorique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour aborder l’inégalité de Sperner, commençons par définir les
+concepts clés.</p>
+<h2 id="famille-antichaînée">Famille antichaînée</h2>
+<p>Considérons un ensemble <span class="math inline">\(E\)</span> et
+soit <span class="math inline">\(\mathcal{F}\)</span> une famille de
+sous-ensembles de <span class="math inline">\(E\)</span>. Nous cherchons
+à décrire une propriété que peut avoir cette famille par rapport aux
+relations d’inclusion entre ses éléments.</p>
+<p>Formellement, une famille <span
+class="math inline">\(\mathcal{F}\)</span> est dite antichaînée si pour
+tout <span class="math inline">\(A, B \in \mathcal{F}\)</span>, on a
+<span class="math inline">\(A \not\subseteq B\)</span> et <span
+class="math inline">\(B \not\subseteq A\)</span>. En d’autres termes,
+aucun élément de la famille n’est inclus dans un autre.</p>
+<p><span class="math display">\[\mathcal{F} \text{ est antichaînée }
+\iff \forall A, B \in \mathcal{F}, A \not\subseteq B \text{ et } B
+\not\subseteq A\]</span></p>
+<h2 id="nombre-de-sperner">Nombre de Sperner</h2>
+<p>Le nombre de Sperner, noté <span class="math inline">\(S(n)\)</span>,
+représente le cardinal maximal d’une famille antichaînée de
+sous-ensembles d’un ensemble à <span class="math inline">\(n\)</span>
+éléments.</p>
+<p><span class="math display">\[S(n) = \max \{ |\mathcal{F}| :
+\mathcal{F} \text{ est antichaînée et } \mathcal{F} \subseteq
+\mathcal{P}(E) \text{ avec } |E| = n \}\]</span></p>
+<h1 id="théorème-de-sperner">Théorème de Sperner</h1>
+<h2 id="énoncé-du-théorème">Énoncé du théorème</h2>
+<p>Le théorème de Sperner affirme que le nombre maximal d’ensembles dans
+une famille antichaînée de sous-ensembles d’un ensemble à <span
+class="math inline">\(n\)</span> éléments est atteint par l’ensemble des
+sous-ensembles de cardinal <span class="math inline">\(\lfloor
+\frac{n}{2} \rfloor\)</span>.</p>
+<p>En d’autres termes, pour tout ensemble <span
+class="math inline">\(E\)</span> de cardinal <span
+class="math inline">\(n\)</span>, on a :</p>
+<p><span class="math display">\[S(n) = \binom{n}{\lfloor \frac{n}{2}
+\rfloor}\]</span></p>
+<h2 id="démonstration">Démonstration</h2>
+<p>Pour démontrer ce théorème, nous utilisons le principe
+d’inclusion-exclusion et les propriétés des coefficients binomiaux.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un ensemble <span
+class="math inline">\(E\)</span> de cardinal <span
+class="math inline">\(n\)</span>. Nous voulons montrer que la famille
+des sous-ensembles de cardinal <span class="math inline">\(k\)</span>
+est antichaînée et qu’elle atteint le nombre maximal d’éléments.</p>
+<p>1. **Antichaînée** : Soit <span class="math inline">\(\mathcal{F} =
+\{ A \subseteq E : |A| = k \}\)</span>. Pour tout <span
+class="math inline">\(A, B \in \mathcal{F}\)</span>, si <span
+class="math inline">\(A \subseteq B\)</span> alors <span
+class="math inline">\(|A| \leq |B|\)</span>. Mais comme <span
+class="math inline">\(|A| = |B| = k\)</span>, on a <span
+class="math inline">\(A = B\)</span>. Donc, <span
+class="math inline">\(\mathcal{F}\)</span> est antichaînée.</p>
+<p>2. **Maximalité** : Nous devons montrer que <span
+class="math inline">\(S(n) \leq \binom{n}{\lfloor \frac{n}{2}
+\rfloor}\)</span>. Pour cela, nous utilisons le principe
+d’inclusion-exclusion et les propriétés des coefficients binomiaux.</p>
+<p>Soit <span class="math inline">\(\mathcal{F}\)</span> une famille
+antichaînée. Pour tout <span class="math inline">\(k\)</span>, notons
+<span class="math inline">\(m_k\)</span> le nombre d’ensembles de
+cardinal <span class="math inline">\(k\)</span> dans <span
+class="math inline">\(\mathcal{F}\)</span>. Alors, on a :</p>
+<p><span class="math display">\[|\mathcal{F}| = \sum_{k=0}^n
+m_k\]</span></p>
+<p>Nous devons montrer que <span class="math inline">\(\sum_{k=0}^n m_k
+\leq \binom{n}{\lfloor \frac{n}{2} \rfloor}\)</span>.</p>
+<p>Utilisons le fait que pour toute famille antichaînée, on a <span
+class="math inline">\(m_k \leq \binom{n}{k}\)</span> pour tout <span
+class="math inline">\(k\)</span>. En effet, si deux ensembles de
+cardinal <span class="math inline">\(k\)</span> sont dans <span
+class="math inline">\(\mathcal{F}\)</span>, ils ne peuvent pas être en
+inclusion l’un de l’autre.</p>
+<p>Donc,</p>
+<p><span class="math display">\[|\mathcal{F}| = \sum_{k=0}^n m_k \leq
+\sum_{k=0}^n \binom{n}{k} = 2^n\]</span></p>
+<p>Cependant, cette majoration est trop grossière. Nous devons affiner
+notre raisonnement.</p>
+<p>Considérons l’ensemble <span class="math inline">\(\mathcal{F}_k = \{
+A \subseteq E : |A| = k \}\)</span>. Nous savons que <span
+class="math inline">\(|\mathcal{F}_k| = \binom{n}{k}\)</span>.</p>
+<p>Nous voulons montrer que <span class="math inline">\(S(n) \leq \max_k
+\binom{n}{k}\)</span>. Or, on sait que <span
+class="math inline">\(\max_k \binom{n}{k} = \binom{n}{\lfloor
+\frac{n}{2} \rfloor}\)</span>.</p>
+<p>Donc,</p>
+<p><span class="math display">\[S(n) \leq \binom{n}{\lfloor \frac{n}{2}
+\rfloor}\]</span></p>
+<p>Ce qui achève la démonstration. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-1-symétrie-des-coefficients-binomiaux">Propriété 1 :
+Symétrie des coefficients binomiaux</h2>
+<p>Les coefficients binomiaux <span
+class="math inline">\(\binom{n}{k}\)</span> sont symétriques,
+c’est-à-dire que <span class="math inline">\(\binom{n}{k} =
+\binom{n}{n-k}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Cela découle directement de la définition des
+coefficients binomiaux :</p>
+<p><span class="math display">\[\binom{n}{k} = \frac{n!}{k!(n-k)!} =
+\frac{n!}{(n-k)!k!} = \binom{n}{n-k}\]</span> ◻</p>
+</div>
+<h2 id="propriété-2-majorations-des-coefficients-binomiaux">Propriété 2
+: Majorations des coefficients binomiaux</h2>
+<p>Pour tout <span class="math inline">\(k\)</span>, on a <span
+class="math inline">\(\binom{n}{k} \leq \binom{n}{\lfloor \frac{n}{2}
+\rfloor}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Cela découle du fait que la fonction <span
+class="math inline">\(k \mapsto \binom{n}{k}\)</span> est maximale en
+<span class="math inline">\(k = \lfloor \frac{n}{2}
+\rfloor\)</span>. ◻</p>
+</div>
+<h2 id="propriété-3-inégalité-de-sperner-généralisée">Propriété 3 :
+Inégalité de Sperner généralisée</h2>
+<p>Pour toute famille <span class="math inline">\(\mathcal{F}\)</span>
+de sous-ensembles d’un ensemble à <span class="math inline">\(n\)</span>
+éléments, on a :</p>
+<p><span class="math display">\[|\mathcal{F}| \leq \sum_{k=0}^n
+\binom{n}{k} = 2^n\]</span></p>
+<p>Cette inégalité est une généralisation de l’inégalité de Sperner, car
+elle s’applique à toute famille de sous-ensembles, pas seulement aux
+familles antichaînées.</p>
+<div class="proof">
+<p><em>Proof.</em> Cela découle directement du principe
+d’inclusion-exclusion et des propriétés des coefficients
+binomiaux. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’inégalité de Sperner est un résultat fondamental en combinatoire,
+avec des applications dans divers domaines. Sa démonstration repose sur
+des propriétés profondes des coefficients binomiaux et des familles
+antichaînées. Les corollaires et propriétés associés enrichissent notre
+compréhension des structures combinatoires et ouvrent la voie à de
+nouvelles recherches.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,337 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de cryptographie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de cryptographie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La cryptographie, art millénaire de la communication secrète, a connu
+une révolution avec l’avènement des ordinateurs. Les problèmes de
+cryptographie ne se résument plus à la simple substitution de lettres,
+mais s’étendent à des domaines complexes comme l’algèbre, la théorie des
+nombres et l’informatique théorique. L’étude de leur complexité est
+cruciale pour évaluer la robustesse des protocoles et garantir la
+sécurité des communications.</p>
+<p>L’émergence de cette notion est motivée par le besoin de comprendre
+les limites algorithmiques des attaques cryptographiques. En effet, un
+problème peut être facile à résoudre en théorie mais extrêmement
+difficile en pratique, surtout lorsque les tailles des données
+augmentent. La complexité nous permet de quantifier cette difficulté et
+d’établir des garanties mathématiques sur la sécurité des systèmes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails, il est essentiel de comprendre ce
+que nous cherchons à mesurer. En cryptographie, un problème est
+généralement défini par une relation entre des entrées et des sorties.
+Par exemple, dans le cas du chiffrement, on cherche à transformer un
+message clair en un texte chiffré de manière irréversible sans la clé
+secrète. La complexité d’un problème mesure le temps et les ressources
+nécessaires pour résoudre ce problème.</p>
+<p>Formellement, considérons un problème de décision <span
+class="math inline">\(L\)</span> défini par une langue sur un alphabet
+fini. On dit que <span class="math inline">\(L\)</span> est résoluble en
+temps polynomial si et seulement s’il existe une machine de Turing
+déterministe <span class="math inline">\(M\)</span> telle que pour tout
+<span class="math inline">\(x \in L\)</span>, <span
+class="math inline">\(M\)</span> accepte <span
+class="math inline">\(x\)</span> en un temps polynomial en la longueur
+de <span class="math inline">\(x\)</span>.</p>
+<p><span class="math display">\[\exists M, \forall x \in L, T_M(x) =
+O(p(|x|)) \text{ où } p \text{ est un polynôme.}\]</span></p>
+<p>Un problème de fonction <span class="math inline">\(f\)</span> est
+dit calculable en temps polynomial si et seulement s’il existe une
+machine de Turing <span class="math inline">\(M\)</span> telle que pour
+tout <span class="math inline">\(x\)</span>, <span
+class="math inline">\(M\)</span> calcule <span
+class="math inline">\(f(x)\)</span> en un temps polynomial en la
+longueur de <span class="math inline">\(x\)</span>.</p>
+<p><span class="math display">\[\exists M, \forall x, T_M(x) = O(p(|x|))
+\text{ où } p \text{ est un polynôme.}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>L’un des théorèmes fondamentaux en cryptographie est le théorème de
+Feige-Fiat-Shamir, qui établit une connexion entre la complexité des
+problèmes et la sécurité des protocoles d’identification. Ce théorème
+montre que si un problème est difficile à résoudre, alors il peut être
+utilisé pour construire des protocoles d’identification sécurisés.</p>
+<p>Pédagogiquement, imaginons que nous avons un problème <span
+class="math inline">\(P\)</span> qui est difficile à résoudre mais
+facile à vérifier. Si un attaquant peut trouver une solution à <span
+class="math inline">\(P\)</span>, alors il peut tromper le protocole
+d’identification. Le théorème de Feige-Fiat-Shamir montre que si <span
+class="math inline">\(P\)</span> est difficile, alors le protocole est
+sécurisé.</p>
+<p>Formellement, soit <span class="math inline">\(P\)</span> un problème
+de décision. On dit que <span class="math inline">\(P\)</span> est à
+préimage difficile si pour toute fonction efficace <span
+class="math inline">\(f\)</span>, il existe une infinité d’entrées <span
+class="math inline">\(x\)</span> telles que <span
+class="math inline">\(f(x) \neq y\)</span> pour tout préimage <span
+class="math inline">\(y\)</span> de <span
+class="math inline">\(x\)</span>.</p>
+<p><span class="math display">\[\forall f, \exists^\infty x, \forall y
+\text{ tel que } P(y) = x, f(x) \neq y.\]</span></p>
+<p>Le théorème de Feige-Fiat-Shamir stipule que si <span
+class="math inline">\(P\)</span> est à préimage difficile, alors le
+protocole d’identification basé sur <span
+class="math inline">\(P\)</span> est sécurisé.</p>
+<p><span class="math display">\[\text{Si } P \text{ est à préimage
+difficile, alors le protocole d&#39;identification basé sur } P \text{
+est sécurisé.}\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Feige-Fiat-Shamir, nous devons montrer
+que si un attaquant peut tromper le protocole d’identification, alors il
+peut résoudre le problème <span class="math inline">\(P\)</span>.
+Supposons qu’un attaquant <span class="math inline">\(A\)</span> puisse
+tromper le protocole avec une probabilité non négligeable. Nous
+construisons alors une machine <span class="math inline">\(M\)</span>
+qui utilise <span class="math inline">\(A\)</span> pour résoudre <span
+class="math inline">\(P\)</span>.</p>
+<p>1. **Initialisation**: <span class="math inline">\(M\)</span> reçoit
+une instance <span class="math inline">\(x\)</span> du problème <span
+class="math inline">\(P\)</span>. 2. **Simulation**: <span
+class="math inline">\(M\)</span> simule le protocole d’identification
+avec <span class="math inline">\(A\)</span>. 3. **Extraction**: Si <span
+class="math inline">\(A\)</span> trompe le protocole, <span
+class="math inline">\(M\)</span> extrait la solution à <span
+class="math inline">\(P\)</span>.</p>
+<p>La preuve repose sur le fait que si <span
+class="math inline">\(A\)</span> peut tromper le protocole, alors il
+doit connaître une solution à <span class="math inline">\(P\)</span>. En
+utilisant <span class="math inline">\(A\)</span>, <span
+class="math inline">\(M\)</span> peut résoudre <span
+class="math inline">\(P\)</span>, ce qui contredit l’hypothèse que <span
+class="math inline">\(P\)</span> est difficile.</p>
+<p><span class="math display">\[\text{Si } A \text{ trompe le protocole,
+alors } M \text{ peut résoudre } P.\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les propriétés suivantes découlent du théorème de Feige-Fiat-Shamir
+et illustrent son importance en cryptographie.</p>
+<ul>
+<li><p>Si un problème est à préimage difficile, alors tout protocole
+d’identification basé sur ce problème est sécurisé.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span class="math inline">\(P\)</span>
+soit à préimage difficile. Si un attaquant peut tromper le protocole,
+alors il peut résoudre <span class="math inline">\(P\)</span>, ce qui
+contredit l’hypothèse. Donc le protocole est sécurisé. ◻</p>
+</div></li>
+<li><p>La sécurité des protocoles d’identification repose sur la
+difficulté des problèmes sous-jacents.</p>
+<div class="proof">
+<p><em>Proof.</em> Si un problème est facile à résoudre, alors le
+protocole basé sur ce problème peut être trompé. Donc la sécurité du
+protocole dépend de la difficulté du problème. ◻</p>
+</div></li>
+<li><p>Les problèmes à préimage difficile sont essentiels pour la
+construction de protocoles cryptographiques sécurisés.</p>
+<div class="proof">
+<p><em>Proof.</em> Sans des problèmes à préimage difficile, il serait
+impossible de garantir la sécurité des protocoles d’identification. Donc
+ces problèmes sont indispensables en cryptographie. ◻</p>
+</div></li>
+</ul>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’étude de la complexité des problèmes de cryptographie est un
+domaine fascinant et crucial pour la sécurité des communications. Les
+théorèmes comme celui de Feige-Fiat-Shamir nous permettent de comprendre
+les limites des attaques cryptographiques et de construire des
+protocoles sécurisés. En continuant à explorer ces notions, nous pouvons
+espérer développer des systèmes cryptographiques encore plus robustes et
+fiables.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,340 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance inter-cluster : Mesure de la qualité des partitions en clusters</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance inter-cluster : Mesure de la qualité des
+partitions en clusters</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse de données par clustering est une tâche fondamentale en
+apprentissage automatique et en statistique. Elle vise à regrouper des
+objets similaires tout en séparant ceux qui sont différents. La qualité
+d’une partition en clusters est souvent évaluée à l’aide de critères
+objectifs, parmi lesquels la variance inter-cluster occupe une place
+centrale.</p>
+<p>La notion de variance inter-cluster émerge naturellement dans le
+cadre des méthodes de clustering basées sur la minimisation de critères
+de dispersion. Elle permet de quantifier la séparation entre les
+clusters, et donc d’évaluer la qualité globale d’une partition. Cette
+mesure est particulièrement utile dans les algorithmes de type k-means,
+où l’objectif est de minimiser la somme des variances intra-cluster.</p>
+<p>Dans cet article, nous explorerons en détail la notion de variance
+inter-cluster. Nous commencerons par une définition rigoureuse, puis
+nous étudierons ses propriétés et ses applications.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de variance inter-cluster, commençons par
+rappeler quelques concepts préliminaires. Considérons un ensemble de
+données <span class="math inline">\(X = \{x_1, x_2, \dots,
+x_n\}\)</span> dans un espace euclidien <span
+class="math inline">\(\mathbb{R}^d\)</span>. Une partition de <span
+class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> clusters est une famille <span
+class="math inline">\(\{C_1, C_2, \dots, C_k\}\)</span> de
+sous-ensembles disjoints de <span class="math inline">\(X\)</span> dont
+la réunion est <span class="math inline">\(X\)</span>.</p>
+<p>La variance intra-cluster d’un cluster <span
+class="math inline">\(C_i\)</span> est définie comme la somme des carrés
+des distances entre chaque point du cluster et le centroïde de ce
+cluster. Formellement, si <span class="math inline">\(\mu_i\)</span>
+désigne le centroïde du cluster <span
+class="math inline">\(C_i\)</span>, alors :</p>
+<p><span class="math display">\[\text{Var}_{\text{intra}}(C_i) = \sum_{x
+\in C_i} \|x - \mu_i\|^2\]</span></p>
+<p>La variance intra-cluster globale est alors la somme des variances
+intra-cluster de tous les clusters :</p>
+<p><span class="math display">\[\text{Var}_{\text{intra}} = \sum_{i=1}^k
+\text{Var}_{\text{intra}}(C_i)\]</span></p>
+<p>La variance inter-cluster, quant à elle, mesure la séparation entre
+les clusters. Elle est définie comme la somme des carrés des distances
+entre chaque centroïde et le centroïde global. Si <span
+class="math inline">\(\mu\)</span> désigne le centroïde global de
+l’ensemble <span class="math inline">\(X\)</span>, alors :</p>
+<p><span class="math display">\[\text{Var}_{\text{inter}} = \sum_{i=1}^k
+|C_i| \cdot \|\mu_i - \mu\|^2\]</span></p>
+<p>où <span class="math inline">\(|C_i|\)</span> désigne le nombre de
+points dans le cluster <span class="math inline">\(C_i\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un résultat fondamental en théorie du clustering est que la somme des
+variances intra-cluster et inter-cluster est égale à la variance totale
+de l’ensemble de données. Plus précisément, nous avons le théorème
+suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+dans <span class="math inline">\(\mathbb{R}^d\)</span>, et soit <span
+class="math inline">\(\{C_1, C_2, \dots, C_k\}\)</span> une partition de
+<span class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> clusters. Alors :</p>
+<p><span class="math display">\[\text{Var}_{\text{intra}} +
+\text{Var}_{\text{inter}} = \text{Var}_{\text{totale}}\]</span></p>
+<p>où <span class="math inline">\(\text{Var}_{\text{totale}}\)</span>
+est la variance totale de l’ensemble <span
+class="math inline">\(X\)</span>, définie par :</p>
+<p><span class="math display">\[\text{Var}_{\text{totale}} = \sum_{x \in
+X} \|x - \mu\|^2\]</span></p>
+<p>avec <span class="math inline">\(\mu\)</span> le centroïde global de
+<span class="math inline">\(X\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de la variance totale, commençons par
+exprimer la variance intra-cluster d’un cluster <span
+class="math inline">\(C_i\)</span> en fonction du centroïde global <span
+class="math inline">\(\mu\)</span>. Nous avons :</p>
+<p><span class="math display">\[\text{Var}_{\text{intra}}(C_i) = \sum_{x
+\in C_i} \|x - \mu_i\|^2\]</span></p>
+<p>En utilisant l’identité de Pythagore, nous pouvons écrire :</p>
+<p><span class="math display">\[\|x - \mu_i\|^2 = \|x - \mu\|^2 + \|\mu
+- \mu_i\|^2 + 2(x - \mu)^T (\mu - \mu_i)\]</span></p>
+<p>En sommant sur tous les points <span class="math inline">\(x\)</span>
+du cluster <span class="math inline">\(C_i\)</span>, le terme croisé
+<span class="math inline">\(2(x - \mu)^T (\mu - \mu_i)\)</span>
+s’annule, car <span class="math inline">\(\mu_i\)</span> est le
+centroïde du cluster <span class="math inline">\(C_i\)</span>. Il reste
+donc :</p>
+<p><span class="math display">\[\text{Var}_{\text{intra}}(C_i) = \sum_{x
+\in C_i} \|x - \mu\|^2 + |C_i| \cdot \|\mu - \mu_i\|^2\]</span></p>
+<p>En sommant sur tous les clusters, nous obtenons :</p>
+<p><span class="math display">\[\text{Var}_{\text{intra}} = \sum_{i=1}^k
+\left( \sum_{x \in C_i} \|x - \mu\|^2 + |C_i| \cdot \|\mu - \mu_i\|^2
+\right)\]</span></p>
+<p>Or, la somme <span class="math inline">\(\sum_{i=1}^k \sum_{x \in
+C_i} \|x - \mu\|^2\)</span> est égale à la variance totale <span
+class="math inline">\(\text{Var}_{\text{totale}}\)</span>, et la somme
+<span class="math inline">\(\sum_{i=1}^k |C_i| \cdot \|\mu -
+\mu_i\|^2\)</span> est égale à la variance inter-cluster <span
+class="math inline">\(\text{Var}_{\text{inter}}\)</span>. Nous avons
+donc bien :</p>
+<p><span class="math display">\[\text{Var}_{\text{intra}} +
+\text{Var}_{\text{inter}} = \text{Var}_{\text{totale}}\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le théorème de la variance totale a plusieurs conséquences
+importantes. En voici quelques-unes :</p>
+<ol>
+<li><p>La variance inter-cluster est toujours inférieure ou égale à la
+variance totale. En effet, nous avons :</p>
+<p><span class="math display">\[\text{Var}_{\text{inter}} =
+\text{Var}_{\text{totale}} - \text{Var}_{\text{intra}} \leq
+\text{Var}_{\text{totale}}\]</span></p>
+<p>car la variance intra-cluster est toujours positive.</p></li>
+<li><p>La variance inter-cluster est maximale lorsque les clusters sont
+aussi séparés que possible. En effet, plus les centroïdes des clusters
+sont éloignés du centroïde global, plus la variance inter-cluster est
+grande.</p></li>
+<li><p>La variance inter-cluster peut être utilisée comme critère
+d’optimisation dans les algorithmes de clustering. Par exemple,
+l’algorithme des k-moyennes minimise la variance intra-cluster, ce qui
+revient à maximiser la variance inter-cluster.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La variance inter-cluster est une mesure fondamentale en théorie du
+clustering. Elle permet de quantifier la séparation entre les clusters,
+et donc d’évaluer la qualité globale d’une partition. Dans cet article,
+nous avons exploré en détail cette notion, en commençant par une
+définition rigoureuse, puis en étudiant ses propriétés et ses
+applications. Nous avons également démontré le théorème de la variance
+totale, qui relie la variance inter-cluster à la variance intra-cluster
+et à la variance totale.</p>
+<p>La variance inter-cluster est un outil puissant pour l’analyse de
+données, et elle continue d’être étudiée activement dans la communauté
+scientifique. Ses propriétés et ses applications ouvrent de nombreuses
+pistes de recherche, notamment dans le domaine de l’apprentissage
+automatique et de la statistique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

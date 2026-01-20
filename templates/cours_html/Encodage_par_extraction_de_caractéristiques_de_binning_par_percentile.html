@@ -1,0 +1,374 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de binning par percentile</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de binning
+par percentile</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques est une technique
+puissante dans le domaine du traitement des données et de
+l’apprentissage automatique. Elle permet de transformer des variables
+catégorielles en variables numériques, facilitant ainsi leur utilisation
+dans les modèles prédictifs. Le binning par percentile est une méthode
+particulièrement efficace pour cette transformation, car elle divise les
+données en intervalles de manière à ce que chaque intervalle contienne
+le même nombre d’observations.</p>
+<p>Cette technique est indispensable dans de nombreux domaines,
+notamment en analyse de données, en machine learning et en statistique.
+Elle permet de réduire la dimensionnalité des données tout en préservant
+les informations essentielles. De plus, elle est particulièrement utile
+pour traiter les variables catégorielles qui peuvent contenir des
+valeurs manquantes ou des outliers.</p>
+<p>Dans cet article, nous explorerons les concepts fondamentaux de
+l’encodage par extraction de caractéristiques de binning par percentile.
+Nous commencerons par définir formellement cette technique, puis nous
+présenterons les théorèmes et propriétés associés. Enfin, nous
+fournirons des preuves détaillées pour illustrer l’efficacité de cette
+méthode.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement l’encodage par extraction de
+caractéristiques de binning par percentile, il est important de
+comprendre ce que nous cherchons à accomplir. Nous voulons transformer
+une variable catégorielle en une variable numérique de manière à ce que
+les valeurs numériques reflètent la distribution des données d’origine.
+Cela permet de préserver les relations entre les différentes catégories
+tout en facilitant l’analyse des données.</p>
+<p>Pour ce faire, nous divisons les données en intervalles, ou bins, de
+manière à ce que chaque intervalle contienne le même nombre
+d’observations. Ensuite, nous extrayons des caractéristiques de ces
+intervalles pour encoder les données.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une variable catégorielle
+avec <span class="math inline">\(n\)</span> observations. Nous voulons
+diviser ces observations en <span class="math inline">\(k\)</span>
+intervalles de manière à ce que chaque intervalle contienne <span
+class="math inline">\(\frac{n}{k}\)</span> observations.</p>
+<p>Formellement, pour chaque observation <span
+class="math inline">\(x_i\)</span>, nous définissons un intervalle <span
+class="math inline">\(I_j\)</span> tel que : <span
+class="math display">\[I_j = \{ x_i \mid p_{j-1} &lt; x_i \leq p_j
+\}\]</span> où <span class="math inline">\(p_j\)</span> est le <span
+class="math inline">\(j\)</span>-ème percentile de la distribution des
+données.</p>
+</div>
+<div class="definition">
+<p>Une fois les intervalles définis, nous pouvons extraire des
+caractéristiques pour chaque intervalle. Par exemple, nous pouvons
+calculer la moyenne, l’écart-type ou toute autre statistique descriptive
+pour chaque intervalle.</p>
+<p>Formellement, pour chaque intervalle <span
+class="math inline">\(I_j\)</span>, nous définissons une caractéristique
+<span class="math inline">\(f_j\)</span> telle que : <span
+class="math display">\[f_j = \text{statistique}(I_j)\]</span> où <span
+class="math inline">\(\text{statistique}\)</span> peut être la moyenne,
+l’écart-type, etc.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons quelques théorèmes importants
+liés à l’encodage par extraction de caractéristiques de binning par
+percentile.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> une variable catégorielle
+avec <span class="math inline">\(n\)</span> observations. Si nous
+divisons ces observations en <span class="math inline">\(k\)</span>
+intervalles de manière à ce que chaque intervalle contienne <span
+class="math inline">\(\frac{n}{k}\)</span> observations, alors la
+moyenne de chaque intervalle est une approximation de la moyenne globale
+des données.</p>
+<p>Formellement, pour chaque intervalle <span
+class="math inline">\(I_j\)</span>, nous avons : <span
+class="math display">\[\mu_j = \frac{1}{|I_j|} \sum_{x_i \in I_j}
+x_i\]</span> où <span class="math inline">\(\mu_j\)</span> est la
+moyenne de l’intervalle <span class="math inline">\(I_j\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ce théorème découle directement de la
+définition de la moyenne. En effet, la moyenne d’un intervalle est
+calculée en sommant toutes les observations de cet intervalle et en
+divisant par le nombre d’observations dans l’intervalle. Puisque chaque
+intervalle contient le même nombre d’observations, la moyenne de chaque
+intervalle est une approximation de la moyenne globale des
+données. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Dans cette section, nous fournissons des preuves détaillées pour
+illustrer l’efficacité de l’encodage par extraction de caractéristiques
+de binning par percentile.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver que l’encodage par extraction de
+caractéristiques de binning par percentile préserve les informations
+essentielles des données, nous devons montrer que les caractéristiques
+extraites sont corrélées avec les variables d’origine.</p>
+<p>Soit <span class="math inline">\(X\)</span> une variable catégorielle
+avec <span class="math inline">\(n\)</span> observations. Nous divisons
+ces observations en <span class="math inline">\(k\)</span> intervalles
+de manière à ce que chaque intervalle contienne <span
+class="math inline">\(\frac{n}{k}\)</span> observations. Ensuite, nous
+extrayons une caractéristique <span class="math inline">\(f_j\)</span>
+pour chaque intervalle <span class="math inline">\(I_j\)</span>.</p>
+<p>Nous voulons montrer que <span class="math inline">\(f_j\)</span> est
+corrélée avec <span class="math inline">\(X\)</span>. Pour ce faire,
+nous calculons la covariance entre <span
+class="math inline">\(f_j\)</span> et <span
+class="math inline">\(X\)</span> : <span
+class="math display">\[\text{Cov}(f_j, X) = \frac{1}{n} \sum_{i=1}^n
+(f_j - \mu_{f_j})(x_i - \mu_X)\]</span> où <span
+class="math inline">\(\mu_{f_j}\)</span> et <span
+class="math inline">\(\mu_X\)</span> sont les moyennes de <span
+class="math inline">\(f_j\)</span> et <span
+class="math inline">\(X\)</span>, respectivement.</p>
+<p>En développant cette expression, nous obtenons : <span
+class="math display">\[\text{Cov}(f_j, X) = \frac{1}{n} \sum_{i=1}^n f_j
+x_i - \mu_{f_j} \mu_X\]</span></p>
+<p>Puisque <span class="math inline">\(f_j\)</span> est une
+caractéristique de l’intervalle <span
+class="math inline">\(I_j\)</span>, elle est corrélée avec les
+observations <span class="math inline">\(x_i\)</span> de cet intervalle.
+Par conséquent, la covariance entre <span
+class="math inline">\(f_j\)</span> et <span
+class="math inline">\(X\)</span> est non nulle, ce qui prouve que
+l’encodage par extraction de caractéristiques de binning par percentile
+préserve les informations essentielles des données. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Dans cette section, nous listons quelques propriétés et corollaires
+importants liés à l’encodage par extraction de caractéristiques de
+binning par percentile.</p>
+<ol>
+<li><p><strong>Propriété de la moyenne</strong> : La moyenne de chaque
+intervalle est une approximation de la moyenne globale des
+données.</p></li>
+<li><p><strong>Propriété de l’écart-type</strong> : L’écart-type de
+chaque intervalle est une approximation de l’écart-type global des
+données.</p></li>
+<li><p><strong>Propriété de la corrélation</strong> : Les
+caractéristiques extraites sont corrélées avec les variables
+d’origine.</p></li>
+</ol>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver la propriété de la moyenne, nous devons
+montrer que la moyenne de chaque intervalle est une approximation de la
+moyenne globale des données.</p>
+<p>Soit <span class="math inline">\(X\)</span> une variable catégorielle
+avec <span class="math inline">\(n\)</span> observations. Nous divisons
+ces observations en <span class="math inline">\(k\)</span> intervalles
+de manière à ce que chaque intervalle contienne <span
+class="math inline">\(\frac{n}{k}\)</span> observations. Ensuite, nous
+calculons la moyenne de chaque intervalle <span
+class="math inline">\(I_j\)</span> : <span class="math display">\[\mu_j
+= \frac{1}{|I_j|} \sum_{x_i \in I_j} x_i\]</span></p>
+<p>Puisque chaque intervalle contient le même nombre d’observations, la
+moyenne de chaque intervalle est une approximation de la moyenne globale
+des données.</p>
+<p>La preuve de la propriété de l’écart-type est similaire. Nous
+calculons l’écart-type de chaque intervalle <span
+class="math inline">\(I_j\)</span> : <span
+class="math display">\[\sigma_j = \sqrt{\frac{1}{|I_j|} \sum_{x_i \in
+I_j} (x_i - \mu_j)^2}\]</span></p>
+<p>Puisque chaque intervalle contient le même nombre d’observations,
+l’écart-type de chaque intervalle est une approximation de l’écart-type
+global des données.</p>
+<p>Enfin, pour prouver la propriété de la corrélation, nous devons
+montrer que les caractéristiques extraites sont corrélées avec les
+variables d’origine. Nous avons déjà fourni une preuve détaillée de
+cette propriété dans la section précédente. ◻</p>
+</div>
+</body>
+</html>
+{% include "footer.html" %}
+

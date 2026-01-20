@@ -1,0 +1,323 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>R² ajusté : Une mesure clé en régression linéaire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">R² ajusté : Une mesure clé en régression linéaire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La régression linéaire est un outil fondamental en statistique pour
+modéliser la relation entre une variable dépendante et une ou plusieurs
+variables indépendantes. Parmi les nombreuses métriques utilisées pour
+évaluer la qualité d’un modèle de régression, le coefficient de
+détermination, noté <span class="math inline">\(R^2\)</span>, occupe une
+place centrale. Cependant, dans le cadre de modèles multiples où
+plusieurs variables indépendantes sont considérées, une version ajustée
+de ce coefficient, <span
+class="math inline">\(R^2_{\text{ajusté}}\)</span>, devient
+indispensable.</p>
+<p>L’émergence du <span
+class="math inline">\(R^2_{\text{ajusté}}\)</span> répond à un besoin
+crucial : pénaliser l’ajout de variables indépendantes superflues dans
+le modèle. En effet, bien que l’ajout de nouvelles variables puisse
+augmenter le <span class="math inline">\(R^2\)</span> traditionnel, cela
+ne garantit pas nécessairement une meilleure prédiction. Le <span
+class="math inline">\(R^2_{\text{ajusté}}\)</span> permet de corriger
+cette tendance en tenant compte du nombre de variables indépendantes
+dans le modèle, offrant ainsi une mesure plus robuste et fiable de la
+qualité du modèle.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le <span
+class="math inline">\(R^2_{\text{ajusté}}\)</span>, il est essentiel de
+revenir d’abord à la définition du <span
+class="math inline">\(R^2\)</span> traditionnel. Supposons que nous
+avons un modèle de régression linéaire multiple avec <span
+class="math inline">\(n\)</span> observations et <span
+class="math inline">\(p\)</span> variables indépendantes. Le <span
+class="math inline">\(R^2\)</span> mesure la proportion de la variance
+totale de la variable dépendante qui est expliquée par le modèle.</p>
+<h4 id="définition-du-r2-traditionnel">Définition du <span
+class="math inline">\(R^2\)</span> traditionnel :</h4>
+<p>Le coefficient de détermination <span
+class="math inline">\(R^2\)</span> est défini comme suit : <span
+class="math display">\[R^2 = 1 - \frac{\text{SSE}}{\text{SST}}\]</span>
+où :</p>
+<ul>
+<li><p>SSE (Sum of Squares Error) est la somme des carrés des résidus,
+c’est-à-dire la différence entre les valeurs observées et les valeurs
+prédites par le modèle.</p></li>
+<li><p>SST (Total Sum of Squares) est la somme des carrés des
+différences entre les valeurs observées et la moyenne des
+observations.</p></li>
+</ul>
+<h4 id="problème-du-r2-traditionnel">Problème du <span
+class="math inline">\(R^2\)</span> traditionnel :</h4>
+<p>Bien que le <span class="math inline">\(R^2\)</span> soit une mesure
+utile, il présente un biais en faveur des modèles avec plus de variables
+indépendantes. En effet, l’ajout d’une nouvelle variable indépendante
+peut augmenter le <span class="math inline">\(R^2\)</span> même si cette
+variable n’a pas de pouvoir explicatif réel. Cela est particulièrement
+problématique dans les contextes où le nombre de variables indépendantes
+est élevé par rapport au nombre d’observations.</p>
+<h4 id="définition-du-r2_textajusté">Définition du <span
+class="math inline">\(R^2_{\text{ajusté}}\)</span> :</h4>
+<p>Pour pallier ce problème, le <span
+class="math inline">\(R^2_{\text{ajusté}}\)</span> est introduit. Il
+ajuste le <span class="math inline">\(R^2\)</span> traditionnel en
+fonction du nombre de variables indépendantes dans le modèle. La formule
+du <span class="math inline">\(R^2_{\text{ajusté}}\)</span> est la
+suivante : <span class="math display">\[R^2_{\text{ajusté}} = 1 -
+\frac{\text{SSE}/(n - p - 1)}{\text{SST}/(n - 1)}\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(n\)</span> est le nombre
+d’observations.</p></li>
+<li><p><span class="math inline">\(p\)</span> est le nombre de variables
+indépendantes dans le modèle.</p></li>
+</ul>
+<p>Cette formule peut également être exprimée en fonction du <span
+class="math inline">\(R^2\)</span> traditionnel : <span
+class="math display">\[R^2_{\text{ajusté}} = 1 - (1 - R^2) \frac{n -
+1}{n - p - 1}\]</span></p>
+<h1 id="théorèmes-et-propriétés">Théorèmes et Propriétés</h1>
+<h4 id="propriété-1">Propriété 1 :</h4>
+<p>Le <span class="math inline">\(R^2_{\text{ajusté}}\)</span> est
+toujours inférieur ou égal au <span class="math inline">\(R^2\)</span>
+traditionnel. De plus, il ne peut jamais être négatif.</p>
+<h4 id="preuve">Preuve :</h4>
+<p>Considérons la formule du <span
+class="math inline">\(R^2_{\text{ajusté}}\)</span> : <span
+class="math display">\[R^2_{\text{ajusté}} = 1 - (1 - R^2) \frac{n -
+1}{n - p - 1}\]</span> Puisque <span class="math inline">\(R^2 \leq
+1\)</span>, il s’ensuit que <span class="math inline">\((1 - R^2) \geq
+0\)</span>. De plus, comme <span class="math inline">\(n &gt; p +
+1\)</span>, le terme <span class="math inline">\(\frac{n - 1}{n - p - 1}
+&gt; 1\)</span>. Par conséquent, <span class="math inline">\((1 - R^2)
+\frac{n - 1}{n - p - 1} &gt; (1 - R^2)\)</span>, ce qui implique que
+<span class="math inline">\(R^2_{\text{ajusté}} &lt; R^2\)</span>.</p>
+<h4 id="propriété-2">Propriété 2 :</h4>
+<p>Le <span class="math inline">\(R^2_{\text{ajusté}}\)</span> augmente
+seulement si l’ajout d’une nouvelle variable indépendante améliore
+significativement la qualité du modèle.</p>
+<h4 id="preuve-1">Preuve :</h4>
+<p>Supposons que nous ajoutons une nouvelle variable indépendante au
+modèle. Le <span class="math inline">\(R^2_{\text{ajusté}}\)</span>
+nouveau est donné par : <span class="math display">\[R^2_{\text{ajusté,
+nouveau}} = 1 - (1 - R^2) \frac{n - 1}{n - p - 2}\]</span> Pour que
+<span class="math inline">\(R^2_{\text{ajusté, nouveau}} &gt;
+R^2_{\text{ajusté, ancien}}\)</span>, il faut que : <span
+class="math display">\[(1 - R^2) \frac{n - 1}{n - p - 2} &lt; (1 - R^2)
+\frac{n - 1}{n - p - 1}\]</span> Ce qui est équivalent à : <span
+class="math display">\[\frac{1}{n - p - 2} &lt; \frac{1}{n - p -
+1}\]</span> Cette inégalité est toujours vraie, mais elle ne garantit
+pas que <span class="math inline">\(R^2_{\text{ajusté, nouveau}} &gt;
+R^2_{\text{ajusté, ancien}}\)</span>. En effet, pour que le <span
+class="math inline">\(R^2_{\text{ajusté}}\)</span> augmente, il faut que
+l’amélioration du <span class="math inline">\(R^2\)</span> soit
+suffisamment significative pour compenser la pénalité due à l’ajout
+d’une nouvelle variable.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le <span class="math inline">\(R^2_{\text{ajusté}}\)</span> est une
+mesure essentielle en régression linéaire multiple, offrant une
+évaluation plus robuste et fiable de la qualité d’un modèle. En
+pénalisant l’ajout de variables indépendantes superflues, il permet de
+sélectionner des modèles plus parsimonieux et prédictifs. Comprendre les
+propriétés et les implications du <span
+class="math inline">\(R^2_{\text{ajusté}}\)</span> est crucial pour tout
+praticien en statistique et en analyse de données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

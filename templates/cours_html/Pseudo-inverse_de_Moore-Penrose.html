@@ -1,0 +1,472 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Pseudo-inverse de Moore-Penrose</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Pseudo-inverse de Moore-Penrose</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des systèmes linéaires sous-déterminés ou surdéterminés est
+un problème fondamental en mathématiques appliquées, en particulier dans
+les domaines du traitement du signal, de l’apprentissage automatique et
+de la statistique. Cependant, ces systèmes ne possèdent pas toujours une
+solution exacte, ce qui rend nécessaire l’introduction de concepts plus
+généraux que l’inverse classique d’une matrice. Le pseudo-inverse de
+Moore-Penrose est une généralisation de l’inverse matricielle qui permet
+de résoudre ces systèmes de manière optimale au sens des moindres
+carrés.</p>
+<p>Historiquement, le concept de pseudo-inverse a été introduit
+indépendamment par E.H. Moore en 1920 et Arlen W. Householder en 1955,
+avant d’être formalisé par Roger Penrose en 1955. Cette notion a
+révolutionné l’analyse des systèmes linéaires et a trouvé des
+applications dans de nombreux domaines scientifiques et techniques.</p>
+<p>Dans cet article, nous explorerons les propriétés fondamentales du
+pseudo-inverse de Moore-Penrose, ses théorèmes associés et ses
+applications pratiques. Nous commencerons par une définition rigoureuse
+de ce concept, suivie d’une discussion sur ses propriétés et théorèmes
+clés. Enfin, nous illustrerons son utilité à travers des exemples
+concrets.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire le pseudo-inverse de Moore-Penrose, considérons une
+matrice <span class="math inline">\(A \in \mathbb{C}^{m \times
+n}\)</span>. Nous cherchons une matrice <span class="math inline">\(X
+\in \mathbb{C}^{n \times m}\)</span> qui satisfait certaines conditions
+optimales. Intuitivement, nous voulons que <span
+class="math inline">\(X\)</span> soit une "meilleure approximation" de
+l’inverse de <span class="math inline">\(A\)</span>, même lorsque <span
+class="math inline">\(A\)</span> n’est pas inversible.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A \in \mathbb{C}^{m \times
+n}\)</span>. La pseudo-inverse de Moore-Penrose de <span
+class="math inline">\(A\)</span>, notée <span
+class="math inline">\(A^+\)</span>, est la matrice unique <span
+class="math inline">\(X \in \mathbb{C}^{n \times m}\)</span> qui
+satisfait les quatre conditions suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(A X A = A\)</span></p></li>
+<li><p><span class="math inline">\(X A X = X\)</span></p></li>
+<li><p><span class="math inline">\((A X)^* = A X\)</span></p></li>
+<li><p><span class="math inline">\((X A)^* = X A\)</span></p></li>
+</ol>
+<p>où <span class="math inline">\(*\)</span> désigne l’opérateur adjoint
+(transposée conjuguée).</p>
+</div>
+<p>Ces conditions peuvent être interprétées comme suit :</p>
+<ul>
+<li><p>La première condition <span class="math inline">\(A X A =
+A\)</span> signifie que <span class="math inline">\(X\)</span> est un
+inverse à gauche de <span class="math inline">\(A\)</span> dans l’espace
+image de <span class="math inline">\(A\)</span>.</p></li>
+<li><p>La deuxième condition <span class="math inline">\(X A X =
+X\)</span> signifie que <span class="math inline">\(X\)</span> est un
+inverse à droite de <span class="math inline">\(A\)</span> dans l’espace
+image de <span class="math inline">\(X\)</span>.</p></li>
+<li><p>Les deux dernières conditions <span class="math inline">\((A X)^*
+= A X\)</span> et <span class="math inline">\((X A)^* = X A\)</span>
+assurent que <span class="math inline">\(A X\)</span> et <span
+class="math inline">\(X A\)</span> sont des projecteurs
+orthogonaux.</p></li>
+</ul>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons quelques théorèmes fondamentaux
+concernant le pseudo-inverse de Moore-Penrose.</p>
+<div class="theorem">
+<p>Pour toute matrice <span class="math inline">\(A \in \mathbb{C}^{m
+\times n}\)</span>, il existe une unique matrice <span
+class="math inline">\(X \in \mathbb{C}^{n \times m}\)</span> qui
+satisfait les quatre conditions de la définition du pseudo-inverse de
+Moore-Penrose.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> L’existence et l’unicité du pseudo-inverse de
+Moore-Penrose peuvent être démontrées en utilisant la décomposition en
+valeurs singulières (SVD) de <span class="math inline">\(A\)</span>.
+Soit <span class="math inline">\(A = U \Sigma V^*\)</span> la SVD de
+<span class="math inline">\(A\)</span>, où <span class="math inline">\(U
+\in \mathbb{C}^{m \times m}\)</span> et <span class="math inline">\(V
+\in \mathbb{C}^{n \times n}\)</span> sont des matrices unitaires, et
+<span class="math inline">\(\Sigma \in \mathbb{R}^{m \times n}\)</span>
+est une matrice diagonale avec les valeurs singulières de <span
+class="math inline">\(A\)</span> sur la diagonale.</p>
+<p>Le pseudo-inverse de Moore-Penrose de <span
+class="math inline">\(A\)</span> est alors donné par : <span
+class="math display">\[A^+ = V \Sigma^+ U^*,\]</span> où <span
+class="math inline">\(\Sigma^+\)</span> est obtenue en prenant l’inverse
+des valeurs singulières non nulles de <span
+class="math inline">\(\Sigma\)</span> et en laissant les autres entrées
+à zéro.</p>
+<p>Pour montrer que cette matrice satisfait les quatre conditions de la
+définition, nous utilisons les propriétés des matrices unitaires et des
+matrices diagonales. Par exemple, pour la première condition <span
+class="math inline">\(A X A = A\)</span>, nous avons : <span
+class="math display">\[A A^+ A = U \Sigma V^* V \Sigma^+ U^* U \Sigma
+V^* = U \Sigma \Sigma^+ \Sigma V^* = A,\]</span> où nous avons utilisé
+le fait que <span class="math inline">\(\Sigma \Sigma^+ \Sigma =
+\Sigma\)</span> en raison de la définition de <span
+class="math inline">\(\Sigma^+\)</span>.</p>
+<p>Les autres conditions peuvent être vérifiées de manière similaire, ce
+qui prouve que <span class="math inline">\(A^+\)</span> est bien le
+pseudo-inverse de Moore-Penrose de <span
+class="math inline">\(A\)</span>.</p>
+<p>L’unicité découle du fait que toute matrice satisfaisant les quatre
+conditions doit être égale à <span class="math inline">\(A^+\)</span> en
+raison des propriétés de la SVD. ◻</p>
+</div>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A \in \mathbb{C}^{m \times
+n}\)</span> et <span class="math inline">\(A^+\)</span> son
+pseudo-inverse de Moore-Penrose. Alors les propriétés suivantes sont
+satisfaites :</p>
+<ol>
+<li><p><span class="math inline">\((A^+)^+ = A\)</span></p></li>
+<li><p><span class="math inline">\((A^*)^+ = (A^+)^*\)</span></p></li>
+<li><p><span class="math inline">\(A A^+\)</span> et <span
+class="math inline">\(A^+ A\)</span> sont des projecteurs
+orthogonaux.</p></li>
+<li><p><span class="math inline">\(\text{Im}(A^+) =
+\text{Ker}(A)^\perp\)</span> et <span
+class="math inline">\(\text{Im}(A^+ A) =
+\text{Ker}(A)^\perp\)</span></p></li>
+<li><p><span class="math inline">\(\text{Im}(A^+ A) =
+\text{Ker}(A^+)^\perp\)</span></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Nous allons démontrer chaque propriété une par
+une.</p>
+<p>1. Pour montrer que <span class="math inline">\((A^+)^+ = A\)</span>,
+nous utilisons le fait que les quatre conditions de la définition du
+pseudo-inverse sont satisfaites par <span
+class="math inline">\(A\)</span> lorsque nous remplaçons <span
+class="math inline">\(X\)</span> par <span
+class="math inline">\(A^+\)</span>. Par exemple, la première condition
+devient <span class="math inline">\(A^+ A (A^+) = A^+\)</span>, ce qui
+est équivalent à <span class="math inline">\(A^+ A A^+ = A^+\)</span>.
+Cette condition est satisfaite en raison des propriétés du
+pseudo-inverse.</p>
+<p>2. Pour montrer que <span class="math inline">\((A^*)^+ =
+(A^+)^*\)</span>, nous utilisons la SVD de <span
+class="math inline">\(A\)</span>. Soit <span class="math inline">\(A = U
+\Sigma V^*\)</span> la SVD de <span class="math inline">\(A\)</span>,
+alors <span class="math inline">\(A^* = V \overline{\Sigma}
+U^*\)</span>, où <span class="math inline">\(\overline{\Sigma}\)</span>
+est la matrice diagonale obtenue en prenant les conjugués des valeurs
+singulières de <span class="math inline">\(\Sigma\)</span>. Le
+pseudo-inverse de Moore-Penrose de <span
+class="math inline">\(A^*\)</span> est alors donné par : <span
+class="math display">\[(A^*)^+ = U \overline{\Sigma}^+ V^*,\]</span> où
+<span class="math inline">\(\overline{\Sigma}^+\)</span> est obtenue en
+prenant l’inverse des valeurs singulières non nulles de <span
+class="math inline">\(\overline{\Sigma}\)</span> et en laissant les
+autres entrées à zéro. En prenant le conjugué de <span
+class="math inline">\(A^+\)</span>, nous avons : <span
+class="math display">\[(A^+)^* = (V \Sigma^+ U^*)^* = U
+\overline{\Sigma}^+ V^*,\]</span> ce qui montre que <span
+class="math inline">\((A^*)^+ = (A^+)^*\)</span>.</p>
+<p>3. Pour montrer que <span class="math inline">\(A A^+\)</span> et
+<span class="math inline">\(A^+ A\)</span> sont des projecteurs
+orthogonaux, nous utilisons les conditions de la définition du
+pseudo-inverse. Par exemple, pour <span class="math inline">\(A
+A^+\)</span>, nous avons : <span class="math display">\[(A A^+)^* = (A
+A^+)^* = (A^+)^* A^* = A^+ A,\]</span> où nous avons utilisé le fait que
+<span class="math inline">\((A A^+)^* = A^+ A\)</span> en raison de la
+troisième condition de la définition du pseudo-inverse. De plus, <span
+class="math inline">\(A A^+\)</span> est un projecteur car : <span
+class="math display">\[(A A^+) (A A^+) = A (A^+ A) A^+ = A A^+,\]</span>
+où nous avons utilisé la première condition de la définition du
+pseudo-inverse. Les mêmes arguments s’appliquent à <span
+class="math inline">\(A^+ A\)</span>.</p>
+<p>4. Pour montrer que <span class="math inline">\(\text{Im}(A^+) =
+\text{Ker}(A)^\perp\)</span> et <span
+class="math inline">\(\text{Im}(A^+ A) = \text{Ker}(A)^\perp\)</span>,
+nous utilisons les propriétés des projecteurs orthogonaux. Par exemple,
+pour <span class="math inline">\(\text{Im}(A^+) =
+\text{Ker}(A)^\perp\)</span>, nous avons : <span
+class="math display">\[\text{Im}(A^+) = \text{Ker}(A)^\perp,\]</span>
+car <span class="math inline">\(A^+\)</span> est un inverse à gauche de
+<span class="math inline">\(A\)</span> dans l’espace image de <span
+class="math inline">\(A\)</span>. De même, pour <span
+class="math inline">\(\text{Im}(A^+ A) = \text{Ker}(A)^\perp\)</span>,
+nous avons : <span class="math display">\[\text{Im}(A^+ A) =
+\text{Ker}(A)^\perp,\]</span> car <span class="math inline">\(A^+
+A\)</span> est un projecteur orthogonal sur l’espace image de <span
+class="math inline">\(A\)</span>.</p>
+<p>5. Pour montrer que <span class="math inline">\(\text{Im}(A^+ A) =
+\text{Ker}(A^+)^\perp\)</span>, nous utilisons le fait que <span
+class="math inline">\(A^+ A\)</span> est un projecteur orthogonal sur
+l’espace image de <span class="math inline">\(A\)</span>. Par
+conséquent, son noyau est l’orthogonal de l’espace image de <span
+class="math inline">\(A^+\)</span>, c’est-à-dire : <span
+class="math display">\[\text{Ker}(A^+ A) = \text{Im}(A)^\perp.\]</span>
+En prenant l’orthogonal de cette égalité, nous obtenons : <span
+class="math display">\[\text{Im}(A^+ A) =
+\text{Ker}(A^+)^\perp.\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Dans cette section, nous présentons quelques propriétés
+supplémentaires et corollaires du pseudo-inverse de Moore-Penrose.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(A \in \mathbb{C}^{m \times
+n}\)</span> et <span class="math inline">\(b \in \mathbb{C}^m\)</span>.
+La solution de norme minimale du système linéaire sous-déterminé <span
+class="math inline">\(A x = b\)</span> est donnée par : <span
+class="math display">\[x = A^+ b.\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour montrer cette propriété, nous utilisons le fait
+que <span class="math inline">\(A^+\)</span> est un inverse à gauche de
+<span class="math inline">\(A\)</span> dans l’espace image de <span
+class="math inline">\(A\)</span>. Par conséquent, la solution de norme
+minimale du système linéaire sous-déterminé <span
+class="math inline">\(A x = b\)</span> est donnée par : <span
+class="math display">\[x = A^+ b.\]</span> En effet, <span
+class="math inline">\(x\)</span> est dans l’espace image de <span
+class="math inline">\(A^+\)</span>, qui est l’orthogonal du noyau de
+<span class="math inline">\(A\)</span>. De plus, <span
+class="math inline">\(x\)</span> minimise la norme <span
+class="math inline">\(\|x\|\)</span> parmi toutes les solutions de <span
+class="math inline">\(A x = b\)</span>. ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(A \in \mathbb{C}^{m \times
+n}\)</span> et <span class="math inline">\(b \in \mathbb{C}^m\)</span>.
+La solution de norme minimale du système linéaire surdéterminé <span
+class="math inline">\(A x = b\)</span> est donnée par : <span
+class="math display">\[x = A^+ b.\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour montrer cette propriété, nous utilisons le fait
+que <span class="math inline">\(A^+\)</span> est un inverse à droite de
+<span class="math inline">\(A\)</span> dans l’espace image de <span
+class="math inline">\(X\)</span>. Par conséquent, la solution de norme
+minimale du système linéaire surdéterminé <span class="math inline">\(A
+x = b\)</span> est donnée par : <span class="math display">\[x = A^+
+b.\]</span> En effet, <span class="math inline">\(x\)</span> est dans
+l’espace image de <span class="math inline">\(A^+\)</span>, qui est
+l’orthogonal du noyau de <span class="math inline">\(X\)</span>. De
+plus, <span class="math inline">\(x\)</span> minimise la norme <span
+class="math inline">\(\|A x - b\|\)</span> parmi toutes les solutions de
+<span class="math inline">\(A x = b\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le pseudo-inverse de Moore-Penrose est un concept fondamental en
+mathématiques appliquées, permettant de résoudre des systèmes linéaires
+sous-déterminés ou surdéterminés de manière optimale au sens des
+moindres carrés. Dans cet article, nous avons présenté les définitions,
+théorèmes et propriétés clés de ce concept, ainsi que ses applications
+pratiques. Nous avons vu que le pseudo-inverse de Moore-Penrose peut
+être calculé à l’aide de la décomposition en valeurs singulières, et que
+ses propriétés sont étroitement liées aux concepts d’inverse matricielle
+et de projecteurs orthogonaux.</p>
+<p>Les applications du pseudo-inverse de Moore-Penrose sont nombreuses
+et variées, allant du traitement du signal à l’apprentissage automatique
+en passant par la statistique. En particulier, il joue un rôle crucial
+dans les méthodes de régression linéaire, où il permet de trouver la
+solution de norme minimale du système linéaire associé. De plus, ses
+propriétés d’optimalité en font un outil indispensable pour l’analyse
+des systèmes linéaires dans des contextes où les solutions exactes
+n’existent pas.</p>
+<p>En conclusion, le pseudo-inverse de Moore-Penrose est un outil
+puissant et polyvalent qui a révolutionné l’analyse des systèmes
+linéaires. Son étude continue de susciter un vif intérêt dans la
+communauté mathématique et scientifique, et ses applications pratiques
+ne cessent de croître.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

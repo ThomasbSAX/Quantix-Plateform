@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Mahalanobis : Une mesure statistique multivariée</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Mahalanobis : Une mesure statistique
+multivariée</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La distance de Mahalanobis émerge dans le paysage des statistiques
+multivariées comme une réponse élégante à la limitation des distances
+euclidiennes classiques. En effet, ces dernières ne prennent pas en
+compte la structure de covariance des données, ce qui peut conduire à
+des interprétations erronées dans des espaces où les variables sont
+corrélées. Prabhu Lal Mahalanobis, statisticien indien de renom,
+introduit cette notion en 1936 dans le cadre de l’analyse des données
+anthropométriques. Son innovation réside dans l’incorporation de la
+matrice de covariance inverse, permettant ainsi une normalisation des
+axes de variation en fonction de leur dispersion relative.</p>
+<p>Cette mesure est indispensable dans divers domaines tels que la
+détection d’anomalies, la classification supervisée et l’analyse
+discriminante. Elle permet de définir des régions d’influence
+équilibrées autour des centres de classes, surtout lorsque les données
+présentent une structure ellipsoïdale. De plus, elle joue un rôle clé
+dans les méthodes d’estimation robuste et les modèles de mélange
+gaussien, où la prise en compte des corrélations entre variables est
+cruciale.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Mahalanobis, considérons un ensemble
+de données multivariées où chaque observation est un vecteur dans un
+espace à <span class="math inline">\(p\)</span> dimensions. L’idée
+sous-jacente est de mesurer la distance d’une observation à un point
+central, en tenant compte des variations et corrélations entre les
+variables. Nous cherchons une métrique qui normalise chaque dimension
+par sa variance et ajuste les angles entre dimensions en fonction de
+leurs covariances.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> un vecteur
+aléatoire de dimension <span class="math inline">\(p\)</span> avec une
+matrice de covariance <span class="math inline">\(\Sigma\)</span>. La
+distance de Mahalanobis entre un point <span
+class="math inline">\(x\)</span> et une moyenne <span
+class="math inline">\(\mu\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>La distance de Mahalanobis <span class="math inline">\(D_M(x,
+\mu)\)</span> entre un point <span class="math inline">\(x \in
+\mathbb{R}^p\)</span> et une moyenne <span class="math inline">\(\mu \in
+\mathbb{R}^p\)</span> est donnée par : <span
+class="math display">\[D_M(x, \mu) = \sqrt{(x - \mu)^T \Sigma^{-1} (x -
+\mu)}\]</span> où <span class="math inline">\(\Sigma\)</span> est la
+matrice de covariance de la distribution des données, et <span
+class="math inline">\(\Sigma^{-1}\)</span> sa matrice inverse.</p>
+</div>
+<p>Une autre formulation équivalente est : <span
+class="math display">\[D_M(x, \mu)^2 = (x - \mu)^T \Sigma^{-1} (x -
+\mu)\]</span> Cette expression met en évidence la nature quadratique de
+cette distance.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Mahalanobis est celui de
+l’équivalence avec les distances mahalanoisiennes standardisées. Ce
+théorème montre que sous certaines conditions, la distance de
+Mahalanobis peut être interprétée comme une généralisation de la
+distance euclidienne standardisée.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> un vecteur aléatoire
+gaussien multicentré de dimension <span class="math inline">\(p\)</span>
+avec une matrice de covariance <span
+class="math inline">\(\Sigma\)</span>. Alors, pour tout point <span
+class="math inline">\(x \in \mathbb{R}^p\)</span>, la distance de
+Mahalanobis <span class="math inline">\(D_M(x, \mu)\)</span> est
+équivalente à la distance euclidienne standardisée : <span
+class="math display">\[D_M(x, \mu) = \sqrt{\sum_{i=1}^p \frac{(x_i -
+\mu_i)^2}{\sigma_i^2}}\]</span> où <span
+class="math inline">\(\sigma_i^2\)</span> sont les variances marginales
+des composantes de <span class="math inline">\(X\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous commençons par décomposer la matrice
+de covariance <span class="math inline">\(\Sigma\)</span> en ses valeurs
+propres et vecteurs propres. Soit <span class="math inline">\(\Sigma = V
+\Lambda V^T\)</span>, où <span class="math inline">\(V\)</span> est la
+matrice des vecteurs propres et <span
+class="math inline">\(\Lambda\)</span> est la matrice diagonale des
+valeurs propres. La matrice inverse <span
+class="math inline">\(\Sigma^{-1}\)</span> s’écrit alors : <span
+class="math display">\[\Sigma^{-1} = V \Lambda^{-1} V^T\]</span></p>
+<p>En substituant cette décomposition dans l’expression de la distance
+de Mahalanobis, nous obtenons : <span class="math display">\[D_M(x,
+\mu)^2 = (x - \mu)^T V \Lambda^{-1} V^T (x - \mu)\]</span></p>
+<p>En introduisant le vecteur <span class="math inline">\(z = V^T (x -
+\mu)\)</span>, nous avons : <span class="math display">\[D_M(x, \mu)^2 =
+z^T \Lambda^{-1} z\]</span></p>
+<p>Puisque <span class="math inline">\(\Lambda\)</span> est diagonale,
+cette expression se simplifie en : <span class="math display">\[D_M(x,
+\mu)^2 = \sum_{i=1}^p \frac{z_i^2}{\lambda_i}\]</span></p>
+<p>Or, <span class="math inline">\(z_i\)</span> sont les composantes du
+vecteur <span class="math inline">\(x - \mu\)</span> projetées sur les
+vecteurs propres de <span class="math inline">\(\Sigma\)</span>, et
+<span class="math inline">\(\lambda_i\)</span> sont les valeurs propres
+correspondantes. En utilisant le fait que <span
+class="math inline">\(\sigma_i^2 = \lambda_i\)</span> pour les valeurs
+propres de la matrice de covariance, nous retrouvons l’expression de la
+distance euclidienne standardisée.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La distance de Mahalanobis possède plusieurs propriétés intéressantes
+qui en font un outil puissant pour l’analyse des données.</p>
+<ol>
+<li><p><strong>Invariance par transformation affine</strong> : La
+distance de Mahalanobis est invariante par toute transformation affine
+des données, c’est-à-dire que si <span class="math inline">\(x\)</span>
+et <span class="math inline">\(\mu\)</span> sont transformés
+linéairement, la distance reste inchangée.</p></li>
+<li><p><strong>Normalisation des axes</strong> : La distance de
+Mahalanobis normalise chaque dimension par sa variance, ce qui permet de
+comparer des observations sur des échelles différentes.</p></li>
+<li><p><strong>Prise en compte des corrélations</strong> : En
+incorporant la matrice de covariance inverse, cette distance prend en
+compte les corrélations entre les variables, ce qui est crucial pour
+l’interprétation des données multivariées.</p></li>
+</ol>
+<p>Pour prouver la propriété (i), considérons une transformation affine
+<span class="math inline">\(T(x) = A x + b\)</span>, où <span
+class="math inline">\(A\)</span> est une matrice inversible et <span
+class="math inline">\(b\)</span> un vecteur. La distance de Mahalanobis
+entre <span class="math inline">\(T(x)\)</span> et <span
+class="math inline">\(T(\mu)\)</span> est : <span
+class="math display">\[D_M(T(x), T(\mu)) = \sqrt{(A x + b - A \mu - b)^T
+\Sigma^{-1} (A x + b - A \mu - b)}\]</span> <span
+class="math display">\[= \sqrt{(x - \mu)^T A^T \Sigma^{-1} A (x -
+\mu)}\]</span></p>
+<p>Si <span class="math inline">\(A\)</span> est choisi de telle sorte
+que <span class="math inline">\(A^T \Sigma^{-1} A =
+\Sigma^{-1}\)</span>, alors la distance reste inchangée. Cela est vrai,
+par exemple, si <span class="math inline">\(A\)</span> est une matrice
+orthogonale.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Mahalanobis représente une avancée significative dans
+le domaine des statistiques multivariées. Son utilisation permet de
+surmonter les limitations des distances euclidiennes classiques en
+intégrant la structure de covariance des données. Cette mesure trouve
+des applications dans une variété de domaines, allant de la détection
+d’anomalies à la classification supervisée. Les propriétés et théorèmes
+associés à cette distance en font un outil indispensable pour l’analyse
+des données multivariées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

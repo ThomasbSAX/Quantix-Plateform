@@ -1,0 +1,381 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance de Gower pour variables mixtes : Un outil puissant pour l’analyse des données</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance de Gower pour variables mixtes : Un outil
+puissant pour l’analyse des données</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des données, en particulier dans le cadre de la statistique
+multivariée, nécessite souvent la quantification des similarités ou des
+dissimilarités entre les observations. Lorsque les données sont de
+nature mixte, c’est-à-dire qu’elles contiennent à la fois des variables
+quantitatives et qualitatives, cette tâche se complique. La distance de
+Gower émerge comme une solution élégante et puissante pour traiter ce
+problème.</p>
+<p>Historiquement, la distance de Gower a été introduite par le
+statisticien britannique Michael A. Gower en 1971. Son objectif était de
+fournir une mesure de dissimilarité qui puisse être appliquée à des jeux
+de données hétérogènes, combinant différents types de variables. Cette
+approche est indispensable dans de nombreux domaines, tels que la
+biologie, la médecine, l’économie et les sciences sociales, où les
+données sont rarement homogènes.</p>
+<p>La notion de distance de Gower résout un problème fondamental :
+comment comparer des observations décrites par des variables de types
+différents ? En fournissant une mesure cohérente et interprétable, elle
+permet d’appliquer des méthodes d’analyse multivariée, comme l’analyse
+en composantes principales ou les méthodes de classification, à des jeux
+de données complexes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de Gower, commençons par expliquer ce que
+nous cherchons à obtenir. Nous voulons une mesure de dissimilarité entre
+deux observations, notées <span
+class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span>, dans un espace à <span
+class="math inline">\(p\)</span> dimensions, où certaines dimensions
+sont quantitatives et d’autres qualitatives. La dissimilarité doit être
+normalisée pour chaque variable, de manière à ce que les variables avec
+des échelles différentes ne biaisent pas la mesure globale.</p>
+<p>Formellement, la distance de Gower entre deux observations <span
+class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span> est définie comme suit :</p>
+<p><span class="math display">\[d_G(\mathbf{x}, \mathbf{y}) =
+\frac{\sum_{j=1}^{p} \delta_{jk}(\mathbf{x}, \mathbf{y})}{\sum_{j=1}^{p}
+\delta_{jk}(\mathbf{x}, \mathbf{y})}\]</span></p>
+<p>où <span class="math inline">\(\delta_{jk}(\mathbf{x},
+\mathbf{y})\)</span> est la dissimilarité entre les observations <span
+class="math inline">\(\mathbf{x}\)</span> et <span
+class="math inline">\(\mathbf{y}\)</span> pour la variable <span
+class="math inline">\(j\)</span>, définie en fonction du type de la
+variable.</p>
+<p>Pour les variables quantitatives, la dissimilarité est définie comme
+:</p>
+<p><span class="math display">\[\delta_{jk}(\mathbf{x}, \mathbf{y}) =
+\frac{|x_j - y_j|}{\max_{k} x_{kj} - \min_{k} x_{kj}}\]</span></p>
+<p>Pour les variables qualitatives nominales, la dissimilarité est
+définie comme :</p>
+<p><span class="math display">\[\delta_{jk}(\mathbf{x}, \mathbf{y}) =
+\begin{cases}
+0 &amp; \text{si } x_j = y_j \\
+1 &amp; \text{sinon}
+\end{cases}\]</span></p>
+<p>Pour les variables qualitatives ordinales, la dissimilarité est
+définie comme :</p>
+<p><span class="math display">\[\delta_{jk}(\mathbf{x}, \mathbf{y}) =
+\frac{|r_j(\mathbf{x}) - r_j(\mathbf{y})|}{p_j - 1}\]</span></p>
+<p>où <span class="math inline">\(r_j(\mathbf{x})\)</span> est le rang
+de l’observation <span class="math inline">\(\mathbf{x}\)</span> pour la
+variable <span class="math inline">\(j\)</span>, et <span
+class="math inline">\(p_j\)</span> est le nombre de catégories
+distinctes pour cette variable.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la distance de Gower est le théorème de
+métrique, qui établit que la distance de Gower satisfait les propriétés
+d’une distance au sens mathématique.</p>
+<p>Commençons par expliquer ce que nous cherchons à obtenir. Nous
+voulons montrer que la distance de Gower satisfait les propriétés
+suivantes : non-négativité, identité des indiscernables, symétrie et
+inégalité triangulaire.</p>
+<p>Formellement, le théorème de métrique pour la distance de Gower
+s’énonce comme suit :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\mathbf{x}, \mathbf{y},
+\mathbf{z}\)</span> trois observations dans un espace à <span
+class="math inline">\(p\)</span> dimensions. La distance de Gower <span
+class="math inline">\(d_G\)</span> satisfait les propriétés suivantes
+:</p>
+<ol>
+<li><p>Non-négativité : <span class="math inline">\(d_G(\mathbf{x},
+\mathbf{y}) \geq 0\)</span></p></li>
+<li><p>Identité des indiscernables : <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{y}) = 0\)</span> si et
+seulement si <span class="math inline">\(\mathbf{x} =
+\mathbf{y}\)</span></p></li>
+<li><p>Symétrie : <span class="math inline">\(d_G(\mathbf{x},
+\mathbf{y}) = d_G(\mathbf{y}, \mathbf{x})\)</span></p></li>
+<li><p>Inégalité triangulaire : <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{z}) \leq d_G(\mathbf{x},
+\mathbf{y}) + d_G(\mathbf{y}, \mathbf{z})\)</span></p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de métrique pour la distance de Gower, nous
+allons examiner chaque propriété une par une.</p>
+<div class="proof">
+<p><em>Preuve du théorème de métrique pour la distance de Gower.</em> 1.
+**Non-négativité** : Par définition, la dissimilarité <span
+class="math inline">\(\delta_{jk}(\mathbf{x}, \mathbf{y})\)</span> est
+toujours non-négative. Par conséquent, la somme des dissimilarités <span
+class="math inline">\(\sum_{j=1}^{p} \delta_{jk}(\mathbf{x},
+\mathbf{y})\)</span> est également non-négative. La division par la
+somme des dissimilarités ne change pas cette propriété, donc <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{y}) \geq 0\)</span>.</p>
+<p>2. **Identité des indiscernables** : Si <span
+class="math inline">\(\mathbf{x} = \mathbf{y}\)</span>, alors pour
+chaque variable <span class="math inline">\(j\)</span>, nous avons <span
+class="math inline">\(\delta_{jk}(\mathbf{x}, \mathbf{y}) = 0\)</span>.
+Par conséquent, <span class="math inline">\(d_G(\mathbf{x}, \mathbf{y})
+= 0\)</span>. Réciproquement, si <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{y}) = 0\)</span>, alors
+toutes les dissimilarités <span
+class="math inline">\(\delta_{jk}(\mathbf{x}, \mathbf{y})\)</span>
+doivent être nulles, ce qui implique que <span
+class="math inline">\(\mathbf{x} = \mathbf{y}\)</span>.</p>
+<p>3. **Symétrie** : La dissimilarité <span
+class="math inline">\(\delta_{jk}(\mathbf{x}, \mathbf{y})\)</span> est
+symétrique par définition, c’est-à-dire que <span
+class="math inline">\(\delta_{jk}(\mathbf{x}, \mathbf{y}) =
+\delta_{jk}(\mathbf{y}, \mathbf{x})\)</span>. Par conséquent, la somme
+des dissimilarités est également symétrique, et donc <span
+class="math inline">\(d_G(\mathbf{x}, \mathbf{y}) = d_G(\mathbf{y},
+\mathbf{x})\)</span>.</p>
+<p>4. **Inégalité triangulaire** : Cette propriété est plus complexe à
+prouver et nécessite une analyse détaillée des différentes composantes
+de la distance de Gower. Nous allons utiliser le fait que les
+dissimilarités <span class="math inline">\(\delta_{jk}(\mathbf{x},
+\mathbf{y})\)</span> satisfont elles-mêmes l’inégalité triangulaire. En
+combinant ces inégalités pour chaque variable, nous pouvons montrer que
+la distance de Gower globale satisfait également l’inégalité
+triangulaire.</p>
+<p>Pour chaque variable <span class="math inline">\(j\)</span>, nous
+avons :</p>
+<p><span class="math display">\[\delta_{jk}(\mathbf{x}, \mathbf{z}) \leq
+\delta_{jk}(\mathbf{x}, \mathbf{y}) + \delta_{jk}(\mathbf{y},
+\mathbf{z})\]</span></p>
+<p>En sommant sur toutes les variables, nous obtenons :</p>
+<p><span class="math display">\[\sum_{j=1}^{p} \delta_{jk}(\mathbf{x},
+\mathbf{z}) \leq \sum_{j=1}^{p} \delta_{jk}(\mathbf{x}, \mathbf{y}) +
+\sum_{j=1}^{p} \delta_{jk}(\mathbf{y}, \mathbf{z})\]</span></p>
+<p>En divisant par la somme des dissimilarités, nous obtenons
+l’inégalité triangulaire pour la distance de Gower :</p>
+<p><span class="math display">\[d_G(\mathbf{x}, \mathbf{z}) \leq
+d_G(\mathbf{x}, \mathbf{y}) + d_G(\mathbf{y}, \mathbf{z})\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance de Gower possède plusieurs propriétés intéressantes, que
+nous allons examiner une par une.</p>
+<ol>
+<li><p>**Normalisation** : La distance de Gower est normalisée pour
+chaque variable, ce qui signifie que les variables avec des échelles
+différentes ne biaisent pas la mesure globale. Cette propriété est
+cruciale pour l’analyse des données mixtes.</p></li>
+<li><p>**Interprétabilité** : La distance de Gower est facile à
+interpréter, car elle combine les dissimilarités pour chaque variable de
+manière additive. Cela permet de comprendre quelles variables
+contribuent le plus à la dissimilarité globale entre deux
+observations.</p></li>
+<li><p>**Robustesse** : La distance de Gower est robuste aux valeurs
+aberrantes, car elle utilise des dissimilarités normalisées. Cela
+signifie que les observations extrêmes n’ont pas un impact
+disproportionné sur la mesure globale.</p></li>
+<li><p>**Flexibilité** : La distance de Gower peut être adaptée à
+différents types de variables, y compris les variables quantitatives,
+qualitatives nominales et qualitatives ordinales. Cette flexibilité en
+fait un outil puissant pour l’analyse des données mixtes.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Gower est un outil puissant et flexible pour l’analyse
+des données mixtes. En fournissant une mesure de dissimilarité cohérente
+et interprétable, elle permet d’appliquer des méthodes d’analyse
+multivariée à des jeux de données complexes. Ses propriétés de
+normalisation, d’interprétabilité, de robustesse et de flexibilité en
+font un choix privilégié pour les chercheurs dans de nombreux
+domaines.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

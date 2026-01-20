@@ -1,0 +1,327 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance conditionnelle d’ordre 1</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance conditionnelle d’ordre 1</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La variance conditionnelle d’ordre 1 est un concept fondamental en
+théorie des probabilités et en statistique, particulièrement dans le
+cadre de l’analyse des séries temporelles. Elle émerge comme une
+généralisation naturelle de la variance conditionnelle classique,
+permettant d’étudier les propriétés stochastiques des processus à
+travers une lens plus fine.</p>
+<p>L’idée sous-jacente est de capturer la variabilité d’un processus
+aléatoire conditionnellement à une information disponible. Cette notion
+est indispensable pour modéliser et prédire le comportement de séries
+temporelles, où l’information passée joue un rôle crucial. Elle permet
+également de mieux comprendre les dépendances et les structures
+sous-jacentes dans les données.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la variance conditionnelle d’ordre 1, commençons par
+comprendre ce que nous cherchons à capturer. Supposons que nous avons un
+processus aléatoire <span class="math inline">\(\{X_t\}\)</span> et une
+information disponible à l’instant <span
+class="math inline">\(t-1\)</span>, notée <span
+class="math inline">\(\mathcal{F}_{t-1}\)</span>. Nous voulons mesurer
+la variabilité de <span class="math inline">\(X_t\)</span>
+conditionnellement à cette information.</p>
+<p>La variance conditionnelle d’ordre 1 est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\{X_t\}\)</span> un processus
+aléatoire adapté à une filtration <span
+class="math inline">\(\{\mathcal{F}_t\}\)</span>. La variance
+conditionnelle d’ordre 1 de <span class="math inline">\(X_t\)</span> est
+définie par : <span class="math display">\[\Var(X_t \mid
+\mathcal{F}_{t-1}) = \mathbb{E}\left[(X_t - \mathbb{E}[X_t \mid
+\mathcal{F}_{t-1}])^2 \mid \mathcal{F}_{t-1}\right].\]</span></p>
+</div>
+<p>Cette définition peut également être exprimée en utilisant la
+propriété de projection orthogonale dans l’espace des variables
+aléatoires :</p>
+<p><span class="math display">\[\Var(X_t \mid \mathcal{F}_{t-1}) =
+\mathbb{E}[X_t^2 \mid \mathcal{F}_{t-1}] - (\mathbb{E}[X_t \mid
+\mathcal{F}_{t-1}])^2.\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la variance conditionnelle d’ordre 1
+est le théorème de la loi des grands nombres conditionnels. Ce théorème
+étend la loi des grands nombres classique à un cadre conditionnel.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\{X_t\}\)</span> une suite de
+variables aléatoires adaptées à une filtration <span
+class="math inline">\(\{\mathcal{F}_t\}\)</span>, avec <span
+class="math inline">\(\mathbb{E}[|X_t|] &lt; \infty\)</span> pour tout
+<span class="math inline">\(t\)</span>. Si <span
+class="math display">\[\frac{1}{n} \sum_{t=1}^n X_t \xrightarrow{a.s.}
+\mathbb{E}[X_1],\]</span> alors <span class="math display">\[\frac{1}{n}
+\sum_{t=1}^n X_t \mid \mathcal{F}_0 \xrightarrow{a.s.} \mathbb{E}[X_1
+\mid \mathcal{F}_0].\]</span></p>
+</div>
+<p>La preuve de ce théorème repose sur des techniques d’analyse
+probabiliste avancées, notamment l’utilisation de la convergence presque
+sûre et des propriétés de la filtration.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la loi des grands nombres conditionnels,
+nous commençons par rappeler que la convergence presque sûre implique la
+convergence en probabilité. Ensuite, nous utilisons le fait que la
+convergence en probabilité est préservée sous conditionnement.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\epsilon &gt;
+0\)</span>. Par la loi des grands nombres classique, nous avons : <span
+class="math display">\[\lim_{n \to \infty} P\left(\left|\frac{1}{n}
+\sum_{t=1}^n X_t - \mathbb{E}[X_1]\right| &gt; \epsilon\right) =
+0.\]</span> Par définition de la convergence en probabilité sous
+conditionnement, cela implique que pour tout <span
+class="math inline">\(\delta &gt; 0\)</span>, <span
+class="math display">\[\lim_{n \to \infty} P\left(\left|\frac{1}{n}
+\sum_{t=1}^n X_t - \mathbb{E}[X_1]\right| &gt; \epsilon \mid
+\mathcal{F}_0\right) = 0 \quad \text{presque sûrement}.\]</span> En
+utilisant la propriété de la convergence presque sûre sous
+conditionnement, nous obtenons : <span
+class="math display">\[\frac{1}{n} \sum_{t=1}^n X_t \mid \mathcal{F}_0
+\xrightarrow{a.s.} \mathbb{E}[X_1 \mid \mathcal{F}_0].\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La variance conditionnelle d’ordre 1 possède plusieurs propriétés
+importantes, que nous énumérons et démontrons ci-dessous.</p>
+<ol>
+<li><p><strong>Non-négativité</strong> : Pour tout <span
+class="math inline">\(t\)</span>, <span class="math inline">\(\Var(X_t
+\mid \mathcal{F}_{t-1}) \geq 0\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Cela découle directement de la définition, car le
+carré d’une variable aléatoire est toujours non négatif. ◻</p>
+</div></li>
+<li><p><strong>Linéarité</strong> : Pour des constantes <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span>, <span class="math inline">\(\Var(aX_t
++ b \mid \mathcal{F}_{t-1}) = a^2 \Var(X_t \mid
+\mathcal{F}_{t-1})\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> En utilisant la définition de la variance
+conditionnelle, nous avons : <span class="math display">\[\Var(aX_t + b
+\mid \mathcal{F}_{t-1}) = \mathbb{E}\left[(aX_t + b - a\mathbb{E}[X_t
+\mid \mathcal{F}_{t-1}] - b)^2 \mid \mathcal{F}_{t-1}\right] = a^2
+\Var(X_t \mid \mathcal{F}_{t-1}).\]</span> ◻</p>
+</div></li>
+<li><p><strong>Inégalité de Cauchy-Schwarz</strong> : Pour deux
+processus <span class="math inline">\(\{X_t\}\)</span> et <span
+class="math inline">\(\{Y_t\}\)</span>, <span
+class="math inline">\(\Var(X_t + Y_t \mid \mathcal{F}_{t-1}) \leq
+2\Var(X_t \mid \mathcal{F}_{t-1}) + 2\Var(Y_t \mid
+\mathcal{F}_{t-1})\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> En utilisant l’inégalité de Cauchy-Schwarz et la
+définition de la variance conditionnelle, nous avons : <span
+class="math display">\[\Var(X_t + Y_t \mid \mathcal{F}_{t-1}) =
+\mathbb{E}\left[(X_t + Y_t - \mathbb{E}[X_t + Y_t \mid
+\mathcal{F}_{t-1}])^2 \mid \mathcal{F}_{t-1}\right] \leq 2\Var(X_t \mid
+\mathcal{F}_{t-1}) + 2\Var(Y_t \mid \mathcal{F}_{t-1}).\]</span> ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La variance conditionnelle d’ordre 1 est un outil puissant pour
+l’analyse des séries temporelles et la modélisation probabiliste. Elle
+permet de capturer la variabilité conditionnelle d’un processus
+aléatoire, offrant ainsi des insights précieux sur les structures
+sous-jacentes et les dépendances. Les théorèmes et propriétés associés
+fournissent une base solide pour des applications pratiques et des
+développements théoriques ultérieurs.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

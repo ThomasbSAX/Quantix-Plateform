@@ -1,0 +1,458 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Spectre d’une matrice : une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Spectre d’une matrice : une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le spectre d’une matrice, notion centrale en algèbre linéaire, émerge
+naturellement de l’étude des valeurs propres et des vecteurs propres.
+Introduite au XIXème siècle par les travaux de Cauchy, cette notion a
+trouvé des applications profondes en physique quantique, en théorie du
+signal et même en économie. Le spectre d’une matrice permet de
+comprendre les propriétés fondamentales d’un opérateur linéaire, comme
+sa stabilité ou ses comportements asymptotiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir le spectre d’une matrice, commençons par comprendre ce
+que nous cherchons. Considérons une matrice carrée <span
+class="math inline">\(A\)</span> de taille <span class="math inline">\(n
+\times n\)</span>. Nous voulons identifier tous les scalaires <span
+class="math inline">\(\lambda\)</span> pour lesquels l’équation <span
+class="math inline">\(A\mathbf{x} = \lambda \mathbf{x}\)</span> admet
+une solution non triviale <span class="math inline">\(\mathbf{x} \neq
+0\)</span>. Cette équation nous conduit naturellement à la notion de
+valeur propre.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée de
+taille <span class="math inline">\(n \times n\)</span>. Un scalaire
+<span class="math inline">\(\lambda\)</span> est appelé <strong>valeur
+propre</strong> de <span class="math inline">\(A\)</span> s’il existe un
+vecteur non nul <span class="math inline">\(\mathbf{x} \in
+\mathbb{C}^n\)</span> tel que : <span class="math display">\[A\mathbf{x}
+= \lambda \mathbf{x}.\]</span> Le vecteur <span
+class="math inline">\(\mathbf{x}\)</span> est alors appelé un
+<strong>vecteur propre</strong> associé à la valeur propre <span
+class="math inline">\(\lambda\)</span>.</p>
+</div>
+<p>Pour formuler cette définition de manière équivalente, nous pouvons
+réécrire l’équation <span class="math inline">\(A\mathbf{x} = \lambda
+\mathbf{x}\)</span> sous la forme : <span class="math display">\[(A -
+\lambda I_n)\mathbf{x} = 0,\]</span> où <span
+class="math inline">\(I_n\)</span> est la matrice identité de taille
+<span class="math inline">\(n \times n\)</span>. Pour que cette équation
+admette une solution non triviale, la matrice <span
+class="math inline">\(A - \lambda I_n\)</span> doit être singulière.
+Cela nous amène à la définition suivante :</p>
+<div class="definition">
+<p>Le <strong>spectre</strong> d’une matrice carrée <span
+class="math inline">\(A\)</span> de taille <span class="math inline">\(n
+\times n\)</span>, noté <span class="math inline">\(\sigma(A)\)</span>,
+est l’ensemble des valeurs propres de <span
+class="math inline">\(A\)</span>. Formellement, <span
+class="math display">\[\sigma(A) = \{ \lambda \in \mathbb{C} \mid \det(A
+- \lambda I_n) = 0 \}.\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant le spectre d’une matrice est celui
+de la décomposition spectrale, qui s’applique aux matrices hermitiennes.
+Avant d’énoncer ce théorème, expliquons pourquoi il est naturel de
+chercher une telle décomposition. Nous voulons exprimer une matrice
+<span class="math inline">\(A\)</span> en termes de ses valeurs propres
+et vecteurs propres, ce qui nous permettrait de comprendre son action
+sur un espace vectoriel.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A\)</span> une matrice hermitienne
+de taille <span class="math inline">\(n \times n\)</span>. Alors, il
+existe une matrice unitaire <span class="math inline">\(U\)</span> et
+une matrice diagonale <span class="math inline">\(D\)</span> telles que
+: <span class="math display">\[A = UDU^*.\]</span> De plus, les éléments
+diagonaux de <span class="math inline">\(D\)</span> sont les valeurs
+propres de <span class="math inline">\(A\)</span>.</p>
+</div>
+<p>Pour démontrer ce théorème, nous commençons par rappeler que les
+valeurs propres d’une matrice hermitienne sont réelles. Ensuite, nous
+utilisons le fait que les vecteurs propres associés à des valeurs
+propres distinctes sont orthogonaux. Nous pouvons alors construire une
+base orthonormée de l’espace vectoriel à partir des vecteurs propres, ce
+qui nous permet de définir la matrice unitaire <span
+class="math inline">\(U\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la décomposition spectrale, nous
+procédons par étapes. Tout d’abord, nous montrons que les valeurs
+propres de <span class="math inline">\(A\)</span> sont réelles. Ensuite,
+nous utilisons le fait que les vecteurs propres associés à des valeurs
+propres distinctes sont orthogonaux.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(A\)</span> une
+matrice hermitienne de taille <span class="math inline">\(n \times
+n\)</span>. Nous voulons montrer que <span
+class="math inline">\(A\)</span> est diagonalisable dans une base
+orthonormée.</p>
+<p>1. **Valeurs propres réelles** : Soit <span
+class="math inline">\(\lambda\)</span> une valeur propre de <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(\mathbf{x}\)</span> un vecteur propre associé.
+Alors, nous avons : <span class="math display">\[A\mathbf{x} = \lambda
+\mathbf{x}.\]</span> En prenant le produit scalaire hermitien de chaque
+côté avec <span class="math inline">\(\mathbf{x}\)</span>, nous obtenons
+: <span class="math display">\[\langle A\mathbf{x}, \mathbf{x} \rangle =
+\lambda \langle \mathbf{x}, \mathbf{x} \rangle.\]</span> Puisque <span
+class="math inline">\(A\)</span> est hermitienne, nous avons : <span
+class="math display">\[\langle A\mathbf{x}, \mathbf{x} \rangle = \langle
+\mathbf{x}, A^*\mathbf{x} \rangle = \langle \mathbf{x}, A\mathbf{x}
+\rangle = \overline{\lambda} \langle \mathbf{x}, \mathbf{x}
+\rangle.\]</span> En comparant les deux expressions, nous obtenons :
+<span class="math display">\[\lambda \langle \mathbf{x}, \mathbf{x}
+\rangle = \overline{\lambda} \langle \mathbf{x}, \mathbf{x}
+\rangle.\]</span> Puisque <span class="math inline">\(\mathbf{x} \neq
+0\)</span>, nous avons <span class="math inline">\(\langle \mathbf{x},
+\mathbf{x} \rangle \neq 0\)</span>, et donc <span
+class="math inline">\(\lambda = \overline{\lambda}\)</span>. Cela montre
+que <span class="math inline">\(\lambda\)</span> est réel.</p>
+<p>2. **Orthogonalité des vecteurs propres** : Soient <span
+class="math inline">\(\lambda_1\)</span> et <span
+class="math inline">\(\lambda_2\)</span> deux valeurs propres distinctes
+de <span class="math inline">\(A\)</span>, et <span
+class="math inline">\(\mathbf{x}_1\)</span> et <span
+class="math inline">\(\mathbf{x}_2\)</span> des vecteurs propres
+associés. Alors, nous avons : <span class="math display">\[A\mathbf{x}_1
+= \lambda_1 \mathbf{x}_1 \quad \text{et} \quad A\mathbf{x}_2 = \lambda_2
+\mathbf{x}_2.\]</span> En prenant le produit scalaire hermitien de <span
+class="math inline">\(A\mathbf{x}_1\)</span> avec <span
+class="math inline">\(\mathbf{x}_2\)</span>, nous obtenons : <span
+class="math display">\[\langle A\mathbf{x}_1, \mathbf{x}_2 \rangle =
+\lambda_1 \langle \mathbf{x}_1, \mathbf{x}_2 \rangle.\]</span> De même,
+en prenant le produit scalaire hermitien de <span
+class="math inline">\(\mathbf{x}_1\)</span> avec <span
+class="math inline">\(A\mathbf{x}_2\)</span>, nous obtenons : <span
+class="math display">\[\langle \mathbf{x}_1, A\mathbf{x}_2 \rangle =
+\overline{\lambda_2} \langle \mathbf{x}_1, \mathbf{x}_2
+\rangle.\]</span> Puisque <span class="math inline">\(A\)</span> est
+hermitienne, nous avons : <span class="math display">\[\langle
+A\mathbf{x}_1, \mathbf{x}_2 \rangle = \langle \mathbf{x}_1,
+A\mathbf{x}_2 \rangle.\]</span> En combinant ces résultats, nous
+obtenons : <span class="math display">\[\lambda_1 \langle \mathbf{x}_1,
+\mathbf{x}_2 \rangle = \overline{\lambda_2} \langle \mathbf{x}_1,
+\mathbf{x}_2 \rangle.\]</span> Puisque <span
+class="math inline">\(\lambda_1 \neq \lambda_2\)</span> et que <span
+class="math inline">\(\lambda_1\)</span> est réel, nous avons : <span
+class="math display">\[(\lambda_1 - \overline{\lambda_2}) \langle
+\mathbf{x}_1, \mathbf{x}_2 \rangle = 0.\]</span> Cela implique que <span
+class="math inline">\(\langle \mathbf{x}_1, \mathbf{x}_2 \rangle =
+0\)</span>, c’est-à-dire que <span
+class="math inline">\(\mathbf{x}_1\)</span> et <span
+class="math inline">\(\mathbf{x}_2\)</span> sont orthogonaux.</p>
+<p>3. **Construction de la base orthonormée** : Nous pouvons maintenant
+construire une base orthonormée de <span
+class="math inline">\(\mathbb{C}^n\)</span> à partir des vecteurs
+propres de <span class="math inline">\(A\)</span>. Soit <span
+class="math inline">\(\{ \mathbf{x}_1, \ldots, \mathbf{x}_k \}\)</span>
+une base de l’espace propre associé à la valeur propre <span
+class="math inline">\(\lambda\)</span>. Nous orthonormalisons cette base
+en utilisant le procédé de Gram-Schmidt pour obtenir une base
+orthonormée <span class="math inline">\(\{ \mathbf{u}_1, \ldots,
+\mathbf{u}_k \}\)</span>. En répétant ce processus pour chaque valeur
+propre, nous obtenons une base orthonormée <span
+class="math inline">\(\{ \mathbf{u}_1, \ldots, \mathbf{u}_n \}\)</span>
+de <span class="math inline">\(\mathbb{C}^n\)</span>.</p>
+<p>4. **Décomposition spectrale** : Nous définissons la matrice unitaire
+<span class="math inline">\(U\)</span> dont les colonnes sont les
+vecteurs <span class="math inline">\(\mathbf{u}_1, \ldots,
+\mathbf{u}_n\)</span>, et la matrice diagonale <span
+class="math inline">\(D\)</span> dont les éléments diagonaux sont les
+valeurs propres de <span class="math inline">\(A\)</span>. Alors, nous
+avons : <span class="math display">\[A = UDU^*.\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes du spectre
+d’une matrice.</p>
+<ol>
+<li><p>**Inclusion du spectre** : Pour toute matrice carrée <span
+class="math inline">\(A\)</span> de taille <span class="math inline">\(n
+\times n\)</span>, nous avons : <span class="math display">\[\sigma(A)
+\subseteq \{ z \in \mathbb{C} \mid |z| \leq \|A\| \},\]</span> où <span
+class="math inline">\(\|A\|\)</span> est une norme subordonnée à une
+norme vectorielle sur <span
+class="math inline">\(\mathbb{C}^n\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\lambda \in
+\sigma(A)\)</span>. Alors, il existe un vecteur non nul <span
+class="math inline">\(\mathbf{x} \in \mathbb{C}^n\)</span> tel que :
+<span class="math display">\[A\mathbf{x} = \lambda \mathbf{x}.\]</span>
+En prenant la norme de chaque côté, nous obtenons : <span
+class="math display">\[\|A\mathbf{x}\| = |\lambda|
+\|\mathbf{x}\|.\]</span> Puisque <span
+class="math inline">\(\|A\mathbf{x}\| \leq \|A\|
+\|\mathbf{x}\|\)</span>, nous avons : <span
+class="math display">\[|\lambda| \|\mathbf{x}\| \leq \|A\|
+\|\mathbf{x}\|.\]</span> En simplifiant, nous obtenons : <span
+class="math display">\[|\lambda| \leq \|A\|.\]</span> ◻</p>
+</div></li>
+<li><p>**Stabilité du spectre** : Soient <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices carrées de taille <span
+class="math inline">\(n \times n\)</span>. Alors, nous avons : <span
+class="math display">\[\sigma(A + B) \subseteq \sigma(A) +
+\sigma(B),\]</span> où <span class="math inline">\(\sigma(A) + \sigma(B)
+= \{ \lambda + \mu \mid \lambda \in \sigma(A), \mu \in \sigma(B)
+\}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\lambda \in \sigma(A
++ B)\)</span>. Alors, il existe un vecteur non nul <span
+class="math inline">\(\mathbf{x} \in \mathbb{C}^n\)</span> tel que :
+<span class="math display">\[(A + B)\mathbf{x} = \lambda
+\mathbf{x}.\]</span> Nous pouvons écrire cette équation sous la forme :
+<span class="math display">\[A\mathbf{x} + B\mathbf{x} = \lambda
+\mathbf{x}.\]</span> En utilisant le fait que <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> commutent, nous pouvons écrire : <span
+class="math display">\[(A + \mu I_n)\mathbf{x} = (\lambda -
+\mu)\mathbf{x},\]</span> où <span class="math inline">\(\mu \in
+\sigma(B)\)</span>. Cela montre que <span class="math inline">\(\lambda
+- \mu \in \sigma(A)\)</span>, et donc <span
+class="math inline">\(\lambda \in \sigma(A) + \sigma(B)\)</span>. ◻</p>
+</div></li>
+<li><p>**Produit des spectres** : Soient <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices carrées de taille <span
+class="math inline">\(n \times n\)</span>. Alors, nous avons : <span
+class="math display">\[\sigma(AB) = \sigma(BA).\]</span> De plus, si
+<span class="math inline">\(A\)</span> est inversible, nous avons :
+<span class="math display">\[\sigma(A^{-1}BA) = \sigma(B).\]</span></p>
+<div class="proof">
+<p><em>Proof.</em> Nous commençons par montrer que <span
+class="math inline">\(\sigma(AB) = \sigma(BA)\)</span>. Soit <span
+class="math inline">\(\lambda \in \sigma(AB)\)</span>. Alors, il existe
+un vecteur non nul <span class="math inline">\(\mathbf{x} \in
+\mathbb{C}^n\)</span> tel que : <span
+class="math display">\[AB\mathbf{x} = \lambda \mathbf{x}.\]</span> En
+multipliant chaque côté par <span class="math inline">\(B\)</span>, nous
+obtenons : <span class="math display">\[BAB\mathbf{x} = \lambda
+B\mathbf{x}.\]</span> Cela montre que <span
+class="math inline">\(\lambda \in \sigma(BA)\)</span>. De même, nous
+pouvons montrer que <span class="math inline">\(\sigma(BA) \subseteq
+\sigma(AB)\)</span>.</p>
+<p>Ensuite, nous supposons que <span class="math inline">\(A\)</span>
+est inversible. Nous voulons montrer que <span
+class="math inline">\(\sigma(A^{-1}BA) = \sigma(B)\)</span>. Soit <span
+class="math inline">\(\lambda \in \sigma(A^{-1}BA)\)</span>. Alors, il
+existe un vecteur non nul <span class="math inline">\(\mathbf{x} \in
+\mathbb{C}^n\)</span> tel que : <span
+class="math display">\[A^{-1}BA\mathbf{x} = \lambda \mathbf{x}.\]</span>
+En multipliant chaque côté par <span class="math inline">\(A\)</span>,
+nous obtenons : <span class="math display">\[BA\mathbf{x} = \lambda
+A\mathbf{x}.\]</span> Cela montre que <span
+class="math inline">\(\lambda \in \sigma(BA) = \sigma(AB)\)</span>. De
+même, nous pouvons montrer que <span class="math inline">\(\sigma(B)
+\subseteq \sigma(A^{-1}BA)\)</span>. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le spectre d’une matrice est une notion fondamentale en algèbre
+linéaire, avec des applications profondes dans de nombreux domaines.
+Nous avons exploré les définitions, théorèmes et propriétés du spectre
+d’une matrice, en mettant l’accent sur la décomposition spectrale des
+matrices hermitiennes. Ces résultats ouvrent la voie à de nombreuses
+applications, comme l’analyse des systèmes dynamiques ou la résolution
+d’équations différentielles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

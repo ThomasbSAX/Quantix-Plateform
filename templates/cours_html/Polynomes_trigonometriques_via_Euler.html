@@ -1,0 +1,365 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Polynômes trigonométriques via Euler</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Polynômes trigonométriques via Euler</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les polynômes trigonométriques, ou séries de Fourier finies, sont des
+objets mathématiques d’une richesse insoupçonnée. Leur étude remonte à
+Leonhard Euler, qui les a introduits pour résoudre des équations
+différentielles partielles. Ces polynômes permettent de représenter des
+fonctions périodiques comme des combinaisons linéaires de sinus et
+cosinus, ouvrant ainsi la voie à l’analyse harmonique.</p>
+<p>Dans cet article, nous explorerons les polynômes trigonométriques en
+suivant les traces d’Euler. Nous verrons comment ces polynômes émergent
+naturellement dans divers contextes mathématiques et physiques, et
+pourquoi ils sont indispensables pour comprendre les phénomènes
+périodiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir les polynômes trigonométriques, commençons par
+comprendre ce que nous cherchons à représenter. Imaginons une fonction
+périodique <span class="math inline">\(f\)</span> de période <span
+class="math inline">\(2\pi\)</span>. Nous voulons exprimer cette
+fonction comme une somme infinie de sinus et cosinus. Cependant, pour
+des raisons pratiques, nous pouvons nous contenter d’une somme finie,
+appelée polynôme trigonométrique.</p>
+<p>Formellement, un <strong>polynôme trigonométrique</strong> de degré
+<span class="math inline">\(n\)</span> est une expression de la forme
+:</p>
+<p><span class="math display">\[P_n(x) = a_0 + \sum_{k=1}^n (a_k
+\cos(kx) + b_k \sin(kx))\]</span></p>
+<p>où <span class="math inline">\(a_0, a_1, \ldots, a_n\)</span> et
+<span class="math inline">\(b_1, \ldots, b_n\)</span> sont des
+coefficients réels.</p>
+<p>Une autre manière de formuler cette définition est la suivante :</p>
+<p><span class="math display">\[\exists n \in \mathbb{N}, \exists
+(a_k)_{k=0}^n, (b_k)_{k=1}^n \in \mathbb{R}, P_n(x) = a_0 + \sum_{k=1}^n
+(a_k \cos(kx) + b_k \sin(kx))\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant les polynômes
+trigonométriques est le <strong>théorème d’approximation de
+Weierstrass</strong>, qui stipule que toute fonction continue sur un
+intervalle fermé peut être approchée uniformément par une suite de
+polynômes trigonométriques.</p>
+<p>Pour comprendre ce théorème, considérons une fonction continue <span
+class="math inline">\(f\)</span> sur <span class="math inline">\([-\pi,
+\pi]\)</span>. Nous voulons montrer qu’il existe une suite de polynômes
+trigonométriques <span class="math inline">\((P_n)\)</span> telle que
+:</p>
+<p><span class="math display">\[\lim_{n \to \infty} \sup_{x \in [-\pi,
+\pi]} |f(x) - P_n(x)| = 0\]</span></p>
+<p>Formellement, le théorème s’énonce comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> une fonction continue sur
+<span class="math inline">\([-\pi, \pi]\)</span>. Alors, il existe une
+suite de polynômes trigonométriques <span
+class="math inline">\((P_n)\)</span> telle que :</p>
+<p><span class="math display">\[\forall \epsilon &gt; 0, \exists N \in
+\mathbb{N}, \forall n \geq N, \sup_{x \in [-\pi, \pi]} |f(x) - P_n(x)|
+&lt; \epsilon\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème d’approximation de Weierstrass, nous allons
+utiliser les séries de Fourier. La série de Fourier d’une fonction <span
+class="math inline">\(f\)</span> est définie par :</p>
+<p><span class="math display">\[S_n(x) = \frac{a_0}{2} + \sum_{k=1}^n
+(a_k \cos(kx) + b_k \sin(kx))\]</span></p>
+<p>où les coefficients <span class="math inline">\(a_k\)</span> et <span
+class="math inline">\(b_k\)</span> sont donnés par :</p>
+<p><span class="math display">\[a_k = \frac{1}{\pi} \int_{-\pi}^{\pi}
+f(x) \cos(kx) \, dx\]</span> <span class="math display">\[b_k =
+\frac{1}{\pi} \int_{-\pi}^{\pi} f(x) \sin(kx) \, dx\]</span></p>
+<p>Nous devons montrer que <span class="math inline">\(S_n(x)\)</span>
+converge uniformément vers <span class="math inline">\(f(x)\)</span>.
+Pour cela, nous utilisons le théorème de convergence des séries de
+Fourier, qui stipule que si <span class="math inline">\(f\)</span> est
+continue et de carré intégrable, alors sa série de Fourier converge
+uniformément vers <span class="math inline">\(f\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(f\)</span> une
+fonction continue sur <span class="math inline">\([-\pi, \pi]\)</span>.
+Par le théorème de convergence des séries de Fourier, la série <span
+class="math inline">\(S_n(x)\)</span> converge uniformément vers <span
+class="math inline">\(f(x)\)</span>. Cela signifie que :</p>
+<p><span class="math display">\[\forall \epsilon &gt; 0, \exists N \in
+\mathbb{N}, \forall n \geq N, \sup_{x \in [-\pi, \pi]} |f(x) - S_n(x)|
+&lt; \epsilon\]</span></p>
+<p>Puisque <span class="math inline">\(S_n(x)\)</span> est un polynôme
+trigonométrique, le théorème est démontré. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les polynômes trigonométriques possèdent de nombreuses propriétés
+intéressantes. En voici quelques-unes :</p>
+<ol>
+<li><p><strong>Linearité</strong> : La somme de deux polynômes
+trigonométriques est un polynôme trigonométrique. Plus précisément, si
+<span class="math inline">\(P_n\)</span> et <span
+class="math inline">\(Q_m\)</span> sont des polynômes trigonométriques
+de degrés respectifs <span class="math inline">\(n\)</span> et <span
+class="math inline">\(m\)</span>, alors <span class="math inline">\(P_n
++ Q_m\)</span> est un polynôme trigonométrique de degré <span
+class="math inline">\(\max(n, m)\)</span>.</p></li>
+<li><p><strong>Multiplication</strong> : Le produit de deux polynômes
+trigonométriques est un polynôme trigonométrique. Plus précisément, si
+<span class="math inline">\(P_n\)</span> et <span
+class="math inline">\(Q_m\)</span> sont des polynômes trigonométriques
+de degrés respectifs <span class="math inline">\(n\)</span> et <span
+class="math inline">\(m\)</span>, alors <span class="math inline">\(P_n
+\cdot Q_m\)</span> est un polynôme trigonométrique de degré <span
+class="math inline">\(n + m\)</span>.</p></li>
+<li><p><strong>Intégration</strong> : L’intégrale d’un polynôme
+trigonométrique est un polynôme trigonométrique. Plus précisément, si
+<span class="math inline">\(P_n\)</span> est un polynôme trigonométrique
+de degré <span class="math inline">\(n\)</span>, alors :</p>
+<p><span class="math display">\[\int P_n(x) \, dx =
+Q_{n+1}(x)\]</span></p>
+<p>où <span class="math inline">\(Q_{n+1}\)</span> est un polynôme
+trigonométrique de degré <span class="math inline">\(n +
+1\)</span>.</p></li>
+</ol>
+<div class="proof">
+<p><em>Proof.</em> <strong>(i) Linearité</strong> : Soient <span
+class="math inline">\(P_n(x) = a_0 + \sum_{k=1}^n (a_k \cos(kx) + b_k
+\sin(kx))\)</span> et <span class="math inline">\(Q_m(x) = c_0 +
+\sum_{k=1}^m (c_k \cos(kx) + d_k \sin(kx))\)</span>. Alors,</p>
+<p><span class="math display">\[P_n(x) + Q_m(x) = (a_0 + c_0) +
+\sum_{k=1}^{\max(n, m)} ((a_k + c_k) \cos(kx) + (b_k + d_k)
+\sin(kx))\]</span></p>
+<p>ce qui est bien un polynôme trigonométrique de degré <span
+class="math inline">\(\max(n, m)\)</span>.</p>
+<p><strong>(ii) Multiplication</strong> : Utilisons les formules de
+trigonométrie pour le produit de cosinus et sinus. Par exemple,</p>
+<p><span class="math display">\[\cos(kx) \cdot \cos(lx) = \frac{1}{2}
+(\cos((k+l)x) + \cos((k-l)x))\]</span></p>
+<p>En appliquant ces formules à chaque terme du produit <span
+class="math inline">\(P_n(x) \cdot Q_m(x)\)</span>, nous obtenons une
+somme de termes de la forme <span
+class="math inline">\(\cos((k+l)x)\)</span> et <span
+class="math inline">\(\sin((k+l)x)\)</span>, ce qui montre que le
+produit est un polynôme trigonométrique de degré <span
+class="math inline">\(n + m\)</span>.</p>
+<p><strong>(iii) Intégration</strong> : Intégrons terme par terme le
+polynôme trigonométrique <span class="math inline">\(P_n(x)\)</span>.
+Par exemple,</p>
+<p><span class="math display">\[\int \cos(kx) \, dx = \frac{1}{k}
+\sin(kx)\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\int \sin(kx) \, dx = -\frac{1}{k}
+\cos(kx)\]</span></p>
+<p>En intégrant chaque terme de <span
+class="math inline">\(P_n(x)\)</span>, nous obtenons une somme de termes
+de la forme <span class="math inline">\(\sin((k+1)x)\)</span> et <span
+class="math inline">\(\cos((k+1)x)\)</span>, ce qui montre que
+l’intégrale est un polynôme trigonométrique de degré <span
+class="math inline">\(n + 1\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les polynômes trigonométriques, introduits par Euler, sont des outils
+puissants pour représenter et analyser les fonctions périodiques. Leur
+étude a conduit à des résultats fondamentaux en analyse, comme le
+théorème d’approximation de Weierstrass. Les propriétés des polynômes
+trigonométriques, telles que la linéarité, la multiplication et
+l’intégration, en font des objets d’une grande richesse
+mathématique.</p>
+<p>En conclusion, les polynômes trigonométriques continuent de jouer un
+rôle central en mathématiques et en physique, offrant des perspectives
+fascinantes pour l’étude des phénomènes périodiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

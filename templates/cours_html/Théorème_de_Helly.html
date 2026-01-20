@@ -1,0 +1,328 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Théorème de Helly : Une Exploration Géométrique Profonde</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Théorème de Helly : Une Exploration Géométrique
+Profonde</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le théorème de Helly, énoncé pour la première fois par Eduard Helly
+en 1913, est un résultat fondamental en géométrie convexe. Ce théorème
+établit une condition nécessaire et suffisante pour que l’intersection
+d’une famille de convexes dans un espace euclidien soit non vide.
+L’origine de ce théorème remonte aux travaux de Helly sur les ensembles
+convexes et leurs propriétés d’intersection.</p>
+<p>L’importance du théorème de Helly réside dans sa capacité à fournir
+des conditions simples et élégantes pour garantir l’existence d’une
+intersection commune. Ce résultat est non seulement d’un intérêt
+théorique, mais trouve également des applications pratiques dans divers
+domaines tels que l’optimisation, la théorie des jeux et l’apprentissage
+automatique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’énoncer le théorème de Helly, il est essentiel de définir
+quelques notions clés.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(E\)</span> un ensemble dans un
+espace vectoriel. On dit que <span class="math inline">\(E\)</span> est
+convexe si pour tout <span class="math inline">\(x, y \in E\)</span>, le
+segment de droite reliant <span class="math inline">\(x\)</span> et
+<span class="math inline">\(y\)</span> est entièrement contenu dans
+<span class="math inline">\(E\)</span>. Formellement, cela signifie que
+pour tout <span class="math inline">\(\lambda \in [0,1]\)</span>, on a :
+<span class="math display">\[\lambda x + (1 - \lambda) y \in
+E.\]</span></p>
+</div>
+<div class="definition">
+<p>Une famille <span class="math inline">\(\mathcal{F} = \{ E_i \}_{i
+\in I}\)</span> d’ensembles convexes est une collection d’ensembles
+convexes indexée par un ensemble <span
+class="math inline">\(I\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorème-de-helly">Théorème de Helly</h1>
+<p>Le théorème de Helly peut être énoncé comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{F} = \{ E_i
+\}_{i=1}^n\)</span> une famille de <span
+class="math inline">\(n\)</span> ensembles convexes dans <span
+class="math inline">\(\mathbb{R}^d\)</span>. Si pour tout sous-ensemble
+de <span class="math inline">\(d+1\)</span> ensembles de <span
+class="math inline">\(\mathcal{F}\)</span>, l’intersection est non vide,
+alors l’intersection de tous les ensembles de <span
+class="math inline">\(\mathcal{F}\)</span> est non vide. Formellement,
+si : <span class="math display">\[\bigcap_{i \in J} E_i \neq \emptyset
+\quad \text{pour tout} \quad J \subseteq \{1, \ldots, n\} \quad
+\text{tel que} \quad |J| = d+1,\]</span> alors : <span
+class="math display">\[\bigcap_{i=1}^n E_i \neq \emptyset.\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve du théorème de Helly repose sur des techniques de géométrie
+convexe et d’induction. Nous allons présenter une preuve détaillée.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous procédons par induction sur le nombre <span
+class="math inline">\(n\)</span> d’ensembles convexes.</p>
+<p><strong>Base de l’induction :</strong> Pour <span
+class="math inline">\(n = d+1\)</span>, le théorème est trivialement
+vrai par hypothèse.</p>
+<p><strong>Hypothèse d’induction :</strong> Supposons que le théorème
+est vrai pour toute famille de <span class="math inline">\(n\)</span>
+ensembles convexes.</p>
+<p><strong>Étape d’induction :</strong> Considérons une famille <span
+class="math inline">\(\mathcal{F} = \{ E_i \}_{i=1}^{n+1}\)</span> de
+<span class="math inline">\(n+1\)</span> ensembles convexes. Par
+hypothèse d’induction, pour toute sous-famille de <span
+class="math inline">\(n\)</span> ensembles, l’intersection est non vide.
+Nous devons montrer que l’intersection de tous les <span
+class="math inline">\(n+1\)</span> ensembles est non vide.</p>
+<p>Soit <span class="math inline">\(E = \bigcap_{i=1}^n E_i\)</span>.
+Par hypothèse d’induction, <span class="math inline">\(E\)</span> est
+non vide. Nous devons montrer que <span class="math inline">\(E \cap
+E_{n+1} \neq \emptyset\)</span>.</p>
+<p>Considérons un point <span class="math inline">\(x \in E\)</span>. Si
+<span class="math inline">\(x \in E_{n+1}\)</span>, alors nous avons
+terminé. Sinon, par le lemme de séparation (lemme utilisé dans la
+démonstration), il existe un hyperplan séparant <span
+class="math inline">\(x\)</span> de <span
+class="math inline">\(E_{n+1}\)</span>. Cependant, cela contredit
+l’hypothèse que toute intersection de <span
+class="math inline">\(d+1\)</span> ensembles est non vide. Par
+conséquent, il doit exister un point dans <span class="math inline">\(E
+\cap E_{n+1}\)</span>.</p>
+<p>Ainsi, par induction, le théorème est prouvé. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le théorème de Helly a plusieurs propriétés intéressantes et
+corollaires.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\mathcal{F} = \{ E_i
+\}_{i=1}^n\)</span> une famille de <span
+class="math inline">\(n\)</span> ensembles convexes dans <span
+class="math inline">\(\mathbb{R}^d\)</span>. Si pour tout sous-ensemble
+de <span class="math inline">\(d+1\)</span> ensembles, l’intersection
+est non vide, alors il existe un point commun à tous les ensembles de
+<span class="math inline">\(\mathcal{F}\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Ce corollaire est une reformulation directe du
+théorème de Helly. La preuve suit immédiatement de l’énoncé du
+théorème. ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\mathcal{F} = \{ E_i
+\}_{i=1}^n\)</span> une famille de <span
+class="math inline">\(n\)</span> ensembles convexes dans <span
+class="math inline">\(\mathbb{R}^d\)</span>. Si pour tout sous-ensemble
+de <span class="math inline">\(d+1\)</span> ensembles, l’intersection
+est non vide, alors il existe un point commun à tous les ensembles de
+<span class="math inline">\(\mathcal{F}\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Ce corollaire est une reformulation directe du
+théorème de Helly. La preuve suit immédiatement de l’énoncé du
+théorème. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le théorème de Helly est un résultat profond et élégant en géométrie
+convexe. Il fournit une condition nécessaire et suffisante pour que
+l’intersection d’une famille de convexes soit non vide. Les preuves et
+les corollaires associés montrent la richesse et l’utilité de ce
+théorème dans divers domaines mathématiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

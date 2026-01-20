@@ -1,0 +1,352 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Intégration par substitution</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Intégration par substitution</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’intégration par substitution est une technique fondamentale en
+analyse mathématique, permettant de simplifier le calcul des intégrales.
+Elle trouve son origine dans la théorie du changement de variable, un
+concept central en analyse et en géométrie différentielle. Cette méthode
+est indispensable pour résoudre des intégrales qui, sans elle, seraient
+impossibles à évaluer de manière élémentaire.</p>
+<p>L’idée sous-jacente est de transformer une intégrale complexe en une
+autre, plus simple, par le biais d’un changement de variable approprié.
+Ce processus est analogue à la dérivation en chaîne, ce qui n’est pas
+surprenant étant donné le lien profond entre l’intégration et la
+différentiation, exprimé par le théorème fondamental de l’analyse.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’intégration par substitution, commençons par
+rappeler ce que nous cherchons à accomplir. Supposons que nous ayons une
+fonction <span class="math inline">\(f\)</span> et une autre fonction
+<span class="math inline">\(g\)</span>, toutes deux dérivables. Nous
+voulons exprimer l’intégrale de <span class="math inline">\(f(g(x))
+\cdot g&#39;(x)\)</span> en termes d’une intégrale de <span
+class="math inline">\(f\)</span>.</p>
+<p>La clé ici est de reconnaître que la dérivée de <span
+class="math inline">\(g(x)\)</span> apparaît dans l’intégrande. Cela
+suggère que nous pouvons effectuer un changement de variable pour
+simplifier l’expression.</p>
+<p>Formellement, nous avons la définition suivante :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(u : I \rightarrow J\)</span> une
+fonction de classe <span class="math inline">\(C^1\)</span>, où <span
+class="math inline">\(I\)</span> et <span
+class="math inline">\(J\)</span> sont des intervalles de <span
+class="math inline">\(\mathbb{R}\)</span>. Soit <span
+class="math inline">\(f : J \rightarrow \mathbb{R}\)</span> une fonction
+continue. Alors, pour tout <span class="math inline">\(a, b \in
+I\)</span>, nous avons : <span class="math display">\[\int_{u(a)}^{u(b)}
+f(u(x)) u&#39;(x) \, dx = \int_{a}^{b} f(u(x)) u&#39;(x) \, dx =
+\int_{u(a)}^{u(b)} f(t) \, dt\]</span> où <span class="math inline">\(t
+= u(x)\)</span>.</p>
+</div>
+<p>Cette définition peut être reformulée en utilisant des
+quantificateurs :</p>
+<div class="definition">
+<p>Pour toute fonction <span class="math inline">\(u \in C^1(I,
+J)\)</span> et toute fonction continue <span class="math inline">\(f : J
+\rightarrow \mathbb{R}\)</span>, il existe une bijection <span
+class="math inline">\(\phi\)</span> telle que : <span
+class="math display">\[\forall a, b \in I, \exists t = u(x) \text{ tel
+que } \int_{a}^{b} f(u(x)) u&#39;(x) \, dx = \int_{\phi(a)}^{\phi(b)}
+f(t) \, dt\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le théorème fondamental de l’intégration par substitution est une
+conséquence directe du théorème fondamental de l’analyse et de la règle
+de dérivation en chaîne.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(u : I \rightarrow J\)</span> une
+fonction de classe <span class="math inline">\(C^1\)</span>, où <span
+class="math inline">\(I\)</span> et <span
+class="math inline">\(J\)</span> sont des intervalles de <span
+class="math inline">\(\mathbb{R}\)</span>. Soit <span
+class="math inline">\(f : J \rightarrow \mathbb{R}\)</span> une fonction
+continue. Alors, pour tout <span class="math inline">\(a, b \in
+I\)</span>, nous avons : <span class="math display">\[\int_{u(a)}^{u(b)}
+f(u(x)) u&#39;(x) \, dx = \int_{a}^{b} f(u(x)) u&#39;(x) \, dx =
+\int_{u(a)}^{u(b)} f(t) \, dt\]</span> où <span class="math inline">\(t
+= u(x)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous utilisons le théorème fondamental de
+l’analyse et la règle de dérivation en chaîne.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la fonction <span class="math inline">\(F
+: J \rightarrow \mathbb{R}\)</span> définie par : <span
+class="math display">\[F(y) = \int_{c}^{y} f(t) \, dt\]</span> où <span
+class="math inline">\(c \in J\)</span>.</p>
+<p>Par le théorème fondamental de l’analyse, <span
+class="math inline">\(F\)</span> est dérivable et <span
+class="math inline">\(F&#39;(y) = f(y)\)</span>.</p>
+<p>Maintenant, considérons la composée <span
+class="math inline">\(F(u(x))\)</span>. Par la règle de dérivation en
+chaîne, nous avons : <span class="math display">\[\frac{d}{dx} F(u(x)) =
+F&#39;(u(x)) \cdot u&#39;(x) = f(u(x)) \cdot u&#39;(x)\]</span></p>
+<p>Nous pouvons alors écrire : <span class="math display">\[\int_{a}^{b}
+f(u(x)) u&#39;(x) \, dx = \int_{a}^{b} \frac{d}{dx} F(u(x)) \, dx =
+F(u(b)) - F(u(a))\]</span></p>
+<p>D’autre part, par définition de <span
+class="math inline">\(F\)</span>, nous avons : <span
+class="math display">\[F(u(b)) - F(u(a)) = \int_{c}^{u(b)} f(t) \, dt -
+\int_{c}^{u(a)} f(t) \, dt = \int_{u(a)}^{u(b)} f(t) \, dt\]</span></p>
+<p>Ainsi, nous avons montré que : <span
+class="math display">\[\int_{a}^{b} f(u(x)) u&#39;(x) \, dx =
+\int_{u(a)}^{u(b)} f(t) \, dt\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés et corollaires importants
+de l’intégration par substitution.</p>
+<ol>
+<li><p><strong>Propriété de linéarité</strong> : Si <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span> sont des fonctions continues sur <span
+class="math inline">\(J\)</span>, alors pour toute fonction <span
+class="math inline">\(u \in C^1(I, J)\)</span>, nous avons : <span
+class="math display">\[\int_{a}^{b} (\alpha f(u(x)) + \beta g(u(x)))
+u&#39;(x) \, dx = \alpha \int_{u(a)}^{u(b)} f(t) \, dt + \beta
+\int_{u(a)}^{u(b)} g(t) \, dt\]</span> où <span
+class="math inline">\(\alpha, \beta \in \mathbb{R}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété découle directement de la linéarité
+de l’intégrale et du théorème de l’intégration par substitution. ◻</p>
+</div></li>
+<li><p><strong>Propriété de changement de variable</strong> : Si <span
+class="math inline">\(u\)</span> est une bijection de classe <span
+class="math inline">\(C^1\)</span> de <span
+class="math inline">\(I\)</span> sur <span
+class="math inline">\(J\)</span>, alors pour toute fonction continue
+<span class="math inline">\(f : J \rightarrow \mathbb{R}\)</span>, nous
+avons : <span class="math display">\[\int_{J} f(t) \, dt = \int_{I}
+f(u(x)) u&#39;(x) \, dx\]</span> où <span class="math inline">\(t =
+u(x)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété est une conséquence directe du
+théorème de l’intégration par substitution, en prenant <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> comme les bornes de l’intervalle <span
+class="math inline">\(I\)</span>. ◻</p>
+</div></li>
+<li><p><strong>Propriété de symétrie</strong> : Si <span
+class="math inline">\(u\)</span> est une bijection de classe <span
+class="math inline">\(C^1\)</span> de <span
+class="math inline">\(I\)</span> sur <span
+class="math inline">\(J\)</span>, alors pour toute fonction continue
+<span class="math inline">\(f : J \rightarrow \mathbb{R}\)</span>, nous
+avons : <span class="math display">\[\int_{I} f(u(x)) u&#39;(x) \, dx =
+\int_{J} f(t) \, dt\]</span> où <span class="math inline">\(t =
+u(x)\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété est similaire à la précédente et
+découle également du théorème de l’intégration par substitution. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’intégration par substitution est une technique puissante et
+polyvalente qui permet de simplifier le calcul des intégrales. Elle
+trouve ses racines dans la théorie du changement de variable et est
+étroitement liée au théorème fondamental de l’analyse. En comprenant
+cette méthode, nous pouvons aborder une large classe de problèmes
+d’intégration avec confiance et efficacité.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

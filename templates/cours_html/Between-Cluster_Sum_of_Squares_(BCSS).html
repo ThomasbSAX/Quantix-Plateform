@@ -1,0 +1,316 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Between-Cluster Sum of Squares (BCSS)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Between-Cluster Sum of Squares (BCSS)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des données est une discipline centrale en statistique,
+visant à extraire des informations significatives de ensembles de
+données souvent complexes. Parmi les nombreuses techniques disponibles,
+l’analyse en composantes principales (ACP) et le clustering sont des
+outils fondamentaux. Le Between-Cluster Sum of Squares (BCSS) est une
+mesure cruciale dans ces méthodes, permettant d’évaluer la qualité d’une
+partition de données en clusters.</p>
+<p>Le BCSS émerge dans le contexte de l’optimisation des partitions de
+données. Il mesure la variance entre les centres des clusters,
+fournissant ainsi une indication sur la séparation des groupes. Cette
+notion est indispensable pour évaluer l’efficacité d’un algorithme de
+clustering, comme les k-means, et pour choisir le nombre optimal de
+clusters.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre le BCSS, commençons par définir quelques concepts
+préliminaires. Considérons un ensemble de données <span
+class="math inline">\(\mathbf{X} = \{\mathbf{x}_1, \mathbf{x}_2, \ldots,
+\mathbf{x}_n\}\)</span> dans <span
+class="math inline">\(\mathbb{R}^d\)</span>, où chaque <span
+class="math inline">\(\mathbf{x}_i\)</span> est un vecteur de
+caractéristiques. Une partition de ces données en <span
+class="math inline">\(k\)</span> clusters est définie par une fonction
+d’affectation <span class="math inline">\(\mathbf{c}: \{1, 2, \ldots,
+n\} \rightarrow \{1, 2, \ldots, k\}\)</span>, où <span
+class="math inline">\(\mathbf{c}(i)\)</span> indique le cluster auquel
+appartient l’observation <span
+class="math inline">\(\mathbf{x}_i\)</span>.</p>
+<p>Le centre d’un cluster <span class="math inline">\(j\)</span> est
+donné par la moyenne des observations appartenant à ce cluster: <span
+class="math display">\[\mu_j = \frac{1}{|C_j|} \sum_{i: c(i)=j}
+\mathbf{x}_i\]</span> où <span class="math inline">\(C_j = \{i : c(i) =
+j\}\)</span> est l’ensemble des indices des observations dans le cluster
+<span class="math inline">\(j\)</span>.</p>
+<p>Le BCSS mesure la somme des carrés des distances entre chaque centre
+de cluster et la moyenne globale des données. La moyenne globale est
+définie par: <span class="math display">\[\mu = \frac{1}{n} \sum_{i=1}^n
+\mathbf{x}_i\]</span></p>
+<p>Le BCSS est alors formellement défini comme: <span
+class="math display">\[BCSS = \sum_{j=1}^k |C_j| \|\mu_j -
+\mu\|^2\]</span> où <span class="math inline">\(\|\cdot\|\)</span>
+désigne la norme euclidienne.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié au BCSS est le théorème de la
+décomposition de la variance totale. Ce théorème montre que la variance
+totale des données peut être décomposée en deux parties: le BCSS et le
+Within-Cluster Sum of Squares (WCSS).</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{X}\)</span> un ensemble de
+données partitionné en <span class="math inline">\(k\)</span> clusters.
+La variance totale des données peut être exprimée comme la somme du BCSS
+et du WCSS: <span class="math display">\[\text{Variance Totale} = BCSS +
+WCSS\]</span> où le WCSS est défini par: <span
+class="math display">\[WCSS = \sum_{j=1}^k \sum_{i: c(i)=j}
+\|\mathbf{x}_i - \mu_j\|^2\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la décomposition de la variance totale,
+nous commençons par exprimer la variance totale des données: <span
+class="math display">\[\text{Variance Totale} = \sum_{i=1}^n
+\|\mathbf{x}_i - \mu\|^2\]</span></p>
+<p>Nous pouvons réécrire cette somme en utilisant l’identité de
+Pythagore pour les normes euclidiennes: <span
+class="math display">\[\|\mathbf{x}_i - \mu\|^2 = \|\mathbf{x}_i - \mu_j
++ \mu_j - \mu\|^2 = \|\mathbf{x}_i - \mu_j\|^2 + \|\mu_j - \mu\|^2 + 2
+(\mathbf{x}_i - \mu_j)^T (\mu_j - \mu)\]</span></p>
+<p>En sommant sur toutes les observations <span
+class="math inline">\(i\)</span> et en utilisant le fait que <span
+class="math inline">\(\sum_{i=1}^n (\mathbf{x}_i - \mu_j) = 0\)</span>
+pour chaque cluster <span class="math inline">\(j\)</span>, nous
+obtenons: <span class="math display">\[\text{Variance Totale} =
+\sum_{j=1}^k \sum_{i: c(i)=j} \|\mathbf{x}_i - \mu_j\|^2 + \sum_{j=1}^k
+|C_j| \|\mu_j - \mu\|^2\]</span></p>
+<p>Ainsi, nous avons bien: <span class="math display">\[\text{Variance
+Totale} = WCSS + BCSS\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes du BCSS:</p>
+<ol>
+<li><p>Le BCSS est toujours non négatif, c’est-à-dire <span
+class="math inline">\(BCSS \geq 0\)</span>. Cette propriété découle du
+fait que les normes au carré sont toujours non négatives.</p></li>
+<li><p>Le BCSS est maximal lorsque les clusters sont aussi éloignés que
+possible les uns des autres. Cela signifie que pour une partition
+donnée, le BCSS est une mesure de la séparation entre les
+clusters.</p></li>
+<li><p>Le BCSS peut être utilisé pour choisir le nombre optimal de
+clusters dans un algorithme de clustering. En effet, plus le BCSS est
+élevé, meilleure est la séparation des clusters.</p></li>
+</ol>
+<p>Pour illustrer ces propriétés, considérons un exemple simple.
+Supposons que nous avons deux clusters avec des centres <span
+class="math inline">\(\mu_1\)</span> et <span
+class="math inline">\(\mu_2\)</span>, et une moyenne globale <span
+class="math inline">\(\mu\)</span>. Le BCSS est alors donné par: <span
+class="math display">\[BCSS = |C_1| \|\mu_1 - \mu\|^2 + |C_2| \|\mu_2 -
+\mu\|^2\]</span></p>
+<p>Si les clusters sont bien séparés, <span
+class="math inline">\(\|\mu_1 - \mu\|\)</span> et <span
+class="math inline">\(\|\mu_2 - \mu\|\)</span> seront grands, ce qui
+entraînera un BCSS élevé. Inversement, si les clusters sont proches, le
+BCSS sera faible.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le Between-Cluster Sum of Squares (BCSS) est une mesure essentielle
+dans l’analyse des données, particulièrement utile pour évaluer la
+qualité des partitions de clusters. En comprenant les définitions,
+théorèmes et propriétés associés au BCSS, nous pouvons mieux apprécier
+son rôle dans les algorithmes de clustering et l’analyse en composantes
+principales. Le BCSS offre une approche rigoureuse pour optimiser les
+partitions de données et améliorer la compréhension des structures
+sous-jacentes dans les ensembles de données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

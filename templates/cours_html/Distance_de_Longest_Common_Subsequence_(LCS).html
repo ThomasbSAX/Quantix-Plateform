@@ -1,0 +1,344 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Longest Common Subsequence (LCS)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Longest Common Subsequence (LCS)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La notion de distance de Longest Common Subsequence (LCS) émerge dans
+le cadre des algorithmes d’alignement de séquences, un domaine central
+en bioinformatique et en traitement du signal. L’idée fondamentale est
+de mesurer la similarité entre deux séquences en identifiant leur plus
+longue sous-séquence commune. Cette approche est indispensable pour
+comparer des génomes, des protéines, ou encore des textes, permettant de
+quantifier les différences et similitudes structurelles.</p>
+<p>Historiquement, le problème du LCS a été introduit par S. S. Maurer
+et M. J. Kosowsky en 1977, bien que des variantes aient été explorées
+dès les années 1960. La distance de LCS offre une alternative aux
+distances d’édition classiques, comme la distance de Levenshtein, en se
+concentrant sur les similitudes plutôt que sur les différences.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de LCS, commençons par comprendre ce que
+nous cherchons à mesurer. Imaginons deux séquences <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Nous voulons identifier la plus longue
+sous-séquence commune à ces deux séquences. La distance de LCS sera
+alors définie comme la longueur des séquences moins la longueur de cette
+sous-séquence commune.</p>
+<p>Formellement, pour deux séquences <span class="math inline">\(X =
+(x_1, x_2, \ldots, x_m)\)</span> et <span class="math inline">\(Y =
+(y_1, y_2, \ldots, y_n)\)</span>, une sous-séquence commune <span
+class="math inline">\(Z = (z_1, z_2, \ldots, z_k)\)</span> est une
+séquence telle que <span class="math inline">\(\exists i_1 &lt; i_2 &lt;
+\ldots &lt; i_k\)</span> et <span class="math inline">\(\exists j_1 &lt;
+j_2 &lt; \ldots &lt; j_k\)</span> avec <span class="math inline">\(z_l =
+x_{i_l} = y_{j_l}\)</span> pour tout <span class="math inline">\(l \in
+\{1, 2, \ldots, k\}\)</span>.</p>
+<p>La longueur de la plus longue sous-séquence commune (LCS) est donnée
+par : <span class="math display">\[\text{LCS}(X, Y) = \max \{ k \mid
+\exists Z \text{ sous-séquence commune de } X \text{ et } Y \text{ avec
+} |Z| = k \}\]</span></p>
+<p>La distance de LCS est alors définie comme : <span
+class="math display">\[d_{\text{LCS}}(X, Y) = \max(|X|, |Y|) -
+\text{LCS}(X, Y)\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de LCS est le théorème de
+programmation dynamique pour le calcul du LCS. Ce théorème permet de
+calculer efficacement la longueur de la plus longue sous-séquence
+commune en utilisant une approche par programmation dynamique.</p>
+<p>Pour énoncer ce théorème, introduisons la notation <span
+class="math inline">\(\text{LCS}_i^j\)</span> pour désigner la longueur
+de la plus longue sous-séquence commune des séquences <span
+class="math inline">\(X[1..i]\)</span> et <span
+class="math inline">\(Y[1..j]\)</span>.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X = (x_1, x_2, \ldots,
+x_m)\)</span> et <span class="math inline">\(Y = (y_1, y_2, \ldots,
+y_n)\)</span> deux séquences. Alors : <span
+class="math display">\[\text{LCS}_i^j =
+\begin{cases}
+0 &amp; \text{si } i = 0 \text{ ou } j = 0 \\
+\text{LCS}_{i-1}^{j-1} + 1 &amp; \text{si } i, j &gt; 0 \text{ et } x_i
+= y_j \\
+\max(\text{LCS}_{i-1}^j, \text{LCS}_i^{j-1}) &amp; \text{sinon}
+\end{cases}\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous procédons par récurrence sur les
+longueurs des séquences <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> <u>Cas de base :</u> Si <span class="math inline">\(i
+= 0\)</span> ou <span class="math inline">\(j = 0\)</span>, alors <span
+class="math inline">\(\text{LCS}_i^j = 0\)</span> car une séquence vide
+n’a pas de sous-séquence commune avec une autre séquence.</p>
+<p><u>Étape de récurrence :</u> Supposons que le théorème soit vrai pour
+toutes les sous-séquences de <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> de longueurs inférieures à <span
+class="math inline">\(i\)</span> ou <span
+class="math inline">\(j\)</span>.</p>
+<p>Si <span class="math inline">\(x_i = y_j\)</span>, alors la
+sous-séquence commune peut être étendue de 1, d’où <span
+class="math inline">\(\text{LCS}_i^j = \text{LCS}_{i-1}^{j-1} +
+1\)</span>.</p>
+<p>Si <span class="math inline">\(x_i \neq y_j\)</span>, alors la plus
+longue sous-séquence commune est soit dans <span
+class="math inline">\(X[1..i-1]\)</span> et <span
+class="math inline">\(Y[1..j]\)</span>, soit dans <span
+class="math inline">\(X[1..i]\)</span> et <span
+class="math inline">\(Y[1..j-1]\)</span>. Donc, <span
+class="math inline">\(\text{LCS}_i^j = \max(\text{LCS}_{i-1}^j,
+\text{LCS}_i^{j-1})\)</span>.</p>
+<p>Par récurrence, le théorème est prouvé. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<ol>
+<li><p><u>Invariance par permutation :</u> La distance de LCS est
+invariante par permutation des éléments dans les séquences. Cela
+signifie que l’ordre des éléments n’affecte pas la distance de
+LCS.</p></li>
+<li><p><u>Propriété de monotonie :</u> Si <span
+class="math inline">\(X&#39;\)</span> est une sous-séquence de <span
+class="math inline">\(X\)</span>, alors <span
+class="math inline">\(d_{\text{LCS}}(X&#39;, Y) \leq d_{\text{LCS}}(X,
+Y)\)</span>. Cette propriété montre que la distance de LCS est monotone
+par rapport à l’inclusion des sous-séquences.</p></li>
+<li><p><u>Relation avec la distance d’édition :</u> La distance de LCS
+est liée à la distance d’édition. Plus précisément, <span
+class="math inline">\(d_{\text{LCS}}(X, Y) \leq d_{\text{edit}}(X,
+Y)\)</span>, où <span class="math inline">\(d_{\text{edit}}\)</span> est
+la distance d’édition de Levenshtein.</p></li>
+</ol>
+<p>Pour prouver ces propriétés, nous utilisons les définitions et
+théorèmes précédents.</p>
+<div class="proof">
+<p><em>Proof.</em> <u>Preuve de (i) :</u> La distance de LCS dépend
+uniquement des éléments présents dans les séquences, pas de leur ordre.
+Donc, toute permutation des éléments ne change pas la longueur de la
+plus longue sous-séquence commune.</p>
+<p><u>Preuve de (ii) :</u> Si <span
+class="math inline">\(X&#39;\)</span> est une sous-séquence de <span
+class="math inline">\(X\)</span>, alors toute sous-séquence commune à
+<span class="math inline">\(X&#39;\)</span> et <span
+class="math inline">\(Y\)</span> est également une sous-séquence commune
+à <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Donc, <span
+class="math inline">\(\text{LCS}(X&#39;, Y) \leq \text{LCS}(X,
+Y)\)</span>, et par conséquent <span
+class="math inline">\(d_{\text{LCS}}(X&#39;, Y) \leq d_{\text{LCS}}(X,
+Y)\)</span>.</p>
+<p><u>Preuve de (iii) :</u> La distance d’édition compte le nombre
+minimal d’opérations nécessaires pour transformer <span
+class="math inline">\(X\)</span> en <span
+class="math inline">\(Y\)</span>. La distance de LCS, quant à elle,
+mesure la longueur de la plus longue sous-séquence commune. Il est clair
+que <span class="math inline">\(d_{\text{LCS}}(X, Y) \leq
+d_{\text{edit}}(X, Y)\)</span>, car les opérations de suppression et
+d’insertion dans la distance d’édition peuvent réduire la longueur de la
+sous-séquence commune. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Longest Common Subsequence (LCS) est un outil puissant
+pour mesurer la similarité entre deux séquences. Son utilisation dans
+divers domaines, tels que la bioinformatique et le traitement du signal,
+démontre son importance pratique. Les théorèmes et propriétés présentés
+dans cet article fournissent une base solide pour comprendre et
+appliquer cette distance de manière efficace.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

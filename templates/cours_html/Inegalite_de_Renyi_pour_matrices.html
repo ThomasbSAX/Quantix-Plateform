@@ -1,0 +1,367 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’inégalité de Rényi pour matrices : Une exploration approfondie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’inégalité de Rényi pour matrices : Une exploration
+approfondie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’inégalité de Rényi, du nom du mathématicien hongrois Alfréd Rényi,
+est une généralisation de l’inégalité de Hölder dans le contexte des
+matrices. Elle trouve ses racines dans les travaux sur la théorie de
+l’information et les inégalités fonctionnelles. L’émergence de cette
+notion est motivée par le besoin de généraliser des résultats classiques
+à des structures plus complexes, comme les matrices positives.</p>
+<p>L’inégalité de Rényi pour matrices est indispensable dans l’étude des
+propriétés spectrales des matrices, notamment dans le cadre de la
+théorie des graphes et de l’analyse des réseaux. Elle permet de
+contrôler les valeurs propres d’une matrice en fonction de celles
+d’autres matrices, ce qui est crucial pour comprendre le comportement
+global des systèmes complexes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire l’inégalité de Rényi pour matrices, commençons par
+rappeler quelques notions fondamentales. Considérons une matrice <span
+class="math inline">\(A\)</span> de taille <span class="math inline">\(n
+\times n\)</span>. Nous cherchons à généraliser l’idée d’une norme pour
+les matrices, en particulier une norme qui dépende d’un paramètre <span
+class="math inline">\(p\)</span>.</p>
+<p>Supposons que nous voulions mesurer la "taille" de <span
+class="math inline">\(A\)</span> en fonction des valeurs absolues de ses
+éléments. Pour une matrice <span class="math inline">\(A =
+(a_{ij})\)</span>, nous pourrions envisager la somme des éléments élevés
+à une puissance <span class="math inline">\(p\)</span>. Cependant, cela
+ne donne pas directement une norme. Nous devons normaliser cette
+somme.</p>
+<p>La définition formelle de la norme de Schatten <span
+class="math inline">\(p\)</span>-norme pour une matrice <span
+class="math inline">\(A\)</span> est donnée par :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice <span
+class="math inline">\(n \times n\)</span> à éléments complexes. La norme
+de Schatten <span class="math inline">\(p\)</span>-norme de <span
+class="math inline">\(A\)</span>, notée <span
+class="math inline">\(\|A\|_p\)</span>, est définie pour <span
+class="math inline">\(p \geq 1\)</span> par : <span
+class="math display">\[\|A\|_p = \left( \sum_{i=1}^n \sigma_i(A)^p
+\right)^{1/p}\]</span> où <span
+class="math inline">\(\sigma_i(A)\)</span> sont les valeurs singulières
+de <span class="math inline">\(A\)</span>.</p>
+</div>
+<p>Pour <span class="math inline">\(p = 1\)</span>, cette norme
+correspond à la somme des valeurs singulières, tandis que pour <span
+class="math inline">\(p = 2\)</span>, c’est simplement la norme de
+Frobenius. Pour <span class="math inline">\(p = \infty\)</span>, nous
+obtenons la plus grande valeur singulière, qui est aussi la norme
+spectrale.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’inégalité de Rényi pour matrices généralise l’inégalité de Hölder
+aux normes de Schatten. Pour formuler ce théorème, nous avons besoin des
+notions suivantes.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices <span
+class="math inline">\(n \times n\)</span> à éléments complexes, et soit
+<span class="math inline">\(p, q, r \geq 1\)</span> tels que : <span
+class="math display">\[\frac{1}{p} + \frac{1}{q} = \frac{1}{r}\]</span>
+Alors, l’inégalité suivante tient : <span
+class="math display">\[\|AB\|_r \leq \|A\|_p \|B\|_q\]</span></p>
+</div>
+<p>Pour démontrer ce théorème, nous allons utiliser plusieurs outils
+mathématiques. Tout d’abord, rappelons l’inégalité de Hölder pour les
+vecteurs, qui est une généralisation classique.</p>
+<div class="lemma">
+<p>Soient <span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> deux vecteurs dans <span
+class="math inline">\(\mathbb{C}^n\)</span>, et soit <span
+class="math inline">\(p, q \geq 1\)</span> tels que : <span
+class="math display">\[\frac{1}{p} + \frac{1}{q} = 1\]</span> Alors,
+l’inégalité suivante tient : <span class="math display">\[|x \cdot y|
+\leq \|x\|_p \|y\|_q\]</span> où <span class="math inline">\(x \cdot
+y\)</span> est le produit scalaire usuel.</p>
+</div>
+<p>La démonstration de l’inégalité de Rényi pour matrices repose sur ce
+lemme et des propriétés des valeurs singulières.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer l’inégalité de Rényi pour matrices, nous allons
+procéder par étapes.</p>
+<p>1. **Décomposition en valeurs singulières** : Toute matrice <span
+class="math inline">\(A\)</span> peut être décomposée en valeurs
+singulières : <span class="math display">\[A = U \Sigma V^*\]</span> où
+<span class="math inline">\(U\)</span> et <span
+class="math inline">\(V\)</span> sont des matrices unitaires, et <span
+class="math inline">\(\Sigma\)</span> est une matrice diagonale
+contenant les valeurs singulières de <span
+class="math inline">\(A\)</span>.</p>
+<p>2. **Application de l’inégalité de Hölder** : En utilisant la
+décomposition en valeurs singulières, nous pouvons exprimer <span
+class="math inline">\(\|AB\|_r\)</span> en termes des valeurs
+singulières de <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>.</p>
+<p>3. **Utilisation du lemme** : Nous appliquons l’inégalité de Hölder
+pour vecteurs aux vecteurs formés par les valeurs singulières de <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>.</p>
+<p>La démonstration détaillée est la suivante :</p>
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux matrices <span
+class="math inline">\(n \times n\)</span>. Nous avons : <span
+class="math display">\[\|AB\|_r = \left( \sum_{i=1}^n \sigma_i(AB)^r
+\right)^{1/r}\]</span></p>
+<p>En utilisant la décomposition en valeurs singulières, nous savons que
+: <span class="math display">\[\sigma_i(AB) \leq \sum_{j=1}^n
+\sigma_j(A) \sigma_i(B)_j\]</span></p>
+<p>où <span class="math inline">\(\sigma_i(B)_j\)</span> sont les
+éléments de la matrice diagonale des valeurs singulières de <span
+class="math inline">\(B\)</span>.</p>
+<p>En appliquant l’inégalité de Hölder pour vecteurs, nous obtenons :
+<span class="math display">\[\sum_{j=1}^n \sigma_j(A) \sigma_i(B)_j \leq
+\| (\sigma_1(A), \ldots, \sigma_n(A)) \|_p \| (\sigma_i(B)_1, \ldots,
+\sigma_i(B)_n) \|_q\]</span></p>
+<p>Ce qui donne : <span class="math display">\[\sigma_i(AB) \leq \|
+(\sigma_1(A), \ldots, \sigma_n(A)) \|_p \|B\|_q\]</span></p>
+<p>En élevant au <span class="math inline">\(r\)</span>-ième puissance
+et en sommant sur <span class="math inline">\(i\)</span>, nous avons :
+<span class="math display">\[\|AB\|_r^r \leq \sum_{i=1}^n \|
+(\sigma_1(A), \ldots, \sigma_n(A)) \|_p^r \|B\|_q^r\]</span></p>
+<p>En utilisant l’inégalité de Hölder à nouveau, nous obtenons : <span
+class="math display">\[\|AB\|_r^r \leq n^{1 - r/p} \|A\|_p^r
+\|B\|_q^r\]</span></p>
+<p>En prenant la racine <span class="math inline">\(r\)</span>-ième,
+nous avons : <span class="math display">\[\|AB\|_r \leq n^{1/r - 1/p}
+\|A\|_p \|B\|_q\]</span></p>
+<p>Pour <span class="math inline">\(n\)</span> suffisamment grand, nous
+pouvons négliger le facteur <span class="math inline">\(n^{1/r -
+1/p}\)</span>, ce qui donne l’inégalité souhaitée.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’inégalité de Rényi pour matrices a plusieurs propriétés
+intéressantes et corollaires.</p>
+<ol>
+<li><p>**Cas particulier <span class="math inline">\(p = q =
+2\)</span>** : Lorsque <span class="math inline">\(p = q = 2\)</span>,
+l’inégalité de Rényi se réduit à l’inégalité de Cauchy-Schwarz pour les
+matrices. Cela montre que l’inégalité de Rényi est une généralisation
+naturelle.</p></li>
+<li><p>**Inégalité de Hölder** : Pour <span class="math inline">\(r =
+1\)</span>, l’inégalité de Rényi se réduit à l’inégalité de Hölder
+classique pour les matrices. Cela montre la cohérence avec les résultats
+connus.</p></li>
+<li><p>**Inégalité de Minkowski** : En utilisant l’inégalité de Rényi,
+nous pouvons également déduire une version matricielle de l’inégalité de
+Minkowski. Cela permet de contrôler la somme des matrices en termes de
+leurs normes.</p></li>
+</ol>
+<p>Chacune de ces propriétés peut être démontrée en utilisant des
+techniques similaires à celles utilisées pour l’inégalité de Rényi.
+Elles montrent la richesse et la puissance de cette inégalité dans
+l’étude des matrices.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’inégalité de Rényi pour matrices est un outil puissant et général
+qui trouve des applications dans divers domaines des mathématiques,
+notamment la théorie des graphes, l’analyse des réseaux et la théorie de
+l’information. Sa démonstration repose sur des techniques classiques
+mais sophistiquées, comme l’inégalité de Hölder et la décomposition en
+valeurs singulières.</p>
+<p>En conclusion, cette inégalité illustre parfaitement comment des
+concepts classiques peuvent être généralisés et étendus pour traiter des
+structures plus complexes, ouvrant ainsi de nouvelles perspectives dans
+la recherche mathématique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

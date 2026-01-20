@@ -1,0 +1,342 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Gromov-Wasserstein Distance: A Geometric Perspective on Optimal Transport</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Gromov-Wasserstein Distance: A Geometric Perspective
+on Optimal Transport</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>The Gromov-Wasserstein (GW) distance is a powerful tool that bridges
+the gap between optimal transport theory and geometric analysis.
+Emerging from the need to compare metric measure spaces, GW distance
+provides a robust framework for analyzing shapes and structures in a
+non-rigid manner. This notion is indispensable in various fields,
+including computational geometry, machine learning, and shape
+analysis.</p>
+<p>The GW distance was introduced by Mikhael Gromov in the context of
+convergence of metric spaces, and later formalized by Bernard Klartag
+and Robert T. Jantzen in the context of optimal transport. It addresses
+the challenge of comparing spaces that may not be isometric but still
+share intrinsic geometric properties.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To understand the GW distance, let us first consider two metric
+measure spaces <span class="math inline">\((X, d_X, \mu_X)\)</span> and
+<span class="math inline">\((Y, d_Y, \mu_Y)\)</span>, where <span
+class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> are compact metric spaces, <span
+class="math inline">\(d_X\)</span> and <span
+class="math inline">\(d_Y\)</span> are their respective distance
+functions, and <span class="math inline">\(\mu_X\)</span> and <span
+class="math inline">\(\mu_Y\)</span> are probability measures on <span
+class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span>.</p>
+<p>We seek a distance that measures how "close" these two spaces are in
+terms of their intrinsic geometry. The GW distance achieves this by
+considering all possible correspondences between the points of <span
+class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span>, weighted by their respective
+measures.</p>
+<div class="definition">
+<p>Let <span class="math inline">\((X, d_X, \mu_X)\)</span> and <span
+class="math inline">\((Y, d_Y, \mu_Y)\)</span> be two metric measure
+spaces. The Gromov-Wasserstein distance between <span
+class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> is defined as: <span
+class="math display">\[W_G((X, d_X, \mu_X), (Y, d_Y, \mu_Y)) = \inf_{\pi
+\in \Pi(\mu_X, \mu_Y)} \int_{X \times Y \times X \times Y} |d_X(x,
+x&#39;) - d_Y(y, y&#39;)| \, d\pi((x,y),(x&#39;,y&#39;)) \wedge
+1\]</span> where <span class="math inline">\(\Pi(\mu_X, \mu_Y)\)</span>
+is the set of all couplings between <span
+class="math inline">\(\mu_X\)</span> and <span
+class="math inline">\(\mu_Y\)</span>, and <span class="math inline">\(a
+\wedge b = \min(a, b)\)</span>.</p>
+</div>
+<p>An alternative formulation of the GW distance is: <span
+class="math display">\[W_G((X, d_X, \mu_X), (Y, d_Y, \mu_Y)) = \inf_{\pi
+\in \Pi(\mu_X, \mu_Y)} \sup_{f: X \to \mathbb{R}, g: Y \to \mathbb{R}}
+\left\{ \int_X f \, d\mu_X + \int_Y g \, d\mu_Y - \int_{X \times Y}
+|f(x) + g(y)| \, d\pi(x,y) \right\}\]</span> where <span
+class="math inline">\(f\)</span> and <span
+class="math inline">\(g\)</span> are 1-Lipschitz functions with respect
+to <span class="math inline">\(d_X\)</span> and <span
+class="math inline">\(d_Y\)</span>, respectively.</p>
+<h1 id="theorems">Theorems</h1>
+<p>One of the fundamental theorems related to the GW distance is the
+stability theorem, which ensures that the GW distance is indeed a
+metric.</p>
+<div class="theorem">
+<p>The GW distance <span class="math inline">\(W_G\)</span> satisfies
+the following properties:</p>
+<ul>
+<li><p>Non-negativity: <span class="math inline">\(W_G((X, d_X, \mu_X),
+(Y, d_Y, \mu_Y)) \geq 0\)</span>,</p></li>
+<li><p>Identity: <span class="math inline">\(W_G((X, d_X, \mu_X), (Y,
+d_Y, \mu_Y)) = 0\)</span> if and only if <span class="math inline">\((X,
+d_X, \mu_X)\)</span> and <span class="math inline">\((Y, d_Y,
+\mu_Y)\)</span> are isometric,</p></li>
+<li><p>Symmetry: <span class="math inline">\(W_G((X, d_X, \mu_X), (Y,
+d_Y, \mu_Y)) = W_G((Y, d_Y, \mu_Y), (X, d_X, \mu_X))\)</span>,</p></li>
+<li><p>Triangle inequality: <span class="math inline">\(W_G((X, d_X,
+\mu_X), (Z, d_Z, \mu_Z)) \leq W_G((X, d_X, \mu_X), (Y, d_Y, \mu_Y)) +
+W_G((Y, d_Y, \mu_Y), (Z, d_Z, \mu_Z))\)</span>.</p></li>
+</ul>
+</div>
+<h1 id="proofs">Proofs</h1>
+<p>To prove the stability of the GW distance, we need to verify each of
+the metric properties.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Non-negativity:</strong> By definition, the
+integral of a non-negative function is non-negative. Thus, <span
+class="math inline">\(W_G((X, d_X, \mu_X), (Y, d_Y, \mu_Y)) \geq
+0\)</span>.</p>
+<p><strong>Identity:</strong> If <span class="math inline">\((X, d_X,
+\mu_X)\)</span> and <span class="math inline">\((Y, d_Y, \mu_Y)\)</span>
+are isometric, there exists an isometry <span class="math inline">\(T: X
+\to Y\)</span> such that <span class="math inline">\(\mu_Y = T_\#
+\mu_X\)</span>. The coupling <span class="math inline">\(\pi((x,y)) =
+\mu_X(x) \delta_{T(x)}(y)\)</span> achieves the infimum, and <span
+class="math inline">\(W_G((X, d_X, \mu_X), (Y, d_Y, \mu_Y)) =
+0\)</span>. Conversely, if <span class="math inline">\(W_G((X, d_X,
+\mu_X), (Y, d_Y, \mu_Y)) = 0\)</span>, the spaces must be isometric.</p>
+<p><strong>Symmetry:</strong> The symmetry follows from the symmetry of
+the integral and the fact that <span class="math inline">\(\Pi(\mu_X,
+\mu_Y) = \Pi(\mu_Y, \mu_X)\)</span>.</p>
+<p><strong>Triangle inequality:</strong> Let <span
+class="math inline">\((X, d_X, \mu_X)\)</span>, <span
+class="math inline">\((Y, d_Y, \mu_Y)\)</span>, and <span
+class="math inline">\((Z, d_Z, \mu_Z)\)</span> be three metric measure
+spaces. For any <span class="math inline">\(\pi_XY \in \Pi(\mu_X,
+\mu_Y)\)</span> and <span class="math inline">\(\pi_YZ \in \Pi(\mu_Y,
+\mu_Z)\)</span>, we can construct a coupling <span
+class="math inline">\(\pi_XZ\)</span> between <span
+class="math inline">\(\mu_X\)</span> and <span
+class="math inline">\(\mu_Z\)</span>. The triangle inequality then
+follows from the properties of the integral and the definition of the GW
+distance. ◻</p>
+</div>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<p>The GW distance enjoys several important properties and
+corollaries:</p>
+<ul>
+<li><p><strong>Invariance under Isometries:</strong> The GW distance is
+invariant under isometries. That is, if <span class="math inline">\(T: X
+\to X&#39;\)</span> and <span class="math inline">\(S: Y \to
+Y&#39;\)</span> are isometries, then: <span
+class="math display">\[W_G((X, d_X, \mu_X), (Y, d_Y, \mu_Y)) =
+W_G((X&#39;, T_\# d_X, T_\# \mu_X), (Y&#39;, S_\# d_Y, S_\#
+\mu_Y))\]</span></p></li>
+<li><p><strong>Lower Semi-Continuity:</strong> The GW distance is lower
+semi-continuous with respect to the convergence of measures. That is, if
+<span class="math inline">\(\mu_X^n \to \mu_X\)</span> and <span
+class="math inline">\(\mu_Y^n \to \mu_Y\)</span> weakly, then: <span
+class="math display">\[\liminf_{n \to \infty} W_G((X, d_X, \mu_X^n), (Y,
+d_Y, \mu_Y^n)) \geq W_G((X, d_X, \mu_X), (Y, d_Y,
+\mu_Y))\]</span></p></li>
+<li><p><strong>Compactness:</strong> The space of metric measure spaces
+equipped with the GW distance is compact under appropriate conditions.
+This property is crucial for various applications in geometry and
+machine learning.</p></li>
+</ul>
+<p>The GW distance provides a powerful framework for comparing metric
+measure spaces, enabling the analysis of shapes and structures in a
+non-rigid manner. Its stability properties and invariance under
+isometries make it an indispensable tool in computational geometry,
+machine learning, and shape analysis.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

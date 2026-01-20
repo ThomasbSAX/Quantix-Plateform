@@ -1,0 +1,360 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized Affinity Propagation: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized Affinity Propagation: A Comprehensive
+Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>Affinity Propagation (AP) is a clustering algorithm that identifies
+exemplars among the data points and forms clusters of data points around
+these exemplars. The kernelized version extends this approach by
+incorporating kernel methods, which allow for non-linear relationships
+in the data.</p>
+<p>The emergence of Kernelized Affinity Propagation (KAP) is motivated
+by the need to handle complex data structures that linear methods cannot
+effectively capture. Kernel methods transform the data into a
+higher-dimensional space where linear separation becomes possible, thus
+enabling more accurate clustering.</p>
+<p>KAP is indispensable in fields such as bioinformatics, image
+processing, and text mining, where data often exhibits non-linear
+patterns. By leveraging kernel functions, KAP provides a robust
+framework for uncovering the underlying structure of such data.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To understand KAP, we first need to define some key concepts. Let’s
+start by considering the problem of clustering data points.</p>
+<p>Suppose we have a dataset <span class="math inline">\(X = \{x_1, x_2,
+\ldots, x_n\}\)</span> where each <span class="math inline">\(x_i \in
+\mathbb{R}^d\)</span>. The goal is to partition this dataset into
+clusters such that data points within the same cluster are more similar
+to each other than to those in other clusters.</p>
+<p>The similarity between data points is often measured using a
+similarity matrix <span class="math inline">\(S\)</span>, where <span
+class="math inline">\(S_{ij}\)</span> represents the similarity between
+<span class="math inline">\(x_i\)</span> and <span
+class="math inline">\(x_j\)</span>. In the context of KAP, this
+similarity is computed using a kernel function <span
+class="math inline">\(k\)</span>:</p>
+<p><span class="math display">\[S_{ij} = k(x_i, x_j)\]</span></p>
+<p>The kernel function <span class="math inline">\(k\)</span> maps the
+data into a higher-dimensional space <span
+class="math inline">\(\mathcal{H}\)</span>, where linear operations can
+capture non-linear relationships. Common kernel functions include the
+Gaussian (RBF) kernel:</p>
+<p><span class="math display">\[k(x_i, x_j) = \exp\left(-\frac{\|x_i -
+x_j\|^2}{2\sigma^2}\right)\]</span></p>
+<p>where <span class="math inline">\(\sigma\)</span> is a parameter that
+controls the width of the kernel.</p>
+<h1 id="the-affinity-propagation-algorithm">The Affinity Propagation
+Algorithm</h1>
+<p>Affinity Propagation is an iterative algorithm that identifies
+exemplars and forms clusters around them. The key steps involve
+computing responsibility and availability matrices.</p>
+<p>Let <span class="math inline">\(r(i, k)\)</span> denote the
+responsibility that data point <span class="math inline">\(x_i\)</span>
+takes for choosing <span class="math inline">\(x_k\)</span> as its
+exemplar, and <span class="math inline">\(a(i, k)\)</span> denote the
+availability that <span class="math inline">\(x_k\)</span> sends to
+<span class="math inline">\(x_i\)</span> indicating how appropriate it
+would be for <span class="math inline">\(x_i\)</span> to choose <span
+class="math inline">\(x_k\)</span> as its exemplar.</p>
+<p>The responsibility and availability are updated iteratively using the
+following equations:</p>
+<p><span class="math display">\[r(i, k) \leftarrow s(i, k) -
+\max_{k&#39; \neq k} \{a(i, k&#39;) + s(i, k&#39;)\}\]</span></p>
+<p><span class="math display">\[a(i, k) \leftarrow \min\left\{0, r(k, k)
++ \sum_{i&#39; \notin \{i, k\}} \max\{0, r(i&#39;,
+k)\}\right\}\]</span></p>
+<p>where <span class="math inline">\(s(i, k)\)</span> is the similarity
+between <span class="math inline">\(x_i\)</span> and <span
+class="math inline">\(x_k\)</span>.</p>
+<h1 id="kernelized-affinity-propagation">Kernelized Affinity
+Propagation</h1>
+<p>In Kernelized Affinity Propagation, the similarity matrix <span
+class="math inline">\(S\)</span> is computed using a kernel function.
+The algorithm proceeds as follows:</p>
+<p>1. **Initialization**: Compute the similarity matrix <span
+class="math inline">\(S\)</span> using the kernel function <span
+class="math inline">\(k\)</span>.</p>
+<p>2. **Responsibility Update**: For each data point <span
+class="math inline">\(x_i\)</span> and potential exemplar <span
+class="math inline">\(x_k\)</span>, update the responsibility <span
+class="math inline">\(r(i, k)\)</span>.</p>
+<p>3. **Availability Update**: For each data point <span
+class="math inline">\(x_i\)</span> and potential exemplar <span
+class="math inline">\(x_k\)</span>, update the availability <span
+class="math inline">\(a(i, k)\)</span>.</p>
+<p>4. **Exemplar Identification**: Identify exemplars as data points
+with positive self-responsibility <span class="math inline">\(r(k,
+k)\)</span>.</p>
+<p>5. **Cluster Formation**: Form clusters by assigning each data point
+to the exemplar with the highest sum of responsibility and
+availability.</p>
+<p>6. **Termination**: Repeat steps 2-5 until convergence, i.e., until
+the exemplars and cluster assignments no longer change.</p>
+<h1 id="theorems">Theorems</h1>
+<p>We now present some theoretical results related to Kernelized
+Affinity Propagation.</p>
+<div class="theorem">
+<p>Let <span class="math inline">\(R\)</span> and <span
+class="math inline">\(A\)</span> denote the responsibility and
+availability matrices, respectively. The KAP algorithm converges if the
+following condition holds:</p>
+<p><span class="math display">\[\exists N \in \mathbb{N} \text{ such
+that } R^{(N)} = R^{(N+1)} \text{ and } A^{(N)} = A^{(N+1)}\]</span></p>
+<p>where <span class="math inline">\(R^{(n)}\)</span> and <span
+class="math inline">\(A^{(n)}\)</span> denote the matrices at iteration
+<span class="math inline">\(n\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The convergence of KAP can be shown by analyzing the
+updates to the responsibility and availability matrices. The algorithm
+is guaranteed to converge if the updates lead to a fixed point where the
+matrices no longer change.</p>
+<p>To see this, consider the update rules for <span
+class="math inline">\(r(i, k)\)</span> and <span
+class="math inline">\(a(i, k)\)</span>. The responsibility update rule
+ensures that each data point chooses the exemplar with the highest
+combined similarity and availability. The availability update rule
+ensures that each potential exemplar sends back a signal indicating its
+suitability as an exemplar.</p>
+<p>Since the number of possible exemplars is finite, the algorithm must
+converge to a stable configuration where no further updates are
+possible. This stability corresponds to the fixed point condition stated
+in the theorem. ◻</p>
+</div>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<p>We now list some important properties and corollaries of Kernelized
+Affinity Propagation.</p>
+<div class="corollary">
+<p>The exemplars identified by KAP are unique if the similarity matrix
+<span class="math inline">\(S\)</span> is strictly positive
+definite.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> If the similarity matrix <span
+class="math inline">\(S\)</span> is strictly positive definite, then the
+kernel function <span class="math inline">\(k\)</span> induces a unique
+mapping into the higher-dimensional space <span
+class="math inline">\(\mathcal{H}\)</span>. This uniqueness ensures that
+each data point has a unique exemplar, as the similarity between data
+points is uniquely determined by the kernel function. ◻</p>
+</div>
+<div class="corollary">
+<p>KAP is robust to noise in the data if the kernel function <span
+class="math inline">\(k\)</span> is chosen appropriately.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The choice of kernel function plays a crucial role in
+the robustness of KAP. For example, the Gaussian (RBF) kernel is known
+to be robust to noise because it smooths out small variations in the
+data. By selecting an appropriate kernel function, KAP can effectively
+cluster data even in the presence of noise. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Kernelized Affinity Propagation is a powerful clustering algorithm
+that leverages kernel methods to handle non-linear data structures. By
+incorporating kernel functions, KAP extends the capabilities of
+traditional Affinity Propagation and provides a robust framework for
+uncovering the underlying structure of complex data.</p>
+<p>The theoretical results presented in this article highlight the
+convergence properties and robustness of KAP, making it a valuable tool
+for various applications in data analysis and machine learning.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

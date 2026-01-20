@@ -1,0 +1,367 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Entropie de Shannon Continue</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Entropie de Shannon Continue</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’entropie de Shannon continue, introduite par Claude Shannon en 1948
+dans son célèbre article <em>A Mathematical Theory of
+Communication</em>, est une mesure fondamentale de l’incertitude ou de
+l’information contenue dans une variable aléatoire continue. Cette
+notion est essentielle en théorie de l’information, où elle permet de
+quantifier la quantité d’information produite par une source continue.
+L’entropie de Shannon continue généralise l’entropie discrète à des
+variables aléatoires prenant leurs valeurs dans un ensemble continu,
+comme par exemple la position ou la vitesse d’une particule en
+physique.</p>
+<p>L’importance de l’entropie de Shannon continue réside dans sa
+capacité à fournir une mesure de la complexité ou de l’incertitude d’une
+distribution de probabilité continue. Elle est également utilisée dans
+divers domaines tels que le traitement du signal, la compression de
+données et les communications numériques. Dans cet article, nous
+explorerons en détail cette notion, ses définitions, ses propriétés et
+ses applications.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir l’entropie de Shannon continue, nous devons d’abord
+comprendre ce que nous cherchons à mesurer. Imaginons une variable
+aléatoire continue <span class="math inline">\(X\)</span> avec une
+densité de probabilité <span class="math inline">\(f(x)\)</span>. Nous
+voulons quantifier l’incertitude associée à cette variable, c’est-à-dire
+la quantité d’information nécessaire pour spécifier sa valeur avec
+précision.</p>
+<p>L’entropie de Shannon continue est définie comme la mesure de
+l’incertitude moyenne d’une variable aléatoire continue. Elle est donnée
+par l’intégrale suivante :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+continue avec une densité de probabilité <span
+class="math inline">\(f(x)\)</span>. L’entropie de Shannon continue
+<span class="math inline">\(H(X)\)</span> est définie par :</p>
+<p><span class="math display">\[H(X) = -\int_{-\infty}^{\infty} f(x)
+\log(f(x)) \, dx\]</span></p>
+<p>où <span class="math inline">\(\log\)</span> désigne le logarithme
+naturel.</p>
+</div>
+<p>Cette définition peut être reformulée de plusieurs manières. Par
+exemple, si <span class="math inline">\(X\)</span> prend ses valeurs
+dans un intervalle borné <span class="math inline">\([a, b]\)</span>,
+l’entropie peut être écrite comme :</p>
+<p><span class="math display">\[H(X) = -\int_{a}^{b} f(x) \log(f(x)) \,
+dx\]</span></p>
+<p>Dans le cas où <span class="math inline">\(X\)</span> est une
+variable aléatoire continue à densité, l’entropie peut également être
+exprimée en utilisant la fonction de distribution cumulative <span
+class="math inline">\(F(x)\)</span>. Cependant, cette formulation est
+moins courante et plus complexe.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’entropie de Shannon continue est le
+théorème de l’entropie maximale. Ce théorème stipule que, parmi toutes
+les distributions de probabilité continues avec une variance donnée, la
+distribution qui maximise l’entropie est la distribution gaussienne.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+continue avec une variance fixe <span
+class="math inline">\(\sigma^2\)</span>. Alors, la distribution qui
+maximise l’entropie de Shannon continue <span
+class="math inline">\(H(X)\)</span> est la distribution normale de
+moyenne <span class="math inline">\(\mu\)</span> et de variance <span
+class="math inline">\(\sigma^2\)</span>.</p>
+</div>
+<p>La démonstration de ce théorème repose sur des techniques
+d’optimisation et utilise le principe du multiplicateur de Lagrange pour
+trouver la distribution qui maximise l’entropie sous la contrainte de
+variance fixée.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de l’entropie maximale, nous devons
+d’abord exprimer l’entropie en fonction des moments de la distribution.
+Nous utilisons ensuite le principe du multiplicateur de Lagrange pour
+maximiser l’entropie sous la contrainte de variance fixée.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(X\)</span> une
+variable aléatoire continue avec une densité de probabilité <span
+class="math inline">\(f(x)\)</span>. L’entropie de Shannon continue est
+donnée par :</p>
+<p><span class="math display">\[H(X) = -\int_{-\infty}^{\infty} f(x)
+\log(f(x)) \, dx\]</span></p>
+<p>Nous voulons maximiser <span class="math inline">\(H(X)\)</span> sous
+la contrainte que la variance de <span class="math inline">\(X\)</span>
+est fixée à <span class="math inline">\(\sigma^2\)</span>. La contrainte
+peut être écrite comme :</p>
+<p><span class="math display">\[\int_{-\infty}^{\infty} (x - \mu)^2 f(x)
+\, dx = \sigma^2\]</span></p>
+<p>où <span class="math inline">\(\mu\)</span> est la moyenne de <span
+class="math inline">\(X\)</span>. Pour maximiser l’entropie sous cette
+contrainte, nous utilisons le principe du multiplicateur de Lagrange. Le
+lagrangien est donné par :</p>
+<p><span class="math display">\[\mathcal{L}(f, \lambda) =
+-\int_{-\infty}^{\infty} f(x) \log(f(x)) \, dx - \lambda \left(
+\int_{-\infty}^{\infty} (x - \mu)^2 f(x) \, dx - \sigma^2
+\right)\]</span></p>
+<p>où <span class="math inline">\(\lambda\)</span> est le multiplicateur
+de Lagrange. Pour trouver la distribution qui maximise l’entropie, nous
+devons résoudre les équations d’Euler-Lagrange. En prenant la dérivée
+fonctionnelle de <span class="math inline">\(\mathcal{L}\)</span> par
+rapport à <span class="math inline">\(f(x)\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\frac{\delta \mathcal{L}}{\delta f(x)} =
+-\log(f(x)) - 1 - \lambda (x - \mu)^2 = 0\]</span></p>
+<p>En résolvant cette équation, nous trouvons que la densité de
+probabilité <span class="math inline">\(f(x)\)</span> est donnée par
+:</p>
+<p><span class="math display">\[f(x) = \exp\left( -1 - \lambda (x -
+\mu)^2 \right)\]</span></p>
+<p>Pour déterminer la valeur de <span
+class="math inline">\(\lambda\)</span>, nous utilisons la contrainte de
+variance. En substituant <span class="math inline">\(f(x)\)</span> dans
+l’expression de la variance, nous obtenons :</p>
+<p><span class="math display">\[\int_{-\infty}^{\infty} (x - \mu)^2
+\exp\left( -1 - \lambda (x - \mu)^2 \right) \, dx =
+\sigma^2\]</span></p>
+<p>Cette intégrale peut être évaluée en utilisant les fonctions gamma,
+et nous trouvons que :</p>
+<p><span class="math display">\[\lambda =
+\frac{1}{2\sigma^2}\]</span></p>
+<p>Ainsi, la densité de probabilité qui maximise l’entropie sous la
+contrainte de variance fixée est la distribution normale :</p>
+<p><span class="math display">\[f(x) = \frac{1}{\sqrt{2\pi\sigma^2}}
+\exp\left( -\frac{(x - \mu)^2}{2\sigma^2} \right)\]</span></p>
+<p>Ceci conclut la démonstration du théorème de l’entropie
+maximale. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’entropie de Shannon continue possède plusieurs propriétés
+importantes. Nous en énumérons quelques-unes ci-dessous :</p>
+<ol>
+<li><p>L’entropie de Shannon continue est toujours non négative,
+c’est-à-dire <span class="math inline">\(H(X) \geq 0\)</span>. Cette
+propriété découle du fait que le logarithme d’une probabilité est
+toujours négatif ou nul.</p></li>
+<li><p>L’entropie de Shannon continue atteint son maximum lorsque la
+densité de probabilité est uniforme sur un intervalle borné. Cela
+signifie que, pour une distribution uniforme, l’incertitude est
+maximisée.</p></li>
+<li><p>L’entropie de Shannon continue est invariante par translation.
+Cela signifie que si nous décalons la variable aléatoire <span
+class="math inline">\(X\)</span> d’une constante <span
+class="math inline">\(c\)</span>, l’entropie reste inchangée.
+Mathématiquement, cela s’exprime par :</p>
+<p><span class="math display">\[H(X + c) = H(X)\]</span></p></li>
+<li><p>L’entropie de Shannon continue est également invariante par
+changement d’échelle. Si nous multiplions la variable aléatoire <span
+class="math inline">\(X\)</span> par une constante positive <span
+class="math inline">\(a\)</span>, l’entropie reste inchangée.
+Mathématiquement, cela s’exprime par :</p>
+<p><span class="math display">\[H(aX) = H(X) + \log(a)\]</span></p>
+<p>Cette propriété est particulièrement utile dans le traitement du
+signal, où les changements d’échelle sont courants.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’entropie de Shannon continue est une notion fondamentale en théorie
+de l’information, permettant de quantifier l’incertitude ou
+l’information contenue dans une variable aléatoire continue. Nous avons
+exploré ses définitions, ses théorèmes associés et ses propriétés.
+L’entropie de Shannon continue trouve des applications dans divers
+domaines, notamment le traitement du signal, la compression de données
+et les communications numériques. Sa compréhension est essentielle pour
+toute personne travaillant dans ces domaines ou s’intéressant à la
+théorie de l’information.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

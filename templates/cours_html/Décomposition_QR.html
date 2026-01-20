@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Décomposition QR : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Décomposition QR : Fondements et Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La décomposition QR est une technique fondamentale en algèbre
+linéaire numérique, permettant de factoriser une matrice en un produit
+d’une matrice orthogonale et d’une matrice triangulaire supérieure.
+Cette décomposition trouve ses racines dans les travaux de Householder,
+Givens et Gram-Schmidt au milieu du XXe siècle. Son importance réside
+dans sa capacité à résoudre des systèmes linéaires, calculer des valeurs
+propres et effectuer des régressions linéaires de manière stable et
+efficace.</p>
+<p>La nécessité d’une telle décomposition émerge lorsque l’on cherche à
+éviter les instabilités numériques inhérentes aux méthodes directes
+comme la factorisation LU. En effet, les matrices orthogonales
+préservent les normes des vecteurs, ce qui garantit une meilleure
+stabilité numérique. De plus, la décomposition QR est particulièrement
+utile dans les problèmes de moindres carrés, où elle permet de
+transformer un problème mal conditionné en un système triangulaire bien
+conditionné.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la décomposition QR, commençons par définir les
+concepts clés. Supposons que nous ayons une matrice <span
+class="math inline">\(A \in \mathbb{R}^{m \times n}\)</span> avec <span
+class="math inline">\(m \geq n\)</span>. Nous cherchons à exprimer <span
+class="math inline">\(A\)</span> comme le produit d’une matrice
+orthogonale <span class="math inline">\(Q \in \mathbb{R}^{m \times
+m}\)</span> et d’une matrice triangulaire supérieure <span
+class="math inline">\(R \in \mathbb{R}^{m \times n}\)</span>.</p>
+<div class="definition">
+<p>Une matrice <span class="math inline">\(Q \in \mathbb{R}^{m \times
+m}\)</span> est dite orthogonale si elle satisfait la condition: <span
+class="math display">\[Q^T Q = I_m\]</span> où <span
+class="math inline">\(Q^T\)</span> désigne la transposée de <span
+class="math inline">\(Q\)</span> et <span
+class="math inline">\(I_m\)</span> l’identité de taille <span
+class="math inline">\(m \times m\)</span>. En d’autres termes, les
+colonnes de <span class="math inline">\(Q\)</span> forment une base
+orthonormée de <span class="math inline">\(\mathbb{R}^m\)</span>.</p>
+</div>
+<div class="definition">
+<p>Une matrice <span class="math inline">\(R \in \mathbb{R}^{m \times
+n}\)</span> est dite triangulaire supérieure si tous ses éléments situés
+strictement en dessous de la diagonale principale sont nuls.
+Formellement, cela signifie que pour tout <span class="math inline">\(i
+&gt; j\)</span>, on a: <span class="math display">\[R_{ij} =
+0\]</span></p>
+</div>
+<p>La décomposition QR de <span class="math inline">\(A\)</span> est
+alors définie par: <span class="math display">\[A = Q R\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Le théorème central de cette section est le suivant:</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A \in \mathbb{R}^{m \times
+n}\)</span> avec <span class="math inline">\(m \geq n\)</span>. Il
+existe une matrice orthogonale <span class="math inline">\(Q \in
+\mathbb{R}^{m \times m}\)</span> et une matrice triangulaire supérieure
+<span class="math inline">\(R \in \mathbb{R}^{m \times n}\)</span>
+telles que: <span class="math display">\[A = Q R\]</span></p>
+</div>
+<p>Pour démontrer ce théorème, nous utilisons l’algorithme de
+Gram-Schmidt, qui permet d’orthonormaliser les colonnes de <span
+class="math inline">\(A\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<div class="proof">
+<p><em>Proof.</em> Considérons les colonnes de <span
+class="math inline">\(A\)</span>, notées <span
+class="math inline">\(a_1, a_2, \ldots, a_n\)</span>. L’algorithme de
+Gram-Schmidt consiste à construire une base orthonormée <span
+class="math inline">\(q_1, q_2, \ldots, q_n\)</span> à partir de ces
+colonnes. Pour chaque <span class="math inline">\(k\)</span> de 1 à
+<span class="math inline">\(n\)</span>, nous définissons: <span
+class="math display">\[q_k = a_k - \sum_{i=1}^{k-1}
+\text{proj}_{q_i}(a_k)\]</span> où <span
+class="math inline">\(\text{proj}_{q_i}(a_k)\)</span> désigne la
+projection de <span class="math inline">\(a_k\)</span> sur <span
+class="math inline">\(q_i\)</span>. En normalisant <span
+class="math inline">\(q_k\)</span>, nous obtenons une base
+orthonormée.</p>
+<p>La matrice <span class="math inline">\(Q\)</span> est alors
+construite en ajoutant des vecteurs orthonormés supplémentaires pour
+compléter la base de <span class="math inline">\(\mathbb{R}^m\)</span>.
+La matrice <span class="math inline">\(R\)</span> est définie par: <span
+class="math display">\[R_{ij} = q_i^T a_j\]</span> pour <span
+class="math inline">\(i \leq j\)</span> et <span
+class="math inline">\(R_{ij} = 0\)</span> sinon. Il est facile de
+vérifier que: <span class="math display">\[Q R = A\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La décomposition QR possède plusieurs propriétés importantes:</p>
+<ol>
+<li><p>**Stabilité Numérique**: La décomposition QR est numériquement
+stable, ce qui signifie que les erreurs d’arrondi sont contrôlées et ne
+se propagent pas de manière significative.</p></li>
+<li><p>**Résolution des Systèmes Linéaires**: La décomposition QR permet
+de résoudre les systèmes linéaires <span class="math inline">\(A x =
+b\)</span> en transformant le problème en un système triangulaire, qui
+est plus facile à résoudre.</p></li>
+<li><p>**Problèmes de Moindres Carrés**: Dans le cadre des problèmes de
+moindres carrés, la décomposition QR permet de trouver une solution
+optimale en minimisant la norme des résidus.</p></li>
+</ol>
+<div class="corollary">
+<p>Soit <span class="math inline">\(A \in \mathbb{R}^{m \times
+n}\)</span> avec <span class="math inline">\(m \geq n\)</span> et <span
+class="math inline">\(\text{rank}(A) = n\)</span>. Soit <span
+class="math inline">\(Q R\)</span> la décomposition QR de <span
+class="math inline">\(A\)</span>. Pour tout vecteur <span
+class="math inline">\(b \in \mathbb{R}^m\)</span>, le système linéaire
+<span class="math inline">\(A x = b\)</span> peut être résolu en deux
+étapes:</p>
+<ol>
+<li><p>Résoudre <span class="math inline">\(Q^T b = y\)</span></p></li>
+<li><p>Résoudre <span class="math inline">\(R x = y\)</span></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Puisque <span class="math inline">\(Q\)</span> est
+orthogonale, on a: <span class="math display">\[A x = b \iff Q R x = b
+\iff R x = Q^T b\]</span> La première étape consiste à résoudre <span
+class="math inline">\(Q^T b = y\)</span>, ce qui est trivial car <span
+class="math inline">\(Q^T\)</span> est orthogonale. La deuxième étape
+consiste à résoudre le système triangulaire <span
+class="math inline">\(R x = y\)</span>, ce qui peut être fait par
+substitution arrière. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La décomposition QR est un outil puissant et polyvalent en algèbre
+linéaire numérique. Ses applications vont de la résolution des systèmes
+linéaires à l’analyse des valeurs propres, en passant par les problèmes
+de moindres carrés. Sa stabilité numérique et son efficacité en font une
+technique incontournable dans de nombreux domaines scientifiques et
+ingénierie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

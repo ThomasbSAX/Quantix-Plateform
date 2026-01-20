@@ -1,0 +1,319 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Dérivées directionnelles : Une exploration approfondie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Dérivées directionnelles : Une exploration
+approfondie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les dérivées directionnelles constituent un outil fondamental en
+analyse vectorielle, permettant d’étendre la notion classique de dérivée
+à des directions arbitraires dans l’espace. Cette généralisation s’avère
+indispensable dans de nombreux domaines, notamment en physique pour
+modéliser des flux ou des gradients, en économie pour analyser des
+variations multidirectionnelles, et en informatique graphique pour
+simuler des effets de lumière. L’émergence de ce concept répond à un
+besoin crucial : comprendre comment une fonction varie non seulement le
+long d’un axe donné, mais dans toutes les directions possibles de
+l’espace.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la dérivée directionnelle, commençons par comprendre
+ce que nous cherchons à mesurer. Imaginons une fonction <span
+class="math inline">\(f : \mathbb{R}^n \rightarrow \mathbb{R}\)</span>
+et un point <span class="math inline">\(\mathbf{a} \in
+\mathbb{R}^n\)</span>. Nous voulons quantifier la variation de <span
+class="math inline">\(f\)</span> au point <span
+class="math inline">\(\mathbf{a}\)</span> dans une direction donnée par
+un vecteur unitaire <span class="math inline">\(\mathbf{u}\)</span>.</p>
+<p>Formellement, la dérivée directionnelle de <span
+class="math inline">\(f\)</span> au point <span
+class="math inline">\(\mathbf{a}\)</span> dans la direction <span
+class="math inline">\(\mathbf{u}\)</span> est définie comme :</p>
+<p><span class="math display">\[D_{\mathbf{u}} f(\mathbf{a}) = \lim_{h
+\to 0} \frac{f(\mathbf{a} + h\mathbf{u}) -
+f(\mathbf{a})}{h}\]</span></p>
+<p>Cette limite, si elle existe, mesure la vitesse de variation de <span
+class="math inline">\(f\)</span> en <span
+class="math inline">\(\mathbf{a}\)</span> lorsque l’on se déplace dans
+la direction de <span class="math inline">\(\mathbf{u}\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un résultat fondamental lie la dérivée directionnelle aux dérivées
+partielles de <span class="math inline">\(f\)</span>. Supposons que
+<span class="math inline">\(f\)</span> soit différentiable en <span
+class="math inline">\(\mathbf{a}\)</span>, et notons <span
+class="math inline">\(\nabla f(\mathbf{a})\)</span> le gradient de <span
+class="math inline">\(f\)</span> en <span
+class="math inline">\(\mathbf{a}\)</span>. Alors, la dérivée
+directionnelle peut être exprimée comme le produit scalaire du gradient
+avec le vecteur unitaire <span
+class="math inline">\(\mathbf{u}\)</span>.</p>
+<p>Pour comprendre ce théorème, considérons que le gradient <span
+class="math inline">\(\nabla f(\mathbf{a})\)</span> pointe dans la
+direction de la plus forte augmentation de <span
+class="math inline">\(f\)</span>. La dérivée directionnelle <span
+class="math inline">\(D_{\mathbf{u}} f(\mathbf{a})\)</span> est donc la
+projection de cette direction de plus forte augmentation sur <span
+class="math inline">\(\mathbf{u}\)</span>.</p>
+<p>Formellement, nous avons :</p>
+<p><span class="math display">\[D_{\mathbf{u}} f(\mathbf{a}) = \nabla
+f(\mathbf{a}) \cdot \mathbf{u}\]</span></p>
+<p>où <span class="math inline">\(\cdot\)</span> désigne le produit
+scalaire.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer ce théorème, nous utilisons la différentiabilité de
+<span class="math inline">\(f\)</span> en <span
+class="math inline">\(\mathbf{a}\)</span>. Par définition, il existe une
+application linéaire <span class="math inline">\(L : \mathbb{R}^n
+\rightarrow \mathbb{R}\)</span> telle que :</p>
+<p><span class="math display">\[f(\mathbf{a} + \mathbf{h}) =
+f(\mathbf{a}) + L(\mathbf{h}) + o(\|\mathbf{h}\|)\]</span></p>
+<p>où <span class="math inline">\(o\)</span> est une fonction qui tend
+vers zéro plus vite que <span
+class="math inline">\(\|\mathbf{h}\|\)</span>.</p>
+<p>En prenant <span class="math inline">\(\mathbf{h} =
+h\mathbf{u}\)</span> et en divisant par <span
+class="math inline">\(h\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\frac{f(\mathbf{a} + h\mathbf{u}) -
+f(\mathbf{a})}{h} = L(\mathbf{u}) + o(h)\]</span></p>
+<p>En faisant tendre <span class="math inline">\(h\)</span> vers zéro,
+nous retrouvons la définition de la dérivée directionnelle :</p>
+<p><span class="math display">\[D_{\mathbf{u}} f(\mathbf{a}) =
+L(\mathbf{u})\]</span></p>
+<p>Or, par le théorème de la différentielle totale, <span
+class="math inline">\(L\)</span> est précisément le gradient <span
+class="math inline">\(\nabla f(\mathbf{a})\)</span>. Ainsi :</p>
+<p><span class="math display">\[D_{\mathbf{u}} f(\mathbf{a}) = \nabla
+f(\mathbf{a}) \cdot \mathbf{u}\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les dérivées directionnelles possèdent plusieurs propriétés
+intéressantes, que nous énumérons et démontrons ci-dessous.</p>
+<ol>
+<li><p><strong>Homogénéité</strong> : Pour tout scalaire <span
+class="math inline">\(\lambda \in \mathbb{R}\)</span>, nous avons :</p>
+<p><span class="math display">\[D_{\mathbf{u}} (\lambda f)(\mathbf{a}) =
+\lambda D_{\mathbf{u}} f(\mathbf{a})\]</span></p>
+<p>Cette propriété découle directement de la linéarité du
+gradient.</p></li>
+<li><p><strong>Additivité</strong> : Pour deux fonctions <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(g\)</span>, nous avons :</p>
+<p><span class="math display">\[D_{\mathbf{u}} (f + g)(\mathbf{a}) =
+D_{\mathbf{u}} f(\mathbf{a}) + D_{\mathbf{u}} g(\mathbf{a})\]</span></p>
+<p>Cette propriété résulte de l’additivité du gradient.</p></li>
+<li><p><strong>Inégalité de Lipschitz</strong> : Si <span
+class="math inline">\(f\)</span> est différentiable et <span
+class="math inline">\(\|\nabla f(\mathbf{a})\| \leq M\)</span>, alors
+pour tout vecteur unitaire <span
+class="math inline">\(\mathbf{u}\)</span>, nous avons :</p>
+<p><span class="math display">\[|D_{\mathbf{u}} f(\mathbf{a})| \leq
+M\]</span></p>
+<p>Cette inégalité est une conséquence directe de la définition du
+produit scalaire.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les dérivées directionnelles enrichissent considérablement notre
+compréhension des variations des fonctions multivariées. Elles
+permettent d’analyser les changements dans des directions spécifiques,
+offrant ainsi des outils puissants pour résoudre des problèmes complexes
+en analyse vectorielle. Leur lien avec le gradient met en lumière
+l’importance de cette notion centrale en mathématiques appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

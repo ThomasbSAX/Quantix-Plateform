@@ -1,0 +1,443 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>LightGBM : Gradient Boosting Framework Optimisé</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">LightGBM : Gradient Boosting Framework Optimisé</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’apprentissage automatique a connu une croissance exponentielle ces
+dernières décennies, avec des applications dans des domaines aussi
+variés que la finance, la médecine ou l’industrie. Parmi les nombreuses
+techniques disponibles, le gradient boosting est devenu une méthode
+incontournable pour la résolution de problèmes de classification et de
+régression. LightGBM, développé par Microsoft, est une implémentation
+optimisée de cette méthode, offrant des performances exceptionnelles en
+termes de vitesse et d’efficacité.</p>
+<p>LightGBM émerge comme une réponse aux limitations des algorithmes
+traditionnels de gradient boosting, tels que XGBoost ou AdaBoost. Il
+introduit plusieurs innovations majeures, notamment l’utilisation de
+l’algorithme Tree Learner basé sur les arbres de décision et une
+approche optimisée pour le traitement des données massives. Ces
+améliorations permettent non seulement d’accélérer le processus
+d’apprentissage, mais aussi de réduire la consommation de mémoire,
+rendant LightGBM particulièrement adapté aux environnements industriels
+où les données sont souvent volumineuses et complexes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails techniques, il est essentiel de
+comprendre les concepts fondamentaux sur lesquels repose LightGBM. Nous
+commencerons par définir les notions clés de gradient boosting et
+d’arbres de décision, puis nous introduirons les spécificités de
+LightGBM.</p>
+<h2 class="unnumbered" id="gradient-boosting">Gradient Boosting</h2>
+<p>Le gradient boosting est une technique d’apprentissage ensembliste
+qui combine plusieurs modèles faibles pour former un modèle fort. L’idée
+sous-jacente est d’ajouter séquentiellement des modèles pour corriger
+les erreurs commises par les modèles précédents. Formellement, donnons
+une définition du gradient boosting.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{D} = \{(x_i,
+y_i)\}_{i=1}^n\)</span> un ensemble de données d’apprentissage, où <span
+class="math inline">\(x_i \in \mathbb{R}^d\)</span> et <span
+class="math inline">\(y_i \in \mathbb{R}\)</span>. Le gradient boosting
+cherche à minimiser une fonction de perte <span
+class="math inline">\(\ell(y, F(x))\)</span> en construisant un ensemble
+d’arbres de décision <span class="math inline">\(h_t(x)\)</span> de
+manière itérative.</p>
+<p>L’algorithme peut être formalisé comme suit :</p>
+<ol>
+<li><p>Initialiser le modèle <span class="math inline">\(F_0(x) =
+\arg\min_F \sum_{i=1}^n \ell(y_i, F(x_i))\)</span>.</p></li>
+<li><p>Pour <span class="math inline">\(t = 1\)</span> à <span
+class="math inline">\(T\)</span> :</p>
+<ul>
+<li><p>Calculer les résidus (gradients) <span
+class="math inline">\(g_{it} = -\left[\frac{\partial \ell(y_i,
+F(x_i))}{\partial F(x_i)}\right]_{F(x)=F_{t-1}(x)}\)</span>.</p></li>
+<li><p>Ajuster un arbre de décision <span
+class="math inline">\(h_t(x)\)</span> aux résidus <span
+class="math inline">\(g_{it}\)</span>.</p></li>
+<li><p>Mettre à jour le modèle <span class="math inline">\(F_t(x) =
+F_{t-1}(x) + \nu h_t(x)\)</span>, où <span
+class="math inline">\(\nu\)</span> est un taux d’apprentissage.</p></li>
+</ul></li>
+</ol>
+<p>où <span class="math inline">\(T\)</span> est le nombre total
+d’arbres, et <span class="math inline">\(\nu\)</span> est un
+hyperparamètre contrôlant la contribution de chaque arbre.</p>
+</div>
+<h2 class="unnumbered" id="arbres-de-décision">Arbres de Décision</h2>
+<p>Les arbres de décision sont des modèles prédictifs qui utilisent une
+structure arborescente pour prendre des décisions basées sur les
+caractéristiques des données. Chaque nœud interne représente une
+condition sur une caractéristique, et chaque feuille représente une
+prédiction.</p>
+<div class="definition">
+<p>Un arbre de décision est un modèle <span
+class="math inline">\(h(x)\)</span> défini par une structure
+hiérarchique de nœuds, où chaque nœud interne <span
+class="math inline">\(j\)</span> est associé à une condition <span
+class="math inline">\(c_j(x)\)</span> et chaque feuille <span
+class="math inline">\(l\)</span> est associée à une valeur prédite <span
+class="math inline">\(\hat{y}_l\)</span>.</p>
+<p>Formellement, un arbre de décision peut être représenté comme : <span
+class="math display">\[h(x) = \sum_{l=1}^L \hat{y}_l \mathbb{I}(x \in
+R_l)\]</span> où <span class="math inline">\(R_l\)</span> est la région
+définie par les nœuds internes menant à la feuille <span
+class="math inline">\(l\)</span>, et <span
+class="math inline">\(\mathbb{I}\)</span> est l’indicatrice de
+l’ensemble <span class="math inline">\(R_l\)</span>.</p>
+</div>
+<h2 class="unnumbered" id="lightgbm">LightGBM</h2>
+<p>LightGBM est une implémentation optimisée du gradient boosting qui
+introduit plusieurs innovations pour améliorer les performances et
+l’efficacité.</p>
+<div class="definition">
+<p>LightGBM est un framework de gradient boosting qui utilise une
+approche basée sur les arbres de décision et plusieurs optimisations
+pour accélérer le processus d’apprentissage.</p>
+<p>Les principales caractéristiques de LightGBM sont :</p>
+<ul>
+<li><p>Utilisation de l’algorithme Tree Learner basé sur les arbres de
+décision.</p></li>
+<li><p>Optimisation des données par le biais du histogramme pour réduire
+la complexité computationnelle.</p></li>
+<li><p>Prise en charge des données manquantes et des
+catégories.</p></li>
+</ul>
+<p>Formellement, LightGBM peut être vu comme une variante du gradient
+boosting où les arbres de décision sont construits en utilisant des
+histogrammes pour approximer les distributions des caractéristiques.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes-et-propriétés">Théorèmes et
+Propriétés</h1>
+<p>Dans cette section, nous présenterons quelques théorèmes et
+propriétés clés liés à LightGBM. Nous commencerons par le théorème de
+convergence du gradient boosting, puis nous discuterons des propriétés
+spécifiques à LightGBM.</p>
+<h2 class="unnumbered"
+id="théorème-de-convergence-du-gradient-boosting">Théorème de
+Convergence du Gradient Boosting</h2>
+<p>Le gradient boosting est garanti de converger vers un minimum local
+de la fonction de perte sous certaines conditions. Ce théorème est
+crucial pour comprendre pourquoi le gradient boosting est une méthode
+efficace.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\ell(y, F(x))\)</span> une fonction
+de perte convexe et différentiable. Supposons que les arbres de décision
+<span class="math inline">\(h_t(x)\)</span> sont ajustés aux résidus
+<span class="math inline">\(g_{it}\)</span> en minimisant une fonction
+de coût <span class="math inline">\(\sum_{i=1}^n (g_{it} -
+h_t(x_i))^2\)</span>.</p>
+<p>Alors, sous certaines conditions régulières, le modèle <span
+class="math inline">\(F_T(x) = F_0(x) + \nu \sum_{t=1}^T h_t(x)\)</span>
+converge vers un minimum local de <span
+class="math inline">\(\sum_{i=1}^n \ell(y_i, F(x_i))\)</span> lorsque
+<span class="math inline">\(T \to \infty\)</span>.</p>
+</div>
+<h2 class="unnumbered" id="propriétés-de-lightgbm">Propriétés de
+LightGBM</h2>
+<p>LightGBM possède plusieurs propriétés qui le distinguent des autres
+implémentations de gradient boosting. Nous en discuterons quelques-unes
+ci-dessous.</p>
+<div class="proposition">
+<p>LightGBM utilise des histogrammes pour approximer les distributions
+des caractéristiques, ce qui permet de réduire la complexité
+computationnelle.</p>
+<p>Formellement, pour une caractéristique <span
+class="math inline">\(x_j\)</span>, LightGBM construit un histogramme
+<span class="math inline">\(H_j\)</span> en divisant la plage de valeurs
+de <span class="math inline">\(x_j\)</span> en <span
+class="math inline">\(B\)</span> bins. Ensuite, pour chaque bin <span
+class="math inline">\(b\)</span>, LightGBM calcule la somme des
+gradients et des hessiens des échantillons appartenant à ce bin.</p>
+<p>Cette approche permet de réduire le nombre d’opérations nécessaires
+pour construire les arbres de décision.</p>
+</div>
+<div class="corollaire">
+<p>LightGBM prend en charge les données manquantes de manière native. Il
+traite les valeurs manquantes comme une catégorie distincte lors de la
+construction des histogrammes.</p>
+<p>Formellement, pour une caractéristique <span
+class="math inline">\(x_j\)</span> avec des valeurs manquantes, LightGBM
+ajoute un bin supplémentaire dans l’histogramme <span
+class="math inline">\(H_j\)</span> pour les valeurs manquantes. Ensuite,
+il utilise ce bin pour déterminer la meilleure division lors de la
+construction des arbres de décision.</p>
+</div>
+<h1 class="unnumbered" id="preuves-et-démonstrations">Preuves et
+Démonstrations</h1>
+<p>Dans cette section, nous fournirons des preuves détaillées pour les
+théorèmes et propositions présentés précédemment.</p>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-convergence-du-gradient-boosting">Preuve du
+Théorème de Convergence du Gradient Boosting</h2>
+<p>Pour prouver la convergence du gradient boosting, nous utiliserons
+des outils de l’optimisation convexe. Nous commencerons par rappeler
+quelques résultats clés.</p>
+<div class="lemma">
+<p>Soit <span class="math inline">\(f(x)\)</span> une fonction convexe
+et différentiable. L’algorithme de gradient descent <span
+class="math inline">\(x_{k+1} = x_k - \eta \nabla f(x_k)\)</span>
+converge vers un minimum local de <span
+class="math inline">\(f(x)\)</span> sous certaines conditions
+régulières.</p>
+</div>
+<p>Nous pouvons maintenant prouver le théorème de convergence du
+gradient boosting.</p>
+<div class="proof">
+<p><em>Preuve du Théorème de Convergence du Gradient Boosting.</em>
+Considérons la fonction de perte <span
+class="math inline">\(\mathcal{L}(F) = \sum_{i=1}^n \ell(y_i,
+F(x_i))\)</span>. Le gradient boosting ajuste les arbres de décision
+<span class="math inline">\(h_t(x)\)</span> aux résidus <span
+class="math inline">\(g_{it} = -\nabla \ell(y_i,
+F(x_i))|_{F(x)=F_{t-1}(x)}\)</span>.</p>
+<p>En utilisant l’algorithme de gradient descent, nous avons : <span
+class="math display">\[F_{t}(x) = F_{t-1}(x) - \nu \nabla
+\mathcal{L}(F_{t-1})\]</span> où <span
+class="math inline">\(\nu\)</span> est le taux d’apprentissage.</p>
+<p>Sous certaines conditions régulières, telles que la convexité de
+<span class="math inline">\(\ell(y, F(x))\)</span> et la
+différentiabilité de <span class="math inline">\(F(x)\)</span>,
+l’algorithme de gradient descent converge vers un minimum local de <span
+class="math inline">\(\mathcal{L}(F)\)</span>. Par conséquent, le modèle
+<span class="math inline">\(F_T(x) = F_0(x) + \nu \sum_{t=1}^T
+h_t(x)\)</span> converge vers un minimum local de <span
+class="math inline">\(\mathcal{L}(F)\)</span> lorsque <span
+class="math inline">\(T \to \infty\)</span>. ◻</p>
+</div>
+<h2 class="unnumbered"
+id="preuve-de-la-proposition-doptimisation-par-histogramme">Preuve de la
+Proposition d’Optimisation par Histogramme</h2>
+<p>Pour prouver que l’optimisation par histogramme réduit la complexité
+computationnelle, nous analyserons le nombre d’opérations nécessaires
+pour construire un arbre de décision.</p>
+<div class="proof">
+<p><em>Preuve de la Proposition d’Optimisation par Histogramme.</em>
+Considérons une caractéristique <span class="math inline">\(x_j\)</span>
+avec <span class="math inline">\(n\)</span> échantillons. Sans
+l’optimisation par histogramme, le nombre d’opérations nécessaires pour
+trouver la meilleure division est de l’ordre de <span
+class="math inline">\(O(n \log n)\)</span>.</p>
+<p>Avec l’optimisation par histogramme, nous divisons la plage de
+valeurs de <span class="math inline">\(x_j\)</span> en <span
+class="math inline">\(B\)</span> bins. Ensuite, pour chaque bin <span
+class="math inline">\(b\)</span>, nous calculons la somme des gradients
+et des hessiens des échantillons appartenant à ce bin. Le nombre
+d’opérations nécessaires est alors de l’ordre de <span
+class="math inline">\(O(B \log B)\)</span>.</p>
+<p>Puisque <span class="math inline">\(B\)</span> est généralement
+beaucoup plus petit que <span class="math inline">\(n\)</span>,
+l’optimisation par histogramme réduit considérablement la complexité
+computationnelle. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Dans cet article, nous avons présenté LightGBM, une implémentation
+optimisée du gradient boosting. Nous avons discuté des concepts
+fondamentaux sur lesquels repose LightGBM, tels que le gradient boosting
+et les arbres de décision. Nous avons également présenté quelques
+théorèmes et propositions clés, ainsi que leurs preuves détaillées.</p>
+<p>LightGBM est une méthode puissante et efficace pour la résolution de
+problèmes de classification et de régression. Ses optimisations, telles
+que l’utilisation des histogrammes et la prise en charge des données
+manquantes, en font un outil indispensable pour les praticiens de
+l’apprentissage automatique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

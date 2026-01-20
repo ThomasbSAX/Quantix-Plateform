@@ -1,0 +1,347 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Projection sur un sous-espace</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Projection sur un sous-espace</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La notion de projection sur un sous-espace est fondamentale en
+analyse et en algèbre linéaire. Elle trouve ses racines dans les travaux
+de Joseph-Louis Lagrange sur la mécanique analytique, où il introduisit
+l’idée de projection pour minimiser les distances. Cette notion est
+indispensable dans de nombreux domaines, tels que l’optimisation, le
+traitement du signal et les méthodes numériques.</p>
+<p>La projection sur un sous-espace permet de décomposer un vecteur en
+une partie appartenant à ce sous-espace et une autre orthogonale. Cette
+décomposition est cruciale pour résoudre des problèmes de minimisation,
+comme la recherche de la distance minimale entre un point et un
+sous-espace.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’énoncer la définition formelle, considérons un vecteur <span
+class="math inline">\(\mathbf{v}\)</span> dans un espace préhilbertien
+<span class="math inline">\(E\)</span>. Nous cherchons à décomposer ce
+vecteur en une partie appartenant à un sous-espace <span
+class="math inline">\(F\)</span> de <span
+class="math inline">\(E\)</span> et une autre orthogonale à <span
+class="math inline">\(F\)</span>. Cette décomposition nous permet de
+"projeter" <span class="math inline">\(\mathbf{v}\)</span> sur <span
+class="math inline">\(F\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(E\)</span> un espace préhilbertien
+et <span class="math inline">\(F\)</span> un sous-espace de <span
+class="math inline">\(E\)</span>. La projection de <span
+class="math inline">\(\mathbf{v} \in E\)</span> sur <span
+class="math inline">\(F\)</span> est l’unique vecteur <span
+class="math inline">\(\mathbf{p} \in F\)</span> tel que : <span
+class="math display">\[\mathbf{v} - \mathbf{p} \perp F\]</span> En
+d’autres termes, pour tout <span class="math inline">\(\mathbf{u} \in
+F\)</span>, on a : <span class="math display">\[\langle \mathbf{v} -
+\mathbf{p}, \mathbf{u} \rangle = 0\]</span></p>
+</div>
+<p>La projection <span class="math inline">\(\mathbf{p}\)</span> peut
+également être caractérisée par la propriété suivante : <span
+class="math display">\[\mathbf{p} = \arg\min_{\mathbf{u} \in F}
+\|\mathbf{v} - \mathbf{u}\|\]</span> C’est-à-dire que <span
+class="math inline">\(\mathbf{p}\)</span> est le vecteur de <span
+class="math inline">\(F\)</span> qui minimise la distance à <span
+class="math inline">\(\mathbf{v}\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Le théorème suivant est central dans l’étude des projections sur les
+sous-espaces.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(E\)</span> un espace préhilbertien
+et <span class="math inline">\(F\)</span> un sous-espace fermé de <span
+class="math inline">\(E\)</span>. Pour tout <span
+class="math inline">\(\mathbf{v} \in E\)</span>, il existe un unique
+vecteur <span class="math inline">\(\mathbf{p} \in F\)</span> tel que :
+<span class="math display">\[\mathbf{v} - \mathbf{p} \perp F\]</span> De
+plus, <span class="math inline">\(\mathbf{p}\)</span> est donné par :
+<span class="math display">\[\mathbf{p} = \sum_{i=1}^n \frac{\langle
+\mathbf{v}, \mathbf{e}_i \rangle}{\langle \mathbf{e}_i, \mathbf{e}_i
+\rangle} \mathbf{e}_i\]</span> où <span class="math inline">\(\{
+\mathbf{e}_1, \ldots, \mathbf{e}_n \}\)</span> est une base orthonormale
+de <span class="math inline">\(F\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la projection, nous procédons en
+plusieurs étapes.</p>
+<div class="proof">
+<p><em>Proof.</em> 1. **Existence** : Considérons une base orthonormale
+<span class="math inline">\(\{ \mathbf{e}_1, \ldots, \mathbf{e}_n
+\}\)</span> de <span class="math inline">\(F\)</span>. Définissons :
+<span class="math display">\[\mathbf{p} = \sum_{i=1}^n \frac{\langle
+\mathbf{v}, \mathbf{e}_i \rangle}{\langle \mathbf{e}_i, \mathbf{e}_i
+\rangle} \mathbf{e}_i\]</span> Nous devons montrer que <span
+class="math inline">\(\mathbf{v} - \mathbf{p} \perp F\)</span>. Pour
+tout <span class="math inline">\(\mathbf{u} \in F\)</span>, on a : <span
+class="math display">\[\mathbf{u} = \sum_{i=1}^n \langle \mathbf{u},
+\mathbf{e}_i \rangle \mathbf{e}_i\]</span> Donc : <span
+class="math display">\[\langle \mathbf{v} - \mathbf{p}, \mathbf{u}
+\rangle = \left\langle \mathbf{v} - \sum_{i=1}^n \frac{\langle
+\mathbf{v}, \mathbf{e}_i \rangle}{\langle \mathbf{e}_i, \mathbf{e}_i
+\rangle} \mathbf{e}_i, \sum_{j=1}^n \langle \mathbf{u}, \mathbf{e}_j
+\rangle \mathbf{e}_j \right\rangle\]</span> En développant le produit
+scalaire, on obtient : <span class="math display">\[\langle \mathbf{v},
+\mathbf{u} \rangle - \sum_{i=1}^n \frac{\langle \mathbf{v}, \mathbf{e}_i
+\rangle}{\langle \mathbf{e}_i, \mathbf{e}_i \rangle} \langle
+\mathbf{e}_i, \mathbf{u} \rangle\]</span> En utilisant l’orthonormalité
+de la base, on a <span class="math inline">\(\langle \mathbf{e}_i,
+\mathbf{u} \rangle = \sum_{j=1}^n \langle \mathbf{u}, \mathbf{e}_j
+\rangle \langle \mathbf{e}_i, \mathbf{e}_j \rangle = \langle \mathbf{u},
+\mathbf{e}_i \rangle\)</span>. Donc : <span
+class="math display">\[\langle \mathbf{v} - \mathbf{p}, \mathbf{u}
+\rangle = \langle \mathbf{v}, \mathbf{u} \rangle - \sum_{i=1}^n \langle
+\mathbf{v}, \mathbf{e}_i \rangle \langle \mathbf{u}, \mathbf{e}_i
+\rangle = 0\]</span> 2. **Unicité** : Supposons qu’il existe deux
+vecteurs <span class="math inline">\(\mathbf{p}_1\)</span> et <span
+class="math inline">\(\mathbf{p}_2\)</span> dans <span
+class="math inline">\(F\)</span> tels que <span
+class="math inline">\(\mathbf{v} - \mathbf{p}_1 \perp F\)</span> et
+<span class="math inline">\(\mathbf{v} - \mathbf{p}_2 \perp F\)</span>.
+Alors : <span class="math display">\[\langle \mathbf{v} - \mathbf{p}_1,
+\mathbf{p}_2 - \mathbf{p}_1 \rangle = 0\]</span> et <span
+class="math display">\[\langle \mathbf{v} - \mathbf{p}_2, \mathbf{p}_1 -
+\mathbf{p}_2 \rangle = 0\]</span> En additionnant ces deux égalités, on
+obtient : <span class="math display">\[\langle \mathbf{p}_1 -
+\mathbf{p}_2, \mathbf{p}_1 - \mathbf{p}_2 \rangle = 0\]</span> Ce qui
+implique <span class="math inline">\(\mathbf{p}_1 =
+\mathbf{p}_2\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les propriétés suivantes découlent directement du théorème de la
+projection.</p>
+<ol>
+<li><p>**Propriété de minimalité** : La projection <span
+class="math inline">\(\mathbf{p}\)</span> minimise la distance entre
+<span class="math inline">\(\mathbf{v}\)</span> et <span
+class="math inline">\(F\)</span>. En effet, pour tout <span
+class="math inline">\(\mathbf{u} \in F\)</span>, on a : <span
+class="math display">\[\|\mathbf{v} - \mathbf{p}\|^2 = \langle
+\mathbf{v} - \mathbf{p}, \mathbf{v} - \mathbf{p} \rangle = \langle
+\mathbf{v} - \mathbf{u}, \mathbf{v} - \mathbf{u} \rangle + \langle
+\mathbf{u} - \mathbf{p}, \mathbf{u} - \mathbf{p} \rangle\]</span> Donc
+<span class="math inline">\(\|\mathbf{v} - \mathbf{p}\|^2 \leq
+\|\mathbf{v} - \mathbf{u}\|^2\)</span>.</p></li>
+<li><p>**Idempotence** : L’opérateur de projection <span
+class="math inline">\(P\)</span> est idempotent, c’est-à-dire que :
+<span class="math display">\[P^2 = P\]</span> En effet, pour tout <span
+class="math inline">\(\mathbf{v} \in E\)</span>, on a : <span
+class="math display">\[P(P(\mathbf{v})) = P(\mathbf{v})\]</span> car
+<span class="math inline">\(P(\mathbf{v}) \in F\)</span> et donc sa
+projection sur <span class="math inline">\(F\)</span> est
+lui-même.</p></li>
+<li><p>**Auto-adjoint** : L’opérateur de projection <span
+class="math inline">\(P\)</span> est auto-adjoint, c’est-à-dire que :
+<span class="math display">\[P^* = P\]</span> En effet, pour tous <span
+class="math inline">\(\mathbf{u}, \mathbf{v} \in E\)</span>, on a :
+<span class="math display">\[\langle P(\mathbf{u}), \mathbf{v} \rangle =
+\langle \mathbf{u}, P(\mathbf{v}) \rangle\]</span> car <span
+class="math inline">\(P(\mathbf{u}) - \langle P(\mathbf{u}), \mathbf{v}
+\rangle = 0\)</span> et <span class="math inline">\(P(\mathbf{v}) -
+\langle \mathbf{u}, P(\mathbf{v}) \rangle = 0\)</span>.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La projection sur un sous-espace est une notion puissante et
+polyvalente en analyse et en algèbre linéaire. Elle trouve des
+applications dans de nombreux domaines, allant de l’optimisation au
+traitement du signal. Les propriétés et théorèmes associés à la
+projection permettent une compréhension profonde des structures
+géométriques et algébriques sous-jacentes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

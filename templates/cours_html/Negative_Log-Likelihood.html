@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Négative Vraisemblance Logarithmique : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Négative Vraisemblance Logarithmique : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La notion de négative vraisemblance logarithmique, souvent désignée
+par son acronyme anglais NLL (Negative Log-Likelihood), émerge comme un
+pilier fondamental dans l’analyse statistique et la modélisation
+probabiliste. Son importance réside dans sa capacité à transformer des
+problèmes complexes de maximisation de vraisemblance en des formulations
+plus tractables, notamment dans le cadre de l’estimation de paramètres
+et de l’optimisation d’algorithmes.</p>
+<p>Historiquement, cette notion trouve ses racines dans les travaux
+pionniers de Fisher sur la théorie des estimations. La vraisemblance,
+introduite par Fisher en 1922, mesure la plausibilité d’un modèle donné
+des observations. Cependant, la manipulation directe de cette
+vraisemblance se révèle souvent ardue en raison de sa nature
+multiplicative. L’introduction du logarithme, une transformation
+monotone et concave, permet de convertir cette multiplicité en une
+somme, simplifiant ainsi les calculs et facilitant l’optimisation.</p>
+<p>Dans ce contexte, la négative vraisemblance logarithmique se
+distingue par son rôle crucial dans les méthodes d’estimation par
+maximum de vraisemblance (MLE). Elle est particulièrement indispensable
+dans des domaines tels que la classification, la régression, et
+l’apprentissage automatique, où l’optimisation efficace des paramètres
+est primordiale.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de négative vraisemblance logarithmique,
+considérons un ensemble de données observées <span
+class="math inline">\(\mathcal{D} = \{x_1, x_2, \ldots, x_n\}\)</span>
+et un modèle paramétrique <span
+class="math inline">\(p(x|\theta)\)</span>, où <span
+class="math inline">\(\theta\)</span> représente les paramètres du
+modèle. La vraisemblance de <span
+class="math inline">\(\mathcal{D}\)</span> sous ce modèle est définie
+comme le produit des probabilités individuelles de chaque observation
+:</p>
+<p><span class="math display">\[L(\theta|\mathcal{D}) = \prod_{i=1}^n
+p(x_i|\theta)\]</span></p>
+<p>Cette formulation, bien que conceptuellement claire, présente des
+défis computationnels en raison de la multiplication des probabilités.
+Pour surmonter cette difficulté, on introduit le logarithme, ce qui
+conduit à la vraisemblance logarithmique :</p>
+<p><span class="math display">\[\log L(\theta|\mathcal{D}) =
+\sum_{i=1}^n \log p(x_i|\theta)\]</span></p>
+<p>La négative vraisemblance logarithmique, notée <span
+class="math inline">\(\text{NLL}\)</span>, est alors définie comme
+l’opposé de cette quantité :</p>
+<p><span class="math display">\[\text{NLL}(\theta|\mathcal{D}) = -\log
+L(\theta|\mathcal{D}) = -\sum_{i=1}^n \log p(x_i|\theta)\]</span></p>
+<p>Cette transformation présente plusieurs avantages. Tout d’abord, elle
+convertit le produit en une somme, simplifiant les calculs et
+l’optimisation. Ensuite, elle préserve la monotonie de la fonction, ce
+qui signifie que minimiser <span
+class="math inline">\(\text{NLL}\)</span> est équivalent à maximiser
+<span class="math inline">\(L(\theta|\mathcal{D})\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème central lié à la négative vraisemblance logarithmique est
+le <strong>Théorème du Maximum de Vraisemblance</strong>, qui stipule
+que sous certaines conditions régulières, l’estimateur du maximum de
+vraisemblance est asymptotiquement efficace et sans biais. Formellement,
+ce théorème peut être énoncé comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{D} = \{x_1, x_2, \ldots,
+x_n\}\)</span> un échantillon indépendant et identiquement distribué
+(i.i.d.) de variables aléatoires avec densité <span
+class="math inline">\(p(x|\theta)\)</span>, où <span
+class="math inline">\(\theta \in \Theta \subset \mathbb{R}^k\)</span>.
+Supposons que les conditions régulières de Cramér-Rao soient
+satisfaites. Alors, l’estimateur du maximum de vraisemblance <span
+class="math inline">\(\hat{\theta}_n\)</span> est asymptotiquement
+normal et efficace, c’est-à-dire que :</p>
+<p><span class="math display">\[\sqrt{n}(\hat{\theta}_n - \theta)
+\xrightarrow{d} \mathcal{N}(0, I(\theta)^{-1})\]</span></p>
+<p>où <span class="math inline">\(I(\theta)\)</span> est la matrice
+d’information de Fisher.</p>
+</div>
+<p>La preuve de ce théorème repose sur des outils avancés de la théorie
+des probabilités et de l’analyse statistique, notamment le développement
+de Taylor et les propriétés asymptotiques des estimateurs. Une
+démonstration détaillée peut être trouvée dans des ouvrages spécialisés
+tels que celui de Lehmann et Casella.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour illustrer l’application du théorème du maximum de vraisemblance,
+considérons un exemple simple où <span
+class="math inline">\(p(x|\theta)\)</span> suit une distribution
+exponentielle de paramètre <span class="math inline">\(\theta\)</span>.
+La vraisemblance logarithmique est alors donnée par :</p>
+<p><span class="math display">\[\log L(\theta|\mathcal{D}) =
+\sum_{i=1}^n \left( \log \theta - \theta x_i \right) = n \log \theta -
+\theta \sum_{i=1}^n x_i\]</span></p>
+<p>La négative vraisemblance logarithmique s’écrit :</p>
+<p><span class="math display">\[\text{NLL}(\theta|\mathcal{D}) = -n \log
+\theta + \theta \sum_{i=1}^n x_i\]</span></p>
+<p>Pour trouver l’estimateur du maximum de vraisemblance, nous
+minimisons <span class="math inline">\(\text{NLL}\)</span> par rapport à
+<span class="math inline">\(\theta\)</span>. La dérivée première de
+<span class="math inline">\(\text{NLL}\)</span> est :</p>
+<p><span class="math display">\[\frac{\partial}{\partial \theta}
+\text{NLL}(\theta|\mathcal{D}) = -\frac{n}{\theta} + \sum_{i=1}^n
+x_i\]</span></p>
+<p>En égalisant cette dérivée à zéro, nous obtenons :</p>
+<p><span class="math display">\[-\frac{n}{\theta} + \sum_{i=1}^n x_i = 0
+\implies \hat{\theta}_n = \frac{n}{\sum_{i=1}^n x_i}\]</span></p>
+<p>Cette solution est l’estimateur du maximum de vraisemblance pour
+<span class="math inline">\(\theta\)</span>. Pour vérifier qu’il s’agit
+bien d’un minimum, nous examinons la dérivée seconde :</p>
+<p><span class="math display">\[\frac{\partial^2}{\partial \theta^2}
+\text{NLL}(\theta|\mathcal{D}) = \frac{n}{\theta^2}\]</span></p>
+<p>Puisque cette dérivée est strictement positive pour tout <span
+class="math inline">\(\theta &gt; 0\)</span>, l’estimateur <span
+class="math inline">\(\hat{\theta}_n\)</span> est effectivement un
+minimum de <span class="math inline">\(\text{NLL}\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La négative vraisemblance logarithmique possède plusieurs propriétés
+intéressantes, qui en font un outil puissant pour l’analyse statistique.
+Nous en énumérons quelques-unes ci-dessous :</p>
+<ol>
+<li><p><strong>Monotonie</strong> : La transformation logarithmique est
+monotone, ce qui signifie que minimiser <span
+class="math inline">\(\text{NLL}\)</span> est équivalent à maximiser la
+vraisemblance <span
+class="math inline">\(L(\theta|\mathcal{D})\)</span>.</p></li>
+<li><p><strong>Convexité</strong> : Sous des conditions régulières,
+<span class="math inline">\(\text{NLL}\)</span> est une fonction convexe
+de <span class="math inline">\(\theta\)</span>. Cette propriété garantit
+que tout minimum local est également un minimum global, facilitant ainsi
+l’optimisation.</p></li>
+<li><p><strong>Interprétabilité</strong> : La négative vraisemblance
+logarithmique peut être interprétée comme une mesure de la complexité du
+modèle. Plus <span class="math inline">\(\text{NLL}\)</span> est faible,
+plus le modèle est bien ajusté aux données observées.</p></li>
+</ol>
+<p>Chacune de ces propriétés joue un rôle crucial dans l’application
+pratique de la négative vraisemblance logarithmique. Par exemple, la
+convexité permet d’utiliser des algorithmes d’optimisation efficaces
+tels que la descente de gradient, tandis que l’interprétabilité facilite
+la comparaison entre différents modèles.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>En conclusion, la négative vraisemblance logarithmique représente un
+outil fondamental dans l’analyse statistique et la modélisation
+probabiliste. Son introduction permet de transformer des problèmes
+complexes de maximisation de vraisemblance en formulations plus
+tractables, facilitant ainsi l’estimation des paramètres et
+l’optimisation des modèles. Les propriétés de monotonie, convexité, et
+interprétabilité en font un outil puissant pour l’analyse des données et
+la prise de décision.</p>
+<p>Les applications de la négative vraisemblance logarithmique sont
+vastes et couvrent des domaines tels que la classification, la
+régression, et l’apprentissage automatique. Son rôle central dans le
+théorème du maximum de vraisemblance en fait un pilier de la théorie
+statistique moderne. À mesure que les techniques d’analyse des données
+continuent de se développer, l’importance de la négative vraisemblance
+logarithmique ne fera que croître.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

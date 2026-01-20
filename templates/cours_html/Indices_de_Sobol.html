@@ -1,0 +1,313 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Indices de Sobol : Analyse de Sensibilité Globale</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Indices de Sobol : Analyse de Sensibilité Globale</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les indices de Sobol sont des outils fondamentaux en analyse de
+sensibilité globale, permettant d’évaluer l’importance relative des
+variables d’entrée dans un modèle mathématique. Introduits par Ilya M.
+Sobol dans les années 1990, ces indices ont révolutionné l’étude des
+modèles complexes en ingénierie, en physique et en sciences
+sociales.</p>
+<p>L’analyse de sensibilité est cruciale pour comprendre comment les
+incertitudes dans les variables d’entrée se propagent à travers un
+modèle et affectent ses sorties. Les indices de Sobol offrent une
+méthode systématique pour décomposer la variance de la sortie d’un
+modèle en contributions attribuables à chaque variable d’entrée, ainsi
+qu’à leurs interactions.</p>
+<p>Dans ce chapitre, nous explorerons les définitions rigoureuses des
+indices de Sobol, les théorèmes clés associés et leurs preuves
+détaillées. Nous examinerons également des propriétés importantes et des
+corollaires qui enrichissent notre compréhension de ces indices.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir les indices de Sobol, considérons un modèle mathématique
+<span class="math inline">\(Y = f(X_1, X_2, \ldots, X_d)\)</span>, où
+<span class="math inline">\(Y\)</span> est la sortie du modèle et <span
+class="math inline">\(X_i\)</span> sont les variables d’entrée.
+Supposons que chaque <span class="math inline">\(X_i\)</span> est une
+variable aléatoire indépendante uniformément distribuée sur l’intervalle
+<span class="math inline">\([0,1]\)</span>.</p>
+<p>Nous cherchons à décomposer la variance de <span
+class="math inline">\(Y\)</span> en contributions attribuables à chaque
+variable d’entrée et à leurs interactions. Pour ce faire, nous
+introduisons les indices de Sobol.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(Y = f(X_1, X_2, \ldots,
+X_d)\)</span>. L’indice de Sobol d’ordre premier pour la variable <span
+class="math inline">\(X_i\)</span> est défini par : <span
+class="math display">\[S_i = \frac{\text{Var}(\mathbb{E}[Y |
+X_i])}{\text{Var}(Y)}\]</span> où <span
+class="math inline">\(\mathbb{E}[Y | X_i]\)</span> est l’espérance
+conditionnelle de <span class="math inline">\(Y\)</span> donnée <span
+class="math inline">\(X_i\)</span>, et <span
+class="math inline">\(\text{Var}\)</span> désigne la variance.</p>
+<p>L’indice de Sobol d’ordre total pour la variable <span
+class="math inline">\(X_i\)</span> est défini par : <span
+class="math display">\[S_{Ti} = 1 - \frac{\text{Var}(\mathbb{E}[Y |
+X_{-i}])}{\text{Var}(Y)}\]</span> où <span
+class="math inline">\(X_{-i}\)</span> représente l’ensemble des
+variables d’entrée excluant <span
+class="math inline">\(X_i\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Nous présentons maintenant un théorème fondamental concernant les
+indices de Sobol.</p>
+<div class="theorem">
+<p>La variance totale de <span class="math inline">\(Y\)</span> peut
+être décomposée en une somme d’indices de Sobol d’ordre premier et
+d’interaction : <span class="math display">\[\text{Var}(Y) =
+\sum_{i=1}^d S_i \text{Var}(Y) + \sum_{1 \leq i &lt; j \leq d} S_{ij}
+\text{Var}(Y) + \ldots + S_{12\ldots d} \text{Var}(Y)\]</span> où <span
+class="math inline">\(S_{ij}\)</span> est l’indice de Sobol d’ordre deux
+pour les variables <span class="math inline">\(X_i\)</span> et <span
+class="math inline">\(X_j\)</span>, et ainsi de suite.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Nous fournissons une preuve détaillée du théorème de décomposition de
+la variance.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la décomposition de Hoeffding-Anscombe
+pour la variance conditionnelle : <span
+class="math display">\[\text{Var}(Y) = \sum_{i=1}^d
+\text{Var}(\mathbb{E}[Y | X_i]) + \sum_{1 \leq i &lt; j \leq d}
+\text{Cov}(\mathbb{E}[Y | X_i, X_j], \mathbb{E}[Y | X_i] + \mathbb{E}[Y
+| X_j]) + \ldots\]</span> En normalisant par <span
+class="math inline">\(\text{Var}(Y)\)</span>, nous obtenons : <span
+class="math display">\[1 = \sum_{i=1}^d S_i + \sum_{1 \leq i &lt; j \leq
+d} S_{ij} + \ldots + S_{12\ldots d}\]</span> où <span
+class="math inline">\(S_i = \frac{\text{Var}(\mathbb{E}[Y |
+X_i])}{\text{Var}(Y)}\)</span>, <span class="math inline">\(S_{ij} =
+\frac{\text{Cov}(\mathbb{E}[Y | X_i, X_j], \mathbb{E}[Y | X_i] +
+\mathbb{E}[Y | X_j])}{\text{Var}(Y)}\)</span>, et ainsi de suite.</p>
+<p>Cette décomposition montre que la variance totale de <span
+class="math inline">\(Y\)</span> est la somme des contributions
+individuelles et interactives des variables d’entrée. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous énumérons quelques propriétés importantes des indices de
+Sobol.</p>
+<ol>
+<li><p><strong>Non-négativité</strong> : Les indices de Sobol sont non
+négatifs, c’est-à-dire <span class="math inline">\(S_i \geq 0\)</span>
+pour tout <span class="math inline">\(i\)</span>.</p></li>
+<li><p><strong>Normalisation</strong> : La somme des indices de Sobol
+d’ordre premier et d’interaction est égale à 1 : <span
+class="math display">\[\sum_{i=1}^d S_i + \sum_{1 \leq i &lt; j \leq d}
+S_{ij} + \ldots + S_{12\ldots d} = 1\]</span></p></li>
+<li><p><strong>Interprétation</strong> : Un indice de Sobol élevé pour
+une variable <span class="math inline">\(X_i\)</span> indique que cette
+variable a un impact significatif sur la variance de la sortie <span
+class="math inline">\(Y\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les indices de Sobol sont des outils puissants pour l’analyse de
+sensibilité globale, permettant de quantifier l’importance relative des
+variables d’entrée dans un modèle mathématique. Leur utilisation est
+essentielle pour comprendre la robustesse et les incertitudes des
+modèles complexes.</p>
+<p>En conclusion, nous avons présenté les définitions rigoureuses des
+indices de Sobol, un théorème fondamental et ses preuves détaillées.
+Nous avons également discuté des propriétés importantes qui enrichissent
+notre compréhension de ces indices.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

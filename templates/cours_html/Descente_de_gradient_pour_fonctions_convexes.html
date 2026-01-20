@@ -1,0 +1,347 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Descente de Gradient pour Fonctions Convexes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Descente de Gradient pour Fonctions Convexes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La descente de gradient est une méthode fondamentale en optimisation,
+particulièrement adaptée aux fonctions convexes. Cette technique,
+inspirée par la nature des surfaces de niveau des fonctions convexes,
+permet de trouver efficacement les minima globaux. Historiquement, elle
+trouve ses racines dans les travaux de Cauchy sur la méthode des
+gradients en 1847, et a été ensuite généralisée et formalisée par
+d’autres mathématiciens. Dans le cadre des fonctions convexes, la
+descente de gradient est non seulement efficace mais aussi garantie de
+convergence vers le minimum global.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’aborder la descente de gradient, il est essentiel de définir
+rigoureusement les concepts clés.</p>
+<h2 id="fonction-convexe">Fonction Convexe</h2>
+<p>Une fonction convexe est une fonction qui, intuitivement, "courbe
+vers le haut". Formellement :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction. On dit que <span
+class="math inline">\(f\)</span> est convexe si pour tout <span
+class="math inline">\(x, y \in \mathbb{R}^n\)</span> et pour tout <span
+class="math inline">\(\lambda \in [0, 1]\)</span>, on a : <span
+class="math display">\[f(\lambda x + (1 - \lambda) y) \leq \lambda f(x)
++ (1 - \lambda) f(y).\]</span></p>
+</div>
+<p>Cette définition peut également être exprimée en termes de gradient
+:</p>
+<div class="definition">
+<p>Une fonction <span class="math inline">\(f\)</span> est convexe si et
+seulement si son gradient <span class="math inline">\(\nabla f\)</span>
+est monotone, c’est-à-dire que pour tout <span class="math inline">\(x,
+y \in \mathbb{R}^n\)</span>, on a : <span class="math display">\[(x -
+y)^T (\nabla f(x) - \nabla f(y)) \geq 0.\]</span></p>
+</div>
+<h2 id="descente-de-gradient">Descente de Gradient</h2>
+<p>La descente de gradient est une méthode itérative pour minimiser une
+fonction. Elle consiste à suivre la direction opposée au gradient de la
+fonction en chaque point.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction convexe et différentiable. La descente
+de gradient est définie par l’algorithme itératif suivant : <span
+class="math display">\[x_{k+1} = x_k - \alpha_k \nabla f(x_k),\]</span>
+où <span class="math inline">\(\alpha_k &gt; 0\)</span> est le taux
+d’apprentissage (ou pas de gradient).</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="convergence-de-la-descente-de-gradient">Convergence de la
+Descente de Gradient</h2>
+<p>Un des théorèmes fondamentaux concernant la descente de gradient est
+celui de sa convergence vers le minimum global pour les fonctions
+convexes.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction convexe et différentiable, avec <span
+class="math inline">\(\nabla f\)</span> Lipschitz-continue. Si la suite
+<span class="math inline">\(\{x_k\}\)</span> est générée par
+l’algorithme de descente de gradient avec un taux d’apprentissage <span
+class="math inline">\(\alpha_k\)</span> suffisamment petit, alors :
+<span class="math display">\[\lim_{k \to \infty} x_k = x^*,\]</span> où
+<span class="math inline">\(x^*\)</span> est un point critique de <span
+class="math inline">\(f\)</span>, c’est-à-dire <span
+class="math inline">\(\nabla f(x^*) = 0\)</span>.</p>
+</div>
+<h2 id="démonstration-du-théorème-de-convergence">Démonstration du
+Théorème de Convergence</h2>
+<p>Pour démontrer ce théorème, nous utilisons plusieurs propriétés et
+lemmes clés.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous commençons par noter que, puisque <span
+class="math inline">\(f\)</span> est convexe et différentiable, le
+gradient <span class="math inline">\(\nabla f\)</span> est monotone. De
+plus, comme <span class="math inline">\(\nabla f\)</span> est
+Lipschitz-continue, il existe une constante <span
+class="math inline">\(L &gt; 0\)</span> telle que pour tout <span
+class="math inline">\(x, y \in \mathbb{R}^n\)</span>, on a : <span
+class="math display">\[\| \nabla f(x) - \nabla f(y) \| \leq L \| x - y
+\|.\]</span></p>
+<p>En utilisant l’inégalité de descent, nous avons : <span
+class="math display">\[f(x_{k+1}) \leq f(x_k) - \alpha_k \| \nabla
+f(x_k) \|^2 + \frac{L}{2} \alpha_k^2 \| \nabla f(x_k) \|^2.\]</span></p>
+<p>En choisissant <span class="math inline">\(\alpha_k =
+\frac{1}{L}\)</span>, nous obtenons : <span
+class="math display">\[f(x_{k+1}) \leq f(x_k) - \frac{1}{2L} \| \nabla
+f(x_k) \|^2.\]</span></p>
+<p>En sommant cette inégalité de <span class="math inline">\(k =
+0\)</span> à <span class="math inline">\(N-1\)</span>, nous obtenons :
+<span class="math display">\[f(x_N) \leq f(x_0) - \frac{1}{2L}
+\sum_{k=0}^{N-1} \| \nabla f(x_k) \|^2.\]</span></p>
+<p>Puisque <span class="math inline">\(f\)</span> est bornée
+inférieurement, la somme <span class="math inline">\(\sum_{k=0}^{\infty}
+\| \nabla f(x_k) \|^2\)</span> est convergente, ce qui implique que
+<span class="math inline">\(\lim_{k \to \infty} \| \nabla f(x_k) \| =
+0\)</span>. Comme <span class="math inline">\(f\)</span> est convexe,
+cela signifie que la suite <span class="math inline">\(\{x_k\}\)</span>
+converge vers un point critique <span
+class="math inline">\(x^*\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-convergence-linéaire">Propriété de Convergence
+Linéaire</h2>
+<p>La descente de gradient pour les fonctions convexes a une propriété
+de convergence linéaire sous certaines conditions.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(f: \mathbb{R}^n \rightarrow
+\mathbb{R}\)</span> une fonction convexe et fortement convexe avec
+constante <span class="math inline">\(m &gt; 0\)</span>. Alors, la suite
+<span class="math inline">\(\{x_k\}\)</span> générée par l’algorithme de
+descente de gradient converge linéairement vers <span
+class="math inline">\(x^*\)</span>, c’est-à-dire qu’il existe des
+constantes <span class="math inline">\(C &gt; 0\)</span> et <span
+class="math inline">\(0 &lt; q &lt; 1\)</span> telles que : <span
+class="math display">\[\| x_k - x^* \| \leq C q^k.\]</span></p>
+</div>
+<h2 id="démonstration-de-la-convergence-linéaire">Démonstration de la
+Convergence Linéaire</h2>
+<div class="proof">
+<p><em>Proof.</em> Puisque <span class="math inline">\(f\)</span> est
+fortement convexe, il existe une constante <span class="math inline">\(m
+&gt; 0\)</span> telle que pour tout <span class="math inline">\(x, y \in
+\mathbb{R}^n\)</span>, on a : <span class="math display">\[f(y) \geq
+f(x) + \nabla f(x)^T (y - x) + \frac{m}{2} \| y - x \|^2.\]</span></p>
+<p>En utilisant cette inégalité pour <span class="math inline">\(y =
+x^*\)</span> et <span class="math inline">\(x = x_k\)</span>, nous
+obtenons : <span class="math display">\[f(x^*) \geq f(x_k) + \nabla
+f(x_k)^T (x^* - x_k) + \frac{m}{2} \| x^* - x_k \|^2.\]</span></p>
+<p>En réarrangeant et en utilisant l’algorithme de descente de gradient,
+nous avons : <span class="math display">\[\frac{m}{2} \| x^* - x_k \|^2
+\leq f(x_k) - f(x^*) + \nabla f(x_k)^T (x^* - x_k).\]</span></p>
+<p>En utilisant l’inégalité de descent et les propriétés du gradient,
+nous pouvons montrer que : <span class="math display">\[\| x_{k+1} - x^*
+\|^2 \leq \left(1 - \frac{m}{L}\right) \| x_k - x^* \|^2.\]</span></p>
+<p>En choisissant <span class="math inline">\(\alpha_k =
+\frac{1}{L}\)</span>, nous obtenons la convergence linéaire avec <span
+class="math inline">\(q = 1 - \frac{m}{L}\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La descente de gradient est une méthode puissante et efficace pour
+minimiser les fonctions convexes. Son utilisation est garantie de
+converger vers le minimum global, et sous des conditions
+supplémentaires, elle présente une convergence linéaire. Ces propriétés
+en font un outil indispensable dans de nombreux domaines de
+l’optimisation et des sciences appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

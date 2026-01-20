@@ -1,0 +1,367 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Polynomial Kernel: A Mathematical Exploration</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Polynomial Kernel: A Mathematical Exploration</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les noyaux polynomiaux, ou <em>polynomial kernels</em>, constituent
+une classe fondamentale de fonctions noyaux dans le cadre des méthodes
+d’apprentissage automatique, particulièrement en machine learning
+supervisé. Leur origine remonte aux travaux pionniers sur les machines à
+vecteurs de support (SVM), où la nécessité d’opérer dans des espaces de
+haute dimension a conduit à l’élaboration de ces noyaux. L’intérêt
+principal réside dans leur capacité à capturer des relations non
+linéaires entre les données, tout en conservant une structure algébrique
+simple et exploitable.</p>
+<p>Historiquement, les noyaux polynomiaux ont émergé comme une réponse
+aux limitations des modèles linéaires. En effet, dans de nombreux
+contextes pratiques, les données ne sont pas séparables par des
+hyperplans linéaires. Les noyaux polynomiaux permettent de projeter les
+données dans un espace de caractéristiques polynomiales, facilitant
+ainsi la séparation linéaire. Cette transformation est particulièrement
+utile dans des domaines tels que la reconnaissance d’images, le
+traitement du langage naturel et l’analyse de données financières.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre les noyaux polynomiaux, il est essentiel de saisir le
+concept de fonction noyau. Une fonction noyau est une fonction
+symétrique et définie positive qui permet de calculer le produit
+scalaire entre deux vecteurs dans un espace de caractéristiques
+transformé. Formellement, un noyau est une fonction <span
+class="math inline">\(K: \mathcal{X} \times \mathcal{X} \rightarrow
+\mathbb{R}\)</span> telle que pour tout <span class="math inline">\(x, y
+\in \mathcal{X}\)</span>, il existe un espace de Hilbert <span
+class="math inline">\(\mathcal{H}\)</span> et une application <span
+class="math inline">\(\phi: \mathcal{X} \rightarrow \mathcal{H}\)</span>
+tels que :</p>
+<p><span class="math display">\[K(x, y) = \langle \phi(x), \phi(y)
+\rangle_{\mathcal{H}}\]</span></p>
+<p>Le noyau polynomial est une instance particulière de cette
+définition. Supposons que nous ayons un espace d’entrée <span
+class="math inline">\(\mathcal{X} = \mathbb{R}^n\)</span>. Le noyau
+polynomial d’ordre <span class="math inline">\(d\)</span> est défini
+comme suit :</p>
+<p><span class="math display">\[K_d(x, y) = (x \cdot y +
+c)^d\]</span></p>
+<p>où <span class="math inline">\(x \cdot y\)</span> désigne le produit
+scalaire euclidien entre les vecteurs <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span>, <span class="math inline">\(c\)</span>
+est une constante positive, et <span class="math inline">\(d\)</span>
+est un entier positif représentant le degré du polynôme.</p>
+<p>Pour illustrer cette définition, considérons deux vecteurs <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> dans <span
+class="math inline">\(\mathbb{R}^n\)</span>. Le noyau polynomial de
+degré 2 est donné par :</p>
+<p><span class="math display">\[K_2(x, y) = (x \cdot y +
+c)^2\]</span></p>
+<p>Cette expression peut être développée en utilisant le binôme de
+Newton :</p>
+<p><span class="math display">\[K_2(x, y) = (x \cdot y)^2 + 2c(x \cdot
+y) + c^2\]</span></p>
+<p>Cette expansion montre que le noyau polynomial de degré 2 capture non
+seulement les interactions linéaires entre les composantes des vecteurs
+<span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span>, mais aussi leurs interactions
+quadratiques.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié aux noyaux polynomiaux est le théorème de
+représentation des noyaux, qui stipule que toute fonction noyau
+symétrique et définie positive peut être exprimée comme un produit
+scalaire dans un espace de Hilbert. Pour les noyaux polynomiaux, ce
+théorème garantit que l’application <span
+class="math inline">\(\phi\)</span> associée au noyau polynomial existe
+et transforme les données dans un espace de caractéristiques
+polynomiales.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(K\)</span> une fonction symétrique
+et définie positive sur <span class="math inline">\(\mathcal{X} \times
+\mathcal{X}\)</span>. Alors, il existe un espace de Hilbert <span
+class="math inline">\(\mathcal{H}\)</span> et une application <span
+class="math inline">\(\phi: \mathcal{X} \rightarrow \mathcal{H}\)</span>
+tels que pour tout <span class="math inline">\(x, y \in
+\mathcal{X}\)</span>, on a :</p>
+<p><span class="math display">\[K(x, y) = \langle \phi(x), \phi(y)
+\rangle_{\mathcal{H}}\]</span></p>
+</div>
+<p>Pour les noyaux polynomiaux, ce théorème peut être formulé de manière
+plus explicite. Considérons le noyau polynomial d’ordre <span
+class="math inline">\(d\)</span> :</p>
+<p><span class="math display">\[K_d(x, y) = (x \cdot y +
+c)^d\]</span></p>
+<p>L’application <span class="math inline">\(\phi\)</span> associée à ce
+noyau peut être interprétée comme une transformation qui génère toutes
+les combinaisons polynomiales des composantes des vecteurs <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span>. Plus précisément, pour un noyau
+polynomial de degré <span class="math inline">\(d\)</span>, l’espace de
+caractéristiques <span class="math inline">\(\mathcal{H}\)</span> est
+engendré par les monômes de degré inférieur ou égal à <span
+class="math inline">\(d\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de représentation des noyaux pour les
+noyaux polynomiaux, nous devons montrer que la fonction <span
+class="math inline">\(K_d(x, y) = (x \cdot y + c)^d\)</span> est
+symétrique et définie positive. La symétrie est immédiate, car <span
+class="math inline">\(K_d(x, y) = K_d(y, x)\)</span>.</p>
+<p>Pour la positivité définie, nous devons montrer que pour tout
+ensemble de points <span class="math inline">\(\{x_1, x_2, \ldots,
+x_m\}\)</span> et tout vecteur <span class="math inline">\(\alpha =
+(\alpha_1, \alpha_2, \ldots, \alpha_m)\)</span>, on a :</p>
+<p><span class="math display">\[\sum_{i=1}^m \sum_{j=1}^m \alpha_i
+\alpha_j K_d(x_i, x_j) \geq 0\]</span></p>
+<p>En développant cette expression, nous obtenons :</p>
+<p><span class="math display">\[\sum_{i=1}^m \sum_{j=1}^m \alpha_i
+\alpha_j (x_i \cdot x_j + c)^d \geq 0\]</span></p>
+<p>Cette inégalité est satisfaite car <span class="math inline">\((x_i
+\cdot x_j + c)^d\)</span> est une combinaison linéaire de termes de la
+forme <span class="math inline">\((x_i \cdot x_j)^k\)</span>, et chaque
+terme est non négatif en raison de la positivité du produit scalaire
+euclidien et de la constante <span class="math inline">\(c\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Les noyaux polynomiaux possèdent plusieurs propriétés intéressantes
+qui en font un outil puissant dans le cadre des méthodes d’apprentissage
+automatique. Nous en listons quelques-unes ci-dessous :</p>
+<ol>
+<li><p>**Propriété de translation** : Le noyau polynomial est invariant
+par translation. Plus précisément, pour tout vecteur <span
+class="math inline">\(v \in \mathbb{R}^n\)</span>, on a :</p>
+<p><span class="math display">\[K_d(x + v, y + v) = (x \cdot y + x \cdot
+v + y \cdot v + v \cdot v + c)^d\]</span></p>
+<p>Cette propriété est utile pour les applications où les données sont
+soumises à des translations.</p></li>
+<li><p>**Propriété d’échelle** : Le noyau polynomial est homogène de
+degré <span class="math inline">\(d\)</span>. Cela signifie que pour
+tout scalaire <span class="math inline">\(\lambda &gt; 0\)</span>, on a
+:</p>
+<p><span class="math display">\[K_d(\lambda x, \lambda y) = \lambda^d (x
+\cdot y + c)^d\]</span></p>
+<p>Cette propriété permet de contrôler l’influence des échelles des
+données sur le noyau.</p></li>
+<li><p>**Propriété de combinaison linéaire** : Les noyaux polynomiaux
+peuvent être combinés linéairement pour former de nouveaux noyaux. Plus
+précisément, si <span class="math inline">\(K_d\)</span> et <span
+class="math inline">\(K_{d&#39;}\)</span> sont des noyaux polynomiaux
+d’ordres <span class="math inline">\(d\)</span> et <span
+class="math inline">\(d&#39;\)</span>, alors pour tout <span
+class="math inline">\(\alpha, \beta \geq 0\)</span>, la fonction <span
+class="math inline">\(\alpha K_d + \beta K_{d&#39;}\)</span> est
+également un noyau polynomial.</p>
+<p>Cette propriété permet de construire des noyaux plus complexes à
+partir de noyaux simples.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les noyaux polynomiaux représentent une classe importante de
+fonctions noyaux dans le cadre des méthodes d’apprentissage automatique.
+Leur capacité à capturer des relations non linéaires entre les données,
+tout en conservant une structure algébrique simple, en fait un outil
+précieux pour de nombreuses applications pratiques. Les propriétés et
+théorèmes associés aux noyaux polynomiaux offrent une base solide pour
+leur utilisation dans des domaines tels que la reconnaissance d’images,
+le traitement du langage naturel et l’analyse de données
+financières.</p>
+<p>En conclusion, les noyaux polynomiaux continuent d’être un sujet de
+recherche actif, avec des développements récents visant à améliorer leur
+efficacité et leur généralisation. Leur étude approfondie permet de
+mieux comprendre les mécanismes sous-jacents des méthodes
+d’apprentissage automatique et d’ouvrir de nouvelles perspectives pour
+le traitement des données complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

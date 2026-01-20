@@ -1,0 +1,382 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence du chi-deux : Un outil fondamental en statistique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence du chi-deux : Un outil fondamental en
+statistique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La divergence du chi-deux, ou distance du chi-deux, est une mesure de
+dissimilarité entre deux distributions de probabilités discrètes. Elle
+trouve ses racines dans les travaux de Karl Pearson à la fin du XIXème
+siècle, et reste aujourd’hui un outil incontournable en statistique, en
+particulier pour les tests d’ajustement et les méthodes de régression
+logistique.</p>
+<p>Cette notion émerge naturellement lorsque l’on cherche à mesurer
+combien deux distributions discrètes diffèrent l’une de l’autre. Elle
+est indispensable dans le cadre des tests d’hypothèses, où l’on souhaite
+évaluer si un modèle statistique est conforme aux observations
+empiriques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Considérons deux distributions de probabilités discrètes <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> définies sur un ensemble fini <span
+class="math inline">\(\Omega = \{1, 2, \dots, n\}\)</span>. Nous
+cherchons à mesurer la distance entre ces deux distributions.</p>
+<p>Intuitivement, cette mesure doit être nulle lorsque <span
+class="math inline">\(P = Q\)</span>, et positive sinon. Elle doit
+également être symétrique, c’est-à-dire que la distance entre <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> doit être égale à la distance entre
+<span class="math inline">\(Q\)</span> et <span
+class="math inline">\(P\)</span>.</p>
+<p>La divergence du chi-deux, notée <span
+class="math inline">\(D_{\chi^2}(P\|Q)\)</span>, est définie par :</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) = \sum_{i=1}^n
+\frac{(P(i) - Q(i))^2}{Q(i)}\]</span></p>
+<p>De manière équivalente, on peut l’écrire comme :</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) = \sum_{i=1}^n
+\frac{P(i)^2}{Q(i)} - 1\]</span></p>
+<p>Cette définition est valable lorsque <span class="math inline">\(Q(i)
+&gt; 0\)</span> pour tout <span class="math inline">\(i\)</span>. Si
+<span class="math inline">\(Q(i) = 0\)</span> pour certains <span
+class="math inline">\(i\)</span>, il est nécessaire de restreindre la
+somme aux indices pour lesquels <span class="math inline">\(Q(i) &gt;
+0\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Le théorème suivant établit une relation entre la divergence du
+chi-deux et l’entropie de Kullback-Leibler.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilités
+discrètes définies sur un ensemble fini <span
+class="math inline">\(\Omega\)</span>. Alors, la divergence du chi-deux
+<span class="math inline">\(D_{\chi^2}(P\|Q)\)</span> est liée à
+l’entropie de Kullback-Leibler <span
+class="math inline">\(D_{KL}(P\|Q)\)</span> par l’inégalité suivante
+:</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) \geq 2
+D_{KL}(P\|Q)\]</span></p>
+<p>De plus, cette inégalité est stricte lorsque <span
+class="math inline">\(P \neq Q\)</span>.</p>
+</div>
+<p>La démonstration de ce théorème repose sur l’inégalité de
+Cauchy-Schwarz et les propriétés de la fonction logarithme.</p>
+<h1 id="preuves">Preuves</h1>
+<div class="proof">
+<p><em>Proof.</em> Pour démontrer l’inégalité <span
+class="math inline">\(D_{\chi^2}(P\|Q) \geq 2 D_{KL}(P\|Q)\)</span>,
+nous partons de la définition de la divergence du chi-deux :</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) = \sum_{i=1}^n
+\frac{(P(i) - Q(i))^2}{Q(i)}\]</span></p>
+<p>En développant le carré, nous obtenons :</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) = \sum_{i=1}^n
+\frac{P(i)^2}{Q(i)} - 2 \sum_{i=1}^n P(i) + \sum_{i=1}^n
+Q(i)\]</span></p>
+<p>Comme <span class="math inline">\(\sum_{i=1}^n P(i) = 1\)</span> et
+<span class="math inline">\(\sum_{i=1}^n Q(i) = 1\)</span>, cela se
+simplifie en :</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) = \sum_{i=1}^n
+\frac{P(i)^2}{Q(i)} - 1\]</span></p>
+<p>D’autre part, l’entropie de Kullback-Leibler est définie par :</p>
+<p><span class="math display">\[D_{KL}(P\|Q) = \sum_{i=1}^n P(i)
+\log\left(\frac{P(i)}{Q(i)}\right)\]</span></p>
+<p>Pour établir l’inégalité souhaitée, nous utilisons l’inégalité de
+Cauchy-Schwarz, qui stipule que pour tout <span class="math inline">\(x
+&gt; 0\)</span> et <span class="math inline">\(y &gt; 0\)</span>, on a
+:</p>
+<p><span class="math display">\[x^2 + y^2 \geq 2xy\]</span></p>
+<p>En posant <span class="math inline">\(x =
+\sqrt{\frac{P(i)}{Q(i)}}\)</span> et <span class="math inline">\(y =
+1\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\frac{P(i)}{Q(i)} + 1 \geq 2
+\sqrt{\frac{P(i)}{Q(i)}}\]</span></p>
+<p>En multipliant par <span class="math inline">\(P(i)\)</span> et en
+sommant sur <span class="math inline">\(i\)</span>, cela donne :</p>
+<p><span class="math display">\[\sum_{i=1}^n P(i) + \sum_{i=1}^n P(i)
+Q(i) \geq 2 \sum_{i=1}^n P(i)^{3/2} Q(i)^{-1/2}\]</span></p>
+<p>Cependant, cette approche semble complexe. Une méthode plus directe
+consiste à utiliser l’inégalité de Taylor pour la fonction logarithme
+:</p>
+<p><span class="math display">\[\log(1 + x) \leq x \quad \text{pour}
+\quad x &gt; -1\]</span></p>
+<p>En posant <span class="math inline">\(x = \frac{P(i)}{Q(i)} -
+1\)</span>, nous avons :</p>
+<p><span class="math display">\[\log\left(\frac{P(i)}{Q(i)}\right) \leq
+\frac{P(i)}{Q(i)} - 1\]</span></p>
+<p>En multipliant par <span class="math inline">\(P(i)\)</span> et en
+sommant sur <span class="math inline">\(i\)</span>, cela donne :</p>
+<p><span class="math display">\[D_{KL}(P\|Q) \leq \sum_{i=1}^n P(i) -
+\sum_{i=1}^n Q(i)\]</span></p>
+<p>Mais cela ne semble pas directement utile. Revenons à la définition
+de <span class="math inline">\(D_{\chi^2}(P\|Q)\)</span>. Nous savons
+que :</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) = \sum_{i=1}^n
+\frac{P(i)^2}{Q(i)} - 1\]</span></p>
+<p>Et que :</p>
+<p><span class="math display">\[D_{KL}(P\|Q) = \sum_{i=1}^n P(i)
+\log\left(\frac{P(i)}{Q(i)}\right)\]</span></p>
+<p>En utilisant l’inégalité <span class="math inline">\(\log(x) \leq x -
+1\)</span> pour <span class="math inline">\(x &gt; 0\)</span>, nous
+obtenons :</p>
+<p><span class="math display">\[D_{KL}(P\|Q) \leq \sum_{i=1}^n P(i)
+\left(\frac{P(i)}{Q(i)} - 1\right)\]</span></p>
+<p>Ce qui se simplifie en :</p>
+<p><span class="math display">\[D_{KL}(P\|Q) \leq \sum_{i=1}^n
+\frac{P(i)^2}{Q(i)} - 1\]</span></p>
+<p>Or, <span class="math inline">\(\sum_{i=1}^n \frac{P(i)^2}{Q(i)} - 1
+= D_{\chi^2}(P\|Q)\)</span>. Donc :</p>
+<p><span class="math display">\[D_{KL}(P\|Q) \leq
+D_{\chi^2}(P\|Q)\]</span></p>
+<p>Pour obtenir l’inégalité <span class="math inline">\(D_{\chi^2}(P\|Q)
+\geq 2 D_{KL}(P\|Q)\)</span>, il nous faut une majoration plus fine.
+Utilisons l’inégalité de Pinsker, qui stipule que :</p>
+<p><span class="math display">\[D_{KL}(P\|Q) \geq \frac{1}{2}
+D_{\text{TV}}(P, Q)^2\]</span></p>
+<p>Où <span class="math inline">\(D_{\text{TV}}(P, Q)\)</span> est la
+distance totale de variation entre <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span>, définie par :</p>
+<p><span class="math display">\[D_{\text{TV}}(P, Q) = \frac{1}{2}
+\sum_{i=1}^n |P(i) - Q(i)|\]</span></p>
+<p>D’autre part, nous avons :</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) = \sum_{i=1}^n
+\frac{(P(i) - Q(i))^2}{Q(i)} \geq \sum_{i=1}^n (P(i) -
+Q(i))^2\]</span></p>
+<p>Car <span class="math inline">\(Q(i) \leq 1\)</span>. En utilisant
+l’inégalité de Cauchy-Schwarz, nous obtenons :</p>
+<p><span class="math display">\[\sum_{i=1}^n (P(i) - Q(i))^2 \geq
+\frac{1}{4} \left(\sum_{i=1}^n |P(i) - Q(i)| \right)^2\]</span></p>
+<p>Donc :</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) \geq \frac{1}{4}
+D_{\text{TV}}(P, Q)^2\]</span></p>
+<p>En combinant avec l’inégalité de Pinsker, nous avons :</p>
+<p><span class="math display">\[D_{\chi^2}(P\|Q) \geq 2
+D_{KL}(P\|Q)\]</span></p>
+<p>Ce qui achève la démonstration. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et corollaires</h1>
+<ol>
+<li><p>La divergence du chi-deux est toujours non négative, c’est-à-dire
+que <span class="math inline">\(D_{\chi^2}(P\|Q) \geq 0\)</span>. De
+plus, <span class="math inline">\(D_{\chi^2}(P\|Q) = 0\)</span> si et
+seulement si <span class="math inline">\(P = Q\)</span>.</p></li>
+<li><p>La divergence du chi-deux n’est pas symétrique, c’est-à-dire que
+<span class="math inline">\(D_{\chi^2}(P\|Q) \neq
+D_{\chi^2}(Q\|P)\)</span> en général. Cependant, elle est invariante par
+transformation affine des probabilités.</p></li>
+<li><p>La divergence du chi-deux est convexe en <span
+class="math inline">\(P\)</span> pour <span
+class="math inline">\(Q\)</span> fixé, et convexe en <span
+class="math inline">\(Q\)</span> pour <span
+class="math inline">\(P\)</span> fixé.</p></li>
+</ol>
+<p>La preuve de ces propriétés repose sur des arguments simples
+d’analyse et d’algèbre. Par exemple, la non-négativité découle
+directement de l’inégalité <span class="math inline">\((P(i) - Q(i))^2
+\geq 0\)</span>.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La divergence du chi-deux est un outil puissant et polyvalent en
+statistique. Ses applications vont des tests d’ajustement aux méthodes
+de régression, en passant par l’apprentissage automatique. Son étude
+approfondie permet de mieux comprendre les relations entre différentes
+mesures de dissimilarité et d’entropie, ouvrant ainsi la voie à de
+nouvelles avancées théoriques et pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

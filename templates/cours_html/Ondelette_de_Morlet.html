@@ -1,0 +1,302 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Ondelette de Morlet : Une Outil Puissant en Analyse Temps-Fréquence</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Ondelette de Morlet : Une Outil Puissant en Analyse
+Temps-Fréquence</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse temps-fréquence est une branche de l’analyse mathématique
+qui vise à étudier les signaux en fonction du temps et de la fréquence
+simultanément. L’une des méthodes les plus populaires dans ce domaine
+est l’utilisation des ondelettes, en particulier l’ondelette de Morlet.
+Introduite par Jean Morlet dans les années 1980, cette ondelette est
+devenue un outil fondamental en traitement du signal, en analyse
+sismique et dans de nombreuses autres applications scientifiques.</p>
+<p>L’ondelette de Morlet est une fonction complexe qui permet de
+décomposer un signal en différentes échelles et fréquences. Elle est
+particulièrement utile pour analyser des signaux non stationnaires,
+c’est-à-dire des signaux dont les caractéristiques fréquentielles
+changent avec le temps. Cette propriété en fait un outil indispensable
+dans l’étude de phénomènes complexes et variés, allant des signaux
+biologiques aux données financières.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’ondelette de Morlet, il est essentiel de définir
+d’abord ce qu’est une ondelette. Une ondelette est une fonction qui est
+localisée à la fois dans le temps et dans la fréquence. Elle est
+utilisée pour décomposer un signal en une somme de versions translatées
+et dilatées d’elle-même.</p>
+<p>Considérons un signal <span class="math inline">\(f(t)\)</span>. Nous
+cherchons une fonction <span class="math inline">\(\psi(t)\)</span>
+telle que : <span class="math display">\[f(t) = \sum_{j,k} c_{j,k}
+\psi_{j,k}(t)\]</span> où <span class="math inline">\(\psi_{j,k}(t) =
+2^{-j/2} \psi(2^{-j}t - k)\)</span>, <span
+class="math inline">\(c_{j,k}\)</span> sont les coefficients de
+l’ondelette, et <span class="math inline">\(j, k \in
+\mathbb{Z}\)</span>.</p>
+<p>L’ondelette de Morlet est une fonction complexe définie par : <span
+class="math display">\[\psi(t) = e^{i \omega_0 t} e^{-t^2 / 2}\]</span>
+où <span class="math inline">\(\omega_0\)</span> est une constante
+réelle.</p>
+<p>Formellement, l’ondelette de Morlet peut être écrite comme : <span
+class="math display">\[\psi(t) = e^{i \omega_0 t} e^{-t^2 / 2}\]</span>
+ou, en utilisant des quantificateurs : <span
+class="math display">\[\forall t \in \mathbb{R}, \psi(t) = e^{i \omega_0
+t} e^{-t^2 / 2}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>L’un des théorèmes fondamentaux liés à l’ondelette de Morlet est le
+théorème de reconstruction. Ce théorème stipule que tout signal peut
+être reconstruit à partir de ses coefficients d’ondelette.</p>
+<p>Supposons que <span class="math inline">\(f(t)\)</span> soit un
+signal de carré intégrable. Alors, il existe une constante <span
+class="math inline">\(C_{\psi}\)</span> telle que : <span
+class="math display">\[f(t) = \frac{1}{C_{\psi}} \int_{-\infty}^{\infty}
+\int_{0}^{\infty} \langle f, \psi_{a,b} \rangle \psi_{a,b}(t)
+\frac{da}{a^2} db\]</span> où <span class="math inline">\(\psi_{a,b}(t)
+= \frac{1}{\sqrt{a}} \psi\left(\frac{t - b}{a}\right)\)</span>, et <span
+class="math inline">\(C_{\psi} = \int_{-\infty}^{\infty}
+\frac{|\hat{\psi}(\omega)|^2}{|\omega|} d\omega &lt;
+\infty\)</span>.</p>
+<p>Pour l’ondelette de Morlet, la condition <span
+class="math inline">\(C_{\psi} &lt; \infty\)</span> est satisfaite pour
+<span class="math inline">\(\omega_0 &gt; 5\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<p>La preuve du théorème de reconstruction repose sur le théorème de
+Plancherel et les propriétés des ondelettes. Nous allons esquisser la
+preuve ici.</p>
+<p>Considérons le transformée en ondelette d’un signal <span
+class="math inline">\(f(t)\)</span> : <span
+class="math display">\[W_f(a, b) = \langle f, \psi_{a,b}
+\rangle\]</span></p>
+<p>En utilisant le théorème de Plancherel, nous avons : <span
+class="math display">\[W_f(a, b) = \frac{1}{2\pi}
+\int_{-\infty}^{\infty} \hat{f}(\omega) \overline{\hat{\psi}_a(\omega)}
+e^{i \omega b} d\omega\]</span></p>
+<p>où <span class="math inline">\(\hat{\psi}_a(\omega) = \sqrt{a}
+\hat{\psi}(a \omega)\)</span>.</p>
+<p>En inversant cette transformée, nous obtenons : <span
+class="math display">\[f(t) = \frac{1}{C_{\psi}} \int_{-\infty}^{\infty}
+\int_{0}^{\infty} W_f(a, b) \psi_{a,b}(t) \frac{da}{a^2} db\]</span></p>
+<p>Cette preuve montre que tout signal peut être reconstruit à partir de
+ses coefficients d’ondelette.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’ondelette de Morlet possède plusieurs propriétés intéressantes
+:</p>
+<ol>
+<li><p>**Localisation en Fréquence** : L’ondelette de Morlet est bien
+localisée en fréquence, ce qui la rend idéale pour l’analyse des signaux
+à haute résolution fréquentielle.</p></li>
+<li><p>**Symétrie** : L’ondelette de Morlet est symétrique autour de son
+centre, ce qui simplifie l’analyse des signaux.</p></li>
+<li><p>**Condition d’Admissibilité** : Pour <span
+class="math inline">\(\omega_0 &gt; 5\)</span>, l’ondelette de Morlet
+satisfait la condition d’admissibilité <span
+class="math inline">\(C_{\psi} &lt; \infty\)</span>, ce qui garantit que
+le théorème de reconstruction est applicable.</p></li>
+</ol>
+<p>Pour prouver la propriété (iii), nous devons montrer que <span
+class="math inline">\(C_{\psi} &lt; \infty\)</span> pour <span
+class="math inline">\(\omega_0 &gt; 5\)</span>. En calculant l’intégrale
+: <span class="math display">\[C_{\psi} = \int_{-\infty}^{\infty}
+\frac{|\hat{\psi}(\omega)|^2}{|\omega|} d\omega\]</span></p>
+<p>Nous trouvons que pour <span class="math inline">\(\omega_0 &gt;
+5\)</span>, cette intégrale converge, ce qui prouve la condition
+d’admissibilité.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

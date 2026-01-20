@@ -1,0 +1,366 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Quantile Loss (Pinball Loss)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Quantile Loss (Pinball Loss)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le concept de <em>Quantile Loss</em>, également connu sous le nom de
+<em>Pinball Loss</em>, émerge dans un contexte où les méthodes
+statistiques traditionnelles, telles que la régression linéaire ou les
+modèles de prédiction basés sur l’erreur quadratique moyenne, se
+révèlent insuffisantes pour capturer la complexité des distributions de
+données. L’idée fondamentale derrière le Quantile Loss est de fournir
+une mesure d’erreur qui ne se limite pas à la moyenne ou à la médiane,
+mais qui permet de modéliser et prédire des quantiles spécifiques d’une
+distribution.</p>
+<p>Cette approche est particulièrement utile dans les domaines où la
+prise de décision repose sur des quantiles spécifiques, tels que la
+finance (gestion des risques), l’ingénierie (prévision des extrêmes) ou
+encore la médecine (estimation des seuils critiques). Le Quantile Loss
+offre une flexibilité qui permet de pondérer différemment les erreurs en
+fonction de leur position relative par rapport au quantile cible, ce qui
+est crucial pour les applications où certaines erreurs sont plus
+coûteuses que d’autres.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le Quantile Loss, commençons par définir ce qu’est un
+quantile. Un quantile est une valeur qui divise une distribution de
+probabilité en deux parties, où une fraction donnée des données se
+trouve en dessous du quantile et le reste au-dessus. Par exemple, la
+médiane est un quantile de 0.5.</p>
+<p>Supposons que nous ayons une variable aléatoire <span
+class="math inline">\(Y\)</span> et un quantile cible <span
+class="math inline">\(\tau \in (0, 1)\)</span>. Nous cherchons à prédire
+un quantile <span class="math inline">\(\tau\)</span> de la distribution
+de <span class="math inline">\(Y\)</span>. Soit <span
+class="math inline">\(F_Y(y) = P(Y \leq y)\)</span> la fonction de
+répartition de <span class="math inline">\(Y\)</span>. Le quantile <span
+class="math inline">\(q_\tau\)</span> est défini comme :</p>
+<p><span class="math display">\[q_\tau = F_Y^{-1}(\tau)\]</span></p>
+<p>où <span class="math inline">\(F_Y^{-1}\)</span> est la fonction
+quantile inverse de <span class="math inline">\(Y\)</span>.</p>
+<p>Le Quantile Loss, ou Pinball Loss, est une fonction de perte qui
+mesure l’erreur entre la prédiction <span
+class="math inline">\(\hat{y}\)</span> et la valeur réelle <span
+class="math inline">\(y\)</span>, en tenant compte du quantile cible
+<span class="math inline">\(\tau\)</span>. Intuitivement, nous voulons
+pénaliser différemment les erreurs en fonction de leur position par
+rapport au quantile <span class="math inline">\(\tau\)</span>.</p>
+<p>La fonction de perte du Quantile Loss est définie comme suit :</p>
+<p><span class="math display">\[L_\tau(y, \hat{y}) =
+\begin{cases}
+\tau (y - \hat{y}) &amp; \text{si } y \geq \hat{y} \\
+(1 - \tau)(\hat{y} - y) &amp; \text{si } y &lt; \hat{y}
+\end{cases}\]</span></p>
+<p>Cette fonction de perte peut également être exprimée sous une forme
+compacte en utilisant la fonction max :</p>
+<p><span class="math display">\[L_\tau(y, \hat{y}) = (1 - \tau) \max(0,
+\hat{y} - y) + \tau \max(0, y - \hat{y})\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour mieux comprendre les propriétés du Quantile Loss, nous allons
+maintenant énoncer et prouver quelques théorèmes clés.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(Y\)</span> une variable aléatoire
+avec fonction de répartition <span
+class="math inline">\(F_Y(y)\)</span>, et soit <span
+class="math inline">\(\tau \in (0, 1)\)</span>. La valeur qui minimise
+l’espérance du Quantile Loss <span class="math inline">\(L_\tau(Y,
+\hat{y})\)</span> est le quantile <span class="math inline">\(q_\tau =
+F_Y^{-1}(\tau)\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver ce théorème, nous devons montrer que
+<span class="math inline">\(q_\tau\)</span> minimise l’espérance du
+Quantile Loss. Considérons la fonction de perte attendue :</p>
+<p><span class="math display">\[\mathbb{E}[L_\tau(Y, \hat{y})] = (1 -
+\tau) \int_{\hat{y}}^{\infty} (y&#39; - \hat{y}) dF_Y(y&#39;) + \tau
+\int_{-\infty}^{\hat{y}} (\hat{y} - y&#39;) dF_Y(y&#39;)\]</span></p>
+<p>Nous devons trouver <span class="math inline">\(\hat{y}\)</span> qui
+minimise cette expression. Pour ce faire, nous allons prendre la dérivée
+de <span class="math inline">\(\mathbb{E}[L_\tau(Y, \hat{y})]\)</span>
+par rapport à <span class="math inline">\(\hat{y}\)</span> et la mettre
+à zéro.</p>
+<p><span class="math display">\[\frac{d}{d\hat{y}} \mathbb{E}[L_\tau(Y,
+\hat{y})] = (1 - \tau) F_Y(\hat{y}) - \tau (1 -
+F_Y(\hat{y}))\]</span></p>
+<p>En mettant la dérivée à zéro, nous obtenons :</p>
+<p><span class="math display">\[(1 - \tau) F_Y(\hat{y}) = \tau (1 -
+F_Y(\hat{y}))\]</span></p>
+<p>En résolvant cette équation, nous trouvons :</p>
+<p><span class="math display">\[F_Y(\hat{y}) = \tau\]</span></p>
+<p>Cela signifie que <span class="math inline">\(\hat{y} =
+F_Y^{-1}(\tau) = q_\tau\)</span>, ce qui prouve que le quantile <span
+class="math inline">\(q_\tau\)</span> minimise l’espérance du Quantile
+Loss. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Le Quantile Loss possède plusieurs propriétés intéressantes qui le
+rendent utile dans diverses applications. Nous allons maintenant énoncer
+et prouver quelques-unes de ces propriétés.</p>
+<div class="corollaire">
+<p>Le Quantile Loss <span class="math inline">\(L_\tau(y,
+\hat{y})\)</span> est une fonction convexe de <span
+class="math inline">\(\hat{y}\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver la convexité du Quantile Loss, nous
+devons montrer que sa seconde dérivée par rapport à <span
+class="math inline">\(\hat{y}\)</span> est toujours positive.
+Considérons la fonction de perte :</p>
+<p><span class="math display">\[L_\tau(y, \hat{y}) = (1 - \tau) \max(0,
+\hat{y} - y) + \tau \max(0, y - \hat{y})\]</span></p>
+<p>La première dérivée de <span class="math inline">\(L_\tau(y,
+\hat{y})\)</span> par rapport à <span
+class="math inline">\(\hat{y}\)</span> est :</p>
+<p><span class="math display">\[\frac{d}{d\hat{y}} L_\tau(y, \hat{y}) =
+\begin{cases}
+1 - \tau &amp; \text{si } y &lt; \hat{y} \\
+\tau &amp; \text{si } y &gt; \hat{y}
+\end{cases}\]</span></p>
+<p>La seconde dérivée est :</p>
+<p><span class="math display">\[\frac{d^2}{d\hat{y}^2} L_\tau(y,
+\hat{y}) = 0\]</span></p>
+<p>Cependant, cette dérivée seconde n’est pas définie au point <span
+class="math inline">\(y = \hat{y}\)</span>, mais elle est toujours non
+négative, ce qui prouve que le Quantile Loss est une fonction
+convexe. ◻</p>
+</div>
+<div class="corollaire">
+<p>Le Quantile Loss est symétrique en ce sens que <span
+class="math inline">\(L_\tau(y, \hat{y}) = L_{1-\tau}(\hat{y},
+y)\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour prouver cette propriété, nous allons montrer que
+les deux fonctions de perte sont égales. Considérons d’abord le cas où
+<span class="math inline">\(y \geq \hat{y}\)</span> :</p>
+<p><span class="math display">\[L_\tau(y, \hat{y}) = \tau (y -
+\hat{y})\]</span></p>
+<p>Maintenant, considérons <span
+class="math inline">\(L_{1-\tau}(\hat{y}, y)\)</span> dans le même cas
+:</p>
+<p><span class="math display">\[L_{1-\tau}(\hat{y}, y) = (1 - \tau)(y -
+\hat{y}) + 0 = (1 - \tau)(y - \hat{y})\]</span></p>
+<p>Cependant, cela ne montre pas directement la symétrie. Pour une
+preuve plus rigoureuse, nous devons considérer les deux cas possibles
+:</p>
+<p>1. Si <span class="math inline">\(y \geq \hat{y}\)</span>, alors :
+<span class="math display">\[L_\tau(y, \hat{y}) = \tau (y -
+\hat{y})\]</span> <span class="math display">\[L_{1-\tau}(\hat{y}, y) =
+(1 - \tau)(y - \hat{y}) + 0 = (1 - \tau)(y - \hat{y})\]</span></p>
+<p>2. Si <span class="math inline">\(y &lt; \hat{y}\)</span>, alors :
+<span class="math display">\[L_\tau(y, \hat{y}) = (1 - \tau)(\hat{y} -
+y)\]</span> <span class="math display">\[L_{1-\tau}(\hat{y}, y) = 0 +
+\tau (\hat{y} - y) = \tau (\hat{y} - y)\]</span></p>
+<p>Ainsi, nous voyons que <span class="math inline">\(L_\tau(y, \hat{y})
+= L_{1-\tau}(\hat{y}, y)\)</span>, ce qui prouve la symétrie du Quantile
+Loss. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le Quantile Loss, ou Pinball Loss, est une fonction de perte
+puissante et flexible qui permet de modéliser et prédire des quantiles
+spécifiques d’une distribution. Ses propriétés de convexité, de symétrie
+et sa capacité à minimiser l’espérance du Quantile Loss en font un outil
+précieux dans de nombreuses applications, notamment la finance,
+l’ingénierie et la médecine. En comprenant les définitions, théorèmes et
+propriétés du Quantile Loss, nous pouvons mieux appréhender son
+importance et son utilité dans le domaine de la modélisation
+statistique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

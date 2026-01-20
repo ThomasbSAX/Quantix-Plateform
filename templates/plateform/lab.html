@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantix Lab</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lab.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+    <style>
+        .quantix-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #1a1a1a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+{% include 'header.html' %}
+
+<main class="simple-container" style="max-width:1200px; margin: 40px auto; padding: 0 20px;">
+
+    <section class="quantix-hero">
+        <div class="hero-content">
+            <h1>Math Lab</h1>
+            <p>Outils d'exploration et d'analyse de données — rapide, propre et prêt pour la production.</p>
+        </div>
+    </section>
+
+    <!-- Onglets: Nettoyage / Transformation / Visualisation -->
+    <section id="lab-tabs" class="lab-tabs" style="margin: 18px 0 22px;">
+        <div class="lab-tabs-card" style="background:#fff; border:1px solid #e5e5e5; border-radius: 10px; padding: 14px 16px; display:flex; gap:14px; align-items:center; flex-wrap:wrap;">
+            <div style="flex: 1; min-width: 280px;">
+                <div style="font-weight:600; color:#111827;">Parcours simple</div>
+                <div style="margin-top:6px; color:#6b7280; font-size:0.95rem;">
+                    1) Importez un dataset → 2) Nettoyez → 3) Transformez → 4) Visualisez.
+                </div>
+            </div>
+            <div class="lab-tabs-buttons" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <button class="btn lab-tab-back" id="tab-back" type="button" title="Revenir à l’étape précédente">← Retour</button>
+                <button class="btn lab-tab" id="tab-clean" type="button" data-tab="clean" aria-selected="true">Nettoyage</button>
+                <button class="btn lab-tab" id="tab-transform" type="button" data-tab="transform" aria-selected="false">Transformation</button>
+                <button class="btn btn-primary lab-tab" id="tab-viz" type="button" data-tab="viz" aria-selected="false">Visualisation</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Panneau commun: Table + outils (Nettoyage/Transformation) -->
+    <div id="lab-panel-data" class="lab-panel" style="display:block;">
+
+    <!-- Data Explorer (aperçu + tri + édition) -->
+    <section id="data-explorer" style="display:none; margin: 24px 0 8px;">
+        <div style="background:#fff; border:1px solid #e5e5e5; border-radius: 10px; overflow:hidden;">
+            <div style="padding: 14px 16px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                <div>
+                    <h3 style="margin:0; font-size: 1.05rem; font-weight: 600; color:#111827;">Aperçu du dataset
+                        <span id="data-explorer-meta" style="margin-left:10px; font-weight:400; color:#6b7280; font-size:0.9rem;"></span>
+                    </h3>
+                    <div style="margin-top:6px; color:#6b7280; font-size:0.9rem;">Clique sur un en-tête pour trier. Double-clique une cellule pour modifier (type Excel).</div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn" id="data-refresh" type="button">Rafraîchir</button>
+                </div>
+            </div>
+
+            <div style="padding: 12px 16px; border-bottom:1px solid #f0f0f0; display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
+                <div id="data-explorer-cleaning-tools" style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end; width:100%;">
+                <div style="flex:1; min-width: 520px;">
+                    <div style="font-size:0.85rem; color:#6b7280; margin-bottom:6px;">Recherche</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                        <input id="query-q" type="text" placeholder="Recherche texte (ex: Nord, Alpha, Web...)"
+                               style="min-width: 240px; flex:1; padding:8px; border:1px solid #e5e5e5; border-radius:8px;" />
+                        <select id="query-column" style="min-width: 200px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;"></select>
+                        <select id="query-op" style="min-width: 160px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;">
+                            <option value="contains">contient</option>
+                            <option value="equals">égal</option>
+                            <option value="ne">différent</option>
+                            <option value="gt">&gt;</option>
+                            <option value="gte">&gt;=</option>
+                            <option value="lt">&lt;</option>
+                            <option value="lte">&lt;=</option>
+                            <option value="between">entre (a,b)</option>
+                            <option value="in">dans (a,b,c)</option>
+                            <option value="isnull">est vide</option>
+                            <option value="notnull">non vide</option>
+                        </select>
+                        <input id="query-value" type="text" placeholder="valeur / a,b" style="width: 220px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;" />
+                        <button class="btn btn-primary" id="query-apply" type="button">Appliquer</button>
+                        <button class="btn" id="query-clear" type="button">Réinitialiser</button>
+                        <button class="btn" id="query-export" type="button">Exporter CSV</button>
+                    </div>
+                    <div id="query-hint" style="margin-top:6px; color:#6b7280; font-size:0.85rem;"></div>
+                </div>
+
+                <div style="min-width: 260px;">
+                    <div style="font-size:0.85rem; color:#6b7280; margin-bottom:6px;">Affichage</div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <select id="display-column" style="flex:1; padding:8px; border:1px solid #e5e5e5; border-radius:8px;"></select>
+                        <select id="display-mode" style="width: 200px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;">
+                            <option value="auto">Auto</option>
+                            <option value="scientific">Scientifique</option>
+                            <option value="fixed">Arrondi (fixe)</option>
+                        </select>
+                        <input id="display-decimals" type="number" min="0" max="12" value="2" style="width:90px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;" />
+                        <button class="btn" id="display-apply" type="button">Appliquer</button>
+                    </div>
+                </div>
+
+                <div style="min-width: 360px;">
+                    <div style="font-size:0.85rem; color:#6b7280; margin-bottom:6px;">Colonnes</div>
+                    <div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap;">
+                        <select id="drop-columns" multiple size="4" style="min-width: 240px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;"></select>
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <button class="btn" id="drop-apply" type="button" style="color:#b91c1c; border-color: rgba(185,28,28,0.25);">Supprimer</button>
+                            <div style="font-size:0.82rem; color:#6b7280; max-width: 220px; line-height:1.25;">
+                                Astuce: sélection multiple avec Cmd (Mac) / Ctrl (Windows).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+
+                <div id="data-explorer-transform-tools" style="display:none; flex-wrap:wrap; gap:16px; align-items:flex-end; width:100%;">
+
+                <div style="flex:1; min-width: 420px;">
+                    <div style="font-size:0.85rem; color:#6b7280; margin-bottom:6px;">Transformation / Feature engineering</div>
+                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                        <select id="transform-column" style="min-width: 220px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;"></select>
+                        <select id="transform-action" style="min-width: 220px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;">
+                            <option value="linear">x = a·y + b</option>
+                            <option value="multiply">x = y · k</option>
+                            <option value="add">x = y + k</option>
+                            <option value="power">x = y ^ p</option>
+                            <option value="log10">x = log10(y)</option>
+                            <option value="ln">x = ln(y)</option>
+                            <option value="sqrt">x = sqrt(y)</option>
+                            <option value="abs">x = abs(y)</option>
+                            <option value="minmax">x = min-max(y)</option>
+                            <option value="zscore">x = z-score(y)</option>
+                            <option value="round">x = arrondir(y, d)</option>
+                            <option value="upper">x = UPPER(y)</option>
+                            <option value="lower">x = lower(y)</option>
+                            <option value="strip">x = trim(y)</option>
+                            <option value="replace">x = replace(y)</option>
+                        </select>
+                        <input id="transform-value" type="text" placeholder="params" style="width:160px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;" />
+                        <input id="transform-find" type="text" placeholder="find" style="width:140px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;" />
+                        <input id="transform-replace" type="text" placeholder="replace" style="width:140px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;" />
+                        <select id="transform-mode" style="width:140px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;">
+                            <option value="new">Nouvelle colonne</option>
+                            <option value="inplace">Modifier</option>
+                        </select>
+                        <input id="transform-newcol" type="text" placeholder="Nom nouvelle colonne" style="min-width:200px; padding:8px; border:1px solid #e5e5e5; border-radius:8px;" />
+                        <button class="btn btn-primary" id="transform-apply" type="button">Exécuter</button>
+                    </div>
+                    <div id="transform-hint" style="margin-top:6px; font-size:0.85rem; color:#6b7280;"></div>
+                </div>
+
+                </div>
+            </div>
+
+            <div style="padding: 12px 16px; overflow:auto; max-height: 520px;">
+                <table id="data-table" style="border-collapse:collapse; width:100%; min-width: 760px;">
+                    <thead id="data-thead"></thead>
+                    <tbody id="data-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    </div>
+
+    <!-- Zone de dépôt de fichier (toujours visible) -->
+    <section style="margin: 32px 0;">
+        <div id="upload-zone" style="border: 2px dashed #e5e5e5; border-radius: 8px; padding: 60px 40px; text-align: center; cursor: pointer; transition: all 0.3s; background: #fafafa;">
+            <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #999; margin-bottom: 20px; display: block;"></i>
+            <div style="font-size: 1.1rem; color: #565869; margin-bottom: 8px;">Déposer un fichier CSV pour commencer</div>
+            <div style="font-size: 0.9rem; color: #8e8ea0;">ou cliquer pour sélectionner</div>
+            <input type="file" id="file-input" accept=".csv" style="display: none;">
+        </div>
+        
+        <!-- Informations du fichier chargé -->
+        <div id="file-info" style="display: none; margin-top: 20px; padding: 20px; background: #ffffff; border: 1px solid #e5e5e5; border-radius: 8px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <i class="fas fa-file-csv" style="font-size: 2rem; color: #0066ff;"></i>
+                <div style="flex: 1;">
+                    <h3 id="file-name" style="font-size: 1.2rem; font-weight: 500; margin: 0 0 5px 0; color: #1a1a1a;"></h3>
+                    <div style="font-size: 0.9rem; color: #8e8ea0;">
+                        <span id="file-size"></span> • <span id="file-rows"></span> lignes • <span id="file-cols"></span> colonnes
+                    </div>
+                </div>
+                <button id="remove-file" style="padding: 8px 16px; border: 1px solid #e5e5e5; background: white; border-radius: 4px; cursor: pointer; color: #dc3545; font-weight: 500; transition: all 0.2s;">
+                    <i class="fas fa-times"></i> Supprimer
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Panneau: Nettoyage (résumé) -->
+    <div id="lab-panel-clean-summary" class="lab-panel" style="display:block;">
+
+    <!-- Résumé descriptif (auto après upload) -->
+    <section id="quickstart-summary" style="display:none; margin: 18px 0 28px;">
+        <div style="background:#fff; border:1px solid #e5e5e5; border-radius: 10px; overflow:hidden;">
+            <div style="padding: 14px 16px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+                <div>
+                    <h3 style="margin:0; font-size: 1.05rem; font-weight: 600; color:#111827;">Résumé descriptif</h3>
+                    <div id="quickstart-meta" style="margin-top:6px; color:#6b7280; font-size:0.9rem;">Types, valeurs manquantes, valeurs uniques, distributions.</div>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                    <button class="btn btn-primary" id="qs-btn-summary" type="button">Résumé</button>
+                    <button class="btn" id="qs-btn-missing" type="button">Manquants</button>
+                    <button class="btn" id="qs-btn-hist" type="button">Histogramme</button>
+                    <button class="btn" id="qs-btn-count" type="button">Comptage</button>
+                </div>
+            </div>
+            <div style="padding: 12px 16px;">
+                <div id="qs-summary" style="overflow:auto; border:1px solid #f3f4f6; border-radius:8px;"></div>
+                <div id="qs-plot" style="width:100%; height: 520px; margin-top: 14px;"></div>
+            </div>
+        </div>
+    </section>
+
+    </div>
+
+    <!-- Panneau: Transformation (réutilise Data Explorer + bloc transformation) -->
+    <div id="lab-panel-transform" class="lab-panel" style="display:none;">
+        <div style="background:#fff; border:1px solid #e5e5e5; border-radius: 10px; padding: 14px 16px; margin: 18px 0 12px;">
+            <div style="font-weight:600; color:#111827;">Transformation</div>
+            <div style="margin-top:6px; color:#6b7280; font-size:0.95rem;">
+                Utilisez les transformations par colonne (log, normalisation, encodage…) puis vérifiez le résultat dans l’aperçu.
+            </div>
+        </div>
+        <div style="margin-bottom: 8px; color:#6b7280; font-size:0.9rem;">
+            Astuce : le tableau “Aperçu du dataset” est partagé avec l’onglet Nettoyage.
+        </div>
+    </div>
+
+    <!-- Panneau: Visualisation -->
+    <div id="lab-panel-viz" class="lab-panel" style="display:none;">
+
+    <section class="quantix-categories" id="quantixCategories">
+        <div class="categories-container">
+            <h2 style="margin: 0 0 10px;">Graphiques</h2>
+            <p style="margin: 0 0 14px; color: #6b7280; font-size: 0.95rem;">
+                Visualisations classiques (qui marchent) + exemples. Pour les classiques, vous choisissez simplement les colonnes cibles. Les autres options avancées seront bientôt disponibles.
+            </p>
+            {% if not file_available %}
+            <div style="margin: 0 0 14px; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(245,158,11,0.35); background: rgba(245,158,11,0.08); color:#92400e;">
+                Importez d’abord un dataset (section au-dessus), puis revenez ici pour choisir une visualisation.
+            </div>
+            {% endif %}
+            <div style="display:flex; gap:12px; align-items:center; margin-bottom: 12px;">
+                <input id="plots-search" type="text" placeholder="Rechercher (exemples) (ex: kde, contours...)"
+                       style="flex:1; padding: 10px 12px; border: 1px solid #e5e5e5; border-radius: 8px; outline: none;" />
+                <button class="btn" id="plots-reload" type="button">Rafraîchir</button>
+            </div>
+            <div id="plots-tools" class="category-tools {% if not file_available %}disabled{% endif %}">
+                <div class="tool-item">
+                    <h4>Chargement…</h4>
+                    <span>Récupération du catalogue des visualisations.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </div>
+
+</main>
+
+{% include 'footer.html' %}
+
+<!-- Options modal for Lab tools -->
+<div id="lab-options-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:10000; align-items:center; justify-content:center;">
+    <div style="background:white; padding:18px; border-radius:8px; width:720px; max-width:95%; box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+        <h3 id="lab-options-title" style="margin-top:0;">Options</h3>
+        <div id="lab-options-body" style="max-height:60vh; overflow:auto;"></div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+            <button id="lab-options-cancel" class="btn">Annuler</button>
+            <button id="lab-options-confirm" class="btn btn-primary">Appliquer</button>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/lab.js') }}"></script>
+
+<script>
+    // Effet typewriter pour le titre
+    function typeWriter(element, text, speed, callback) {
+        let i = 0;
+        element.textContent = '';
+        element.style.opacity = '1';
+        
+        function type() {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            } else if (callback) {
+                setTimeout(callback, 300);
+            }
+        }
+        type();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const title = document.querySelector('.quantix-hero h1');
+        if (title) {
+            typeWriter(title, 'Math Lab', 80);
+        }
+
+        // Gestion du drag and drop
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileInfo = document.getElementById('file-info');
+        const removeFileBtn = document.getElementById('remove-file');
+        let currentFile = null;
+
+        // Click pour ouvrir le sélecteur
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        // Drag over
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#0066ff';
+            uploadZone.style.background = '#f0f7ff';
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.style.borderColor = '#e5e5e5';
+            uploadZone.style.background = '#fafafa';
+        });
+
+        // Drop
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#e5e5e5';
+            uploadZone.style.background = '#fafafa';
+            
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // Gérer le fichier sélectionné
+        async function handleFile(file) {
+            if (!file.name.endsWith('.csv')) {
+                alert('Veuillez sélectionner un fichier CSV');
+                return;
+            }
+
+            currentFile = file;
+            
+            // Afficher les infos du fichier
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-size').textContent = formatFileSize(file.size);
+            
+            // Lire le CSV pour compter lignes et colonnes
+            const text = await file.text();
+            const lines = text.trim().split('\n');
+            const cols = lines[0].split(',').length;
+            
+            document.getElementById('file-rows').textContent = lines.length - 1;
+            document.getElementById('file-cols').textContent = cols;
+            
+            // Masquer upload zone, afficher file info
+            uploadZone.style.display = 'none';
+            fileInfo.style.display = 'block';
+
+            // Uploader le fichier
+            uploadFile(file);
+        }
+
+        // Upload vers le serveur
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Fichier uploadé avec succès:', data);
+                    // Activer Plot Studio sans recharger (important pour la confidentialité + UX)
+                    const plotsTools = document.getElementById('plots-tools');
+                    if (plotsTools) plotsTools.classList.remove('disabled');
+
+                    // Rafraîchir le statut session (toast) si disponible
+                    if (typeof checkSessionStatus === 'function') {
+                        checkSessionStatus();
+                    }
+
+                    // Rafraîchir l'aperçu de données si disponible
+                    if (window.quantixLab && typeof window.quantixLab.refreshDataExplorer === 'function') {
+                        window.quantixLab.refreshDataExplorer();
+                    }
+
+                    // Résumé descriptif: affichage automatique après upload
+                    if (window.quantixLab && typeof window.quantixLab.quickStart === 'function') {
+                        window.quantixLab.quickStart();
+                    }
+
+                    // Revenir sur l'onglet Nettoyage (parcours guidé)
+                    if (window.quantixLab && typeof window.quantixLab.setActiveTab === 'function') {
+                        window.quantixLab.setActiveTab('clean');
+                    }
+                } else {
+                    alert('Erreur lors du téléchargement du fichier');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du téléchargement');
+            }
+        }
+
+        // Supprimer le fichier
+        removeFileBtn.addEventListener('click', () => {
+            currentFile = null;
+            fileInput.value = '';
+            uploadZone.style.display = 'block';
+            fileInfo.style.display = 'none';
+            
+            // Purge serveur (supprime aussi le fichier uploadé)
+            fetch('/api/session/clear', { method: 'POST' })
+                .then(() => {
+                    const plotsTools = document.getElementById('plots-tools');
+                    if (plotsTools) plotsTools.classList.add('disabled');
+                    if (typeof checkSessionStatus === 'function') {
+                        checkSessionStatus();
+                    }
+
+                    if (window.quantixLab && typeof window.quantixLab.setActiveTab === 'function') {
+                        window.quantixLab.setActiveTab('clean');
+                    }
+                })
+                .catch(console.error);
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // L'UI onglets est gérée dans static/js/lab.js
+    });
+</script>
+
+</body>
+</html>

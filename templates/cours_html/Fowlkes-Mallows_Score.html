@@ -1,0 +1,361 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>The Fowlkes-Mallows Score: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The Fowlkes-Mallows Score: A Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>The Fowlkes-Mallows (FM) score is a metric used to evaluate the
+similarity between two data clusterings. It is derived from the
+<em>Precision</em> and <em>Recall</em> measures, which are fundamental
+concepts in information retrieval and classification tasks. The FM score
+addresses the need for a robust and interpretable metric to compare
+clusterings, especially in the context of unsupervised learning where
+ground truth labels are often unavailable.</p>
+<p>The FM score was introduced by Fowlkes and Mallows in 1983 as a
+solution to the limitations of other clustering evaluation metrics, such
+as the Rand Index. It provides a balanced measure that combines both
+precision and recall, offering a more nuanced view of clustering
+performance.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To understand the FM score, we first need to define some fundamental
+concepts. Consider two clusterings of a set <span
+class="math inline">\(S\)</span> with <span
+class="math inline">\(n\)</span> elements: the true clustering <span
+class="math inline">\(U = \{U_1, U_2, \ldots, U_r\}\)</span> and the
+predicted clustering <span class="math inline">\(V = \{V_1, V_2, \ldots,
+V_k\}\)</span>.</p>
+<h2 id="precision-and-recall">Precision and Recall</h2>
+<p>The precision of a clustering <span class="math inline">\(V\)</span>
+with respect to <span class="math inline">\(U\)</span> is defined as the
+ratio of the number of pairs of elements in <span
+class="math inline">\(S\)</span> that are both in the same cluster in
+<span class="math inline">\(V\)</span> and in the same cluster in <span
+class="math inline">\(U\)</span>, to the total number of pairs of
+elements in <span class="math inline">\(S\)</span> that are in the same
+cluster in <span class="math inline">\(V\)</span>.</p>
+<p><span class="math display">\[\text{Precision}(V, U) =
+\frac{\sum_{i=1}^{k} \sum_{j=1}^{r} |V_i \cap U_j|^2}{\sum_{i=1}^{k}
+|V_i|^2}\]</span></p>
+<p>Similarly, the recall of a clustering <span
+class="math inline">\(V\)</span> with respect to <span
+class="math inline">\(U\)</span> is defined as the ratio of the number
+of pairs of elements in <span class="math inline">\(S\)</span> that are
+both in the same cluster in <span class="math inline">\(V\)</span> and
+in the same cluster in <span class="math inline">\(U\)</span>, to the
+total number of pairs of elements in <span
+class="math inline">\(S\)</span> that are in the same cluster in <span
+class="math inline">\(U\)</span>.</p>
+<p><span class="math display">\[\text{Recall}(V, U) =
+\frac{\sum_{i=1}^{k} \sum_{j=1}^{r} |V_i \cap U_j|^2}{\sum_{j=1}^{r}
+|U_j|^2}\]</span></p>
+<h2 id="fowlkes-mallows-score">Fowlkes-Mallows Score</h2>
+<p>The Fowlkes-Mallows score is the geometric mean of precision and
+recall. It provides a single value that balances both measures, offering
+a comprehensive evaluation of clustering performance.</p>
+<p><span class="math display">\[\text{FM}(V, U) =
+\sqrt{\text{Precision}(V, U) \times \text{Recall}(V, U)}\]</span></p>
+<p>Alternatively, the FM score can be expressed in terms of the number
+of pairs of elements that are concordant and discordant between the two
+clusterings.</p>
+<p>Let <span class="math inline">\(a\)</span> be the number of pairs of
+elements that are in the same cluster in both <span
+class="math inline">\(U\)</span> and <span
+class="math inline">\(V\)</span>, <span class="math inline">\(b\)</span>
+be the number of pairs that are in the same cluster in <span
+class="math inline">\(U\)</span> but not in <span
+class="math inline">\(V\)</span>, and <span
+class="math inline">\(c\)</span> be the number of pairs that are in the
+same cluster in <span class="math inline">\(V\)</span> but not in <span
+class="math inline">\(U\)</span>. Then:</p>
+<p><span class="math display">\[\text{FM}(V, U) =
+\sqrt{\frac{a}{\sqrt{(a + b)(a + c)}}}\]</span></p>
+<h1 id="theorems">Theorems</h1>
+<h2 id="theorem-1-symmetry-of-the-fm-score">Theorem 1: Symmetry of the
+FM Score</h2>
+<p>The FM score is symmetric with respect to its arguments. That is, for
+any two clusterings <span class="math inline">\(U\)</span> and <span
+class="math inline">\(V\)</span>:</p>
+<p><span class="math display">\[\text{FM}(V, U) = \text{FM}(U,
+V)\]</span></p>
+<h4 id="proof">Proof:</h4>
+<p>We start by expressing the FM score in terms of precision and
+recall.</p>
+<p><span class="math display">\[\text{FM}(V, U) =
+\sqrt{\text{Precision}(V, U) \times \text{Recall}(V, U)}\]</span></p>
+<p>Substituting the definitions of precision and recall:</p>
+<p><span class="math display">\[\text{FM}(V, U) =
+\sqrt{\frac{\sum_{i=1}^{k} \sum_{j=1}^{r} |V_i \cap
+U_j|^2}{\sum_{i=1}^{k} |V_i|^2} \times \frac{\sum_{i=1}^{k}
+\sum_{j=1}^{r} |V_i \cap U_j|^2}{\sum_{j=1}^{r} |U_j|^2}}\]</span></p>
+<p>Simplifying the expression:</p>
+<p><span class="math display">\[\text{FM}(V, U) = \frac{\sum_{i=1}^{k}
+\sum_{j=1}^{r} |V_i \cap U_j|^2}{\sqrt{\sum_{i=1}^{k} |V_i|^2 \times
+\sum_{j=1}^{r} |U_j|^2}}\]</span></p>
+<p>By symmetry, we can interchange <span
+class="math inline">\(U\)</span> and <span
+class="math inline">\(V\)</span>:</p>
+<p><span class="math display">\[\text{FM}(U, V) = \frac{\sum_{j=1}^{r}
+\sum_{i=1}^{k} |U_j \cap V_i|^2}{\sqrt{\sum_{j=1}^{r} |U_j|^2 \times
+\sum_{i=1}^{k} |V_i|^2}} = \text{FM}(V, U)\]</span></p>
+<p>Thus, the FM score is symmetric.</p>
+<h2 id="theorem-2-range-of-the-fm-score">Theorem 2: Range of the FM
+Score</h2>
+<p>The FM score ranges between 0 and 1. Specifically, for any two
+clusterings <span class="math inline">\(U\)</span> and <span
+class="math inline">\(V\)</span>:</p>
+<p><span class="math display">\[0 \leq \text{FM}(V, U) \leq
+1\]</span></p>
+<h4 id="proof-1">Proof:</h4>
+<p>The precision and recall measures are both non-negative, as they are
+ratios of non-negative quantities. Therefore, the product <span
+class="math inline">\(\text{Precision}(V, U) \times \text{Recall}(V,
+U)\)</span> is also non-negative.</p>
+<p>The maximum value of the FM score occurs when <span
+class="math inline">\(V = U\)</span>, in which case both precision and
+recall are equal to 1, and the FM score is also 1.</p>
+<p>The minimum value of the FM score occurs when <span
+class="math inline">\(V\)</span> and <span
+class="math inline">\(U\)</span> are completely dissimilar, in which
+case both precision and recall approach 0, and the FM score approaches
+0.</p>
+<p>Thus, the FM score ranges between 0 and 1.</p>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<h2 id="property-1-consistency-with-rand-index">Property 1: Consistency
+with Rand Index</h2>
+<p>The FM score is consistent with the Rand Index, a widely used measure
+of clustering similarity. Specifically, if two clusterings <span
+class="math inline">\(U\)</span> and <span
+class="math inline">\(V\)</span> have a high Rand Index, they will also
+have a high FM score.</p>
+<h4 id="proof-2">Proof:</h4>
+<p>The Rand Index <span class="math inline">\(R\)</span> is defined
+as:</p>
+<p><span class="math display">\[R = \frac{a + d}{a + b + c +
+d}\]</span></p>
+<p>where <span class="math inline">\(a, b, c,\)</span> and <span
+class="math inline">\(d\)</span> are as defined earlier. The FM score
+can be expressed in terms of the Rand Index as:</p>
+<p><span class="math display">\[\text{FM}(V, U) =
+\sqrt{\frac{a}{\sqrt{(a + b)(a + c)}}}\]</span></p>
+<p>When the Rand Index is high, <span class="math inline">\(a\)</span>
+is large compared to <span class="math inline">\(b\)</span> and <span
+class="math inline">\(c\)</span>, which implies that the FM score will
+also be high.</p>
+<h2 id="property-2-robustness-to-cluster-size">Property 2: Robustness to
+Cluster Size</h2>
+<p>The FM score is robust to the size of clusters in <span
+class="math inline">\(U\)</span> and <span
+class="math inline">\(V\)</span>. Specifically, the FM score does not
+depend on the absolute sizes of the clusters but rather on their
+relative sizes.</p>
+<h4 id="proof-3">Proof:</h4>
+<p>The FM score is defined in terms of the ratios of the number of pairs
+of elements that are concordant and discordant between the two
+clusterings. These ratios are invariant to the absolute sizes of the
+clusters, as they depend only on the relative sizes.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>The Fowlkes-Mallows score is a powerful and interpretable metric for
+evaluating the similarity between two clusterings. Its symmetry, range,
+and robustness to cluster size make it a valuable tool in the field of
+unsupervised learning. By providing a balanced measure that combines
+both precision and recall, the FM score offers a comprehensive
+evaluation of clustering performance.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

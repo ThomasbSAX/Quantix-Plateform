@@ -1,0 +1,345 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Transformation d’Anscombe : Une Analyse Approfondie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Transformation d’Anscombe : Une Analyse
+Approfondie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La transformation d’Anscombe, introduite par le statisticien Francis
+Anscombe en 1961, est une technique puissante pour stabiliser la
+variance et rendre les données plus conformes aux hypothèses des modèles
+linéaires. Cette transformation émerge dans un contexte où les données
+présentent une hétéroscédasticité marquée, c’est-à-dire une variance non
+constante des résidus. Anscombe a proposé quatre transformations
+différentes pour traiter ce problème, chacune adaptée à des situations
+spécifiques.</p>
+<p>L’importance de la transformation d’Anscombe réside dans sa capacité
+à améliorer l’efficacité des estimations et la validité des tests
+statistiques. En effet, lorsque les hypothèses de normalité et
+d’homoscedasticité ne sont pas satisfaites, les résultats des analyses
+peuvent être biaisés ou inefficaces. La transformation d’Anscombe permet
+de remédier à ces problèmes en rendant les données plus compatibles avec
+les modèles linéaires classiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la transformation d’Anscombe, il est essentiel de
+définir clairement le problème de l’hétéroscédasticité et les objectifs
+de la transformation.</p>
+<p>Supposons que nous ayons un ensemble de données <span
+class="math inline">\((x_i, y_i)\)</span> pour <span
+class="math inline">\(i = 1, \dots, n\)</span>, où <span
+class="math inline">\(y_i\)</span> est une variable dépendante et <span
+class="math inline">\(x_i\)</span> est une variable indépendante. Nous
+cherchons à modéliser la relation entre <span
+class="math inline">\(y_i\)</span> et <span
+class="math inline">\(x_i\)</span> par un modèle linéaire de la forme :
+<span class="math display">\[y_i = \beta_0 + \beta_1 x_i +
+\epsilon_i\]</span> où <span class="math inline">\(\epsilon_i\)</span>
+sont les résidus, supposés indépendants et identiquement distribués
+(i.i.d.) avec une variance constante.</p>
+<p>Cependant, en pratique, les résidus peuvent présenter une variance
+non constante, ce qui rend les estimations des paramètres <span
+class="math inline">\(\beta_0\)</span> et <span
+class="math inline">\(\beta_1\)</span> inefficaces. La transformation
+d’Anscombe vise à stabiliser la variance des résidus en transformant la
+variable dépendante <span class="math inline">\(y_i\)</span>.</p>
+<p>La transformation d’Anscombe est définie de manière générale comme
+suit : <span class="math display">\[T(y_i) = \begin{cases}
+\sqrt{y_i} &amp; \text{si } y_i \geq 0 \\
+-\sqrt{-y_i} &amp; \text{si } y_i &lt; 0
+\end{cases}\]</span></p>
+<p>Cette transformation peut être généralisée pour inclure des poids et
+des ajustements spécifiques. Les quatre transformations proposées par
+Anscombe sont les suivantes :</p>
+<p>1. **Transformation linéaire** : <span
+class="math display">\[T_1(y_i) = y_i\]</span></p>
+<p>2. **Transformation racine carrée** : <span
+class="math display">\[T_2(y_i) = \sqrt{y_i}\]</span></p>
+<p>3. **Transformation logarithmique** : <span
+class="math display">\[T_3(y_i) = \log(y_i + c)\]</span> où <span
+class="math inline">\(c\)</span> est une constante choisie pour éviter
+les logarithmes de zéro.</p>
+<p>4. **Transformation inverse** : <span class="math display">\[T_4(y_i)
+= \frac{1}{y_i}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour justifier l’utilisation de la transformation d’Anscombe, nous
+pouvons énoncer le théorème suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((x_i, y_i)\)</span> un ensemble de
+données avec <span class="math inline">\(y_i = \beta_0 + \beta_1 x_i +
+\epsilon_i\)</span>, où <span class="math inline">\(\epsilon_i\)</span>
+sont des résidus i.i.d. avec une variance non constante. Si nous
+appliquons la transformation d’Anscombe <span
+class="math inline">\(T\)</span> à <span
+class="math inline">\(y_i\)</span>, alors la variance des résidus
+transformés <span class="math inline">\(\epsilon_i&#39;\)</span> est
+stabilisée, c’est-à-dire que : <span
+class="math display">\[\text{Var}(\epsilon_i&#39;) \approx
+\sigma^2\]</span> pour une constante <span
+class="math inline">\(\sigma^2\)</span> indépendante de <span
+class="math inline">\(x_i\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de stabilisation de la variance, nous devons
+montrer que la transformation d’Anscombe réduit effectivement
+l’hétéroscédasticité des résidus. Considérons la transformation racine
+carrée <span class="math inline">\(T_2(y_i) = \sqrt{y_i}\)</span>.</p>
+<p>Supposons que les résidus <span
+class="math inline">\(\epsilon_i\)</span> suivent une distribution
+normale avec une variance proportionnelle à <span
+class="math inline">\(x_i\)</span> : <span
+class="math display">\[\text{Var}(\epsilon_i) = \sigma^2
+x_i\]</span></p>
+<p>En appliquant la transformation racine carrée, nous obtenons : <span
+class="math display">\[T_2(y_i) = \sqrt{\beta_0 + \beta_1 x_i +
+\epsilon_i}\]</span></p>
+<p>En utilisant un développement de Taylor du premier ordre autour du
+point <span class="math inline">\(\beta_0 + \beta_1 x_i\)</span>, nous
+avons : <span class="math display">\[T_2(y_i) \approx \sqrt{\beta_0 +
+\beta_1 x_i} + \frac{1}{2\sqrt{\beta_0 + \beta_1 x_i}}
+\epsilon_i\]</span></p>
+<p>La variance des résidus transformés est alors : <span
+class="math display">\[\text{Var}(T_2(y_i)) \approx \left(
+\frac{1}{2\sqrt{\beta_0 + \beta_1 x_i}} \right)^2 \text{Var}(\epsilon_i)
+= \frac{\sigma^2 x_i}{4(\beta_0 + \beta_1 x_i)}\]</span></p>
+<p>En supposant que <span class="math inline">\(\beta_0\)</span> et
+<span class="math inline">\(\beta_1\)</span> sont tels que <span
+class="math inline">\(4(\beta_0 + \beta_1 x_i) =
+\text{constante}\)</span>, nous obtenons : <span
+class="math display">\[\text{Var}(T_2(y_i)) \approx
+\frac{\sigma^2}{4}\]</span></p>
+<p>Ainsi, la variance des résidus transformés est stabilisée.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous pouvons énoncer plusieurs propriétés et corollaires de la
+transformation d’Anscombe :</p>
+<ol>
+<li><p>**Stabilisation de la variance** : La transformation d’Anscombe
+stabilise la variance des résidus, rendant les estimations plus
+efficaces.</p></li>
+<li><p>**Normalisation des résidus** : En stabilisant la variance, la
+transformation d’Anscombe contribue également à la normalité des
+résidus.</p></li>
+<li><p>**Adaptabilité** : Les quatre transformations proposées par
+Anscombe permettent de traiter différents types
+d’hétéroscédasticité.</p></li>
+</ol>
+<p>Pour prouver la propriété (i), nous avons déjà montré que la
+transformation racine carrée stabilise la variance des résidus. Pour la
+propriété (ii), nous pouvons utiliser le théorème central limite, qui
+stipule que la somme de variables aléatoires indépendantes tend vers une
+distribution normale. En stabilisant la variance, nous réduisons les
+écarts entre les résidus, ce qui favorise la normalité.</p>
+<p>Pour la propriété (iii), nous pouvons considérer les différentes
+transformations proposées par Anscombe. La transformation linéaire est
+adaptée aux données sans hétéroscédasticité, la transformation racine
+carrée est efficace pour les données avec une variance proportionnelle à
+<span class="math inline">\(x_i\)</span>, la transformation
+logarithmique est utile pour les données avec une variance
+exponentielle, et la transformation inverse est adaptée aux données avec
+une variance inversement proportionnelle à <span
+class="math inline">\(x_i\)</span>.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>La transformation d’Anscombe est une technique puissante pour
+stabiliser la variance et améliorer l’efficacité des estimations dans
+les modèles linéaires. En comprenant les définitions, les théorèmes et
+les propriétés de cette transformation, nous pouvons mieux traiter
+l’hétéroscédasticité et obtenir des résultats plus fiables dans nos
+analyses statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

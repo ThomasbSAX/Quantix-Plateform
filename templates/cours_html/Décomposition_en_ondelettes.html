@@ -1,0 +1,372 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Décomposition en ondelettes : Une révolution dans l’analyse des signaux</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Décomposition en ondelettes : Une révolution dans
+l’analyse des signaux</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse des signaux a toujours été un domaine crucial en
+mathématiques appliquées, en ingénierie et en traitement du signal. Les
+méthodes traditionnelles comme la transformée de Fourier ont longtemps
+dominé ce domaine, offrant une représentation fréquentielle des signaux.
+Cependant, ces méthodes présentent des limitations importantes lorsqu’il
+s’agit de capturer des informations temporelles précises. C’est dans ce
+contexte que la décomposition en ondelettes a émergé, offrant une
+alternative puissante et flexible.</p>
+<p>Les ondelettes sont des fonctions qui permettent de représenter un
+signal à différentes échelles, offrant ainsi une résolution temporelle
+et fréquentielle adaptative. Cette propriété est particulièrement utile
+pour l’analyse de signaux non stationnaires, où les caractéristiques
+fréquentielles changent au cours du temps. La décomposition en
+ondelettes a trouvé des applications dans divers domaines, allant de la
+compression d’images à la détection de singularités en passant par
+l’analyse sismique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la décomposition en ondelettes, il est essentiel de
+définir quelques concepts fondamentaux. Commençons par la notion
+d’ondelette mère.</p>
+<h2 id="ondelettes-mères">Ondelettes Mères</h2>
+<p>Supposons que nous cherchions une fonction qui puisse capturer les
+variations locales d’un signal. Cette fonction doit être localisée à la
+fois dans le temps et dans la fréquence. Une ondelette mère est une
+fonction qui satisfait certaines conditions mathématiques pour pouvoir
+être utilisée dans la transformée en ondelettes.</p>
+<div class="definition">
+<p>Une fonction <span class="math inline">\(\psi \in
+L^2(\mathbb{R})\)</span> est appelée ondelette mère si elle satisfait
+les conditions suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(\int_{-\infty}^{\infty} \psi(t) \, dt
+= 0\)</span> (condition d’admissibilité),</p></li>
+<li><p><span class="math inline">\(\int_{-\infty}^{\infty}
+|\hat{\psi}(\omega)|^2 \frac{d\omega}{\omega} &lt; \infty\)</span>, où
+<span class="math inline">\(\hat{\psi}\)</span> est la transformée de
+Fourier de <span class="math inline">\(\psi\)</span>.</p></li>
+</ol>
+</div>
+<h2 id="transformée-en-ondelettes">Transformée en Ondelettes</h2>
+<p>La transformée en ondelettes d’un signal <span
+class="math inline">\(f(t)\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>La transformée en ondelettes d’un signal <span
+class="math inline">\(f(t) \in L^2(\mathbb{R})\)</span> par rapport à
+une ondelette mère <span class="math inline">\(\psi\)</span> est donnée
+par : <span class="math display">\[W_\psi f(a, b) = \frac{1}{\sqrt{|a|}}
+\int_{-\infty}^{\infty} f(t) \overline{\psi\left(\frac{t - b}{a}\right)}
+\, dt\]</span> où <span class="math inline">\(a \neq 0\)</span> est le
+facteur d’échelle et <span class="math inline">\(b\)</span> est le
+décalage temporel.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-reconstruction">Théorème de Reconstruction</h2>
+<p>L’un des théorèmes les plus importants en analyse en ondelettes est
+le théorème de reconstruction, qui permet de retrouver le signal
+original à partir de sa transformée en ondelettes.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f(t) \in L^2(\mathbb{R})\)</span> et
+<span class="math inline">\(\psi\)</span> une ondelette mère. Alors, le
+signal <span class="math inline">\(f(t)\)</span> peut être reconstruit à
+partir de sa transformée en ondelettes <span
+class="math inline">\(W_\psi f(a, b)\)</span> par la formule : <span
+class="math display">\[f(t) = \frac{1}{C_\psi} \int_{-\infty}^{\infty}
+\int_{-\infty}^{\infty} W_\psi f(a, b) \frac{1}{\sqrt{|a|}}
+\psi\left(\frac{t - b}{a}\right) \frac{da \, db}{a^2}\]</span> où <span
+class="math inline">\(C_\psi = \int_{-\infty}^{\infty}
+\frac{|\hat{\psi}(\omega)|^2}{|\omega|} \, d\omega\)</span> est une
+constante dépendant de l’ondelette mère <span
+class="math inline">\(\psi\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-reconstruction">Preuve du Théorème de
+Reconstruction</h2>
+<p>Pour prouver le théorème de reconstruction, nous utilisons la théorie
+des distributions et les propriétés de la transformée en ondelettes. La
+preuve repose sur l’utilisation du noyau de reconstruction et des
+propriétés d’orthogonalité des ondelettes.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la transformée en ondelettes <span
+class="math inline">\(W_\psi f(a, b)\)</span> d’un signal <span
+class="math inline">\(f(t)\)</span>. Nous voulons montrer que : <span
+class="math display">\[f(t) = \frac{1}{C_\psi} \int_{-\infty}^{\infty}
+\int_{-\infty}^{\infty} W_\psi f(a, b) \frac{1}{\sqrt{|a|}}
+\psi\left(\frac{t - b}{a}\right) \frac{da \, db}{a^2}\]</span></p>
+<p>Commençons par exprimer <span class="math inline">\(W_\psi f(a,
+b)\)</span> en termes de la transformée de Fourier : <span
+class="math display">\[W_\psi f(a, b) = \frac{1}{\sqrt{|a|}}
+\int_{-\infty}^{\infty} f(t) \overline{\psi\left(\frac{t - b}{a}\right)}
+\, dt\]</span></p>
+<p>En utilisant la propriété de translation et d’échelle de la
+transformée de Fourier, nous avons : <span class="math display">\[W_\psi
+f(a, b) = \sqrt{|a|} \int_{-\infty}^{\infty} \hat{f}(\omega)
+\overline{\hat{\psi}(a\omega)} e^{i b \omega} \, d\omega\]</span></p>
+<p>En substituant cette expression dans l’intégrale de reconstruction,
+nous obtenons : <span class="math display">\[f(t) = \frac{1}{C_\psi}
+\int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \left( \sqrt{|a|}
+\int_{-\infty}^{\infty} \hat{f}(\omega&#39;)
+\overline{\hat{\psi}(a\omega&#39;)} e^{i b \omega&#39;} \, d\omega&#39;
+\right) \frac{1}{\sqrt{|a|}} \psi\left(\frac{t - b}{a}\right) \frac{da
+\, db}{a^2}\]</span></p>
+<p>En simplifiant les termes, nous obtenons : <span
+class="math display">\[f(t) = \frac{1}{C_\psi} \int_{-\infty}^{\infty}
+\int_{-\infty}^{\infty} \hat{f}(\omega&#39;)
+\overline{\hat{\psi}(a\omega&#39;)} e^{i b \omega&#39;}
+\psi\left(\frac{t - b}{a}\right) \frac{da \, db}{a}\]</span></p>
+<p>En utilisant la propriété d’inversion de la transformée de Fourier,
+nous pouvons montrer que cette intégrale converge vers <span
+class="math inline">\(f(t)\)</span>. La constante <span
+class="math inline">\(C_\psi\)</span> assure la normalisation nécessaire
+pour garantir que le signal reconstruit est égal au signal
+original. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriétés-des-ondelettes">Propriétés des Ondelettes</h2>
+<p>Les ondelettes possèdent plusieurs propriétés importantes qui les
+rendent utiles pour l’analyse des signaux.</p>
+<ol>
+<li><p><strong>Localisation Temporelle et Fréquentielle</strong> : Les
+ondelettes sont localisées à la fois dans le temps et dans la fréquence,
+ce qui permet de capturer les variations locales d’un signal.</p></li>
+<li><p><strong>Multi-résolution</strong> : Les ondelettes permettent
+d’analyser un signal à différentes échelles, offrant ainsi une
+résolution adaptative.</p></li>
+<li><p><strong>Orthogonalité</strong> : Certaines ondelettes sont
+orthogonales, ce qui simplifie les calculs de reconstruction et de
+décomposition.</p></li>
+</ol>
+<h2 id="corollaires">Corollaires</h2>
+<p>Les propriétés des ondelettes conduisent à plusieurs corollaires
+importants.</p>
+<div class="corollary">
+<p>Si une ondelette mère <span class="math inline">\(\psi\)</span> est
+localisée dans le temps et dans la fréquence, alors sa transformée en
+ondelettes <span class="math inline">\(W_\psi f(a, b)\)</span> capture
+les variations locales d’un signal <span
+class="math inline">\(f(t)\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La localisation temporelle et fréquentielle de
+l’ondelette mère <span class="math inline">\(\psi\)</span> implique que
+la transformée en ondelettes <span class="math inline">\(W_\psi f(a,
+b)\)</span> est sensible aux variations locales du signal <span
+class="math inline">\(f(t)\)</span>. Cela permet de détecter les
+singularités et les caractéristiques temporelles du signal. ◻</p>
+</div>
+<div class="corollary">
+<p>La décomposition en ondelettes permet d’analyser un signal à
+différentes échelles, offrant ainsi une résolution adaptative.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La propriété de multi-résolution des ondelettes
+permet de décomposer un signal en différentes bandes de fréquence,
+chacune correspondant à une échelle différente. Cela permet d’analyser
+les caractéristiques du signal à différentes résolutions temporelles et
+fréquentielles. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La décomposition en ondelettes a révolutionné l’analyse des signaux,
+offrant une alternative puissante aux méthodes traditionnelles comme la
+transformée de Fourier. Les ondelettes permettent de capturer les
+variations locales d’un signal à différentes échelles, ce qui est
+particulièrement utile pour l’analyse de signaux non stationnaires. Les
+théorèmes et propriétés des ondelettes, tels que le théorème de
+reconstruction et la localisation temporelle et fréquentielle, en font
+un outil indispensable dans divers domaines d’application.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

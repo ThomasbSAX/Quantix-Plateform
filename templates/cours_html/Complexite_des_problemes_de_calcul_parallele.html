@@ -1,0 +1,410 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de calcul parallèle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de calcul parallèle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le calcul parallèle est une discipline qui a émergé avec la nécessité
+de résoudre des problèmes trop complexes pour être traités par un seul
+processeur. L’origine historique du calcul parallèle remonte aux années
+1960 avec l’introduction des premiers systèmes multiprocesseurs.
+Conceptuellement, le calcul parallèle repose sur l’idée de diviser un
+problème en sous-problèmes plus petits qui peuvent être traités
+simultanément par plusieurs processeurs.</p>
+<p>La notion de complexité des problèmes de calcul parallèle est
+indispensable pour comprendre les limites et les possibilités des
+algorithmes parallèles. Elle permet de déterminer si un problème peut
+être résolu efficacement en parallèle et de comparer les performances
+des différentes approches parallèles.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la complexité des problèmes de calcul parallèle, il
+est essentiel de définir quelques concepts clés.</p>
+<h2 id="problème-de-calcul-parallèle">Problème de calcul parallèle</h2>
+<p>Un problème de calcul parallèle est un problème qui peut être divisé
+en sous-problèmes indépendants ou faiblement dépendants. Par exemple,
+considérons un problème où nous devons calculer la somme de plusieurs
+nombres. Si nous pouvons diviser cette somme en sous-sommes qui peuvent
+être calculées indépendamment, alors ce problème est un problème de
+calcul parallèle.</p>
+<p>Formellement, un problème de calcul parallèle peut être défini comme
+suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(P\)</span> un problème de calcul. On
+dit que <span class="math inline">\(P\)</span> est un problème de calcul
+parallèle si et seulement s’il existe une partition de l’ensemble des
+entrées du problème en sous-ensembles disjoints <span
+class="math inline">\(S_1, S_2, \ldots, S_k\)</span> tels que le calcul
+de la solution pour chaque sous-ensemble <span
+class="math inline">\(S_i\)</span> peut être effectué indépendamment des
+autres sous-ensembles.</p>
+</div>
+<h2 id="complexité-parallèle">Complexité parallèle</h2>
+<p>La complexité parallèle mesure le temps nécessaire pour résoudre un
+problème sur une machine parallèle. Elle est généralement exprimée en
+termes du nombre de processeurs et du temps nécessaire pour effectuer
+une opération élémentaire.</p>
+<p>Formellement, la complexité parallèle peut être définie comme suit
+:</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(P\)</span> un problème de calcul
+parallèle et soit <span class="math inline">\(M\)</span> une machine
+parallèle avec <span class="math inline">\(p\)</span> processeurs. La
+complexité parallèle de <span class="math inline">\(P\)</span> sur <span
+class="math inline">\(M\)</span>, notée <span
+class="math inline">\(T_p(P)\)</span>, est le temps nécessaire pour
+résoudre <span class="math inline">\(P\)</span> sur <span
+class="math inline">\(M\)</span> en utilisant <span
+class="math inline">\(p\)</span> processeurs.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-brent">Théorème de Brent</h2>
+<p>Le théorème de Brent est un résultat fondamental en complexité des
+problèmes de calcul parallèle. Il fournit une borne inférieure sur le
+temps nécessaire pour résoudre un problème sur une machine
+parallèle.</p>
+<h2 id="énoncé-du-théorème">Énoncé du théorème</h2>
+<p>Considérons un problème où nous devons effectuer <span
+class="math inline">\(n\)</span> opérations élémentaires. Si nous
+disposons de <span class="math inline">\(p\)</span> processeurs, le
+théorème de Brent nous dit que le temps nécessaire pour effectuer ces
+opérations est au moins <span class="math inline">\(\frac{n}{p} +
+O(1)\)</span>.</p>
+<p>Formellement, le théorème de Brent peut être énoncé comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(P\)</span> un problème de calcul
+parallèle nécessitant <span class="math inline">\(n\)</span> opérations
+élémentaires. Soit <span class="math inline">\(M\)</span> une machine
+parallèle avec <span class="math inline">\(p\)</span> processeurs.
+Alors, la complexité parallèle de <span class="math inline">\(P\)</span>
+sur <span class="math inline">\(M\)</span> satisfait : <span
+class="math display">\[T_p(P) \geq \frac{n}{p} + O(1)\]</span></p>
+</div>
+<h2 id="démonstration-du-théorème">Démonstration du théorème</h2>
+<p>La démonstration du théorème de Brent repose sur l’idée que chaque
+processeur ne peut effectuer qu’une seule opération élémentaire à la
+fois. Par conséquent, le temps nécessaire pour effectuer <span
+class="math inline">\(n\)</span> opérations sur <span
+class="math inline">\(p\)</span> processeurs est au moins <span
+class="math inline">\(\frac{n}{p}\)</span>.</p>
+<p>Plus formellement, la démonstration peut être structurée comme suit
+:</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(P\)</span> un
+problème de calcul parallèle nécessitant <span
+class="math inline">\(n\)</span> opérations élémentaires. Soit <span
+class="math inline">\(M\)</span> une machine parallèle avec <span
+class="math inline">\(p\)</span> processeurs. Chaque processeur peut
+effectuer au plus une opération élémentaire à la fois. Par conséquent,
+le temps nécessaire pour effectuer <span
+class="math inline">\(n\)</span> opérations sur <span
+class="math inline">\(p\)</span> processeurs est au moins <span
+class="math inline">\(\frac{n}{p}\)</span>. En tenant compte des temps
+de communication et de synchronisation, nous obtenons : <span
+class="math display">\[T_p(P) \geq \frac{n}{p} + O(1)\]</span> ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-brent">Preuve du théorème de Brent</h2>
+<p>La preuve du théorème de Brent repose sur l’idée que chaque
+processeur ne peut effectuer qu’une seule opération élémentaire à la
+fois. Par conséquent, le temps nécessaire pour effectuer <span
+class="math inline">\(n\)</span> opérations sur <span
+class="math inline">\(p\)</span> processeurs est au moins <span
+class="math inline">\(\frac{n}{p}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(P\)</span> un
+problème de calcul parallèle nécessitant <span
+class="math inline">\(n\)</span> opérations élémentaires. Soit <span
+class="math inline">\(M\)</span> une machine parallèle avec <span
+class="math inline">\(p\)</span> processeurs. Chaque processeur peut
+effectuer au plus une opération élémentaire à la fois. Par conséquent,
+le temps nécessaire pour effectuer <span
+class="math inline">\(n\)</span> opérations sur <span
+class="math inline">\(p\)</span> processeurs est au moins <span
+class="math inline">\(\frac{n}{p}\)</span>. En tenant compte des temps
+de communication et de synchronisation, nous obtenons : <span
+class="math display">\[T_p(P) \geq \frac{n}{p} + O(1)\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et corollaires</h1>
+<h2 id="propriété-de-scalabilité">Propriété de scalabilité</h2>
+<p>La propriété de scalabilité est une conséquence directe du théorème
+de Brent. Elle indique que le temps nécessaire pour résoudre un problème
+sur une machine parallèle diminue lorsque le nombre de processeurs
+augmente.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(P\)</span> un problème de calcul
+parallèle nécessitant <span class="math inline">\(n\)</span> opérations
+élémentaires. Soit <span class="math inline">\(M\)</span> une machine
+parallèle avec <span class="math inline">\(p\)</span> processeurs. Si le
+nombre de processeurs <span class="math inline">\(p\)</span> augmente,
+alors la complexité parallèle <span
+class="math inline">\(T_p(P)\)</span> diminue.</p>
+</div>
+<h2 id="démonstration-de-la-propriété-de-scalabilité">Démonstration de
+la propriété de scalabilité</h2>
+<p>La démonstration de la propriété de scalabilité repose sur le
+théorème de Brent. Si le nombre de processeurs <span
+class="math inline">\(p\)</span> augmente, alors le terme <span
+class="math inline">\(\frac{n}{p}\)</span> dans l’inégalité du théorème
+de Brent diminue, ce qui entraîne une diminution de la complexité
+parallèle.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(P\)</span> un
+problème de calcul parallèle nécessitant <span
+class="math inline">\(n\)</span> opérations élémentaires. Soit <span
+class="math inline">\(M\)</span> une machine parallèle avec <span
+class="math inline">\(p\)</span> processeurs. D’après le théorème de
+Brent, nous avons : <span class="math display">\[T_p(P) \geq \frac{n}{p}
++ O(1)\]</span> Si le nombre de processeurs <span
+class="math inline">\(p\)</span> augmente, alors le terme <span
+class="math inline">\(\frac{n}{p}\)</span> diminue, ce qui entraîne une
+diminution de la complexité parallèle <span
+class="math inline">\(T_p(P)\)</span>. ◻</p>
+</div>
+<h2 id="corollaire-de-la-loi-damdahl">Corollaire de la loi d’Amdahl</h2>
+<p>Le corollaire de la loi d’Amdahl est une autre conséquence importante
+du théorème de Brent. Il indique que l’accélération maximale possible en
+utilisant une machine parallèle est limitée par la partie séquentielle
+du problème.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(P\)</span> un problème de calcul
+parallèle avec une partie séquentielle nécessitant <span
+class="math inline">\(s\)</span> opérations élémentaires et une partie
+parallèle nécessitant <span class="math inline">\(p\)</span> opérations
+élémentaires. Soit <span class="math inline">\(M\)</span> une machine
+parallèle avec <span class="math inline">\(n\)</span> processeurs.
+L’accélération maximale possible <span class="math inline">\(A\)</span>
+est donnée par : <span class="math display">\[A = \frac{1}{s +
+\frac{p}{n}}\]</span></p>
+</div>
+<h2 id="démonstration-du-corollaire-de-la-loi-damdahl">Démonstration du
+corollaire de la loi d’Amdahl</h2>
+<p>La démonstration du corollaire de la loi d’Amdahl repose sur l’idée
+que l’accélération maximale possible est limitée par la partie
+séquentielle du problème. Si la partie séquentielle nécessite <span
+class="math inline">\(s\)</span> opérations élémentaires, alors le temps
+nécessaire pour résoudre le problème sur une machine parallèle est au
+moins <span class="math inline">\(s + \frac{p}{n}\)</span>, où <span
+class="math inline">\(p\)</span> est le nombre d’opérations élémentaires
+dans la partie parallèle et <span class="math inline">\(n\)</span> est
+le nombre de processeurs.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(P\)</span> un
+problème de calcul parallèle avec une partie séquentielle nécessitant
+<span class="math inline">\(s\)</span> opérations élémentaires et une
+partie parallèle nécessitant <span class="math inline">\(p\)</span>
+opérations élémentaires. Soit <span class="math inline">\(M\)</span> une
+machine parallèle avec <span class="math inline">\(n\)</span>
+processeurs. Le temps nécessaire pour résoudre le problème sur une
+machine parallèle est au moins <span class="math inline">\(s +
+\frac{p}{n}\)</span>. Par conséquent, l’accélération maximale possible
+<span class="math inline">\(A\)</span> est donnée par : <span
+class="math display">\[A = \frac{1}{s + \frac{p}{n}}\]</span> ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La complexité des problèmes de calcul parallèle est une discipline
+fascinante qui permet de comprendre les limites et les possibilités des
+algorithmes parallèles. Les théorèmes de Brent et d’Amdahl fournissent
+des bornes importantes sur la complexité parallèle et permettent de
+déterminer si un problème peut être résolu efficacement en parallèle.
+Les propriétés et corollaires dérivés de ces théorèmes offrent des
+insights précieux sur la scalabilité et l’accélération des algorithmes
+parallèles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

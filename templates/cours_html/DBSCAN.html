@@ -1,0 +1,358 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Density-Based Spatial Clustering of Applications with Noise (DBSCAN)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Density-Based Spatial Clustering of Applications with
+Noise (DBSCAN)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le clustering est une tâche fondamentale en apprentissage
+automatique, visant à regrouper des données similaires sans supervision.
+Parmi les nombreuses méthodes de clustering, DBSCAN (Density-Based
+Spatial Clustering of Applications with Noise) se distingue par sa
+capacité à identifier des clusters de formes arbitraires et à gérer les
+bruits. Introduite par Ester, et al. en 1996, DBSCAN repose sur l’idée
+intuitive que les points proches dans un espace dense forment des
+clusters.</p>
+<p>L’émergence de DBSCAN répond à plusieurs limitations des méthodes
+traditionnelles comme les K-means. En effet, ces dernières supposent que
+les clusters sont de forme sphérique et nécessitent le nombre de
+clusters comme paramètre d’entrée. DBSCAN, en revanche, est capable de
+découvrir des clusters de formes complexes et n’exige pas le nombre de
+clusters a priori. De plus, DBSCAN est robuste aux bruits et peut
+identifier les points aberrants.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir formellement DBSCAN, il est essentiel de comprendre
+les concepts clés sous-jacents.</p>
+<h2 class="unnumbered" id="concepts-clés">Concepts Clés</h2>
+<p>Un <strong>voisinage</strong> d’un point <span
+class="math inline">\(p\)</span> est un ensemble de points situés à une
+distance maximale <span class="math inline">\(\epsilon\)</span> de <span
+class="math inline">\(p\)</span>. Formellement, pour un espace métrique
+<span class="math inline">\((X, d)\)</span>, le voisinage de <span
+class="math inline">\(p\)</span> est défini comme : <span
+class="math display">\[N_{\epsilon}(p) = \{ q \in X \mid d(p, q) \leq
+\epsilon \}\]</span></p>
+<p>Un point <span class="math inline">\(p\)</span> est dit
+<strong>densité-direct</strong> (ou core point) si son voisinage
+contient au moins <span class="math inline">\(MinPts\)</span> points.
+Mathématiquement, cela s’écrit : <span class="math display">\[p \text{
+est densité-direct} \iff |N_{\epsilon}(p)| \geq MinPts\]</span></p>
+<p>Un point <span class="math inline">\(q\)</span> est dans
+l’<strong>extension</strong> de <span class="math inline">\(p\)</span>
+si <span class="math inline">\(q\)</span> appartient au voisinage de
+<span class="math inline">\(p\)</span>. On note ceci comme : <span
+class="math display">\[q \in N_{\epsilon}(p)\]</span></p>
+<h2 class="unnumbered" id="définition-formelle-de-dbscan">Définition
+Formelle de DBSCAN</h2>
+<p>DBSCAN est un algorithme de clustering basé sur la densité qui prend
+en entrée deux paramètres : <span
+class="math inline">\(\epsilon\)</span> (rayon de recherche) et <span
+class="math inline">\(MinPts\)</span> (nombre minimal de points requis
+pour former un cluster).</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(X\)</span> un ensemble de points
+dans un espace métrique, <span class="math inline">\(\epsilon &gt;
+0\)</span>, et <span class="math inline">\(MinPts \geq 1\)</span>.
+L’algorithme DBSCAN procède comme suit :</p>
+<ol>
+<li><p>Pour chaque point <span class="math inline">\(p \in X\)</span>
+non visité :</p>
+<ol>
+<li><p>Marquer <span class="math inline">\(p\)</span> comme
+visité.</p></li>
+<li><p>Si <span class="math inline">\(p\)</span> est densité-direct,
+c’est-à-dire <span class="math inline">\(|N_{\epsilon}(p)| \geq
+MinPts\)</span>, alors :</p>
+<ul>
+<li><p>Créer un nouveau cluster <span
+class="math inline">\(C\)</span>.</p></li>
+<li><p>Ajouter <span class="math inline">\(p\)</span> à <span
+class="math inline">\(C\)</span>.</p></li>
+<li><p>Pour chaque point <span class="math inline">\(q \in
+N_{\epsilon}(p)\)</span> :</p>
+<ul>
+<li><p>Si <span class="math inline">\(q\)</span> n’est pas visité,
+répéter les étapes 1 à 3.</p></li>
+<li><p>Si <span class="math inline">\(q\)</span> est densité-direct,
+ajouter tous les points de <span
+class="math inline">\(N_{\epsilon}(q)\)</span> non encore visités à
+<span class="math inline">\(C\)</span>.</p></li>
+</ul></li>
+</ul></li>
+<li><p>Sinon, marquer <span class="math inline">\(p\)</span> comme
+bruit.</p></li>
+</ol></li>
+</ol>
+<p>Le résultat est une partition de <span
+class="math inline">\(X\)</span> en clusters et un ensemble de points
+bruits.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-consistance">Théorème de
+Consistance</h2>
+<p>Le théorème suivant montre que DBSCAN est cohérent avec la notion de
+clusters basée sur la densité.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X\)</span> un ensemble de points
+dans un espace métrique, <span class="math inline">\(\epsilon &gt;
+0\)</span>, et <span class="math inline">\(MinPts \geq 1\)</span>.
+DBSCAN produit une partition de <span class="math inline">\(X\)</span>
+en clusters et un ensemble de points bruits. De plus, pour tout cluster
+<span class="math inline">\(C\)</span> produit par DBSCAN, il existe un
+point densité-direct <span class="math inline">\(p \in C\)</span> tel
+que tous les points de <span class="math inline">\(C\)</span> sont
+atteignables à partir de <span class="math inline">\(p\)</span>.</p>
+</div>
+<h2 class="unnumbered" id="preuve-du-théorème-de-consistance">Preuve du
+Théorème de Consistance</h2>
+<p>La preuve repose sur l’idée que chaque cluster est construit autour
+d’un point densité-direct et que tous les points du cluster sont
+atteignables à partir de ce point.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons un cluster <span
+class="math inline">\(C\)</span> produit par DBSCAN. Par construction,
+il existe un point densité-direct <span class="math inline">\(p \in
+C\)</span> qui a initié la création de <span
+class="math inline">\(C\)</span>. Pour chaque point <span
+class="math inline">\(q \in C\)</span>, il existe une séquence de points
+<span class="math inline">\(p_1, p_2, \ldots, p_k\)</span> telle que :
+<span class="math display">\[q \in N_{\epsilon}(p_k), p_k \in
+N_{\epsilon}(p_{k-1}), \ldots, p_2 \in N_{\epsilon}(p_1), p_1 =
+p\]</span></p>
+<p>Ainsi, <span class="math inline">\(q\)</span> est atteignable à
+partir de <span class="math inline">\(p\)</span>, ce qui prouve la
+consistance de DBSCAN. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-de-robustesse-aux-bruits">Propriété
+de Robustesse aux Bruits</h2>
+<p>DBSCAN est robuste aux bruits car il identifie les points qui ne font
+partie d’aucun cluster comme bruits.</p>
+<div class="corollary">
+<p>Soient <span class="math inline">\(X\)</span> un ensemble de points
+dans un espace métrique, <span class="math inline">\(\epsilon &gt;
+0\)</span>, et <span class="math inline">\(MinPts \geq 1\)</span>.
+DBSCAN marque comme bruits tous les points qui ne sont pas atteignables
+à partir de tout point densité-direct.</p>
+</div>
+<h2 class="unnumbered"
+id="propriété-de-découverte-de-clusters-de-formes-arbitraires">Propriété
+de Découverte de Clusters de Formes Arbitraires</h2>
+<p>DBSCAN peut découvrir des clusters de formes arbitraires,
+contrairement aux méthodes basées sur les centres comme K-means.</p>
+<div class="corollary">
+<p>Soient <span class="math inline">\(X\)</span> un ensemble de points
+dans un espace métrique, <span class="math inline">\(\epsilon &gt;
+0\)</span>, et <span class="math inline">\(MinPts \geq 1\)</span>.
+DBSCAN peut identifier des clusters de formes complexes, y compris des
+clusters non convexes et des clusters connectés par des ponts
+étroits.</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>DBSCAN est une méthode puissante et flexible pour le clustering basé
+sur la densité. Sa capacité à gérer les bruits, découvrir des clusters
+de formes arbitraires et ne pas nécessiter le nombre de clusters a
+priori en fait un outil précieux pour l’analyse de données. Les
+théorèmes et propriétés présentés dans cet article montrent la solidité
+mathématique de DBSCAN et son utilité pratique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,335 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance de l’estimateur</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance de l’estimateur</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>En statistique, l’estimation des paramètres d’une distribution à
+partir de données observées est une tâche fondamentale. Un estimateur
+est une fonction des données qui produit une valeur pour le paramètre
+inconnu. Cependant, différents estimateurs peuvent conduire à des
+résultats différents, même sur les mêmes données. La variance de
+l’estimateur est une mesure de la dispersion de ces résultats autour de
+leur moyenne.</p>
+<p>L’étude de la variance des estimateurs est cruciale pour plusieurs
+raisons. Tout d’abord, elle permet de quantifier la précision d’un
+estimateur. Un estimateur avec une faible variance est plus stable et
+moins sensible aux fluctuations des données. Ensuite, la variance joue
+un rôle clé dans le choix entre différents estimateurs. Par exemple, en
+théorie de l’estimation, le critère de l’efficacité compare les
+variances des estimateurs pour déterminer lequel est optimal.</p>
+<p>Dans ce chapitre, nous explorerons la notion de variance d’un
+estimateur, ses propriétés et ses implications. Nous commencerons par
+définir formellement la variance d’un estimateur, puis nous examinerons
+ses propriétés et les théorèmes associés.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir la variance d’un estimateur, il est essentiel de
+comprendre ce que nous cherchons à mesurer. Imaginons que nous ayons un
+paramètre inconnu <span class="math inline">\(\theta\)</span> et un
+estimateur <span class="math inline">\(T\)</span> basé sur un
+échantillon aléatoire <span class="math inline">\(X_1, X_2, \ldots,
+X_n\)</span>. Si nous répétons l’expérience de collecte des données
+plusieurs fois, nous obtiendrons différentes valeurs pour <span
+class="math inline">\(T\)</span>. La variance de <span
+class="math inline">\(T\)</span> mesure à quel point ces valeurs sont
+dispersées autour de l’espérance de <span
+class="math inline">\(T\)</span>.</p>
+<p>Formellement, la variance d’un estimateur <span
+class="math inline">\(T\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>La variance de l’estimateur <span class="math inline">\(T\)</span>
+est donnée par : <span class="math display">\[\text{Var}(T) =
+\mathbb{E}\left[(T - \mathbb{E}[T])^2\right]\]</span> où <span
+class="math inline">\(\mathbb{E}[T]\)</span> est l’espérance de <span
+class="math inline">\(T\)</span>.</p>
+</div>
+<p>Une autre manière d’exprimer la variance est en utilisant les
+propriétés de l’espérance et de la variance :</p>
+<div class="definition">
+<p>La variance de <span class="math inline">\(T\)</span> peut également
+être écrite comme : <span class="math display">\[\text{Var}(T) =
+\mathbb{E}[T^2] - (\mathbb{E}[T])^2\]</span></p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en statistique est le théorème de
+Gauss-Markov, qui concerne les estimateurs linéaires sans biais. Ce
+théorème est particulièrement important dans le contexte de la
+régression linéaire.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(Y = X\beta + \epsilon\)</span>, où
+<span class="math inline">\(X\)</span> est une matrice de design, <span
+class="math inline">\(\beta\)</span> est un vecteur de paramètres et
+<span class="math inline">\(\epsilon\)</span> est un vecteur d’erreurs
+avec <span class="math inline">\(\mathbb{E}[\epsilon] = 0\)</span> et
+<span class="math inline">\(\text{Var}(\epsilon) = \sigma^2 I\)</span>.
+L’estimateur des moindres carrés <span class="math inline">\(\hat{\beta}
+= (X^T X)^{-1} X^T Y\)</span> est l’estimateur linéaire sans biais de
+<span class="math inline">\(\beta\)</span> avec la plus petite
+variance.</p>
+</div>
+<p>La preuve de ce théorème repose sur plusieurs propriétés des
+estimateurs linéaires et sans biais. Nous allons maintenant développer
+cette preuve de manière détaillée.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Gauss-Markov, nous devons montrer que
+l’estimateur des moindres carrés a la plus petite variance parmi tous
+les estimateurs linéaires sans biais.</p>
+<div class="preuve">
+<p>Considérons un estimateur linéaire <span
+class="math inline">\(\tilde{\beta} = A Y\)</span>, où <span
+class="math inline">\(A\)</span> est une matrice de pondération. Pour
+que <span class="math inline">\(\tilde{\beta}\)</span> soit sans biais,
+nous devons avoir : <span
+class="math display">\[\mathbb{E}[\tilde{\beta}] = A \mathbb{E}[Y] = A X
+\beta = \beta\]</span> Ce qui implique que <span class="math inline">\(A
+X = I\)</span>, où <span class="math inline">\(I\)</span> est la matrice
+identité.</p>
+<p>La variance de <span class="math inline">\(\tilde{\beta}\)</span> est
+donnée par : <span class="math display">\[\text{Var}(\tilde{\beta}) = A
+\text{Var}(Y) A^T = \sigma^2 A A^T\]</span> Nous voulons minimiser <span
+class="math inline">\(\text{Var}(\tilde{\beta})\)</span> sous la
+contrainte <span class="math inline">\(A X = I\)</span>.</p>
+<p>En utilisant le multiplicateur de Lagrange, nous trouvons que la
+matrice <span class="math inline">\(A\)</span> qui minimise <span
+class="math inline">\(\text{Var}(\tilde{\beta})\)</span> est : <span
+class="math display">\[A = (X^T X)^{-1} X^T\]</span> Ce qui correspond à
+l’estimateur des moindres carrés <span
+class="math inline">\(\hat{\beta}\)</span>.</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant examiner quelques propriétés importantes de la
+variance des estimateurs.</p>
+<div class="proposition">
+<p>La variance d’un estimateur est toujours non négative, c’est-à-dire :
+<span class="math display">\[\text{Var}(T) \geq 0\]</span></p>
+</div>
+<div class="preuve">
+<p>Puisque <span class="math inline">\(\text{Var}(T) =
+\mathbb{E}\left[(T - \mathbb{E}[T])^2\right]\)</span>, et que le carré
+d’un nombre réel est toujours non négatif, il s’ensuit que <span
+class="math inline">\(\text{Var}(T) \geq 0\)</span>.</p>
+</div>
+<div class="proposition">
+<p>La variance d’un estimateur est nulle si et seulement si l’estimateur
+est une constante presque sûre, c’est-à-dire : <span
+class="math display">\[\text{Var}(T) = 0 \iff T = c \text{ p.s. pour une
+constante } c\]</span></p>
+</div>
+<div class="preuve">
+<p>Si <span class="math inline">\(T = c\)</span> p.s., alors <span
+class="math inline">\(\mathbb{E}[T] = c\)</span> et <span
+class="math inline">\(\text{Var}(T) = \mathbb{E}\left[(c - c)^2\right] =
+0\)</span>.</p>
+<p>Réciproquement, si <span class="math inline">\(\text{Var}(T) =
+0\)</span>, alors <span class="math inline">\(\mathbb{E}\left[(T -
+\mathbb{E}[T])^2\right] = 0\)</span>, ce qui implique que <span
+class="math inline">\(T - \mathbb{E}[T] = 0\)</span> p.s., donc <span
+class="math inline">\(T = \mathbb{E}[T]\)</span> p.s.</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Dans ce chapitre, nous avons exploré la notion de variance d’un
+estimateur, ses définitions, ses théorèmes et ses propriétés. La
+variance est une mesure cruciale de la précision d’un estimateur, et son
+étude permet de comparer différents estimateurs et de choisir le plus
+efficace. Les théorèmes comme celui de Gauss-Markov fournissent des
+résultats fondamentaux pour la théorie de l’estimation, en particulier
+dans le contexte des modèles linéaires.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

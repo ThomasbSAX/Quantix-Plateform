@@ -1,0 +1,410 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Corrélation de Bravais-Pearson</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Corrélation de Bravais-Pearson</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La corrélation de Bravais-Pearson émerge à la fin du XIXème siècle
+comme une réponse aux besoins croissants de l’analyse statistique dans
+les sciences sociales et naturelles. Francis Galton, cousin de Charles
+Darwin, est l’un des premiers à s’intéresser aux relations entre
+variables quantitatives. Il observe que les enfants de parents grands
+ont tendance à être plus grands que la moyenne, mais rarement aussi
+grands que leurs parents. Ce phénomène, qu’il nomme régression vers la
+moyenne, motive le développement de méthodes pour quantifier les
+relations entre variables.</p>
+<p>Bravais et Pearson formalisent cette intuition en introduisant un
+coefficient de corrélation linéaire. Ce coefficient mesure la force et
+la direction d’une relation linéaire entre deux variables aléatoires. Il
+est indispensable dans de nombreux domaines, allant de l’économie à la
+biologie en passant par les sciences sociales. La corrélation de
+Bravais-Pearson permet non seulement de décrire des relations, mais
+aussi de prédire des comportements et d’identifier des tendances.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la corrélation de Bravais-Pearson, considérons deux
+variables aléatoires <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Nous cherchons à mesurer dans quelle
+mesure ces variables varient ensemble. Si <span
+class="math inline">\(X\)</span> augmente, <span
+class="math inline">\(Y\)</span> a-t-il tendance à augmenter ou diminuer
+? Et dans quelle proportion ?</p>
+<p>La corrélation de Bravais-Pearson est un nombre compris entre <span
+class="math inline">\(-1\)</span> et <span
+class="math inline">\(1\)</span>, où <span
+class="math inline">\(1\)</span> indique une corrélation positive
+parfaite, <span class="math inline">\(-1\)</span> une corrélation
+négative parfaite et <span class="math inline">\(0\)</span> aucune
+corrélation linéaire.</p>
+<p>Formellement, le coefficient de corrélation de Bravais-Pearson est
+défini comme suit :</p>
+<p><span class="math display">\[\rho_{X,Y} = \frac{\text{Cov}(X,
+Y)}{\sigma_X \sigma_Y}\]</span></p>
+<p>où <span class="math inline">\(\text{Cov}(X, Y)\)</span> est la
+covariance entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, définie par :</p>
+<p><span class="math display">\[\text{Cov}(X, Y) = \mathbb{E}[(X -
+\mathbb{E}[X])(Y - \mathbb{E}[Y])]\]</span></p>
+<p>et <span class="math inline">\(\sigma_X\)</span> et <span
+class="math inline">\(\sigma_Y\)</span> sont les écarts-types de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, respectivement.</p>
+<p>Une autre formulation équivalente est :</p>
+<p><span class="math display">\[\rho_{X,Y} = \frac{\mathbb{E}[XY] -
+\mathbb{E}[X]\mathbb{E}[Y]}{\sqrt{(\mathbb{E}[X^2] -
+\mathbb{E}[X]^2)(\mathbb{E}[Y^2] - \mathbb{E}[Y]^2)}}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la corrélation de Bravais-Pearson
+est celui de la limite centrale pour les coefficients de corrélation. Ce
+théorème permet de comprendre le comportement asymptotique du
+coefficient de corrélation échantillonné.</p>
+<p>Considérons deux variables aléatoires <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> avec une corrélation <span
+class="math inline">\(\rho\)</span>. Soit <span
+class="math inline">\((X_i, Y_i)\)</span> pour <span
+class="math inline">\(i = 1, \ldots, n\)</span> un échantillon aléatoire
+de taille <span class="math inline">\(n\)</span>. Le coefficient de
+corrélation échantillonné est défini par :</p>
+<p><span class="math display">\[r_n = \frac{\sum_{i=1}^n (X_i -
+\bar{X})(Y_i - \bar{Y})}{\sqrt{\sum_{i=1}^n (X_i - \bar{X})^2
+\sum_{i=1}^n (Y_i - \bar{Y})^2}}\]</span></p>
+<p>où <span class="math inline">\(\bar{X}\)</span> et <span
+class="math inline">\(\bar{Y}\)</span> sont les moyennes échantillonnées
+de <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, respectivement.</p>
+<p>Le théorème de la limite centrale pour les coefficients de
+corrélation stipule que, sous certaines conditions, la distribution de
+<span class="math inline">\(r_n\)</span> converge vers une distribution
+normale lorsque <span class="math inline">\(n\)</span> tend vers
+l’infini. Plus précisément, si <span class="math inline">\(\rho\)</span>
+est la vraie corrélation entre <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span>, alors :</p>
+<p><span class="math display">\[\sqrt{n} (r_n - \rho) \xrightarrow{d}
+\mathcal{N}(0, 1 - \rho^2)\]</span></p>
+<p>où <span class="math inline">\(\xrightarrow{d}\)</span> désigne la
+convergence en distribution.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la limite centrale pour les coefficients
+de corrélation, nous devons d’abord établir quelques lemmes
+intermédiaires.</p>
+<div class="lemma">
+<p>Soit <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables aléatoires centrées avec
+une covariance <span class="math inline">\(\text{Cov}(X, Y)\)</span>.
+Alors, pour tout <span class="math inline">\(n\)</span>, nous avons
+:</p>
+<p><span class="math display">\[\mathbb{E}[r_n] = \rho\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Par linéarité de l’espérance, nous avons :</p>
+<p><span class="math display">\[\mathbb{E}[r_n] =
+\mathbb{E}\left[\frac{\sum_{i=1}^n (X_i - \bar{X})(Y_i -
+\bar{Y})}{\sqrt{\sum_{i=1}^n (X_i - \bar{X})^2 \sum_{i=1}^n (Y_i -
+\bar{Y})^2}}\right]\]</span></p>
+<p>En utilisant le fait que <span class="math inline">\(\mathbb{E}[X_i -
+\bar{X}] = 0\)</span> et <span class="math inline">\(\mathbb{E}[Y_i -
+\bar{Y}] = 0\)</span>, nous pouvons simplifier l’expression :</p>
+<p><span class="math display">\[\mathbb{E}[r_n] = \frac{\sum_{i=1}^n
+\mathbb{E}[(X_i - \bar{X})(Y_i -
+\bar{Y})]}{\sqrt{\mathbb{E}\left[\sum_{i=1}^n (X_i - \bar{X})^2\right]
+\mathbb{E}\left[\sum_{i=1}^n (Y_i - \bar{Y})^2\right]}}\]</span></p>
+<p>En utilisant la définition de la covariance, nous obtenons :</p>
+<p><span class="math display">\[\mathbb{E}[r_n] = \frac{n \text{Cov}(X,
+Y)}{n \sigma_X \sigma_Y} = \rho\]</span> ◻</p>
+</div>
+<div class="theorem">
+<p>Sous les conditions du théorème de la limite centrale pour les
+coefficients de corrélation, nous avons :</p>
+<p><span class="math display">\[\sqrt{n} (r_n - \rho) \xrightarrow{d}
+\mathcal{N}(0, 1 - \rho^2)\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ce théorème repose sur le théorème
+central limite multivarié et des techniques d’approximation
+asymptotique. Nous ne donnons ici qu’un aperçu des étapes
+principales.</p>
+<p>1. **Centrage et réduction** : Nous commençons par centrer et réduire
+les variables <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Soit <span class="math inline">\(U_i =
+\frac{X_i - \mathbb{E}[X]}{\sigma_X}\)</span> et <span
+class="math inline">\(V_i = \frac{Y_i -
+\mathbb{E}[Y]}{\sigma_Y}\)</span>. Alors, <span
+class="math inline">\(r_n\)</span> peut être exprimé en termes de <span
+class="math inline">\(U_i\)</span> et <span
+class="math inline">\(V_i\)</span>.</p>
+<p>2. **Développement de Taylor** : Nous utilisons un développement de
+Taylor pour approximer <span class="math inline">\(r_n\)</span> autour
+de <span class="math inline">\(\rho\)</span>. Cela permet de linéariser
+l’expression et d’appliquer le théorème central limite.</p>
+<p>3. **Convergence en distribution** : En utilisant les résultats du
+développement de Taylor et le théorème central limite multivarié, nous
+montrons que la distribution de <span class="math inline">\(\sqrt{n}
+(r_n - \rho)\)</span> converge vers une distribution normale avec la
+variance appropriée. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+corrélation de Bravais-Pearson.</p>
+<ol>
+<li><p>**Symétrie** : Le coefficient de corrélation est symétrique,
+c’est-à-dire que <span class="math inline">\(\rho_{X,Y} =
+\rho_{Y,X}\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Par définition, <span
+class="math inline">\(\rho_{X,Y} = \frac{\text{Cov}(X, Y)}{\sigma_X
+\sigma_Y}\)</span>. Or, <span class="math inline">\(\text{Cov}(X, Y) =
+\text{Cov}(Y, X)\)</span> et <span class="math inline">\(\sigma_X =
+\sigma_Y\)</span> (les écarts-types sont égaux). Donc, <span
+class="math inline">\(\rho_{X,Y} = \rho_{Y,X}\)</span>. ◻</p>
+</div></li>
+<li><p>**Bornes** : Le coefficient de corrélation est borné entre <span
+class="math inline">\(-1\)</span> et <span
+class="math inline">\(1\)</span>, c’est-à-dire que <span
+class="math inline">\(\forall X, Y, -1 \leq \rho_{X,Y} \leq
+1\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous utilisons l’inégalité de Cauchy-Schwarz, qui
+stipule que pour toute variable aléatoire <span
+class="math inline">\(Z\)</span>, nous avons <span
+class="math inline">\(\mathbb{E}[Z^2] \geq (\mathbb{E}[Z])^2\)</span>.
+En appliquant cette inégalité à <span class="math inline">\(Z = (X -
+\mathbb{E}[X])(Y - \mathbb{E}[Y])\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\mathbb{E}[(X - \mathbb{E}[X])^2 (Y -
+\mathbb{E}[Y])^2] \geq (\mathbb{E}[(X - \mathbb{E}[X])(Y -
+\mathbb{E}[Y])])^2\]</span></p>
+<p>En divisant les deux côtés par <span class="math inline">\(\sigma_X^2
+\sigma_Y^2\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\mathbb{E}\left[\left(\frac{(X -
+\mathbb{E}[X])(Y - \mathbb{E}[Y])}{\sigma_X \sigma_Y}\right)^2\right]
+\geq \left(\frac{\mathbb{E}[(X - \mathbb{E}[X])(Y -
+\mathbb{E}[Y])]}{\sigma_X \sigma_Y}\right)^2\]</span></p>
+<p>Or, <span class="math inline">\(\mathbb{E}\left[\left(\frac{(X -
+\mathbb{E}[X])(Y - \mathbb{E}[Y])}{\sigma_X \sigma_Y}\right)^2\right] =
+1\)</span> et <span class="math inline">\(\frac{\mathbb{E}[(X -
+\mathbb{E}[X])(Y - \mathbb{E}[Y])]}{\sigma_X \sigma_Y} =
+\rho_{X,Y}\)</span>. Donc, <span class="math inline">\(1 \geq
+\rho_{X,Y}^2\)</span>, ce qui implique que <span
+class="math inline">\(-1 \leq \rho_{X,Y} \leq 1\)</span>. ◻</p>
+</div></li>
+<li><p>**Indépendance** : Si <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> sont indépendantes, alors <span
+class="math inline">\(\rho_{X,Y} = 0\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendantes, alors <span
+class="math inline">\(\mathbb{E}[XY] =
+\mathbb{E}[X]\mathbb{E}[Y]\)</span>. Donc, <span
+class="math inline">\(\text{Cov}(X, Y) = \mathbb{E}[XY] -
+\mathbb{E}[X]\mathbb{E}[Y] = 0\)</span>. Par conséquent, <span
+class="math inline">\(\rho_{X,Y} = \frac{0}{\sigma_X \sigma_Y} =
+0\)</span>. ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La corrélation de Bravais-Pearson est un outil fondamental en
+statistique, permettant de quantifier les relations linéaires entre
+variables aléatoires. Son développement historique est étroitement lié
+aux progrès de la statistique et des sciences sociales. Les propriétés
+et théorèmes associés à ce coefficient sont nombreux et variés, offrant
+une richesse d’applications dans divers domaines. La compréhension
+approfondie de la corrélation de Bravais-Pearson est essentielle pour
+toute personne travaillant dans le domaine de l’analyse des données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

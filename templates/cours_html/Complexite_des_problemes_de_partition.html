@@ -1,0 +1,353 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de partition</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de partition</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les problèmes de partition sont au cœur des mathématiques discrètes
+et de l’informatique théorique. Ils émergent naturellement dans divers
+domaines, allant de la théorie des graphes à l’optimisation
+combinatoire. L’origine historique de ces problèmes remonte aux travaux
+fondateurs de la théorie des partitions en nombre entier, mais leur
+formalisation moderne est indissociable du développement de la théorie
+de la complexité algorithmique.</p>
+<p>Pourquoi ces problèmes sont-ils si importants ? Ils modélisent des
+questions fondamentales : comment diviser un ensemble en sous-ensembles
+disjoints avec certaines propriétés ? Comment minimiser une fonction de
+coût sur ces partitions ? Ces questions sont indispensables dans des
+domaines aussi variés que la bioinformatique, l’apprentissage
+automatique ou les réseaux de communication.</p>
+<p>Dans cet article, nous explorons la complexité des problèmes de
+partition. Nous commençons par définir formellement ces problèmes, puis
+nous étudions leurs propriétés et les théorèmes clés qui les
+caractérisent.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir formellement un problème de partition, considérons
+ce que nous cherchons à accomplir. Supposons que nous ayons un ensemble
+<span class="math inline">\(S\)</span> et une fonction de coût <span
+class="math inline">\(c\)</span>. Nous voulons diviser <span
+class="math inline">\(S\)</span> en sous-ensembles disjoints de manière
+à minimiser la somme des coûts des sous-ensembles. Par exemple, si <span
+class="math inline">\(S\)</span> est un ensemble de sommets d’un graphe
+et <span class="math inline">\(c\)</span> est une fonction qui mesure le
+poids des arêtes internes à un sous-ensemble, nous cherchons une
+partition qui minimise le poids total des arêtes internes.</p>
+<p>Formellement, un problème de partition peut être défini comme suit
+:</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(S\)</span> un ensemble fini et <span
+class="math inline">\(c : 2^S \rightarrow \mathbb{R}^+\)</span> une
+fonction de coût. Un problème de partition est un triplet <span
+class="math inline">\((S, c, k)\)</span>, où <span
+class="math inline">\(k\)</span> est un entier positif, et on cherche
+une partition de <span class="math inline">\(S\)</span> en <span
+class="math inline">\(k\)</span> sous-ensembles disjoints <span
+class="math inline">\(\{S_1, S_2, \ldots, S_k\}\)</span> telle que la
+somme des coûts <span class="math inline">\(\sum_{i=1}^k c(S_i)\)</span>
+est minimisée.</p>
+</div>
+<p>Une autre formulation, plus générale, utilise des contraintes
+supplémentaires :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(S\)</span> un ensemble fini et <span
+class="math inline">\(P(S)\)</span> l’ensemble des partitions de <span
+class="math inline">\(S\)</span>. Un problème de partition est défini
+par une fonction objectif <span class="math inline">\(f : P(S)
+\rightarrow \mathbb{R}\)</span> et un ensemble de contraintes <span
+class="math inline">\(C \subseteq P(S)\)</span>. Le but est de trouver
+une partition <span class="math inline">\(\pi \in C\)</span> qui
+minimise <span class="math inline">\(f(\pi)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant les problèmes de partition est le
+théorème de l’approximation par partition. Ce théorème montre que, sous
+certaines conditions, une solution approximative peut être trouvée en
+temps polynomial.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((S, c, k)\)</span> un problème de
+partition où la fonction de coût <span class="math inline">\(c\)</span>
+est sous-modulaire. Alors, il existe un algorithme polynomial qui trouve
+une partition <span class="math inline">\(\{S_1, S_2, \ldots,
+S_k\}\)</span> telle que : <span class="math display">\[\sum_{i=1}^k
+c(S_i) \leq 2 \cdot \min_{\pi \in P_k(S)} \sum_{i=1}^k c(\pi_i)\]</span>
+où <span class="math inline">\(P_k(S)\)</span> est l’ensemble de toutes
+les partitions de <span class="math inline">\(S\)</span> en <span
+class="math inline">\(k\)</span> sous-ensembles.</p>
+</div>
+<p>La démonstration de ce théorème repose sur des techniques
+d’approximation et utilise des résultats de la théorie des fonctions
+sous-modulaires.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de l’approximation par partition, nous
+utilisons une approche basée sur la méthode du glouton. L’idée est de
+construire la partition de manière itérative en ajoutant à chaque étape
+un sous-ensemble qui minimise le coût incrémental.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\((S, c, k)\)</span>
+un problème de partition avec une fonction de coût sous-modulaire <span
+class="math inline">\(c\)</span>. Nous construisons une partition <span
+class="math inline">\(\{S_1, S_2, \ldots, S_k\}\)</span> de la manière
+suivante :</p>
+<ol>
+<li><p>Initialiser <span class="math inline">\(S_1 =
+S\)</span>.</p></li>
+<li><p>Pour <span class="math inline">\(i\)</span> de 2 à <span
+class="math inline">\(k\)</span>, faire :</p>
+<ul>
+<li><p>Trouver un sous-ensemble <span class="math inline">\(S_i
+\subseteq S_{i-1}\)</span> qui minimise <span
+class="math inline">\(c(S_i) + c(S_{i-1} \setminus
+S_i)\)</span>.</p></li>
+<li><p>Mettre à jour <span class="math inline">\(S_{i} = S_i\)</span> et
+<span class="math inline">\(S_{i-1} = S_{i-1} \setminus
+S_i\)</span>.</p></li>
+</ul></li>
+</ol>
+<p>Nous devons montrer que cette partition satisfait la condition
+d’approximation. Pour cela, nous utilisons le fait que <span
+class="math inline">\(c\)</span> est sous-modulaire, ce qui implique que
+pour tout ensemble <span class="math inline">\(A \subseteq B\)</span> et
+tout élément <span class="math inline">\(x \notin B\)</span>, on a :
+<span class="math display">\[c(A \cup \{x\}) - c(A) \geq c(B \cup \{x\})
+- c(B)\]</span></p>
+<p>En appliquant cette propriété à chaque étape de l’algorithme, nous
+pouvons montrer que la somme des coûts de la partition construite est au
+plus le double de la somme des coûts de toute autre partition en <span
+class="math inline">\(k\)</span> sous-ensembles. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les problèmes de partition possèdent plusieurs propriétés
+intéressantes. Nous en listons quelques-unes ci-dessous :</p>
+<ol>
+<li><p>Si la fonction de coût <span class="math inline">\(c\)</span> est
+sous-modulaire, alors le problème de partition admet une solution
+optimale en temps polynomial.</p></li>
+<li><p>Si la fonction de coût <span class="math inline">\(c\)</span> est
+super-modulaire, alors le problème de partition est
+NP-difficile.</p></li>
+<li><p>Pour certaines fonctions de coût spécifiques, comme le problème
+du graphe bipartite maximum ou le problème de la coupe minimum, des
+algorithmes efficaces existent.</p></li>
+</ol>
+<p>Nous développons chacune de ces propriétés ci-dessous.</p>
+<div class="proof">
+<p><em>Proof.</em> Pour la propriété (i), nous utilisons le fait que les
+fonctions sous-modulaires peuvent être optimisées en temps polynomial à
+l’aide d’algorithmes gloutons. La démonstration repose sur le théorème
+de l’approximation par partition et les techniques d’optimisation
+combinatoire.</p>
+<p>Pour la propriété (ii), nous montrons que le problème de partition
+avec une fonction de coût super-modulaire est NP-difficile en réduisant
+un problème connu comme le problème du sommet indépendant maximum.</p>
+<p>Pour la propriété (iii), nous considérons des cas spécifiques où la
+fonction de coût a une structure particulière, permettant l’application
+d’algorithmes efficaces. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les problèmes de partition sont un domaine riche et fascinant des
+mathématiques discrètes. Leur complexité varie en fonction de la nature
+de la fonction de coût et des contraintes imposées. Les théorèmes et
+propriétés présentés dans cet article montrent que ces problèmes peuvent
+être abordés à la fois du point de vue algorithmique et théorique,
+offrant des perspectives prometteuses pour de futures recherches.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

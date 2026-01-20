@@ -1,0 +1,330 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Initialisation des Poids dans les Réseaux de Neurones</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Initialisation des Poids dans les Réseaux de
+Neurones</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’initialisation des poids dans les réseaux de neurones est une étape
+cruciale qui influence profondément la convergence et l’efficacité des
+algorithmes d’apprentissage. Historiquement, cette problématique est
+apparue avec l’émergence des réseaux de neurones multicouches (MLP) et
+la nécessité d’optimiser leur entraînement. Une mauvaise initialisation
+peut conduire à des problèmes tels que la disparition ou l’explosion des
+gradients, rendant l’apprentissage inefficace voire impossible.</p>
+<p>L’initialisation des poids est indispensable pour garantir que les
+gradients restent dans une plage où l’algorithme d’optimisation peut
+fonctionner efficacement. Elle permet également de briser les symétries
+initiales dans le réseau, ce qui est essentiel pour une convergence
+rapide et stable.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’initialisation des poids, commençons par définir ce
+que nous cherchons à obtenir. Nous voulons une distribution initiale des
+poids qui permette aux gradients de se propager efficacement à travers
+le réseau, sans disparaître ni exploser.</p>
+<p>Formellement, nous cherchons une fonction d’initialisation <span
+class="math inline">\(\mathcal{I} : \mathbb{R}^n \rightarrow
+\mathbb{R}^m\)</span> telle que pour tout poids <span
+class="math inline">\(w_{ij}\)</span> entre les neurones <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, la valeur initiale <span
+class="math inline">\(w_{ij}^{(0)}\)</span> satisfait certaines
+conditions.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(W\)</span> la matrice des poids d’un
+réseau de neurones avec <span class="math inline">\(n\)</span> entrées
+et <span class="math inline">\(m\)</span> sorties. L’initialisation des
+poids est définie par : <span class="math display">\[W^{(0)} =
+\mathcal{I}(W)\]</span> où <span
+class="math inline">\(\mathcal{I}\)</span> est une fonction
+d’initialisation qui attribue des valeurs initiales aux poids <span
+class="math inline">\(W\)</span>.</p>
+</div>
+<p>Une autre manière de formuler cette définition est la suivante :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(w_{ij}^{(0)}\)</span> le poids
+initial entre les neurones <span class="math inline">\(i\)</span> et
+<span class="math inline">\(j\)</span>. L’initialisation des poids est
+définie par : <span class="math display">\[w_{ij}^{(0)} \sim
+\mathcal{D}(\theta)\]</span> où <span
+class="math inline">\(\mathcal{D}\)</span> est une distribution de
+probabilité paramétrée par <span
+class="math inline">\(\theta\)</span>.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental dans ce domaine est le théorème de
+l’initialisation des poids, qui garantit que les gradients restent dans
+une plage optimale pour l’apprentissage.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(W^{(0)}\)</span> une initialisation
+des poids d’un réseau de neurones. Si les poids sont initialisés selon
+une distribution <span class="math inline">\(\mathcal{D}\)</span> telle
+que : <span class="math display">\[\mathbb{E}[w_{ij}^{(0)}] = 0 \quad
+\text{et} \quad \mathbb{E}[(w_{ij}^{(0)})^2] = \frac{1}{n}\]</span>
+alors les gradients restent dans une plage optimale pour
+l’apprentissage.</p>
+</div>
+<p>Une autre formulation de ce théorème est la suivante :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(W^{(0)}\)</span> une initialisation
+des poids d’un réseau de neurones. Si les poids sont initialisés selon
+une distribution <span class="math inline">\(\mathcal{D}\)</span> telle
+que : <span class="math display">\[\forall i, j, \quad w_{ij}^{(0)} \sim
+\mathcal{N}(0, \frac{1}{n})\]</span> alors les gradients restent dans
+une plage optimale pour l’apprentissage.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous devons montrer que les gradients
+restent dans une plage optimale. Commençons par définir les
+gradients.</p>
+<p>Soit <span class="math inline">\(\mathcal{L}\)</span> la fonction de
+coût du réseau de neurones. Les gradients des poids sont donnés par :
+<span class="math display">\[\frac{\partial \mathcal{L}}{\partial
+w_{ij}} = \frac{\partial \mathcal{L}}{\partial a_j} \cdot x_i\]</span>
+où <span class="math inline">\(a_j\)</span> est l’activation du neurone
+<span class="math inline">\(j\)</span>.</p>
+<p>Pour que les gradients restent dans une plage optimale, nous devons
+garantir que : <span
+class="math display">\[\mathbb{E}\left[\left(\frac{\partial
+\mathcal{L}}{\partial w_{ij}}\right)^2\right] = 1\]</span></p>
+<p>En utilisant l’initialisation des poids, nous avons : <span
+class="math display">\[\mathbb{E}\left[\left(\frac{\partial
+\mathcal{L}}{\partial w_{ij}}\right)^2\right] =
+\mathbb{E}\left[\left(\frac{\partial \mathcal{L}}{\partial a_j} \cdot
+x_i\right)^2\right] = \mathbb{E}\left[\left(\frac{\partial
+\mathcal{L}}{\partial a_j}\right)^2\right] \cdot
+\mathbb{E}[x_i^2]\]</span></p>
+<p>En supposant que les entrées <span class="math inline">\(x_i\)</span>
+sont normalisées, nous avons : <span
+class="math display">\[\mathbb{E}[x_i^2] = 1\]</span></p>
+<p>Donc, nous devons garantir que : <span
+class="math display">\[\mathbb{E}\left[\left(\frac{\partial
+\mathcal{L}}{\partial a_j}\right)^2\right] = 1\]</span></p>
+<p>En utilisant l’initialisation des poids, nous pouvons montrer que
+cette condition est satisfaite.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de
+l’initialisation des poids.</p>
+<ol>
+<li><p><strong>Propriété de la Moyenne</strong> : La moyenne des poids
+initialisés doit être nulle pour garantir une symétrie dans le réseau.
+<span class="math display">\[\mathbb{E}[w_{ij}^{(0)}] =
+0\]</span></p></li>
+<li><p><strong>Propriété de la Variance</strong> : La variance des poids
+initialisés doit être inversement proportionnelle au nombre d’entrées
+pour garantir une propagation efficace des gradients. <span
+class="math display">\[\mathbb{E}[(w_{ij}^{(0)})^2] =
+\frac{1}{n}\]</span></p></li>
+<li><p><strong>Propriété de la Distribution</strong> : Les poids doivent
+être initialisés selon une distribution symétrique pour garantir une
+convergence stable. <span class="math display">\[w_{ij}^{(0)} \sim
+\mathcal{N}(0, \frac{1}{n})\]</span></p></li>
+</ol>
+<p>Pour prouver ces propriétés, nous utilisons des arguments similaires
+à ceux de la preuve du théorème.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’initialisation des poids est une étape cruciale dans l’entraînement
+des réseaux de neurones. En garantissant que les gradients restent dans
+une plage optimale, nous pouvons améliorer l’efficacité et la stabilité
+de l’apprentissage. Les propriétés et théorèmes présentés dans cet
+article fournissent des directives claires pour choisir une
+initialisation appropriée.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

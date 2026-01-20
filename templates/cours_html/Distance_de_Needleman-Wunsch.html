@@ -1,0 +1,404 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Needleman-Wunsch : Une Approche Algébrique pour l’Alignement de Séquences</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Needleman-Wunsch : Une Approche Algébrique
+pour l’Alignement de Séquences</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’alignement de séquences est une problématique fondamentale en
+bioinformatique, permettant de comparer des séquences d’ADN, d’ARN ou de
+protéines afin d’identifier des similarités structurelles et
+fonctionnelles. La distance de Needleman-Wunsch, introduite par Saul B.
+Needleman et Christian D. Wunsch en 1970, est une méthode algorithmique
+qui permet de quantifier la dissimilarité entre deux séquences en tenant
+compte des insertions, délétions et substitutions.</p>
+<p>Cette notion émerge dans un contexte où la biologie moléculaire
+produit des quantités croissantes de données séquentielles. L’alignement
+optimal, tel que le définit Needleman-Wunsch, est indispensable pour
+l’analyse phylogénétique, la prédiction de structures protéiques et le
+design de médicaments. La formalisation mathématique de cette distance
+permet non seulement d’automatiser les comparaisons, mais aussi
+d’optimiser les calculs grâce à la programmation dynamique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Needleman-Wunsch, nous devons d’abord
+comprendre ce que signifie aligner deux séquences. Considérons deux
+séquences <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, composées respectivement de <span
+class="math inline">\(n\)</span> et <span
+class="math inline">\(m\)</span> éléments. Un alignement consiste à
+insérer des espaces dans ces séquences de manière à ce qu’elles aient la
+même longueur et que les éléments correspondants soient alignés
+verticalement.</p>
+<p>Nous cherchons à minimiser le coût de cet alignement, où le coût est
+défini par une fonction qui pénalise les substitutions, insertions et
+délétions. La distance de Needleman-Wunsch est alors la valeur minimale
+de ce coût.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(A = (a_1, a_2, \ldots,
+a_n)\)</span> et <span class="math inline">\(B = (b_1, b_2, \ldots,
+b_m)\)</span> deux séquences. Un alignement de <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est une paire de séquences <span
+class="math inline">\((A&#39;, B&#39;)\)</span> telles que:</p>
+<ul>
+<li><p><span class="math inline">\(A&#39;\)</span> est obtenue en
+insérant des espaces dans <span
+class="math inline">\(A\)</span>,</p></li>
+<li><p><span class="math inline">\(B&#39;\)</span> est obtenue en
+insérant des espaces dans <span
+class="math inline">\(B\)</span>,</p></li>
+<li><p><span class="math inline">\(|A&#39;| =
+|B&#39;|\)</span>.</p></li>
+</ul>
+<p>Le coût d’un alignement <span class="math inline">\((A&#39;,
+B&#39;)\)</span> est défini par: <span
+class="math display">\[\mathcal{C}(A&#39;, B&#39;) =
+\sum_{i=1}^{|A&#39;|} \delta(a&#39;_i, b&#39;_i)\]</span> où <span
+class="math inline">\(\delta\)</span> est une fonction de coût qui
+pénalise les substitutions, insertions et délétions.</p>
+<p>La distance de Needleman-Wunsch entre <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> est alors: <span
+class="math display">\[D(A, B) = \min_{(A&#39;, B&#39;)}
+\mathcal{C}(A&#39;, B&#39;)\]</span> où le minimum est pris sur tous les
+alignements possibles de <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Le théorème central de Needleman-Wunsch permet de calculer la
+distance de manière efficace en utilisant la programmation dynamique.
+Nous allons d’abord expliquer intuitivement pourquoi ce théorème est
+vrai, puis nous le formulerons de manière rigoureuse.</p>
+<p>Considérons une matrice <span class="math inline">\(M\)</span> où
+<span class="math inline">\(M[i][j]\)</span> représente le coût minimal
+pour aligner les <span class="math inline">\(i\)</span> premiers
+éléments de <span class="math inline">\(A\)</span> avec les <span
+class="math inline">\(j\)</span> premiers éléments de <span
+class="math inline">\(B\)</span>. Le théorème de Needleman-Wunsch
+stipule que cette matrice peut être remplie en utilisant une relation de
+récurrence simple.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> deux séquences de longueurs respectives
+<span class="math inline">\(n\)</span> et <span
+class="math inline">\(m\)</span>. Soit <span
+class="math inline">\(M\)</span> une matrice de taille <span
+class="math inline">\((n+1) \times (m+1)\)</span> définie par: <span
+class="math display">\[M[i][j] = \min \left\{
+\begin{array}{ll}
+M[i-1][j-1] + \delta(a_i, b_j), &amp; \text{si } i &gt; 0 \text{ et } j
+&gt; 0, \\
+M[i-1][j] + \delta(a_i, \text{espace}), &amp; \text{si } i &gt; 0, \\
+M[i][j-1] + \delta(\text{espace}, b_j), &amp; \text{si } j &gt; 0.
+\end{array}
+\right.\]</span> avec <span class="math inline">\(M[0][0] = 0\)</span>,
+<span class="math inline">\(M[i][0] = \sum_{k=1}^{i} \delta(a_k,
+\text{espace})\)</span> pour <span class="math inline">\(i &gt;
+0\)</span>, et <span class="math inline">\(M[0][j] = \sum_{k=1}^{j}
+\delta(\text{espace}, b_k)\)</span> pour <span class="math inline">\(j
+&gt; 0\)</span>.</p>
+<p>Alors, <span class="math inline">\(M[n][m]\)</span> est égal à la
+distance de Needleman-Wunsch entre <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Needleman-Wunsch, nous allons utiliser la
+programmation dynamique. L’idée est de montrer que le coût minimal pour
+aligner les <span class="math inline">\(i\)</span> premiers éléments de
+<span class="math inline">\(A\)</span> avec les <span
+class="math inline">\(j\)</span> premiers éléments de <span
+class="math inline">\(B\)</span> peut être exprimé en fonction des coûts
+minimaux pour aligner les sous-séquences correspondantes.</p>
+<div class="proof">
+<p><em>Proof.</em> Nous allons procéder par récurrence sur <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>.</p>
+<p><strong>Initialisation:</strong> Pour <span class="math inline">\(i =
+0\)</span> ou <span class="math inline">\(j = 0\)</span>, le coût
+minimal est simplement la somme des pénalités pour insérer des espaces.
+Cela correspond aux conditions initiales de la matrice <span
+class="math inline">\(M\)</span>.</p>
+<p><strong>Hérédité:</strong> Supposons que le théorème soit vrai pour
+toutes les sous-séquences de <span class="math inline">\(A\)</span> et
+<span class="math inline">\(B\)</span> de longueurs strictement
+inférieures à <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>. Nous allons montrer qu’il est vrai
+pour les séquences de longueurs <span class="math inline">\(i\)</span>
+et <span class="math inline">\(j\)</span>.</p>
+<p>Considérons un alignement optimal des <span
+class="math inline">\(i\)</span> premiers éléments de <span
+class="math inline">\(A\)</span> avec les <span
+class="math inline">\(j\)</span> premiers éléments de <span
+class="math inline">\(B\)</span>. Cet alignement peut se terminer de
+trois manières:</p>
+<ul>
+<li><p>Par une correspondance entre <span
+class="math inline">\(a_i\)</span> et <span
+class="math inline">\(b_j\)</span>,</p></li>
+<li><p>Par une insertion dans <span class="math inline">\(A\)</span>
+(c’est-à-dire un espace dans <span
+class="math inline">\(B&#39;\)</span>),</p></li>
+<li><p>Par une insertion dans <span class="math inline">\(B\)</span>
+(c’est-à-dire un espace dans <span
+class="math inline">\(A&#39;\)</span>).</p></li>
+</ul>
+<p>Dans le premier cas, le coût minimal est <span
+class="math inline">\(M[i-1][j-1] + \delta(a_i, b_j)\)</span>. Dans le
+deuxième cas, il est <span class="math inline">\(M[i-1][j] + \delta(a_i,
+\text{espace})\)</span>. Dans le troisième cas, il est <span
+class="math inline">\(M[i][j-1] + \delta(\text{espace},
+b_j)\)</span>.</p>
+<p>En prenant le minimum de ces trois valeurs, nous obtenons la relation
+de récurrence donnée dans le théorème. Par conséquent, <span
+class="math inline">\(M[i][j]\)</span> est bien égal au coût minimal
+pour aligner les <span class="math inline">\(i\)</span> premiers
+éléments de <span class="math inline">\(A\)</span> avec les <span
+class="math inline">\(j\)</span> premiers éléments de <span
+class="math inline">\(B\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant énoncer quelques propriétés importantes de la
+distance de Needleman-Wunsch.</p>
+<div class="proposition">
+<p>La distance de Needleman-Wunsch satisfait les propriétés
+suivantes:</p>
+<ul>
+<li><p><span class="math inline">\(D(A, B) \geq 0\)</span>,</p></li>
+<li><p><span class="math inline">\(D(A, A) = 0\)</span>,</p></li>
+<li><p><span class="math inline">\(D(A, B) = D(B, A)\)</span>,</p></li>
+<li><p><span class="math inline">\(D(A, C) \leq D(A, B) + D(B,
+C)\)</span>.</p></li>
+</ul>
+</div>
+<div class="proof">
+<p><em>Proof.</em> <strong>(i)</strong> Le coût d’un alignement est
+toujours non négatif, donc la distance de Needleman-Wunsch est également
+non négative.</p>
+<p><strong>(ii)</strong> L’alignement trivial de <span
+class="math inline">\(A\)</span> avec lui-même a un coût nul, donc <span
+class="math inline">\(D(A, A) = 0\)</span>.</p>
+<p><strong>(iii)</strong> La distance est symétrique car l’alignement de
+<span class="math inline">\(A\)</span> avec <span
+class="math inline">\(B\)</span> et l’alignement de <span
+class="math inline">\(B\)</span> avec <span
+class="math inline">\(A\)</span> sont équivalents.</p>
+<p><strong>(iv)</strong> Cette propriété découle de l’inégalité
+triangulaire pour les distances. Pour tout alignement de <span
+class="math inline">\(A\)</span> avec <span
+class="math inline">\(C\)</span>, nous pouvons le décomposer en un
+alignement de <span class="math inline">\(A\)</span> avec <span
+class="math inline">\(B\)</span> suivi d’un alignement de <span
+class="math inline">\(B\)</span> avec <span
+class="math inline">\(C\)</span>. Le coût total est donc inférieur ou
+égal à la somme des coûts individuels. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Needleman-Wunsch est un outil puissant pour
+l’alignement de séquences, combinant rigueur mathématique et efficacité
+algorithmique. Son utilisation en bioinformatique a révolutionné
+l’analyse des données biologiques, permettant de mieux comprendre les
+relations évolutives et fonctionnelles entre différentes séquences. Les
+propriétés et théorèmes associés à cette distance ouvrent également des
+perspectives pour des développements futurs, notamment dans
+l’optimisation des algorithmes et l’intégration de nouvelles fonctions
+de coût.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

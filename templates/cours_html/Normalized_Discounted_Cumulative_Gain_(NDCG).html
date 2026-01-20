@@ -1,0 +1,334 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Normalized Discounted Cumulative Gain (NDCG): A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Normalized Discounted Cumulative Gain (NDCG): A
+Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>The evaluation of ranking systems is a critical task in information
+retrieval, machine learning, and data science. Traditional metrics such
+as precision and recall often fall short in capturing the nuanced
+quality of ranked lists. The Normalized Discounted Cumulative Gain
+(NDCG) emerges as a powerful solution to this problem, providing a
+comprehensive measure that accounts for both the relevance of items and
+their positions in the ranking.</p>
+<p>Historically, the need for a more sophisticated evaluation metric
+arose from the limitations of binary relevance metrics. The Discounted
+Cumulative Gain (DCG) was introduced to incorporate the gradual nature
+of relevance, and its normalization led to the development of NDCG. This
+metric is indispensable in scenarios where the order of items
+significantly impacts user experience, such as search engines and
+recommendation systems.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To understand NDCG, we first need to grasp the concept of relevance
+and its cumulative nature. Suppose we have a ranked list of items, each
+with an associated relevance score. The goal is to measure how well the
+ranking aligns with the ideal ordering based on relevance.</p>
+<p>Consider a ranked list <span class="math inline">\(\mathbf{r} = (r_1,
+r_2, \ldots, r_n)\)</span>, where <span
+class="math inline">\(r_i\)</span> denotes the relevance of the item at
+position <span class="math inline">\(i\)</span>. The relevance scores
+are typically on an ordinal scale, such as <span>0, 1, 2, 3</span>,
+where higher values indicate greater relevance.</p>
+<p>The Discounted Cumulative Gain (DCG) at position <span
+class="math inline">\(p\)</span> is defined as: <span
+class="math display">\[\text{DCG}_p = \sum_{i=1}^{p} \frac{2^{r_i} -
+1}{\log_2(i + 1)}\]</span> This formula accounts for both the relevance
+of each item and its position in the ranking. The term <span
+class="math inline">\(2^{r_i} - 1\)</span> transforms the relevance
+score into a logarithmic scale, while <span
+class="math inline">\(\log_2(i + 1)\)</span> discounts the gain based on
+the item’s position.</p>
+<p>The Ideal Discounted Cumulative Gain (IDCG) is the DCG of the perfect
+ranking, where items are ordered by their relevance scores in descending
+order. Formally, for a list <span
+class="math inline">\(\mathbf{r}^*\)</span> sorted in decreasing order
+of relevance: <span class="math display">\[\text{IDCG}_p =
+\sum_{i=1}^{p} \frac{2^{r_i^*} - 1}{\log_2(i + 1)}\]</span></p>
+<p>Finally, the Normalized Discounted Cumulative Gain (NDCG) at position
+<span class="math inline">\(p\)</span> is defined as the ratio of DCG to
+IDCG: <span class="math display">\[\text{NDCG}_p =
+\frac{\text{DCG}_p}{\text{IDCG}_p}\]</span> This normalization ensures
+that NDCG ranges between 0 and 1, where 1 indicates a perfect
+ranking.</p>
+<h1 id="theorems">Theorems</h1>
+<p>One of the key properties of NDCG is its ability to measure the
+quality of a ranking relative to an ideal ordering. This property can be
+formalized in the following theorem:</p>
+<div class="theorem">
+<p>For any ranked list <span class="math inline">\(\mathbf{r}\)</span>
+and its corresponding ideal ranking <span
+class="math inline">\(\mathbf{r}^*\)</span>, the NDCG at position <span
+class="math inline">\(p\)</span> satisfies: <span
+class="math display">\[0 \leq \text{NDCG}_p \leq 1\]</span> Moreover,
+<span class="math inline">\(\text{NDCG}_p = 1\)</span> if and only if
+<span class="math inline">\(\mathbf{r}\)</span> is identical to <span
+class="math inline">\(\mathbf{r}^*\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The proof follows directly from the definition of
+NDCG. Since <span class="math inline">\(\text{DCG}_p\)</span> is
+maximized when the items are ordered by their relevance scores in
+descending order, <span class="math inline">\(\text{IDCG}_p\)</span>
+represents the maximum possible DCG for a given list. Therefore, <span
+class="math inline">\(\text{NDCG}_p\)</span> is bounded by 0 and 1.</p>
+<p>To see that <span class="math inline">\(\text{NDCG}_p = 1\)</span> if
+and only if <span class="math inline">\(\mathbf{r} =
+\mathbf{r}^*\)</span>, observe that equality holds precisely when the
+DCG of <span class="math inline">\(\mathbf{r}\)</span> matches the IDCG,
+which occurs only when the rankings are identical. ◻</p>
+</div>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<p>NDCG exhibits several important properties that make it a robust
+metric for evaluating ranking systems. We list and prove these
+properties below:</p>
+<ol>
+<li><p>**Monotonicity**: The NDCG at position <span
+class="math inline">\(p\)</span> is non-decreasing in <span
+class="math inline">\(p\)</span>. That is, for any ranked list <span
+class="math inline">\(\mathbf{r}\)</span>, we have: <span
+class="math display">\[\text{NDCG}_p \leq \text{NDCG}_{p+1}\]</span> for
+all <span class="math inline">\(p \geq 1\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> This property follows from the fact that <span
+class="math inline">\(\text{DCG}_p\)</span> is non-decreasing in <span
+class="math inline">\(p\)</span>, as adding more items to the ranking
+can only increase or maintain the cumulative gain. Since <span
+class="math inline">\(\text{IDCG}_p\)</span> is also non-decreasing, the
+ratio <span
+class="math inline">\(\frac{\text{DCG}_p}{\text{IDCG}_p}\)</span> is
+non-decreasing as well. ◻</p>
+</div></li>
+<li><p>**Invariance to Irrelevant Items**: The NDCG is invariant to the
+presence of irrelevant items in the ranking. Specifically, if all items
+beyond position <span class="math inline">\(p\)</span> are irrelevant
+(i.e., <span class="math inline">\(r_i = 0\)</span> for all <span
+class="math inline">\(i &gt; p\)</span>), then: <span
+class="math display">\[\text{NDCG}_p = \frac{\sum_{i=1}^{p}
+\frac{2^{r_i} - 1}{\log_2(i + 1)}}{\sum_{i=1}^{p} \frac{2^{r_i^*} -
+1}{\log_2(i + 1)}}\]</span> This property ensures that NDCG focuses on
+the relevant portion of the ranking.</p>
+<div class="proof">
+<p><em>Proof.</em> The proof is straightforward from the definition of
+NDCG. Since irrelevant items contribute nothing to both DCG and IDCG,
+they do not affect the ratio. ◻</p>
+</div></li>
+<li><p>**Consistency with User Behavior**: NDCG aligns with user
+behavior by penalizing the ranking of relevant items at lower positions.
+This property is captured by the logarithmic discount factor in the DCG
+formula.</p>
+<div class="proof">
+<p><em>Proof.</em> The logarithmic discount <span
+class="math inline">\(\log_2(i + 1)\)</span> ensures that items at
+higher positions contribute more to the cumulative gain. This reflects
+the intuition that users are more likely to interact with items at the
+top of the ranking. ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>The Normalized Discounted Cumulative Gain (NDCG) is a powerful and
+versatile metric for evaluating the quality of ranked lists. Its ability
+to account for both relevance and position makes it indispensable in
+various applications, from search engines to recommendation systems. By
+understanding its definitions, theorems, and properties, we can
+appreciate the depth and utility of NDCG in modern information
+retrieval.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

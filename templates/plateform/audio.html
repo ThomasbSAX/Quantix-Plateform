@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantix Audio - Transcription Audio et Vidéo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .main-content {
+            padding: 120px 20px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+            font-weight: 300;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            opacity: 0;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .hero-subtitle {
+            font-size: 1rem;
+            color: #565869;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+            opacity: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .mode-selector {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        
+        .mode-btn {
+            flex: 1;
+            max-width: 300px;
+            padding: 30px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .mode-btn:hover {
+            border-color: #007bff;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,123,255,0.2);
+        }
+        
+        .mode-btn.active {
+            border-color: #007bff;
+            background: linear-gradient(135deg, rgba(0,123,255,0.1), rgba(0,86,179,0.1));
+        }
+        
+        .mode-icon {
+            font-size: 48px;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+        
+        .mode-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .mode-description {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .transcription-area {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .transcription-area.active {
+            display: block;
+        }
+        
+        .upload-zone {
+            padding: 60px 30px;
+            border: 2px dashed #6c757d;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upload-zone:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+        
+        .record-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .record-btn {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            font-size: 48px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+        }
+        
+        .record-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 24px rgba(220,53,69,0.4);
+        }
+        
+        .record-btn.recording {
+            animation: pulse-record 1.5s infinite;
+            background: linear-gradient(135deg, #dc3545, #bd2130);
+        }
+        
+        @keyframes pulse-record {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(0.95); }
+        }
+        
+        .recording-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.25rem;
+            color: #dc3545;
+            font-weight: 600;
+        }
+        
+        .recording-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .recording-timer {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #333;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .btn-primary, .btn-secondary {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .transcription-result {
+            margin-top: 30px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .transcription-text {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: #e9ecef;
+            margin: 20px 0;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #6c757d;
+        }
+        
+        .status-dot.ready { background: #28a745; }
+        .status-dot.processing { background: #ffc107; animation: pulse 1s infinite; }
+        .status-dot.error { background: #dc3545; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        #audioPreview {
+            margin: 20px 0;
+        }
+        
+        #audioPlayer {
+            width: 100%;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+    
+    <main class="main-content">
+        <section class="hero-section">
+            <h1 id="main-title"></h1>
+            <p class="hero-subtitle" id="subtitle"></p>
+        </section>
+
+        <!-- Mode Selector -->
+        <div class="mode-selector">
+            <div class="mode-btn active" id="uploadModeBtn" onclick="switchMode('upload')">
+                <div class="mode-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <div class="mode-title">Upload de fichier</div>
+                <div class="mode-description">Importez vos fichiers audio ou vidéo</div>
+            </div>
+            
+            <div class="mode-btn" id="recordModeBtn" onclick="switchMode('record')">
+                <div class="mode-icon"><i class="fas fa-microphone"></i></div>
+                <div class="mode-title">Enregistrement direct</div>
+                <div class="mode-description">Enregistrez et transcrivez en temps réel</div>
+            </div>
+        </div>
+
+        <!-- Upload Mode -->
+        <div class="transcription-area active" id="uploadArea">
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                <h3>Glissez votre fichier ici ou cliquez pour sélectionner</h3>
+                <p style="color: #6c757d; margin: 10px 0;">Formats supportés: MP3, WAV, M4A, FLAC, OGG, MP4, AVI, MOV</p>
+                <input type="file" id="audioFileInput" accept="audio/*,video/*" style="display:none;">
+                <button class="btn-secondary" onclick="document.getElementById('audioFileInput').click()">
+                    <i class="fas fa-folder-open"></i> Choisir un fichier
+                </button>
+            </div>
+            
+            <div id="audioPreview" style="display:none;">
+                <audio id="audioPlayer" controls></audio>
+                <p id="fileName" style="text-align:center; margin-top:10px; color:#666;"></p>
+            </div>
+            
+            <div style="text-align:center; margin-top:20px;">
+                <button id="transcribeBtn" class="btn-primary" style="display:none;">
+                    <i class="fas fa-play"></i> Lancer la transcription
+                </button>
+            </div>
+            
+            <div class="status-indicator" id="uploadStatus" style="display:none;">
+                <span class="status-dot" id="uploadStatusDot"></span>
+                <span id="uploadStatusText">En attente...</span>
+            </div>
+            
+            <div id="uploadTranscriptionResult" style="display:none;" class="transcription-result">
+                <h3><i class="fas fa-file-alt"></i> Transcription</h3>
+                <div class="transcription-text" id="uploadTranscriptionText"></div>
+                <div class="result-actions">
+                    <button class="btn-secondary" onclick="copyTranscription('upload')">
+                        <i class="fas fa-copy"></i> Copier
+                    </button>
+                    <button class="btn-secondary" onclick="downloadTranscription('upload')">
+                        <i class="fas fa-download"></i> Télécharger TXT
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Record Mode -->
+        <div class="transcription-area" id="recordArea">
+            <div class="record-controls">
+                <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
+                    <i class="fas fa-microphone" id="recordIcon"></i>
+                </button>
+                
+                <div id="recordingIndicator" style="display:none;" class="recording-indicator">
+                    <span class="recording-dot"></span>
+                    <span>Enregistrement en cours</span>
+                </div>
+                
+                <div class="recording-timer" id="recordTimer">00:00</div>
+                
+                <p style="color: #6c757d; text-align:center;">
+                    Cliquez sur le bouton pour démarrer l'enregistrement
+                </p>
+            </div>
+            
+            <div class="status-indicator" id="recordStatus" style="display:none;">
+                <span class="status-dot" id="recordStatusDot"></span>
+                <span id="recordStatusText">En attente...</span>
+            </div>
+            
+            <div id="recordTranscriptionResult" style="display:none;" class="transcription-result">
+                <h3><i class="fas fa-file-alt"></i> Transcription</h3>
+                <div class="transcription-text" id="recordTranscriptionText"></div>
+                <div class="result-actions">
+                    <button class="btn-secondary" onclick="copyTranscription('record')">
+                        <i class="fas fa-copy"></i> Copier
+                    </button>
+                    <button class="btn-secondary" onclick="downloadTranscription('record')">
+                        <i class="fas fa-download"></i> Télécharger TXT
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+
+    <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+    <script>
+        // Variables globales
+        let currentMode = 'upload';
+        let currentFile = null;
+        let transcriptionTexts = { upload: '', record: '' };
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let recordingStartTime = null;
+        let timerInterval = null;
+        
+        // Switch entre les modes
+        function switchMode(mode) {
+            currentMode = mode;
+            
+            // Update buttons
+            document.getElementById('uploadModeBtn').classList.toggle('active', mode === 'upload');
+            document.getElementById('recordModeBtn').classList.toggle('active', mode === 'record');
+            
+            // Update areas
+            document.getElementById('uploadArea').classList.toggle('active', mode === 'upload');
+            document.getElementById('recordArea').classList.toggle('active', mode === 'record');
+        }
+        
+        // ===== UPLOAD MODE =====
+        const uploadZone = document.getElementById('uploadZone');
+        const audioFileInput = document.getElementById('audioFileInput');
+        const audioPreview = document.getElementById('audioPreview');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const fileName = document.getElementById('fileName');
+        const transcribeBtn = document.getElementById('transcribeBtn');
+        
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#007bff';
+            uploadZone.style.background = '#f8f9fa';
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.style.borderColor = '#6c757d';
+            uploadZone.style.background = 'transparent';
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.style.borderColor = '#6c757d';
+            uploadZone.style.background = 'transparent';
+            
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+        
+        audioFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+        
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('audio/') && !file.type.startsWith('video/')) {
+                alert('Veuillez sélectionner un fichier audio ou vidéo valide.');
+                return;
+            }
+            
+            currentFile = file;
+            const url = URL.createObjectURL(file);
+            audioPlayer.src = url;
+            fileName.textContent = `${file.name} (${formatFileSize(file.size)})`;
+            audioPreview.style.display = 'block';
+            transcribeBtn.style.display = 'inline-flex';
+            document.getElementById('uploadTranscriptionResult').style.display = 'none';
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+        
+        transcribeBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+            
+            transcribeBtn.disabled = true;
+            transcribeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Transcription en cours...';
+            
+            showStatus('upload', 'processing', 'Transcription en cours...');
+            
+            const formData = new FormData();
+            formData.append('file', currentFile);
+            
+            try {
+                const response = await fetch('/api/audio/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Erreur lors de la transcription');
+                
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.text) {
+                    transcriptionTexts.upload = data.text;
+                    document.getElementById('uploadTranscriptionText').textContent = data.text;
+                    document.getElementById('uploadTranscriptionResult').style.display = 'block';
+                    showStatus('upload', 'ready', 'Transcription terminée !');
+                } else {
+                    throw new Error('Réponse invalide du serveur');
+                }
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la transcription: ' + error.message);
+                showStatus('upload', 'error', 'Erreur lors de la transcription');
+            } finally {
+                transcribeBtn.disabled = false;
+                transcribeBtn.innerHTML = '<i class="fas fa-play"></i> Lancer la transcription';
+            }
+        });
+        
+        // ===== RECORD MODE =====
+        async function toggleRecording() {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                await startRecording();
+            } else {
+                stopRecording();
+            }
+        }
+        
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                recordedChunks = [];
+                
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) {
+                        recordedChunks.push(e.data);
+                    }
+                };
+                
+                mediaRecorder.onstop = async () => {
+                    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                    await transcribeRecording(blob);
+                };
+                
+                mediaRecorder.start();
+                recordingStartTime = Date.now();
+                
+                // Update UI
+                document.getElementById('recordBtn').classList.add('recording');
+                document.getElementById('recordIcon').className = 'fas fa-stop';
+                document.getElementById('recordingIndicator').style.display = 'flex';
+                
+                // Start timer
+                timerInterval = setInterval(updateTimer, 1000);
+                
+            } catch (error) {
+                console.error('Erreur lors de l\'accès au microphone:', error);
+                alert('Impossible d\'accéder au microphone. Vérifiez les permissions.');
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                
+                // Update UI
+                document.getElementById('recordBtn').classList.remove('recording');
+                document.getElementById('recordIcon').className = 'fas fa-microphone';
+                document.getElementById('recordingIndicator').style.display = 'none';
+                
+                // Stop timer
+                clearInterval(timerInterval);
+                document.getElementById('recordTimer').textContent = '00:00';
+            }
+        }
+        
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('recordTimer').textContent = `${minutes}:${seconds}`;
+        }
+        
+        async function transcribeRecording(blob) {
+            showStatus('record', 'processing', 'Transcription en cours...');
+            
+            const formData = new FormData();
+            formData.append('file', blob, 'recording.webm');
+            
+            try {
+                const response = await fetch('/api/audio/transcribe', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error('Erreur lors de la transcription');
+                
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.text) {
+                    transcriptionTexts.record = data.text;
+                    document.getElementById('recordTranscriptionText').textContent = data.text;
+                    document.getElementById('recordTranscriptionResult').style.display = 'block';
+                    showStatus('record', 'ready', 'Transcription terminée !');
+                } else {
+                    throw new Error('Réponse invalide du serveur');
+                }
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la transcription: ' + error.message);
+                showStatus('record', 'error', 'Erreur lors de la transcription');
+            }
+        }
+        
+        // ===== UTILITY FUNCTIONS =====
+        function showStatus(mode, type, text) {
+            const statusEl = document.getElementById(mode + 'Status');
+            const dotEl = document.getElementById(mode + 'StatusDot');
+            const textEl = document.getElementById(mode + 'StatusText');
+            
+            statusEl.style.display = 'flex';
+            dotEl.className = 'status-dot ' + type;
+            textEl.textContent = text;
+        }
+        
+        function copyTranscription(mode) {
+            const text = transcriptionTexts[mode];
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Texte copié dans le presse-papier !');
+            }).catch(err => {
+                alert('Erreur lors de la copie: ' + err);
+            });
+        }
+        
+        function downloadTranscription(mode) {
+            const text = transcriptionTexts[mode];
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `transcription_${mode}_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Effet typewriter pour le titre
+        function typeWriter(element, text, speed, callback) {
+            let i = 0;
+            element.textContent = '';
+            element.style.opacity = '1';
+            
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else if (callback) {
+                    setTimeout(callback, 300);
+                }
+            }
+            type();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const title = document.getElementById('main-title');
+            const subtitle = document.getElementById('subtitle');
+            
+            if (title) {
+                typeWriter(title, 'Quantix Audio', 80, function() {
+                    if (subtitle) {
+                        typeWriter(subtitle, 'Retranscription audio et vidéo automatique avec IA', 50);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

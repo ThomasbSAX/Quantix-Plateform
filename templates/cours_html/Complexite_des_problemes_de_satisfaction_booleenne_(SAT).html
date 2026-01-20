@@ -1,0 +1,387 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes de satisfaction booléenne (SAT)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes de satisfaction booléenne
+(SAT)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les problèmes de satisfaction booléenne (SAT) occupent une place
+centrale en informatique théorique et en mathématiques discrètes. À
+l’origine, ces problèmes émergent de la logique propositionnelle, où
+l’on cherche à déterminer si une formule booléenne donnée peut être
+satisfaite par une affectation de valeurs vraies ou fausses à ses
+variables. L’importance de SAT réside dans son universalité : il est
+possible de réduire de nombreux problèmes décisionnels à SAT, ce qui en
+fait un outil fondamental pour l’étude de la complexité
+computationnelle.</p>
+<p>L’émergence de SAT est étroitement liée aux travaux de logiciens tels
+que George Boole, qui a introduit l’algèbre booléenne au XIXe siècle.
+Cependant, c’est avec l’avènement de l’informatique que SAT a pris toute
+son ampleur. Le problème de la satisfiabilité est devenu un paradigme
+pour l’étude des classes de complexité, en particulier la classe NP. La
+question de savoir si P = NP, l’une des plus célèbres questions non
+résolues en informatique théorique, est directement liée à la
+compréhension de la complexité de SAT.</p>
+<p>SAT est indispensable dans de nombreux domaines appliqués, tels que
+la vérification de circuits électroniques, l’optimisation combinatoire,
+et même en bioinformatique. Sa complexité variée, allant des cas
+facilement résolubles aux instances extrêmes nécessitant des algorithmes
+sophistiqués, en fait un sujet de recherche passionnant et riche.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la complexité des problèmes SAT, commençons par
+définir formellement les concepts clés.</p>
+<h2 class="unnumbered" id="formule-booléenne">Formule booléenne</h2>
+<p>Une formule booléenne est une expression composée de variables
+booléennes, d’opérateurs logiques (ET, OU, NON), et de parenthèses. Par
+exemple, <span class="math inline">\((x_1 \lor \neg x_2) \land (x_3 \lor
+x_4)\)</span> est une formule booléenne.</p>
+<p>Formellement, soit <span class="math inline">\(V\)</span> un ensemble
+fini de variables booléennes. Une formule booléenne <span
+class="math inline">\(\phi\)</span> sur <span
+class="math inline">\(V\)</span> est définie récursivement comme suit
+:</p>
+<ul>
+<li><p><span class="math inline">\(\top\)</span> (vrai) et <span
+class="math inline">\(\bot\)</span> (faux) sont des formules
+booléennes.</p></li>
+<li><p>Pour toute variable <span class="math inline">\(x \in V\)</span>,
+<span class="math inline">\(x\)</span> et <span
+class="math inline">\(\neg x\)</span> sont des formules
+booléennes.</p></li>
+<li><p>Si <span class="math inline">\(\phi_1\)</span> et <span
+class="math inline">\(\phi_2\)</span> sont des formules booléennes,
+alors <span class="math inline">\((\phi_1 \land \phi_2)\)</span>, <span
+class="math inline">\((\phi_1 \lor \phi_2)\)</span>, et <span
+class="math inline">\((\phi_1 \rightarrow \phi_2)\)</span> sont des
+formules booléennes.</p></li>
+</ul>
+<h2 class="unnumbered" id="satisfiabilité">Satisfiabilité</h2>
+<p>Une affectation est une fonction <span class="math inline">\(\alpha :
+V \rightarrow \{\text{vrai}, \text{faux}\}\)</span>. Une formule
+booléenne <span class="math inline">\(\phi\)</span> est satisfaite par
+une affectation <span class="math inline">\(\alpha\)</span> si <span
+class="math inline">\(\phi\)</span> évalue à vrai sous <span
+class="math inline">\(\alpha\)</span>.</p>
+<p>Le problème de la satisfiabilité (SAT) est défini comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\phi\)</span> une formule booléenne.
+Le problème SAT consiste à déterminer s’il existe une affectation <span
+class="math inline">\(\alpha\)</span> telle que <span
+class="math inline">\(\phi\)</span> est satisfaite par <span
+class="math inline">\(\alpha\)</span>.</p>
+</div>
+<p>Formellement, SAT peut être exprimé comme : <span
+class="math display">\[\text{SAT} = \{\phi \mid \exists \alpha.
+\phi(\alpha) = \text{vrai}\}\]</span> où <span
+class="math inline">\(\phi\)</span> est une formule booléenne et <span
+class="math inline">\(\alpha\)</span> est une affectation.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-cook-levin">Théorème de
+Cook-Levin</h2>
+<p>Le théorème de Cook-Levin est un résultat fondamental en théorie de
+la complexité computationnelle. Il établit que SAT est NP-complet, ce
+qui signifie que tout problème dans NP peut être réduit en temps
+polynomial à SAT.</p>
+<p>Pour comprendre ce théorème, commençons par rappeler quelques
+concepts clés. La classe NP est l’ensemble des problèmes décisionnels
+pour lesquels une solution proposée peut être vérifiée en temps
+polynomial. Un problème est NP-complet s’il est dans NP et que tout
+autre problème dans NP peut être réduit à lui en temps polynomial.</p>
+<p>Le théorème de Cook-Levin peut être énoncé comme suit :</p>
+<div class="theorem">
+<p>Le problème SAT est NP-complet.</p>
+</div>
+<p>Formellement, cela signifie que :</p>
+<ul>
+<li><p>SAT est dans NP.</p></li>
+<li><p>Pour tout problème <span class="math inline">\(L\)</span> dans
+NP, il existe une réduction polynomiale de <span
+class="math inline">\(L\)</span> à SAT.</p></li>
+</ul>
+<p>La preuve du théorème de Cook-Levin repose sur la construction d’une
+formule booléenne qui encode une machine de Turing non déterministe.
+Cette construction montre que la question de savoir si une instance d’un
+problème dans NP a une solution peut être réduite à la question de
+satisfiabilité d’une formule booléenne.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered" id="preuve-du-théorème-de-cook-levin">Preuve du
+Théorème de Cook-Levin</h2>
+<p>Pour prouver que SAT est NP-complet, nous devons montrer deux choses
+: que SAT est dans NP et que tout problème dans NP peut être réduit à
+SAT en temps polynomial.</p>
+<h3 class="unnumbered" id="sat-est-dans-np">SAT est dans NP</h3>
+<p>Pour montrer que SAT est dans NP, nous devons démontrer qu’une
+solution proposée (une affectation des variables) peut être vérifiée en
+temps polynomial.</p>
+<p>Soit <span class="math inline">\(\phi\)</span> une formule booléenne
+et <span class="math inline">\(\alpha\)</span> une affectation des
+variables de <span class="math inline">\(\phi\)</span>. Nous pouvons
+vérifier en temps polynomial si <span
+class="math inline">\(\phi\)</span> est satisfaite par <span
+class="math inline">\(\alpha\)</span> en évaluant récursivement la
+formule sous l’affectation <span
+class="math inline">\(\alpha\)</span>.</p>
+<h3 class="unnumbered" id="réduction-polynomiale">Réduction
+Polynomiale</h3>
+<p>Pour montrer que tout problème dans NP peut être réduit à SAT, nous
+utilisons une construction polynomiale. Soit <span
+class="math inline">\(L\)</span> un problème dans NP et <span
+class="math inline">\(M\)</span> une machine de Turing non déterministe
+qui décide <span class="math inline">\(L\)</span> en temps
+polynomial.</p>
+<p>Nous construisons une formule booléenne <span
+class="math inline">\(\phi_x\)</span> pour chaque instance <span
+class="math inline">\(x\)</span> de <span
+class="math inline">\(L\)</span> telle que <span
+class="math inline">\(\phi_x\)</span> est satisfiable si et seulement si
+<span class="math inline">\(M\)</span> accepte <span
+class="math inline">\(x\)</span>. Cette construction repose sur
+l’encodage des configurations de la machine <span
+class="math inline">\(M\)</span> et des transitions entre ces
+configurations.</p>
+<p>La formule <span class="math inline">\(\phi_x\)</span> est construite
+de manière à ce qu’une affectation satisfaisante corresponde à un chemin
+d’acceptation de la machine <span class="math inline">\(M\)</span> sur
+l’entrée <span class="math inline">\(x\)</span>. La taille de <span
+class="math inline">\(\phi_x\)</span> est polynomiale en la taille de
+<span class="math inline">\(x\)</span>, et la construction peut être
+effectuée en temps polynomial.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriétés-de-sat">Propriétés de SAT</h2>
+<ul>
+<li><p>SAT est dans NP. Cela signifie qu’une solution proposée peut être
+vérifiée en temps polynomial.</p></li>
+<li><p>SAT est NP-difficile. Cela signifie que tout problème dans NP
+peut être réduit à SAT en temps polynomial.</p></li>
+<li><p>Le théorème de Cook-Levin implique que SAT est
+NP-complet.</p></li>
+</ul>
+<h2 class="unnumbered" id="corollaires">Corollaires</h2>
+<div class="corollary">
+<p>Tout problème NP-complet peut être réduit à SAT en temps
+polynomial.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Puisque SAT est NP-complet, tout problème dans NP
+peut être réduit à SAT en temps polynomial. Par conséquent, tout
+problème NP-complet peut également être réduit à SAT en temps
+polynomial. ◻</p>
+</div>
+<div class="corollary">
+<p>Si P = NP, alors SAT peut être résolu en temps polynomial.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Si P = NP, alors tous les problèmes dans NP peuvent
+être résolus en temps polynomial. Puisque SAT est dans NP, il peut
+également être résolu en temps polynomial. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les problèmes de satisfaction booléenne (SAT) sont d’une importance
+capitale en informatique théorique et en mathématiques discrètes. Leur
+complexité variée et leur universalité en font un sujet de recherche
+passionnant. Le théorème de Cook-Levin, qui établit que SAT est
+NP-complet, est un résultat fondamental qui a profondément influencé
+notre compréhension de la complexité computationnelle. Les propriétés et
+corollaires associés à SAT continuent d’inspirer des recherches dans
+divers domaines appliqués.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

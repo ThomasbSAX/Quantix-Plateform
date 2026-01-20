@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Entropie de Havrda-Charvát : Une Généralisation de l’Entropie de Shannon</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Entropie de Havrda-Charvát : Une Généralisation de
+l’Entropie de Shannon</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’entropie, concept central en théorie de l’information, mesure
+l’incertitude ou le désordre dans un système. Introduite par Shannon en
+1948, l’entropie de Shannon a révolutionné les communications et
+l’informatique. Cependant, son cadre strict a limité certaines
+applications.</p>
+<p>Dans les années 1960, Havrda et Charvát ont proposé une
+généralisation de l’entropie de Shannon, désormais connue sous le nom
+d’entropie de Havrda-Charvát. Cette généralisation permet une
+flexibilité accrue dans la modélisation de l’incertitude, offrant ainsi
+des outils plus puissants pour diverses applications en théorie de
+l’information, en statistique et en physique.</p>
+<p>L’entropie de Havrda-Charvát émerge comme une réponse aux limitations
+des mesures d’entropie traditionnelles. Elle est indispensable dans les
+cadres où l’information est hiérarchisée ou où les interactions entre
+les éléments d’un système ne sont pas indépendantes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire l’entropie de Havrda-Charvát, considérons d’abord une
+distribution de probabilité discrète. Supposons que nous ayons un
+ensemble fini <span class="math inline">\(X = \{x_1, x_2, \ldots,
+x_n\}\)</span> et une distribution de probabilité <span
+class="math inline">\(P = \{p_1, p_2, \ldots, p_n\}\)</span> sur <span
+class="math inline">\(X\)</span>, où <span class="math inline">\(p_i =
+P(x_i)\)</span> et <span class="math inline">\(\sum_{i=1}^n p_i =
+1\)</span>.</p>
+<p>Nous cherchons une mesure qui généralise l’entropie de Shannon <span
+class="math inline">\(H(P) = -\sum_{i=1}^n p_i \log p_i\)</span>. Cette
+mesure doit capturer l’incertitude dans <span
+class="math inline">\(P\)</span> de manière plus flexible.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\alpha &gt; 0\)</span> un paramètre
+de généralisation. L’entropie de Havrda-Charvát pour une distribution de
+probabilité discrète <span class="math inline">\(P\)</span> est définie
+par : <span class="math display">\[H_{\alpha}(P) = \frac{1}{2(1 -
+2^{1-\alpha})} \left( \sum_{i=1}^n p_i^\alpha - 1 \right)\]</span></p>
+</div>
+<p>Pour <span class="math inline">\(\alpha = 2\)</span>, l’entropie de
+Havrda-Charvát se réduit à l’entropie quadratique : <span
+class="math display">\[H_2(P) = 1 - \sum_{i=1}^n p_i^2\]</span></p>
+<p>Pour <span class="math inline">\(\alpha = 1\)</span>, en prenant la
+limite lorsque <span class="math inline">\(\alpha\)</span> tend vers 1,
+nous retrouvons l’entropie de Shannon : <span
+class="math display">\[H_1(P) = -\sum_{i=1}^n p_i \log p_i\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Nous présentons maintenant un théorème fondamental concernant les
+propriétés de l’entropie de Havrda-Charvát.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(H_{\alpha}(P)\)</span> l’entropie de
+Havrda-Charvát pour une distribution de probabilité discrète <span
+class="math inline">\(P\)</span>. Alors :</p>
+<ol>
+<li><p><span class="math inline">\(H_{\alpha}(P) \geq 0\)</span>, avec
+égalité si et seulement si <span class="math inline">\(P\)</span> est
+une distribution déterministe (c’est-à-dire, il existe un <span
+class="math inline">\(i\)</span> tel que <span class="math inline">\(p_i
+= 1\)</span> et <span class="math inline">\(p_j = 0\)</span> pour tout
+<span class="math inline">\(j \neq i\)</span>).</p></li>
+<li><p><span class="math inline">\(H_{\alpha}(P)\)</span> est concave en
+<span class="math inline">\(P\)</span>, c’est-à-dire que pour toute
+distribution de probabilité <span class="math inline">\(Q\)</span> et
+tout <span class="math inline">\(\lambda \in [0, 1]\)</span>, nous avons
+: <span class="math display">\[H_{\alpha}(\lambda P + (1 - \lambda) Q)
+\geq \lambda H_{\alpha}(P) + (1 - \lambda)
+H_{\alpha}(Q)\]</span></p></li>
+<li><p><span class="math inline">\(H_{\alpha}(P)\)</span> est maximal
+lorsque <span class="math inline">\(P\)</span> est uniforme,
+c’est-à-dire que pour toute distribution de probabilité <span
+class="math inline">\(P\)</span>, nous avons : <span
+class="math display">\[H_{\alpha}(P) \leq \frac{1}{2(1 - 2^{1-\alpha})}
+\left( n^{1-\alpha} - 1 \right)\]</span> avec égalité si et seulement si
+<span class="math inline">\(p_i = \frac{1}{n}\)</span> pour tout <span
+class="math inline">\(i\)</span>.</p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Nous fournissons maintenant les preuves des propriétés de l’entropie
+de Havrda-Charvát.</p>
+<div class="proof">
+<p><em>Preuve du théorème.</em></p>
+<ol>
+<li><p>La non-négativité de <span
+class="math inline">\(H_{\alpha}(P)\)</span> découle du fait que <span
+class="math inline">\(p_i^\alpha \leq 1\)</span> pour tout <span
+class="math inline">\(i\)</span>, et donc : <span
+class="math display">\[H_{\alpha}(P) = \frac{1}{2(1 - 2^{1-\alpha})}
+\left( \sum_{i=1}^n p_i^\alpha - 1 \right) \geq 0\]</span> L’égalité a
+lieu si et seulement si <span class="math inline">\(P\)</span> est
+déterministe.</p></li>
+<li><p>La concavité de <span
+class="math inline">\(H_{\alpha}(P)\)</span> peut être démontrée en
+utilisant la convexité de la fonction <span class="math inline">\(f(x) =
+x^\alpha\)</span>. En effet, pour toute distribution de probabilité
+<span class="math inline">\(Q\)</span> et tout <span
+class="math inline">\(\lambda \in [0, 1]\)</span>, nous avons : <span
+class="math display">\[(\lambda p_i + (1 - \lambda) q_i)^\alpha \leq
+\lambda p_i^\alpha + (1 - \lambda) q_i^\alpha\]</span> en utilisant la
+convexité de <span class="math inline">\(f(x) = x^\alpha\)</span>. En
+sommant sur <span class="math inline">\(i\)</span>, nous obtenons :
+<span class="math display">\[\sum_{i=1}^n (\lambda p_i + (1 - \lambda)
+q_i)^\alpha \leq \lambda \sum_{i=1}^n p_i^\alpha + (1 - \lambda)
+\sum_{i=1}^n q_i^\alpha\]</span> En multipliant par <span
+class="math inline">\(\frac{1}{2(1 - 2^{1-\alpha})}\)</span> et en
+soustrayant 1, nous obtenons la concavité de <span
+class="math inline">\(H_{\alpha}(P)\)</span>.</p></li>
+<li><p>Le maximum de <span class="math inline">\(H_{\alpha}(P)\)</span>
+est atteint lorsque <span class="math inline">\(P\)</span> est uniforme.
+En effet, pour toute distribution de probabilité <span
+class="math inline">\(P\)</span>, nous avons : <span
+class="math display">\[H_{\alpha}(P) = \frac{1}{2(1 - 2^{1-\alpha})}
+\left( \sum_{i=1}^n p_i^\alpha - 1 \right) \leq \frac{1}{2(1 -
+2^{1-\alpha})} \left( n^{1-\alpha} - 1 \right)\]</span> avec égalité si
+et seulement si <span class="math inline">\(p_i = \frac{1}{n}\)</span>
+pour tout <span class="math inline">\(i\)</span>.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés supplémentaires de
+l’entropie de Havrda-Charvát.</p>
+<ol>
+<li><p><strong>Continuité</strong> : L’entropie de Havrda-Charvát <span
+class="math inline">\(H_{\alpha}(P)\)</span> est continue en <span
+class="math inline">\(P\)</span>. Cela signifie que pour toute suite de
+distributions de probabilité <span
+class="math inline">\(\{P_n\}\)</span> convergeant vers une distribution
+de probabilité <span class="math inline">\(P\)</span>, nous avons :
+<span class="math display">\[\lim_{n \to \infty} H_{\alpha}(P_n) =
+H_{\alpha}(P)\]</span></p></li>
+<li><p><strong>Invariance par permutation</strong> : L’entropie de
+Havrda-Charvát <span class="math inline">\(H_{\alpha}(P)\)</span> est
+invariante par permutation des probabilités. Cela signifie que pour
+toute permutation <span class="math inline">\(\sigma\)</span> de <span
+class="math inline">\(\{1, 2, \ldots, n\}\)</span>, nous avons : <span
+class="math display">\[H_{\alpha}(P) = H_{\alpha}(\{p_{\sigma(1)},
+p_{\sigma(2)}, \ldots, p_{\sigma(n)}\})\]</span></p></li>
+<li><p><strong>Additivité</strong> : L’entropie de Havrda-Charvát <span
+class="math inline">\(H_{\alpha}(P)\)</span> est additive pour les
+distributions de probabilité indépendantes. Cela signifie que si <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> sont des distributions de probabilité
+indépendantes, alors : <span class="math display">\[H_{\alpha}(P \times
+Q) = H_{\alpha}(P) + H_{\alpha}(Q)\]</span></p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’entropie de Havrda-Charvát est une généralisation puissante et
+flexible de l’entropie de Shannon. Ses propriétés fondamentales, telles
+que la non-négativité, la concavité et le maximum pour les distributions
+uniformes, en font un outil précieux dans de nombreuses applications en
+théorie de l’information, en statistique et en physique. En comprenant
+les fondements mathématiques de cette mesure d’entropie, nous pouvons
+mieux appréhender l’incertitude et le désordre dans les systèmes
+complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

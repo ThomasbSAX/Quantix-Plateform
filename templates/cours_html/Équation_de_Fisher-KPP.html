@@ -1,0 +1,318 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Équation de Fisher-KPP : Modélisation des fronts de propagation</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Équation de Fisher-KPP : Modélisation des fronts de
+propagation</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’équation de Fisher-KPP, nommée d’après Ronald Aylmer Fisher (1937)
+et les mathématiciens soviétiques Kolmogorov, Petrovsky et Piskunov
+(1937), est un modèle mathématique fondamental en écologie théorique et
+en biologie des populations. Elle décrit la dynamique de propagation
+d’une espèce dans un environnement homogène, modélisant ainsi les fronts
+de colonisation.</p>
+<p>Cette équation émerge naturellement dans le cadre des modèles
+réaction-diffusion, où un terme de diffusion modélise le mouvement
+aléatoire des individus et un terme réaction représente la croissance
+exponentielle locale de la population. Le modèle est indispensable pour
+comprendre les mécanismes sous-jacents à l’expansion spatiale des
+populations, que ce soit dans le contexte de la biologie invasive ou de
+la dynamique des maladies.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Nous cherchons à modéliser l’évolution temporelle d’une densité de
+population <span class="math inline">\(u(x,t)\)</span>, où <span
+class="math inline">\(x\)</span> représente la position spatiale et
+<span class="math inline">\(t\)</span> le temps. Supposons que les
+individus se déplacent de manière aléatoire avec une diffusivité
+constante <span class="math inline">\(D\)</span> et croissent
+exponentiellement en l’absence de contraintes spatiales, avec un taux de
+croissance <span class="math inline">\(r\)</span>.</p>
+<p>La densité de population évolue donc selon l’équation suivante :</p>
+<p><span class="math display">\[\begin{equation}
+    \frac{\partial u}{\partial t} = D \frac{\partial^2 u}{\partial x^2}
++ r u
+\end{equation}\]</span></p>
+<p>Cette équation est connue sous le nom d’équation de Fisher-KPP. Pour
+qu’elle soit biologique, nous devons imposer des conditions aux limites
+et initiales appropriées. Typiquement, on considère un domaine spatial
+infini <span class="math inline">\(x \in (-\infty, +\infty)\)</span>,
+avec une condition initiale compacte :</p>
+<p><span class="math display">\[\begin{equation}
+    u(x,0) = u_0(x), \quad \text{où} \quad u_0(x) &gt; 0 \quad
+\text{pour} \quad x \in [-\ell, \ell] \quad \text{et} \quad u_0(x) = 0
+\quad \text{pour} \quad x \notin [-\ell, \ell]
+\end{equation}\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Nous cherchons à établir des propriétés fondamentales des solutions
+de l’équation de Fisher-KPP. Un résultat clé est le comportement
+asymptotique des fronts de propagation.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(u(x,t)\)</span> une solution de
+l’équation de Fisher-KPP avec une condition initiale compacte. Alors,
+pour tout <span class="math inline">\(c &gt; 2\sqrt{rD}\)</span>, il
+existe une constante <span class="math inline">\(A\)</span> telle que
+:</p>
+<p><span class="math display">\[u(x,t) = 1 - e^{-A(x-ct)} + o(1), \quad
+\text{quand} \quad t \to +\infty\]</span></p>
+<p>où <span class="math inline">\(o(1)\)</span> désigne un terme qui
+tend vers zéro.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous utilisons des techniques d’analyse
+asymptotique et de théorie des fronts de propagation. Nous commençons
+par linéariser l’équation autour du point fixe <span
+class="math inline">\(u = 1\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la solution <span
+class="math inline">\(u(x,t) = 1 - v(x,t)\)</span>, où <span
+class="math inline">\(v(x,t)\)</span> est une petite perturbation. En
+substituant dans l’équation de Fisher-KPP, nous obtenons :</p>
+<p><span class="math display">\[\frac{\partial v}{\partial t} = D
+\frac{\partial^2 v}{\partial x^2} - r v + o(v)\]</span></p>
+<p>En négligeant les termes d’ordre supérieur, nous obtenons l’équation
+linéaire :</p>
+<p><span class="math display">\[\frac{\partial v}{\partial t} = D
+\frac{\partial^2 v}{\partial x^2} - r v\]</span></p>
+<p>Nous cherchons des solutions de la forme <span
+class="math inline">\(v(x,t) = e^{ikx - \omega t}\)</span>, où <span
+class="math inline">\(k\)</span> est le nombre d’onde et <span
+class="math inline">\(\omega\)</span> la fréquence. En substituant dans
+l’équation linéaire, nous obtenons la relation de dispersion :</p>
+<p><span class="math display">\[\omega = -i D k^2 + r\]</span></p>
+<p>La partie imaginaire de <span class="math inline">\(\omega\)</span>
+détermine la vitesse de propagation du front. Pour que le front se
+propage, nous devons avoir <span class="math inline">\(\text{Im}(\omega)
+&gt; 0\)</span>, ce qui implique :</p>
+<p><span class="math display">\[c = 2\sqrt{rD}\]</span></p>
+<p>Cette vitesse est connue sous le nom de vitesse minimale de
+propagation. Pour <span class="math inline">\(c &gt;
+2\sqrt{rD}\)</span>, la perturbation décroît exponentiellement, ce qui
+prouve le théorème. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes des solutions
+de l’équation de Fisher-KPP.</p>
+<ol>
+<li><p><strong>Stabilité du front</strong> : Le front de propagation est
+stable pour <span class="math inline">\(c &gt; 2\sqrt{rD}\)</span>. Cela
+signifie que toute petite perturbation du front initial décroît
+exponentiellement au cours du temps.</p></li>
+<li><p><strong>Invasion réussie</strong> : Pour <span
+class="math inline">\(c &gt; 2\sqrt{rD}\)</span>, le front de
+propagation envahit tout l’espace, c’est-à-dire que <span
+class="math inline">\(u(x,t) \to 1\)</span> pour tout <span
+class="math inline">\(x \in \mathbb{R}\)</span> quand <span
+class="math inline">\(t \to +\infty\)</span>.</p></li>
+<li><p><strong>Invasion échouée</strong> : Pour <span
+class="math inline">\(c &lt; 2\sqrt{rD}\)</span>, le front de
+propagation ne peut pas envahir tout l’espace. La densité de population
+décroît exponentiellement au cours du temps.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’équation de Fisher-KPP est un modèle fondamental en écologie
+théorique et en biologie des populations. Elle permet de comprendre les
+mécanismes sous-jacents à la propagation spatiale des espèces et des
+maladies. Les résultats théoriques présentés dans cet article
+fournissent une base solide pour l’analyse des fronts de propagation et
+ouvrent la voie à des extensions vers des modèles plus complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

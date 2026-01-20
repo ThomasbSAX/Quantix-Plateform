@@ -1,0 +1,329 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Circonférence de l’ellipse : Approximations</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Circonférence de l’ellipse : Approximations</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’ellipse, l’une des coniques les plus étudiées en mathématiques,
+possède une propriété fascinante : sa circonférence ne peut être
+exprimée par une formule exacte simple. Contrairement au cercle, dont la
+circonférence est donnée par <span class="math inline">\(2\pi
+r\)</span>, l’ellipse nécessite des approximations pour évaluer sa
+circonférence. Cette nécessité découle de la complexité de l’intégrale
+elliptique incomplète de deuxième espèce, qui est la forme exacte de la
+circonférence d’une ellipse.</p>
+<p>L’étude des approximations de la circonférence de l’ellipse est
+cruciale dans divers domaines, notamment en astronomie pour le calcul
+des orbites planétaires, en ingénierie pour la conception de structures
+elliptiques, et en physique pour modéliser des phénomènes périodiques.
+Les approximations permettent de simplifier les calculs tout en
+conservant une précision acceptable.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de plonger dans les approximations, il est essentiel de définir
+précisément ce qu’est une ellipse et sa circonférence.</p>
+<p>Une ellipse peut être définie comme l’ensemble des points <span
+class="math inline">\((x, y)\)</span> dans le plan tel que la somme des
+distances à deux points fixes, appelés foyers, est constante.
+Formellement, pour une ellipse centrée à l’origine avec les axes
+principaux alignés sur les axes <span class="math inline">\(x\)</span>
+et <span class="math inline">\(y\)</span>, on a :</p>
+<p><span class="math display">\[E = \left\{ (x, y) \in \mathbb{R}^2 \mid
+\frac{x^2}{a^2} + \frac{y^2}{b^2} = 1 \right\}\]</span></p>
+<p>où <span class="math inline">\(a\)</span> est le demi-grand axe et
+<span class="math inline">\(b\)</span> est le demi-petit axe, avec <span
+class="math inline">\(a \geq b &gt; 0\)</span>.</p>
+<p>La circonférence <span class="math inline">\(C\)</span> de l’ellipse
+est donnée par l’intégrale elliptique incomplète de deuxième espèce
+:</p>
+<p><span class="math display">\[C = 4a \int_{0}^{\pi/2} \sqrt{1 - e^2
+\sin^2 \theta} \, d\theta\]</span></p>
+<p>où <span class="math inline">\(e = \sqrt{1 -
+\frac{b^2}{a^2}}\)</span> est l’excentricité de l’ellipse.</p>
+<h1 class="unnumbered"
+id="approximations-de-la-circonférence">Approximations de la
+Circonférence</h1>
+<p>Plusieurs approximations ont été proposées pour estimer la
+circonférence d’une ellipse. Nous en présentons quelques-unes ici.</p>
+<h2 class="unnumbered" id="approximation-de-ramanujan">Approximation de
+Ramanujan</h2>
+<p>Une des approximations les plus précises est celle de Ramanujan. Elle
+est donnée par :</p>
+<p><span class="math display">\[C \approx \pi \left[ 3(a + b) -
+\sqrt{(3a + b)(a + 3b)} \right]\]</span></p>
+<p>Cette approximation est remarquable par sa simplicité et son
+efficacité. Elle est particulièrement précise lorsque l’ellipse est
+proche d’un cercle, c’est-à-dire lorsque <span class="math inline">\(a
+\approx b\)</span>.</p>
+<h2 class="unnumbered"
+id="approximation-de-srinivasa-ramanujan">Approximation de Srinivasa
+Ramanujan</h2>
+<p>Une autre approximation, également due à Ramanujan, est :</p>
+<p><span class="math display">\[C \approx \pi (a + b) \left( 1 +
+\frac{3h}{10 + \sqrt{4 - 3h}} \right)\]</span></p>
+<p>où <span class="math inline">\(h = \frac{(a - b)^2}{(a +
+b)^2}\)</span>.</p>
+<p>Cette approximation est plus complexe que la précédente, mais elle
+offre une meilleure précision pour les ellipses très allongées.</p>
+<h2 class="unnumbered" id="approximation-de-bessel">Approximation de
+Bessel</h2>
+<p>L’approximation de Bessel est donnée par :</p>
+<p><span class="math display">\[C \approx \pi (a + b) \left( 1 +
+\frac{3h}{10 + \sqrt{4 - 3h}} \right)\]</span></p>
+<p>où <span class="math inline">\(h = \frac{(a - b)^2}{(a +
+b)^2}\)</span>.</p>
+<p>Cette approximation est similaire à celle de Ramanujan, mais elle est
+souvent utilisée dans des contextes spécifiques où une certaine forme
+d’approximation est requise.</p>
+<h1 class="unnumbered" id="preuves-et-justifications">Preuves et
+Justifications</h1>
+<p>Pour chaque approximation, il est important de comprendre comment
+elle est dérivée et pourquoi elle fonctionne.</p>
+<h2 class="unnumbered" id="preuve-de-lapproximation-de-ramanujan">Preuve
+de l’Approximation de Ramanujan</h2>
+<p>L’approximation de Ramanujan peut être dérivée en utilisant une série
+de Taylor pour l’intégrale elliptique. En développant l’intégrande
+autour de <span class="math inline">\(e = 0\)</span>, on obtient une
+série dont les premiers termes donnent l’approximation de Ramanujan.</p>
+<p><span class="math display">\[\sqrt{1 - e^2 \sin^2 \theta} \approx 1 -
+\frac{e^2}{2} \sin^2 \theta - \frac{e^4}{8} \sin^4 \theta +
+\cdots\]</span></p>
+<p>En intégrant terme par terme et en utilisant les propriétés des
+intégrales de puissances de sinus, on obtient une expression qui peut
+être simplifiée pour donner l’approximation de Ramanujan.</p>
+<h2 class="unnumbered"
+id="preuve-de-lapproximation-de-srinivasa-ramanujan">Preuve de
+l’Approximation de Srinivasa Ramanujan</h2>
+<p>L’approximation de Srinivasa Ramanujan est dérivée en utilisant une
+méthode similaire, mais en incluant plus de termes dans le développement
+de Taylor. Cela permet d’obtenir une approximation plus précise, surtout
+pour les valeurs élevées de <span class="math inline">\(e\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Plusieurs propriétés intéressantes découlent des approximations de la
+circonférence de l’ellipse.</p>
+<h2 class="unnumbered" id="propriété-i">Propriété (i)</h2>
+<p>Lorsque <span class="math inline">\(a = b\)</span>, c’est-à-dire
+lorsque l’ellipse est un cercle, toutes les approximations donnent la
+circonférence exacte du cercle :</p>
+<p><span class="math display">\[C = 2\pi a\]</span></p>
+<h2 class="unnumbered" id="propriété-ii">Propriété (ii)</h2>
+<p>Pour les ellipses très allongées, c’est-à-dire lorsque <span
+class="math inline">\(a \gg b\)</span>, l’approximation de Ramanujan
+devient :</p>
+<p><span class="math display">\[C \approx 2\pi a + \frac{\pi
+b^2}{a}\]</span></p>
+<p>Cette approximation est particulièrement utile en astronomie pour
+calculer les orbites des planètes.</p>
+<h2 class="unnumbered" id="propriété-iii">Propriété (iii)</h2>
+<p>L’erreur relative des approximations diminue lorsque <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> se rapprochent. Cela signifie que les
+approximations sont plus précises pour les ellipses proches d’un
+cercle.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les approximations de la circonférence de l’ellipse sont des outils
+puissants pour simplifier les calculs tout en conservant une précision
+acceptable. Elles trouvent des applications dans divers domaines, de
+l’astronomie à l’ingénierie. Bien que la formule exacte soit complexe,
+les approximations de Ramanujan et Bessel offrent des solutions
+pratiques et efficaces.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

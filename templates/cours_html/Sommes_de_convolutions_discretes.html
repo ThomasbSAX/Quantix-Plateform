@@ -1,0 +1,377 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Sommes de convolutions discrètes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Sommes de convolutions discrètes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les sommes de convolutions discrètes apparaissent naturellement dans
+de nombreux domaines des mathématiques appliquées, notamment en
+traitement du signal et en analyse numérique. Historiquement, elles
+trouvent leur origine dans les travaux de Oliver Heaviside sur les
+équations différentielles linéaires et les fonctions de transfert. Ces
+sommes permettent de modéliser des systèmes dynamiques discrets et sont
+essentielles pour comprendre les propriétés de stabilité, de causalité
+et d’invariance temporelle.</p>
+<p>Dans ce chapitre, nous explorons les sommes de convolutions discrètes
+sous différents angles : définition, propriétés fondamentales et
+applications. Nous montrons comment ces sommes peuvent être utilisées
+pour résoudre des problèmes pratiques, tels que le filtrage de signaux
+et la modélisation de systèmes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir les sommes de convolutions discrètes, commençons par
+comprendre ce que nous cherchons à modéliser. Supposons que nous ayons
+deux suites discrètes <span class="math inline">\(\{x[n]\}_{n \in
+\mathbb{Z}}\)</span> et <span class="math inline">\(\{h[n]\}_{n \in
+\mathbb{Z}}\)</span>. Nous voulons trouver une nouvelle suite <span
+class="math inline">\(\{y[n]\}_{n \in \mathbb{Z}}\)</span> qui
+représente l’effet de la suite <span class="math inline">\(\{h[n]\}_{n
+\in \mathbb{Z}}\)</span> sur la suite <span
+class="math inline">\(\{x[n]\}_{n \in \mathbb{Z}}\)</span>.</p>
+<p>En termes mathématiques, cela revient à définir une opération qui
+combine les deux suites de manière à ce que chaque élément de <span
+class="math inline">\(\{y[n]\}_{n \in \mathbb{Z}}\)</span> soit une
+somme pondérée des éléments de <span class="math inline">\(\{x[n]\}_{n
+\in \mathbb{Z}}\)</span>, où les poids sont donnés par <span
+class="math inline">\(\{h[n]\}_{n \in \mathbb{Z}}\)</span>.</p>
+<p>La somme de convolution discrète est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(\{x[n]\}_{n \in
+\mathbb{Z}}\)</span> et <span class="math inline">\(\{h[n]\}_{n \in
+\mathbb{Z}}\)</span> deux suites discrètes. La somme de convolution
+discrète <span class="math inline">\(\{y[n]\}_{n \in
+\mathbb{Z}}\)</span> est définie par : <span class="math display">\[y[n]
+= (x * h)[n] = \sum_{k=-\infty}^{\infty} x[k] h[n - k]\]</span></p>
+</div>
+<p>Cette définition peut également être formulée de manière alternative
+en utilisant l’indice <span class="math inline">\(m\)</span> : <span
+class="math display">\[y[n] = (x * h)[n] = \sum_{m=-\infty}^{\infty} x[n
+- m] h[m]\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant les sommes de convolutions
+discrètes est le théorème de la convolution, qui établit une relation
+entre les transformées de Fourier discrètes des suites <span
+class="math inline">\(\{x[n]\}_{n \in \mathbb{Z}}\)</span> et <span
+class="math inline">\(\{h[n]\}_{n \in \mathbb{Z}}\)</span>.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(\{x[n]\}_{n \in
+\mathbb{Z}}\)</span> et <span class="math inline">\(\{h[n]\}_{n \in
+\mathbb{Z}}\)</span> deux suites discrètes. Alors, la transformée de
+Fourier discrète de leur convolution est le produit des transformées de
+Fourier discrètes de chaque suite : <span
+class="math display">\[\mathcal{F}\{x * h\} = \mathcal{F}\{x\} \cdot
+\mathcal{F}\{h\}\]</span></p>
+</div>
+<p>Pour démontrer ce théorème, nous commençons par rappeler la
+définition de la transformée de Fourier discrète :</p>
+<p><span class="math display">\[\mathcal{F}\{x\}[k] =
+\sum_{n=-\infty}^{\infty} x[n] e^{-i 2 \pi k n / N}\]</span></p>
+<p>En utilisant cette définition, nous pouvons écrire :</p>
+<p><span class="math display">\[\begin{align*}
+\mathcal{F}\{x * h\}[k] &amp;= \sum_{n=-\infty}^{\infty} (x * h)[n]
+e^{-i 2 \pi k n / N} \\
+&amp;= \sum_{n=-\infty}^{\infty} \left( \sum_{m=-\infty}^{\infty} x[n -
+m] h[m] \right) e^{-i 2 \pi k n / N} \\
+&amp;= \sum_{m=-\infty}^{\infty} h[m] \left( \sum_{n=-\infty}^{\infty}
+x[n - m] e^{-i 2 \pi k n / N} \right) \\
+&amp;= \sum_{m=-\infty}^{\infty} h[m] e^{-i 2 \pi k m / N} \left(
+\sum_{n=-\infty}^{\infty} x[n - m] e^{-i 2 \pi k (n - m) / N} \right) \\
+&amp;= \sum_{m=-\infty}^{\infty} h[m] e^{-i 2 \pi k m / N}
+\mathcal{F}\{x\}[k] \\
+&amp;= \mathcal{F}\{h\}[k] \cdot \mathcal{F}\{x\}[k]
+\end{align*}\]</span></p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour illustrer la puissance des sommes de convolutions discrètes,
+considérons un exemple simple. Supposons que nous ayons une suite <span
+class="math inline">\(\{x[n]\}_{n \in \mathbb{Z}}\)</span> définie par :
+<span class="math display">\[x[n] = \begin{cases}
+1 &amp; \text{si } n = 0, \\
+0 &amp; \text{sinon.}
+\end{cases}\]</span></p>
+<p>et une suite <span class="math inline">\(\{h[n]\}_{n \in
+\mathbb{Z}}\)</span> définie par : <span class="math display">\[h[n] =
+\begin{cases}
+1 &amp; \text{si } n = 0, \\
+-1 &amp; \text{si } n = 1, \\
+0 &amp; \text{sinon.}
+\end{cases}\]</span></p>
+<p>Calculons la convolution <span class="math inline">\(\{y[n]\}_{n \in
+\mathbb{Z}} = \{x * h\}[n]\)</span> :</p>
+<p><span class="math display">\[\begin{align*}
+y[n] &amp;= (x * h)[n] = \sum_{k=-\infty}^{\infty} x[k] h[n - k] \\
+&amp;= x[0] h[n] + \sum_{k \neq 0} x[k] h[n - k] \\
+&amp;= h[n]
+\end{align*}\]</span></p>
+<p>Ainsi, dans ce cas particulier, la convolution de <span
+class="math inline">\(\{x[n]\}_{n \in \mathbb{Z}}\)</span> avec <span
+class="math inline">\(\{h[n]\}_{n \in \mathbb{Z}}\)</span> donne
+simplement la suite <span class="math inline">\(\{h[n]\}_{n \in
+\mathbb{Z}}\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les sommes de convolutions discrètes possèdent plusieurs propriétés
+importantes, que nous énumérons et démontrons ci-dessous.</p>
+<ol>
+<li><p><strong>Commutativité</strong> : La convolution est commutative,
+c’est-à-dire que pour toutes suites <span
+class="math inline">\(\{x[n]\}_{n \in \mathbb{Z}}\)</span> et <span
+class="math inline">\(\{h[n]\}_{n \in \mathbb{Z}}\)</span>, nous avons :
+<span class="math display">\[x * h = h * x\]</span></p>
+<p><strong>Démonstration</strong> : Par définition, nous avons : <span
+class="math display">\[(x * h)[n] = \sum_{k=-\infty}^{\infty} x[k] h[n -
+k]\]</span> et <span class="math display">\[(h * x)[n] =
+\sum_{k=-\infty}^{\infty} h[k] x[n - k]\]</span> En effectuant le
+changement de variable <span class="math inline">\(m = n - k\)</span>,
+nous obtenons : <span class="math display">\[(h * x)[n] =
+\sum_{m=-\infty}^{\infty} h[n - m] x[m]\]</span> ce qui montre que <span
+class="math inline">\((h * x)[n] = (x * h)[n]\)</span>.</p></li>
+<li><p><strong>Associativité</strong> : La convolution est associative,
+c’est-à-dire que pour toutes suites <span
+class="math inline">\(\{x[n]\}_{n \in \mathbb{Z}}\)</span>, <span
+class="math inline">\(\{h[n]\}_{n \in \mathbb{Z}}\)</span> et <span
+class="math inline">\(\{g[n]\}_{n \in \mathbb{Z}}\)</span>, nous avons :
+<span class="math display">\[(x * h) * g = x * (h * g)\]</span></p>
+<p><strong>Démonstration</strong> : Par définition, nous avons : <span
+class="math display">\[((x * h) * g)[n] = \sum_{k=-\infty}^{\infty} (x *
+h)[k] g[n - k]\]</span> et <span class="math display">\[(x * (h * g))[n]
+= \sum_{k=-\infty}^{\infty} x[k] (h * g)[n - k]\]</span> En développant
+<span class="math inline">\((x * h)[k]\)</span> et <span
+class="math inline">\((h * g)[n - k]\)</span>, nous obtenons : <span
+class="math display">\[((x * h) * g)[n] = \sum_{k=-\infty}^{\infty}
+\left( \sum_{m=-\infty}^{\infty} x[m] h[k - m] \right) g[n - k]\]</span>
+et <span class="math display">\[(x * (h * g))[n] =
+\sum_{k=-\infty}^{\infty} x[k] \left( \sum_{m=-\infty}^{\infty} h[m] g[n
+- k - m] \right)\]</span> En effectuant le changement de variable <span
+class="math inline">\(p = k - m\)</span>, nous obtenons : <span
+class="math display">\[(x * (h * g))[n] = \sum_{k=-\infty}^{\infty} x[k]
+\left( \sum_{p=-\infty}^{\infty} h[n - k - p] g[p] \right)\]</span> ce
+qui montre que <span class="math inline">\(((x * h) * g)[n] = (x * (h *
+g))[n]\)</span>.</p></li>
+<li><p><strong>Distributivité</strong> : La convolution est distributive
+par rapport à l’addition, c’est-à-dire que pour toutes suites <span
+class="math inline">\(\{x[n]\}_{n \in \mathbb{Z}}\)</span>, <span
+class="math inline">\(\{h[n]\}_{n \in \mathbb{Z}}\)</span> et <span
+class="math inline">\(\{g[n]\}_{n \in \mathbb{Z}}\)</span>, nous avons :
+<span class="math display">\[x * (h + g) = x * h + x * g\]</span></p>
+<p><strong>Démonstration</strong> : Par définition, nous avons : <span
+class="math display">\[(x * (h + g))[n] = \sum_{k=-\infty}^{\infty} x[k]
+(h + g)[n - k]\]</span> et <span class="math display">\[(x * h + x *
+g)[n] = \sum_{k=-\infty}^{\infty} x[k] h[n - k] +
+\sum_{k=-\infty}^{\infty} x[k] g[n - k]\]</span> En développant <span
+class="math inline">\((h + g)[n - k]\)</span>, nous obtenons : <span
+class="math display">\[(x * (h + g))[n] = \sum_{k=-\infty}^{\infty} x[k]
+h[n - k] + \sum_{k=-\infty}^{\infty} x[k] g[n - k]\]</span> ce qui
+montre que <span class="math inline">\((x * (h + g))[n] = (x * h + x *
+g)[n]\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les sommes de convolutions discrètes sont un outil puissant pour
+modéliser et analyser des systèmes dynamiques discrets. Elles trouvent
+des applications dans de nombreux domaines, notamment en traitement du
+signal et en analyse numérique. Dans ce chapitre, nous avons exploré les
+définitions, théorèmes et propriétés fondamentales des sommes de
+convolutions discrètes. Nous avons également démontré plusieurs
+résultats importants, tels que le théorème de la convolution et les
+propriétés de commutativité, associativité et distributivité.</p>
+<p>En conclusion, les sommes de convolutions discrètes sont un sujet
+riche et fascinant qui continue d’être étudié et appliqué dans de
+nombreux domaines des mathématiques appliquées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

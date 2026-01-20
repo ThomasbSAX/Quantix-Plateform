@@ -1,0 +1,350 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized Linear Discriminant Analysis: A Comprehensive Study</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized Linear Discriminant Analysis: A
+Comprehensive Study</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Linear Discriminant Analysis (LDA) is a classical technique in
+pattern recognition and machine learning, primarily used for
+dimensionality reduction while preserving class discriminatory
+information. Its foundation lies in Fisher’s seminal work on
+discriminant analysis, aiming to maximize the ratio of between-class
+scatter to within-class scatter. However, traditional LDA is limited by
+its linear nature, often failing to capture complex, non-linear
+relationships in the data.</p>
+<p>Kernel methods have revolutionized machine learning by enabling
+nonlinear transformations through implicit embedding into
+higher-dimensional spaces. The marriage of kernel methods with LDA,
+termed Kernelized LDA (KLDA), extends the applicability of LDA to
+non-linearly separable data. This article delves into the theoretical
+underpinnings, formulations, and practical implications of KLDA.</p>
+<h1 id="définitions">Définitions</h1>
+<p>To understand Kernelized LDA, we first need to grasp the concepts of
+Linear Discriminant Analysis and kernel methods.</p>
+<h2 id="linear-discriminant-analysis-lda">Linear Discriminant Analysis
+(LDA)</h2>
+<p>Consider a dataset <span class="math inline">\(\mathcal{D} = \{(x_i,
+y_i)\}_{i=1}^n\)</span> where <span class="math inline">\(x_i \in
+\mathbb{R}^d\)</span> and <span class="math inline">\(y_i \in \{1, 2,
+\dots, c\}\)</span>. LDA seeks to find a linear transformation <span
+class="math inline">\(W \in \mathbb{R}^{d \times m}\)</span> (where
+<span class="math inline">\(m &lt; d\)</span>) that maximizes the ratio
+of between-class scatter to within-class scatter in the projected
+space.</p>
+<p>The within-class scatter matrix <span
+class="math inline">\(S_W\)</span> and between-class scatter matrix
+<span class="math inline">\(S_B\)</span> are defined as: <span
+class="math display">\[S_W = \sum_{k=1}^c \sum_{x_i \in C_k} (x_i -
+\mu_k)(x_i - \mu_k)^T\]</span> <span class="math display">\[S_B =
+\sum_{k=1}^c n_k (\mu_k - \mu)(\mu_k - \mu)^T\]</span> where <span
+class="math inline">\(C_k\)</span> is the set of samples in class <span
+class="math inline">\(k\)</span>, <span
+class="math inline">\(\mu_k\)</span> is the mean of class <span
+class="math inline">\(k\)</span>, and <span
+class="math inline">\(\mu\)</span> is the overall mean.</p>
+<p>The optimization problem in LDA is: <span
+class="math display">\[\max_W \frac{\det(W^T S_B W)}{\det(W^T S_W
+W)}\]</span></p>
+<h2 id="kernel-methods">Kernel Methods</h2>
+<p>Kernel methods map data into a higher-dimensional space <span
+class="math inline">\(\mathcal{H}\)</span> using a kernel function <span
+class="math inline">\(k(x, y) = \langle \phi(x), \phi(y)
+\rangle\)</span>, where <span class="math inline">\(\phi: \mathbb{R}^d
+\rightarrow \mathcal{H}\)</span> is a non-linear mapping.</p>
+<p>The key idea is to perform linear operations in <span
+class="math inline">\(\mathcal{H}\)</span> without explicitly computing
+the transformation <span class="math inline">\(\phi\)</span>, leveraging
+the kernel trick.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="fishers-criterion-in-kernel-space">Fisher’s Criterion in Kernel
+Space</h2>
+<p>The goal of KLDA is to extend Fisher’s criterion to the
+kernel-induced feature space. We seek a linear transformation in <span
+class="math inline">\(\mathcal{H}\)</span> that maximizes the ratio of
+between-class scatter to within-class scatter.</p>
+<p>Let <span class="math inline">\(K\)</span> be the kernel matrix with
+entries <span class="math inline">\(K_{ij} = k(x_i, x_j)\)</span>. The
+within-class scatter matrix in <span
+class="math inline">\(\mathcal{H}\)</span> is: <span
+class="math display">\[S_W^\phi = \sum_{k=1}^c \sum_{\phi(x_i) \in
+C_k^\phi} (\phi(x_i) - \mu_k^\phi)(\phi(x_i) - \mu_k^\phi)^T\]</span>
+where <span class="math inline">\(C_k^\phi = \{\phi(x_i) | x_i \in
+C_k\}\)</span> and <span class="math inline">\(\mu_k^\phi =
+\frac{1}{n_k} \sum_{\phi(x_i) \in C_k^\phi} \phi(x_i)\)</span>.</p>
+<p>The between-class scatter matrix in <span
+class="math inline">\(\mathcal{H}\)</span> is: <span
+class="math display">\[S_B^\phi = \sum_{k=1}^c n_k (\mu_k^\phi -
+\mu^\phi)(\mu_k^\phi - \mu^\phi)^T\]</span> where <span
+class="math inline">\(\mu^\phi = \frac{1}{n} \sum_{i=1}^n
+\phi(x_i)\)</span>.</p>
+<p>The optimization problem in <span
+class="math inline">\(\mathcal{H}\)</span> is: <span
+class="math display">\[\max_W^\phi \frac{\det((W^\phi)^T S_B^\phi
+W^\phi)}{\det((W^\phi)^T S_W^\phi W^\phi)}\]</span></p>
+<h2 id="the-kernel-trick">The Kernel Trick</h2>
+<p>Using the kernel trick, we can express the scatter matrices in terms
+of <span class="math inline">\(K\)</span>: <span
+class="math display">\[S_W^\phi = \Phi^T S_W \Phi\]</span> <span
+class="math display">\[S_B^\phi = \Phi^T S_B \Phi\]</span> where <span
+class="math inline">\(\Phi = [\phi(x_1), \phi(x_2), \dots,
+\phi(x_n)]^T\)</span>.</p>
+<p>The optimization problem becomes: <span
+class="math display">\[\max_W^\phi \frac{\det(W^{\phi T} \Phi^T S_B \Phi
+W^\phi)}{\det(W^{\phi T} \Phi^T S_W \Phi W^\phi)}\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="proof-of-fishers-criterion-in-kernel-space">Proof of Fisher’s
+Criterion in Kernel Space</h2>
+<p>We need to show that the optimization problem in <span
+class="math inline">\(\mathcal{H}\)</span> is equivalent to the original
+LDA problem but in the kernel-induced feature space.</p>
+<p>1. **Within-Class Scatter**: <span class="math display">\[S_W^\phi =
+\sum_{k=1}^c \sum_{\phi(x_i) \in C_k^\phi} (\phi(x_i) -
+\mu_k^\phi)(\phi(x_i) - \mu_k^\phi)^T\]</span> Using the kernel trick,
+we can write: <span class="math display">\[S_W^\phi = \Phi^T S_W
+\Phi\]</span> where <span class="math inline">\(S_W\)</span> is the
+within-class scatter matrix in the original space.</p>
+<p>2. **Between-Class Scatter**: <span class="math display">\[S_B^\phi =
+\sum_{k=1}^c n_k (\mu_k^\phi - \mu^\phi)(\mu_k^\phi -
+\mu^\phi)^T\]</span> Similarly, using the kernel trick: <span
+class="math display">\[S_B^\phi = \Phi^T S_B \Phi\]</span> where <span
+class="math inline">\(S_B\)</span> is the between-class scatter matrix
+in the original space.</p>
+<p>3. **Optimization Problem**: The optimization problem in <span
+class="math inline">\(\mathcal{H}\)</span> is: <span
+class="math display">\[\max_W^\phi \frac{\det((W^\phi)^T S_B^\phi
+W^\phi)}{\det((W^\phi)^T S_W^\phi W^\phi)}\]</span> Substituting <span
+class="math inline">\(S_B^\phi\)</span> and <span
+class="math inline">\(S_W^\phi\)</span>: <span
+class="math display">\[\max_W^\phi \frac{\det(W^{\phi T} \Phi^T S_B \Phi
+W^\phi)}{\det(W^{\phi T} \Phi^T S_W \Phi W^\phi)}\]</span> This shows
+that the problem is equivalent to LDA in the kernel-induced feature
+space.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="properties-of-klda">Properties of KLDA</h2>
+<p>1. **Non-Linearity**: KLDA can capture non-linear relationships in
+the data by implicitly mapping it into a higher-dimensional space.</p>
+<p>2. **Dimensionality Reduction**: Like LDA, KLDA reduces the
+dimensionality of the data while preserving class discriminatory
+information.</p>
+<p>3. **Kernel Choice**: The performance of KLDA heavily depends on the
+choice of the kernel function <span class="math inline">\(k(x,
+y)\)</span>.</p>
+<h2 id="corollaries">Corollaries</h2>
+<p>1. **Generalization of LDA**: KLDA generalizes LDA by allowing
+non-linear transformations through the kernel trick.</p>
+<p>2. **Computational Complexity**: The computational complexity of KLDA
+is higher than LDA due to the need to compute and store the kernel
+matrix <span class="math inline">\(K\)</span>.</p>
+<p>3. **Convergence**: KLDA converges to the optimal solution under
+certain conditions, similar to LDA.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Kernelized Linear Discriminant Analysis (KLDA) extends the classical
+LDA to non-linearly separable data by leveraging kernel methods. It
+preserves the discriminatory power of LDA while enabling non-linear
+transformations through implicit embedding into higher-dimensional
+spaces. The choice of kernel function is crucial and can significantly
+impact the performance of KLDA.</p>
+<p>Future research directions include developing more efficient
+algorithms for computing KLDA, exploring new kernel functions tailored
+to specific applications, and investigating the theoretical properties
+of KLDA in various settings.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

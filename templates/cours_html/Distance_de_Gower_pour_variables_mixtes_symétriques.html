@@ -1,0 +1,314 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Gower pour variables mixtes symétriques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Gower pour variables mixtes
+symétriques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Gower émerge dans le contexte de l’analyse des données
+multivariées, où les ensembles de variables sont souvent mixtes,
+combinant à la fois des variables quantitatives et qualitatives.
+L’origine de cette distance remonte aux travaux de Gower (1971), qui
+cherchait à généraliser les notions de similarité et de dissimilarité
+pour des jeux de données hétérogènes. Cette notion est indispensable
+dans les domaines où l’analyse statistique nécessite une mesure robuste
+et flexible, capable de capturer la complexité des relations entre
+variables de nature différente.</p>
+<p>L’intérêt principal de la distance de Gower réside dans sa capacité à
+traiter des variables symétriques, c’est-à-dire des variables
+qualitatives sans ordre intrinsèque. En intégrant ces variables dans un
+cadre métrique cohérent, la distance de Gower permet d’effectuer des
+analyses telles que les classifications hiérarchiques ou les régressions
+multivariées, même en présence de données manquantes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la distance de Gower, nous cherchons à mesurer la
+dissimilarité entre deux objets décrits par un ensemble de variables
+mixtes. L’idée est d’unifier les contributions des différentes
+variables, qu’elles soient quantitatives ou qualitatives, en une seule
+mesure globale.</p>
+<p>Supposons que nous avons un ensemble de <span
+class="math inline">\(n\)</span> objets décrits par <span
+class="math inline">\(p\)</span> variables. Pour chaque paire d’objets
+<span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, nous voulons calculer une distance
+<span class="math inline">\(d_{ij}\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une matrice <span
+class="math inline">\(n \times p\)</span> contenant les données, où
+chaque colonne représente une variable et chaque ligne un objet. Pour
+deux objets <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, la distance de Gower est définie comme
+:</p>
+<p><span class="math display">\[d_{ij} = \frac{\sum_{k=1}^{p}
+\delta_{ijk}}{p}\]</span></p>
+<p>où <span class="math inline">\(\delta_{ijk}\)</span> est la
+contribution de la variable <span class="math inline">\(k\)</span> à la
+distance entre les objets <span class="math inline">\(i\)</span> et
+<span class="math inline">\(j\)</span>.</p>
+</div>
+<p>Pour les variables quantitatives, la contribution est simplement la
+différence normalisée :</p>
+<p><span class="math display">\[\delta_{ijk} = \frac{|x_{ik} -
+x_{jk}|}{\max_k x_k - \min_k x_k}\]</span></p>
+<p>Pour les variables qualitatives symétriques, la contribution est
+définie comme :</p>
+<p><span class="math display">\[\delta_{ijk} = \begin{cases}
+0 &amp; \text{si } x_{ik} = x_{jk} \\
+1 &amp; \text{sinon}
+\end{cases}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Gower est celui de sa
+métrique. Nous cherchons à montrer que cette distance satisfait les
+propriétés d’une distance métrique.</p>
+<div class="theorem">
+<p>La distance de Gower <span class="math inline">\(d_{ij}\)</span>
+satisfait les propriétés suivantes pour tout triplet d’objets <span
+class="math inline">\(i, j, k\)</span> :</p>
+<ol>
+<li><p><strong>Positivité</strong> : <span class="math inline">\(d_{ij}
+\geq 0\)</span> et <span class="math inline">\(d_{ij} = 0\)</span> si et
+seulement si <span class="math inline">\(i = j\)</span>.</p></li>
+<li><p><strong>Symétrie</strong> : <span class="math inline">\(d_{ij} =
+d_{ji}\)</span>.</p></li>
+<li><p><strong>Inégalité triangulaire</strong> : <span
+class="math inline">\(d_{ij} \leq d_{ik} + d_{kj}\)</span>.</p></li>
+</ol>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver la positivité, nous observons que <span
+class="math inline">\(\delta_{ijk} \geq 0\)</span> par définition, et
+<span class="math inline">\(d_{ij} = 0\)</span> seulement si tous les
+<span class="math inline">\(\delta_{ijk} = 0\)</span>, ce qui implique
+que <span class="math inline">\(i = j\)</span>.</p>
+<p>La symétrie découle directement de la symétrie des contributions
+<span class="math inline">\(\delta_{ijk}\)</span>.</p>
+<p>Pour l’inégalité triangulaire, nous utilisons le fait que les
+contributions <span class="math inline">\(\delta_{ijk}\)</span> sont
+bornées par 1. Ainsi, pour toute variable <span
+class="math inline">\(k\)</span>, nous avons :</p>
+<p><span class="math display">\[\delta_{ijk} \leq \delta_{ikm} +
+\delta_{mjk}\]</span></p>
+<p>En sommant sur toutes les variables et en divisant par <span
+class="math inline">\(p\)</span>, nous obtenons l’inégalité triangulaire
+pour <span class="math inline">\(d_{ij}\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<ol>
+<li><p><strong>Invariance par transformation linéaire</strong> : La
+distance de Gower est invariante par toute transformation linéaire des
+variables quantitatives.</p></li>
+<li><p><strong>Gestion des données manquantes</strong> : La distance de
+Gower peut être adaptée pour gérer les données manquantes en excluant
+simplement les variables manquantes du calcul de la distance.</p></li>
+<li><p><strong>Extension aux variables ordinales</strong> : Pour les
+variables qualitatives ordinales, la contribution peut être définie
+comme :</p>
+<p><span class="math display">\[\delta_{ijk} = \frac{|x_{ik} -
+x_{jk}|}{\max_k x_k - \min_k x_k}\]</span></p>
+<p>où <span class="math inline">\(x_{ik}\)</span> et <span
+class="math inline">\(x_{jk}\)</span> sont les rangs des
+modalités.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance de Gower offre une solution élégante et puissante pour
+l’analyse des données mixtes. Son utilisation permet de surmonter les
+limitations des méthodes traditionnelles et d’ouvrir de nouvelles
+perspectives dans l’exploration des jeux de données complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

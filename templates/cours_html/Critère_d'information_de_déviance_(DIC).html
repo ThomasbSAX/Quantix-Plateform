@@ -1,0 +1,395 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Critère d’information de déviance (DIC)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Critère d’information de déviance (DIC)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’analyse de modèles statistiques est une tâche complexe qui
+nécessite souvent des critères objectifs pour comparer différentes
+hypothèses. Parmi ces critères, le Critère d’information de déviance
+(DIC) se distingue par sa simplicité et son efficacité. Introduit par
+Spiegelhalter <em>et al.</em> en 2002, le DIC est un outil essentiel
+pour évaluer la qualité d’ajustement des modèles bayésiens.</p>
+<p>Le DIC émerge de la nécessité de concilier deux aspects fondamentaux
+: la complexité du modèle et sa capacité à expliquer les données
+observées. Il résout le problème classique de surajustement en
+pénalisant les modèles trop complexes, tout en récompensant ceux qui
+capturent efficacement la structure des données. Ce critère est
+particulièrement indispensable dans les contextes où plusieurs modèles
+sont en compétition et où une décision doit être prise de manière
+rigoureuse.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le DIC, il est crucial de définir quelques concepts
+préliminaires. Supposons que nous avons un modèle statistique paramétré
+par <span class="math inline">\(\theta\)</span>, et des données
+observées <span class="math inline">\(y\)</span>. L’objectif est
+d’évaluer la qualité de l’ajustement du modèle aux données.</p>
+<h2 id="log-vraisemblance">Log-vraisemblance</h2>
+<p>La log-vraisemblance est une mesure de la probabilité des données
+observées sous un modèle donné. Elle est définie comme : <span
+class="math display">\[\ell(\theta) = \log p(y|\theta)\]</span> où <span
+class="math inline">\(p(y|\theta)\)</span> est la fonction de densité de
+probabilité des données <span class="math inline">\(y\)</span>
+conditionnellement au paramètre <span
+class="math inline">\(\theta\)</span>.</p>
+<h2 id="déviance">Déviance</h2>
+<p>La déviance est une mesure de la qualité d’ajustement du modèle. Elle
+est définie comme : <span class="math display">\[D(\theta) = -2
+\ell(\theta)\]</span> La déviance est minimisée lorsque le modèle
+s’ajuste parfaitement aux données.</p>
+<h2 id="déviance-postérieure">Déviance postérieure</h2>
+<p>La déviance postérieure est la moyenne de la déviance par rapport à
+la distribution postérieure du paramètre <span
+class="math inline">\(\theta\)</span> : <span
+class="math display">\[D_{post} = E_{\theta|y}[D(\theta)]\]</span> où
+<span class="math inline">\(E_{\theta|y}\)</span> désigne l’espérance
+conditionnellement aux données observées.</p>
+<h2 id="déviance-postérieure-prédictive">Déviance postérieure
+prédictive</h2>
+<p>La déviance postérieure prédictive est la moyenne de la déviance par
+rapport à la distribution postérieure prédictive : <span
+class="math display">\[D_{pp} =
+E_{\theta|y}[E_{y_{rep}|\theta}[D(\theta)]]\]</span> où <span
+class="math inline">\(E_{y_{rep}|\theta}\)</span> désigne l’espérance
+par rapport aux données reproduites.</p>
+<h2 id="dic">DIC</h2>
+<p>Le Critère d’information de déviance est défini comme : <span
+class="math display">\[DIC = D_{post} + p_D\]</span> où <span
+class="math inline">\(p_D\)</span> est la complexité effective du
+modèle, définie comme : <span class="math display">\[p_D = D_{post} -
+D_{pp}\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="propriétés-du-dic">Propriétés du DIC</h2>
+<p>Le DIC possède plusieurs propriétés importantes qui en font un outil
+puissant pour la comparaison de modèles.</p>
+<div class="theorem">
+<p>Le DIC est une mesure cohérente de la qualité d’ajustement des
+modèles. Plus le DIC est faible, meilleur est l’ajustement du modèle aux
+données.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux modèles <span
+class="math inline">\(M_1\)</span> et <span
+class="math inline">\(M_2\)</span> avec des DIC respectifs <span
+class="math inline">\(DIC_1\)</span> et <span
+class="math inline">\(DIC_2\)</span>. Si <span
+class="math inline">\(DIC_1 &lt; DIC_2\)</span>, alors le modèle <span
+class="math inline">\(M_1\)</span> est préférable au modèle <span
+class="math inline">\(M_2\)</span> en termes de qualité
+d’ajustement. ◻</p>
+</div>
+<div class="theorem">
+<p>Le DIC pénalise les modèles trop complexes en ajoutant un terme de
+complexité effective <span class="math inline">\(p_D\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La complexité effective <span
+class="math inline">\(p_D\)</span> est définie comme la différence entre
+la déviance postérieure et la déviance postérieure prédictive. Plus
+<span class="math inline">\(p_D\)</span> est grand, plus le modèle est
+complexe. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-de-la-propriété-1">Preuve de la Propriété 1</h2>
+<p>Pour prouver que le DIC est une mesure cohérente de la qualité
+d’ajustement des modèles, nous devons montrer que plus le DIC est
+faible, meilleur est l’ajustement du modèle aux données.</p>
+<p>Considérons deux modèles <span class="math inline">\(M_1\)</span> et
+<span class="math inline">\(M_2\)</span> avec des DIC respectifs <span
+class="math inline">\(DIC_1\)</span> et <span
+class="math inline">\(DIC_2\)</span>. Si <span
+class="math inline">\(DIC_1 &lt; DIC_2\)</span>, cela signifie que :
+<span class="math display">\[D_{post,1} + p_{D,1} &lt; D_{post,2} +
+p_{D,2}\]</span> où <span class="math inline">\(D_{post,i}\)</span> et
+<span class="math inline">\(p_{D,i}\)</span> sont la déviance
+postérieure et la complexité effective du modèle <span
+class="math inline">\(M_i\)</span>.</p>
+<p>Puisque <span class="math inline">\(D_{post,i}\)</span> est une
+mesure de la qualité d’ajustement du modèle <span
+class="math inline">\(M_i\)</span>, et que <span
+class="math inline">\(p_{D,i}\)</span> est une mesure de sa complexité,
+un DIC plus faible indique un meilleur ajustement global.</p>
+<h2 id="preuve-de-la-propriété-2">Preuve de la Propriété 2</h2>
+<p>Pour prouver que le DIC pénalise les modèles trop complexes, nous
+devons montrer que la complexité effective <span
+class="math inline">\(p_D\)</span> est positive et augmente avec la
+complexité du modèle.</p>
+<p>La complexité effective <span class="math inline">\(p_D\)</span> est
+définie comme : <span class="math display">\[p_D = D_{post} -
+D_{pp}\]</span> où <span class="math inline">\(D_{post}\)</span> est la
+déviance postérieure et <span class="math inline">\(D_{pp}\)</span> est
+la déviance postérieure prédictive.</p>
+<p>Puisque <span class="math inline">\(D_{post} \geq D_{pp}\)</span>
+(car la moyenne de la déviance par rapport à la distribution postérieure
+est toujours supérieure ou égale à la moyenne de la déviance par rapport
+à la distribution postérieure prédictive), <span
+class="math inline">\(p_D\)</span> est toujours positif.</p>
+<p>De plus, plus le modèle est complexe, plus la différence entre <span
+class="math inline">\(D_{post}\)</span> et <span
+class="math inline">\(D_{pp}\)</span> est grande, ce qui augmente <span
+class="math inline">\(p_D\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-1-relation-entre-dic-et-aic">Propriété 1 : Relation
+entre DIC et AIC</h2>
+<p>Le DIC est similaire au Critère d’information d’Akaike (AIC) en ce
+qu’il pénalise la complexité du modèle. Cependant, le DIC est
+spécifiquement conçu pour les modèles bayésiens.</p>
+<div class="corollary">
+<p>Pour un modèle bayésien, le DIC est une approximation de l’AIC
+lorsque la distribution postérieure du paramètre <span
+class="math inline">\(\theta\)</span> est concentrée autour de son
+mode.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Lorsque la distribution postérieure du paramètre
+<span class="math inline">\(\theta\)</span> est concentrée autour de son
+mode, la déviance postérieure <span
+class="math inline">\(D_{post}\)</span> peut être approximée par la
+déviance au mode. Dans ce cas, le DIC devient : <span
+class="math display">\[DIC \approx -2 \ell(\hat{\theta}) + 2
+p_D\]</span> où <span class="math inline">\(\hat{\theta}\)</span> est le
+mode de la distribution postérieure. Cela ressemble à l’AIC, qui est
+défini comme : <span class="math display">\[AIC = -2 \ell(\hat{\theta})
++ 2 k\]</span> où <span class="math inline">\(k\)</span> est le nombre
+de paramètres du modèle. ◻</p>
+</div>
+<h2 id="propriété-2-relation-entre-dic-et-bic">Propriété 2 : Relation
+entre DIC et BIC</h2>
+<p>Le Critère d’information bayésien (BIC) pénalise également la
+complexité du modèle, mais de manière plus stricte que le DIC.</p>
+<div class="corollary">
+<p>Pour un modèle bayésien, le DIC est généralement plus faible que le
+BIC lorsque la taille de l’échantillon est grande.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Le BIC est défini comme : <span
+class="math display">\[BIC = -2 \ell(\hat{\theta}) + k \log n\]</span>
+où <span class="math inline">\(n\)</span> est la taille de
+l’échantillon. Lorsque <span class="math inline">\(n\)</span> est grand,
+le terme <span class="math inline">\(k \log n\)</span> devient dominant,
+ce qui rend le BIC plus strict que le DIC. ◻</p>
+</div>
+<h2 id="propriété-3-sensibilité-du-dic">Propriété 3 : Sensibilité du
+DIC</h2>
+<p>Le DIC est sensible à la spécification du modèle et aux données
+observées.</p>
+<div class="corollary">
+<p>Le DIC peut varier considérablement en fonction des données observées
+et de la spécification du modèle.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Le DIC dépend de la déviance postérieure <span
+class="math inline">\(D_{post}\)</span> et de la complexité effective
+<span class="math inline">\(p_D\)</span>, qui sont toutes deux sensibles
+aux données observées et à la spécification du modèle. Par conséquent,
+le DIC peut varier considérablement en fonction de ces facteurs. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le Critère d’information de déviance (DIC) est un outil puissant pour
+la comparaison de modèles bayésiens. Il combine une mesure de la qualité
+d’ajustement avec une pénalité pour la complexité du modèle, ce qui en
+fait un critère objectif et rigoureux. Les propriétés et corollaires du
+DIC illustrent son utilité dans divers contextes statistiques, et ses
+preuves démontrent sa validité théorique.</p>
+<p>En conclusion, le DIC est un critère essentiel pour l’analyse de
+modèles statistiques, offrant une approche équilibrée entre la
+complexité et la qualité d’ajustement.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

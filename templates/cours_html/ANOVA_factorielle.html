@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Analyse de la Variance Factorielle : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Analyse de la Variance Factorielle : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse de la variance (ANOVA) factorielle est une méthode
+statistique puissante qui permet d’étudier l’effet de plusieurs facteurs
+sur une variable réponse. Introduite par Sir Ronald Aylmer Fisher dans
+les années 1920, cette technique a révolutionné l’analyse des
+expériences en agriculture et en biologie. Aujourd’hui, elle est
+largement utilisée dans divers domaines scientifiques pour comprendre
+les interactions entre différents facteurs et leur impact sur une
+variable dépendante.</p>
+<p>L’ANOVA factorielle est indispensable lorsque l’on souhaite analyser
+non seulement les effets principaux des facteurs, mais aussi leurs
+interactions. Par exemple, dans une expérience agricole, on peut vouloir
+étudier l’effet de différents types d’engrais (facteur 1) et de niveaux
+d’arrosage (facteur 2) sur le rendement des cultures. L’ANOVA
+factorielle permet de déterminer si ces facteurs agissent indépendamment
+ou s’il existe une interaction entre eux.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails techniques, il est essentiel de
+comprendre ce que nous cherchons à accomplir avec l’ANOVA factorielle.
+Supposons que nous avons une variable réponse <span
+class="math inline">\(Y\)</span> et deux facteurs <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, chacun avec plusieurs niveaux. Nous
+voulons savoir si les différences observées dans <span
+class="math inline">\(Y\)</span> peuvent être attribuées aux effets des
+facteurs <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, ainsi qu’à leur interaction.</p>
+<div class="definition">
+<p>Considérons un modèle linéaire généralisé où la variable réponse
+<span class="math inline">\(Y_{ijk}\)</span> est influencée par les
+facteurs <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, ainsi que leur interaction. Le modèle
+peut être écrit comme suit : <span class="math display">\[Y_{ijk} = \mu
++ \alpha_i + \beta_j + (\alpha\beta)_{ij} + \epsilon_{ijk}\]</span> où
+:</p>
+<ul>
+<li><p><span class="math inline">\(\mu\)</span> est la moyenne
+globale,</p></li>
+<li><p><span class="math inline">\(\alpha_i\)</span> est l’effet du
+facteur <span class="math inline">\(A\)</span> au niveau <span
+class="math inline">\(i\)</span>,</p></li>
+<li><p><span class="math inline">\(\beta_j\)</span> est l’effet du
+facteur <span class="math inline">\(B\)</span> au niveau <span
+class="math inline">\(j\)</span>,</p></li>
+<li><p><span class="math inline">\((\alpha\beta)_{ij}\)</span> est
+l’effet d’interaction entre les niveaux <span
+class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> des facteurs <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>,</p></li>
+<li><p><span class="math inline">\(\epsilon_{ijk}\)</span> est l’erreur
+aléatoire associée à l’observation <span
+class="math inline">\(Y_{ijk}\)</span>.</p></li>
+</ul>
+</div>
+<h1 class="unnumbered" id="théorèmes-et-hypothèses">Théorèmes et
+Hypothèses</h1>
+<p>Pour effectuer une ANOVA factorielle, nous devons formuler des
+hypothèses spécifiques concernant les effets des facteurs et leur
+interaction.</p>
+<div class="theorem">
+<p>Les hypothèses principales de l’ANOVA factorielle sont les suivantes
+:</p>
+<ol>
+<li><p><span class="math inline">\(H_0: \alpha_i = 0\)</span> pour tout
+<span class="math inline">\(i\)</span>, c’est-à-dire qu’il n’y a pas
+d’effet principal du facteur <span
+class="math inline">\(A\)</span>.</p></li>
+<li><p><span class="math inline">\(H_0: \beta_j = 0\)</span> pour tout
+<span class="math inline">\(j\)</span>, c’est-à-dire qu’il n’y a pas
+d’effet principal du facteur <span
+class="math inline">\(B\)</span>.</p></li>
+<li><p><span class="math inline">\(H_0: (\alpha\beta)_{ij} = 0\)</span>
+pour tous <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>, c’est-à-dire qu’il n’y a pas
+d’interaction entre les facteurs <span class="math inline">\(A\)</span>
+et <span class="math inline">\(B\)</span>.</p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="preuves-et-développements">Preuves et
+Développements</h1>
+<p>Pour tester ces hypothèses, nous devons calculer les sommes de carrés
+des facteurs et de l’interaction. Voici comment cela peut être fait
+:</p>
+<div class="proof">
+<p><em>Calcul des Sommes de Carrés.</em> Considérons les sommes de
+carrés suivantes : <span class="math display">\[SS_A = n \sum_{i=1}^{a}
+(\bar{Y}_{i..} - \bar{Y}_{...})^2\]</span> <span
+class="math display">\[SS_B = m \sum_{j=1}^{b} (\bar{Y}_{.j.} -
+\bar{Y}_{...})^2\]</span> <span class="math display">\[SS_{AB} = n
+\sum_{i=1}^{a} \sum_{j=1}^{b} (\bar{Y}_{ij.} - \bar{Y}_{i..} -
+\bar{Y}_{.j.} + \bar{Y}_{...})^2\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(n\)</span> est le nombre de
+répétitions pour chaque combinaison des facteurs,</p></li>
+<li><p><span class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> sont les nombres de niveaux des
+facteurs <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>,</p></li>
+<li><p><span class="math inline">\(\bar{Y}_{i..}\)</span> est la moyenne
+de <span class="math inline">\(Y\)</span> pour le niveau <span
+class="math inline">\(i\)</span> du facteur <span
+class="math inline">\(A\)</span>,</p></li>
+<li><p><span class="math inline">\(\bar{Y}_{.j.}\)</span> est la moyenne
+de <span class="math inline">\(Y\)</span> pour le niveau <span
+class="math inline">\(j\)</span> du facteur <span
+class="math inline">\(B\)</span>,</p></li>
+<li><p><span class="math inline">\(\bar{Y}_{ij.}\)</span> est la moyenne
+de <span class="math inline">\(Y\)</span> pour la combinaison des
+niveaux <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span>,</p></li>
+<li><p><span class="math inline">\(\bar{Y}_{...}\)</span> est la moyenne
+globale de <span class="math inline">\(Y\)</span>.</p></li>
+</ul>
+<p>Les sommes de carrés totales et résiduelles sont données par : <span
+class="math display">\[SS_{Total} = \sum_{i=1}^{a} \sum_{j=1}^{b}
+\sum_{k=1}^{n} (Y_{ijk} - \bar{Y}_{...})^2\]</span> <span
+class="math display">\[SS_{Residual} = SS_{Total} - SS_A - SS_B -
+SS_{AB}\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’ANOVA factorielle possède plusieurs propriétés importantes qui en
+font une méthode puissante pour l’analyse des données.</p>
+<div class="corollaire">
+<p>Les propriétés suivantes découlent du modèle ANOVA factorielle :</p>
+<ol>
+<li><p>Si les effets principaux et les interactions sont significatifs,
+cela signifie que les facteurs <span class="math inline">\(A\)</span> et
+<span class="math inline">\(B\)</span> ont un impact sur la variable
+réponse <span class="math inline">\(Y\)</span>, soit individuellement,
+soit en interaction.</p></li>
+<li><p>Si seulement les effets principaux sont significatifs, cela
+indique que les facteurs <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> agissent indépendamment l’un de
+l’autre.</p></li>
+<li><p>Si aucune des hypothèses n’est rejetée, cela suggère que les
+facteurs <span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> n’ont pas d’effet significatif sur la
+variable réponse <span class="math inline">\(Y\)</span>.</p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’ANOVA factorielle est une méthode statistique essentielle pour
+l’analyse des expériences impliquant plusieurs facteurs. En comprenant
+les effets principaux et les interactions entre ces facteurs, nous
+pouvons obtenir des informations précieuses sur la variable réponse. Les
+développements mathématiques et les preuves détaillées présentés dans
+cet article montrent la rigueur et la puissance de cette méthode,
+faisant de l’ANOVA factorielle un outil indispensable dans de nombreux
+domaines scientifiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,311 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Calcul fonctionnel borélien</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Calcul fonctionnel borélien</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le calcul fonctionnel borélien émerge comme une généralisation
+naturelle du calcul fonctionnel classique, étendant les concepts de la
+théorie des fonctions mesurables à un cadre plus général.
+Historiquement, cette notion trouve ses racines dans les travaux de
+Borel sur la mesure et l’intégration, mais c’est avec le développement
+de la théorie des ensembles mesurables que le calcul fonctionnel
+borélien a pris toute son ampleur.</p>
+<p>L’importance de ce sujet réside dans sa capacité à unifier divers
+domaines des mathématiques, notamment l’analyse fonctionnelle, la
+théorie de la mesure et la topologie. En effet, le calcul fonctionnel
+borélien permet de traiter des fonctions qui ne sont pas nécessairement
+continues mais qui préservent certaines propriétés mesurables, ouvrant
+ainsi la voie à des applications dans des domaines aussi variés que les
+probabilités, l’analyse stochastique et la théorie du contrôle.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre le calcul fonctionnel borélien, commençons par
+rappeler ce qu’est une fonction mesurable. Une fonction <span
+class="math inline">\(f: X \rightarrow Y\)</span> entre deux espaces
+mesurables <span class="math inline">\((X, \mathcal{A})\)</span> et
+<span class="math inline">\((Y, \mathcal{B})\)</span> est dite mesurable
+si pour tout ensemble borélien <span class="math inline">\(B \in
+\mathcal{B}\)</span>, l’image réciproque <span
+class="math inline">\(f^{-1}(B)\)</span> appartient à <span
+class="math inline">\(\mathcal{A}\)</span>.</p>
+<p>Maintenant, considérons une fonction <span class="math inline">\(f: X
+\rightarrow \mathbb{R}\)</span> définie sur un espace mesurable <span
+class="math inline">\((X, \mathcal{A})\)</span>. Nous disons que <span
+class="math inline">\(f\)</span> est borélienne si pour tout ensemble
+borélien <span class="math inline">\(B \subseteq \mathbb{R}\)</span>,
+l’image réciproque <span class="math inline">\(f^{-1}(B)\)</span>
+appartient à <span class="math inline">\(\mathcal{A}\)</span>.</p>
+<p>Formellement, une fonction <span class="math inline">\(f: X
+\rightarrow \mathbb{R}\)</span> est borélienne si et seulement si: <span
+class="math display">\[\forall B \in \mathcal{B}(\mathbb{R}), f^{-1}(B)
+\in \mathcal{A}\]</span> où <span
+class="math inline">\(\mathcal{B}(\mathbb{R})\)</span> désigne la tribu
+borélienne de <span class="math inline">\(\mathbb{R}\)</span>.</p>
+<p>Une autre manière d’exprimer cette condition est de dire que <span
+class="math inline">\(f\)</span> est borélienne si et seulement si pour
+toute fonction continue <span class="math inline">\(g: \mathbb{R}
+\rightarrow \mathbb{R}\)</span>, la composée <span
+class="math inline">\(g \circ f\)</span> est mesurable.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en calcul fonctionnel borélien est le
+théorème de Lusin, qui établit une connexion profonde entre les
+fonctions mesurables et les fonctions continues. Ce théorème est dû au
+mathématicien russe Nikolai Lusin.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f: X \rightarrow \mathbb{R}\)</span>
+une fonction mesurable définie sur un espace mesurable <span
+class="math inline">\((X, \mathcal{A})\)</span> de mesure finie. Pour
+tout <span class="math inline">\(\epsilon &gt; 0\)</span>, il existe un
+ensemble fermé <span class="math inline">\(F \subseteq X\)</span> tel
+que la mesure de <span class="math inline">\(X \setminus F\)</span> soit
+inférieure à <span class="math inline">\(\epsilon\)</span> et que la
+restriction de <span class="math inline">\(f\)</span> à <span
+class="math inline">\(F\)</span> soit continue.</p>
+</div>
+<p>Pour démontrer ce théorème, nous pouvons procéder comme suit.
+Considérons une suite de fonctions simples <span
+class="math inline">\(\phi_n\)</span> qui convergent vers <span
+class="math inline">\(f\)</span> presque partout. Pour chaque <span
+class="math inline">\(n\)</span>, choisissons un ensemble fermé <span
+class="math inline">\(F_n\)</span> tel que la restriction de <span
+class="math inline">\(\phi_n\)</span> à <span
+class="math inline">\(F_n\)</span> soit continue et que la mesure de
+<span class="math inline">\(X \setminus F_n\)</span> soit inférieure à
+<span class="math inline">\(\epsilon / 2^n\)</span>. En prenant
+l’intersection <span class="math inline">\(F = \bigcap_{n=1}^{\infty}
+F_n\)</span>, nous obtenons un ensemble fermé tel que la mesure de <span
+class="math inline">\(X \setminus F\)</span> est inférieure à <span
+class="math inline">\(\epsilon\)</span> et que la restriction de <span
+class="math inline">\(f\)</span> à <span
+class="math inline">\(F\)</span> soit continue.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>La preuve du théorème de Lusin repose sur plusieurs étapes clés. Tout
+d’abord, nous utilisons le fait que toute fonction mesurable peut être
+approchée par une suite de fonctions simples. Ensuite, nous appliquons
+le théorème d’Urysohn pour trouver des ensembles fermés sur lesquels les
+fonctions simples sont continues. Enfin, nous utilisons le lemme de
+Borel-Cantelli pour contrôler la mesure des ensembles
+complémentaires.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le calcul fonctionnel borélien possède plusieurs propriétés
+intéressantes, que nous énumérons ci-dessous:</p>
+<ol>
+<li><p>La composée de deux fonctions boréliennes est borélienne. Plus
+précisément, si <span class="math inline">\(f: X \rightarrow Y\)</span>
+et <span class="math inline">\(g: Y \rightarrow Z\)</span> sont
+boréliennes, alors <span class="math inline">\(g \circ f: X \rightarrow
+Z\)</span> est également borélienne.</p></li>
+<li><p>La somme, la différence, le produit et le quotient de fonctions
+boréliennes sont boréliens, sous réserve que les opérations soient bien
+définies.</p></li>
+<li><p>Toute fonction continue est borélienne. En effet, les ensembles
+ouverts de <span class="math inline">\(\mathbb{R}\)</span> forment une
+base de la tribu borélienne, et l’image réciproque d’un ouvert par une
+fonction continue est ouverte.</p></li>
+</ol>
+<p>Pour démontrer la propriété (i), nous utilisons le fait que les
+ensembles boréliens sont stables par image réciproque. Pour la propriété
+(ii), nous utilisons les propriétés algébriques des fonctions
+mesurables. Enfin, pour la propriété (iii), nous utilisons le fait que
+les ensembles ouverts sont des boréliens.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

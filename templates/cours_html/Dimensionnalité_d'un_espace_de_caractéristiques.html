@@ -1,0 +1,326 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Dimensionnalité d’un espace de caractéristiques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Dimensionnalité d’un espace de caractéristiques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La dimensionnalité d’un espace de caractéristiques est un concept
+fondamental en analyse des données et en apprentissage automatique.
+Historiquement, l’idée de dimensionnalité remonte aux travaux de David
+Hilbert sur les espaces vectoriels infinis. En apprentissage
+automatique, la dimensionnalité d’un espace de caractéristiques est
+cruciale pour comprendre et manipuler les données. Elle permet de
+réduire la complexité des modèles, d’améliorer leur généralisation et de
+faciliter l’interprétation des résultats.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la dimensionnalité d’un espace de caractéristiques,
+commençons par définir ce qu’est un espace de caractéristiques.
+Supposons que nous ayons un ensemble de données représentées par des
+vecteurs dans un espace vectoriel. Chaque composante de ces vecteurs
+représente une caractéristique ou une variable.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{X}\)</span> un ensemble de
+données. Un espace de caractéristiques est un espace vectoriel <span
+class="math inline">\(V\)</span> tel que chaque élément <span
+class="math inline">\(x \in \mathcal{X}\)</span> peut être représenté
+par un vecteur <span class="math inline">\(v \in V\)</span>.</p>
+<p>Formellement, pour tout <span class="math inline">\(x \in
+\mathcal{X}\)</span>, il existe un vecteur <span
+class="math inline">\(v_x \in V\)</span> tel que <span
+class="math inline">\(v_x\)</span> représente les caractéristiques de
+<span class="math inline">\(x\)</span>.</p>
+</div>
+<p>La dimensionnalité d’un espace de caractéristiques est alors la
+dimension de l’espace vectoriel sous-jacent.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(V\)</span> un espace vectoriel
+représentant les caractéristiques d’un ensemble de données <span
+class="math inline">\(\mathcal{X}\)</span>. La dimensionnalité de <span
+class="math inline">\(V\)</span> est le nombre minimal de vecteurs
+linéairement indépendants nécessaires pour engendrer <span
+class="math inline">\(V\)</span>.</p>
+<p>Formellement, la dimensionnalité de <span
+class="math inline">\(V\)</span> est le nombre d’éléments dans une base
+de <span class="math inline">\(V\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en analyse des données est le théorème de la
+dimensionnalité, qui stipule que la dimensionnalité d’un espace de
+caractéristiques est égale à la trace de la matrice de covariance des
+données.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{X}\)</span> un ensemble de
+données représentées par des vecteurs dans un espace vectoriel <span
+class="math inline">\(V\)</span>. Soit <span
+class="math inline">\(C\)</span> la matrice de covariance des données.
+La dimensionnalité de <span class="math inline">\(V\)</span> est égale à
+la trace de <span class="math inline">\(C\)</span>.</p>
+<p>Formellement, <span class="math display">\[\dim(V) =
+\text{tr}(C).\]</span></p>
+<p>Preuve: Considérons une base orthonormale <span
+class="math inline">\(\{e_1, e_2, \ldots, e_n\}\)</span> de <span
+class="math inline">\(V\)</span>. La matrice de covariance <span
+class="math inline">\(C\)</span> peut être écrite comme <span
+class="math display">\[C = \sum_{i=1}^n \lambda_i e_i e_i^T,\]</span> où
+<span class="math inline">\(\lambda_i\)</span> sont les valeurs propres
+de <span class="math inline">\(C\)</span>. La trace de <span
+class="math inline">\(C\)</span> est alors <span
+class="math display">\[\text{tr}(C) = \sum_{i=1}^n \lambda_i.\]</span>
+Puisque <span class="math inline">\(C\)</span> est une matrice de
+covariance, toutes les valeurs propres <span
+class="math inline">\(\lambda_i\)</span> sont positives. Par conséquent,
+la dimensionnalité de <span class="math inline">\(V\)</span> est égale
+au nombre de valeurs propres non nulles de <span
+class="math inline">\(C\)</span>, qui est égal à la trace de <span
+class="math inline">\(C\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de la dimensionnalité, nous avons besoin
+de quelques propriétés fondamentales des matrices de covariance et des
+espaces vectoriels.</p>
+<div class="lemma">
+<p>Soit <span class="math inline">\(C\)</span> une matrice de
+covariance. Alors:</p>
+<ul>
+<li><p><span class="math inline">\(C\)</span> est symétrique,
+c’est-à-dire <span class="math inline">\(C = C^T\)</span>.</p></li>
+<li><p><span class="math inline">\(C\)</span> est semi-définie positive,
+c’est-à-dire que pour tout vecteur <span
+class="math inline">\(v\)</span>, <span class="math inline">\(v^T C v
+\geq 0\)</span>.</p></li>
+</ul>
+</div>
+<div class="proof">
+<p><em>Preuve du lemme.</em> La symétrie de <span
+class="math inline">\(C\)</span> découle du fait que la covariance entre
+deux variables est la même indépendamment de l’ordre des variables. La
+semi-définie positivité découle du fait que la variance d’une
+combinaison linéaire de variables est toujours non négative. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Le théorème de la dimensionnalité a plusieurs propriétés
+importantes:</p>
+<ul>
+<li><p>La dimensionnalité d’un espace de caractéristiques est invariante
+par changement de base. Cela signifie que si nous choisissons une autre
+base pour représenter les données, la dimensionnalité reste la
+même.</p></li>
+<li><p>La dimensionnalité d’un espace de caractéristiques est égale au
+rang de la matrice de covariance des données. Cela découle du fait que
+le rang d’une matrice est égal au nombre de valeurs propres non
+nulles.</p></li>
+<li><p>Si les données sont centrées, la matrice de covariance est égale
+à <span class="math inline">\(\frac{1}{n} X^T X\)</span>, où <span
+class="math inline">\(X\)</span> est la matrice des données centrées et
+<span class="math inline">\(n\)</span> est le nombre de points de
+données. Cela permet de calculer facilement la dimensionnalité à partir
+des données.</p></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La dimensionnalité d’un espace de caractéristiques est un concept clé
+en analyse des données et en apprentissage automatique. Elle permet de
+comprendre la structure sous-jacente des données et de réduire la
+complexité des modèles. Le théorème de la dimensionnalité fournit un
+moyen pratique de calculer la dimensionnalité à partir des données, ce
+qui est essentiel pour l’analyse et la modélisation des données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,372 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de SoftTFIDF : Une approche avancée pour la mesure de similarité textuelle</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de SoftTFIDF : Une approche avancée pour la
+mesure de similarité textuelle</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse de texte est un domaine en pleine expansion, notamment avec
+l’essor des technologies numériques et la nécessité de traiter de
+grandes quantités d’informations textuelles. Parmi les nombreuses
+techniques développées pour mesurer la similarité entre documents, la
+distance de SoftTFIDF émerge comme une approche innovante et
+puissante.</p>
+<p>Historiquement, les méthodes de mesure de similarité textuelle ont
+évolué des simples comptages de mots vers des approches plus
+sophistiquées intégrant des pondérations statistiques. Le TF-IDF (Term
+Frequency-Inverse Document Frequency) est l’une des méthodes les plus
+populaires, combinant la fréquence d’un terme dans un document avec sa
+rareté dans l’ensemble des documents. Cependant, cette approche présente
+certaines limitations, notamment en ce qui concerne la gestion des
+termes non présents dans un document mais pertinents pour sa
+compréhension.</p>
+<p>La distance de SoftTFIDF vise à pallier ces limitations en
+introduisant une pondération douce pour les termes absents, permettant
+ainsi une meilleure capture de la similarité sémantique entre documents.
+Cette méthode est particulièrement indispensable dans les applications
+où la précision de la similarité textuelle est cruciale, telles que la
+recherche d’information, le filtrage de contenu et l’analyse de
+sentiments.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de définir formellement la distance de SoftTFIDF, il est
+essentiel de comprendre les concepts sous-jacents. Nous cherchons à
+mesurer la similarité entre deux documents en tenant compte non
+seulement des termes présents, mais aussi de ceux qui pourraient être
+pertinents bien qu’absents. Cette approche nécessite une pondération
+douce des termes absents, ce qui conduit à la notion de SoftTFIDF.</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(\mathcal{D} = \{d_1, d_2, \ldots,
+d_n\}\)</span> un ensemble de documents et <span
+class="math inline">\(\mathcal{V} = \{v_1, v_2, \ldots, v_m\}\)</span>
+un vocabulaire de termes. Pour chaque document <span
+class="math inline">\(d_i\)</span>, nous définissons le vecteur TF-IDF
+classique comme suit : <span class="math display">\[\text{TF-IDF}_{i,j}
+= \text{TF}_{i,j} \times \log\left(\frac{n}{\text{DF}_j}\right)\]</span>
+où <span class="math inline">\(\text{TF}_{i,j}\)</span> est la fréquence
+du terme <span class="math inline">\(v_j\)</span> dans le document <span
+class="math inline">\(d_i\)</span>, et <span
+class="math inline">\(\text{DF}_j\)</span> est le nombre de documents
+contenant le terme <span class="math inline">\(v_j\)</span>.</p>
+<p>La pondération douce pour les termes absents est introduite par un
+paramètre <span class="math inline">\(\alpha \in [0,1]\)</span>. Le
+SoftTFIDF pour le document <span class="math inline">\(d_i\)</span> est
+alors défini comme : <span class="math display">\[\text{SoftTFIDF}_{i,j}
+=
+\begin{cases}
+\text{TF-IDF}_{i,j} &amp; \text{si } v_j \in d_i \\
+\alpha \times \log\left(\frac{n}{\text{DF}_j}\right) &amp; \text{si }
+v_j \notin d_i
+\end{cases}\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour comprendre les propriétés de la distance de SoftTFIDF, nous
+introduisons le théorème suivant, qui établit une relation entre la
+distance de SoftTFIDF et les distances classiques.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(d_i\)</span> et <span
+class="math inline">\(d_j\)</span> deux documents représentés par leurs
+vecteurs SoftTFIDF <span class="math inline">\(\mathbf{v}_i\)</span> et
+<span class="math inline">\(\mathbf{v}_j\)</span>. La distance de
+SoftTFIDF entre <span class="math inline">\(d_i\)</span> et <span
+class="math inline">\(d_j\)</span> est définie comme : <span
+class="math display">\[\text{SoftTFIDF-Distance}(d_i, d_j) = 1 -
+\frac{\mathbf{v}_i \cdot \mathbf{v}_j}{\|\mathbf{v}_i\|
+\|\mathbf{v}_j\|}\]</span> où <span class="math inline">\(\cdot\)</span>
+désigne le produit scalaire et <span
+class="math inline">\(\|\cdot\|\)</span> la norme euclidienne.</p>
+<p>Cette distance vérifie les propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(\text{SoftTFIDF-Distance}(d_i, d_j)
+\in [0,1]\)</span> pour tout <span
+class="math inline">\(i,j\)</span>.</p></li>
+<li><p><span class="math inline">\(\text{SoftTFIDF-Distance}(d_i, d_j) =
+0\)</span> si et seulement si <span class="math inline">\(d_i =
+d_j\)</span>.</p></li>
+<li><p><span class="math inline">\(\text{SoftTFIDF-Distance}(d_i, d_j) =
+\text{SoftTFIDF-Distance}(d_j, d_i)\)</span> pour tout <span
+class="math inline">\(i,j\)</span>.</p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème précédent, nous procédons par étapes.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux documents <span
+class="math inline">\(d_i\)</span> et <span
+class="math inline">\(d_j\)</span>. Leurs vecteurs SoftTFIDF <span
+class="math inline">\(\mathbf{v}_i\)</span> et <span
+class="math inline">\(\mathbf{v}_j\)</span> sont définis comme dans la
+définition précédente.</p>
+<p>1. **Bornes de la distance** : Puisque le produit scalaire <span
+class="math inline">\(\mathbf{v}_i \cdot \mathbf{v}_j\)</span> est borné
+par <span class="math inline">\(-\|\mathbf{v}_i\| \|\mathbf{v}_j\| \leq
+\mathbf{v}_i \cdot \mathbf{v}_j \leq \|\mathbf{v}_i\|
+\|\mathbf{v}_j\|\)</span>, il s’ensuit que : <span
+class="math display">\[-1 \leq \frac{\mathbf{v}_i \cdot
+\mathbf{v}_j}{\|\mathbf{v}_i\| \|\mathbf{v}_j\|} \leq 1\]</span> Donc,
+<span class="math inline">\(\text{SoftTFIDF-Distance}(d_i, d_j) \in
+[0,2]\)</span>. Cependant, en raison de la définition des vecteurs
+SoftTFIDF, tous les termes sont non négatifs, ce qui implique que <span
+class="math inline">\(\mathbf{v}_i \cdot \mathbf{v}_j \geq 0\)</span>.
+Par conséquent, <span
+class="math inline">\(\text{SoftTFIDF-Distance}(d_i, d_j) \in
+[0,1]\)</span>.</p>
+<p>2. **Distance nulle** : Si <span class="math inline">\(d_i =
+d_j\)</span>, alors <span class="math inline">\(\mathbf{v}_i =
+\mathbf{v}_j\)</span> et <span
+class="math inline">\(\text{SoftTFIDF-Distance}(d_i, d_j) = 0\)</span>.
+Réciproquement, si <span
+class="math inline">\(\text{SoftTFIDF-Distance}(d_i, d_j) = 0\)</span>,
+alors <span class="math inline">\(\mathbf{v}_i \cdot \mathbf{v}_j =
+\|\mathbf{v}_i\| \|\mathbf{v}_j\|\)</span>, ce qui implique que <span
+class="math inline">\(\mathbf{v}_i\)</span> et <span
+class="math inline">\(\mathbf{v}_j\)</span> sont colinéaires. Étant
+donné que tous les termes des vecteurs SoftTFIDF sont non négatifs, cela
+signifie que <span class="math inline">\(\mathbf{v}_i =
+\mathbf{v}_j\)</span>, et donc <span class="math inline">\(d_i =
+d_j\)</span>.</p>
+<p>3. **Symétrie** : La symétrie de la distance découle directement de
+la symétrie du produit scalaire : <span
+class="math display">\[\mathbf{v}_i \cdot \mathbf{v}_j = \mathbf{v}_j
+\cdot \mathbf{v}_i\]</span> et donc <span
+class="math inline">\(\text{SoftTFIDF-Distance}(d_i, d_j) =
+\text{SoftTFIDF-Distance}(d_j, d_i)\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous énumérons ci-dessous quelques propriétés importantes de la
+distance de SoftTFIDF.</p>
+<div class="proposition">
+<p>La distance de SoftTFIDF satisfait les propriétés suivantes :</p>
+<ol>
+<li><p>**Inégalité triangulaire** : Pour tout triplet de documents <span
+class="math inline">\(d_i, d_j, d_k\)</span>, nous avons : <span
+class="math display">\[\text{SoftTFIDF-Distance}(d_i, d_k) \leq
+\text{SoftTFIDF-Distance}(d_i, d_j) + \text{SoftTFIDF-Distance}(d_j,
+d_k)\]</span></p></li>
+<li><p>**Continuité** : La distance de SoftTFIDF est continue par
+rapport aux vecteurs SoftTFIDF.</p></li>
+<li><p>**Invariance par translation** : La distance de SoftTFIDF est
+invariante par ajout d’une constante à tous les termes des
+vecteurs.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> 1. **Inégalité triangulaire** : Cette propriété
+découle du fait que la distance de SoftTFIDF est une distance
+euclidienne normalisée. L’inégalité triangulaire pour la norme
+euclidienne implique directement l’inégalité triangulaire pour la
+distance de SoftTFIDF.</p>
+<p>2. **Continuité** : La continuité découle du fait que le produit
+scalaire et la norme euclidienne sont des fonctions continues.</p>
+<p>3. **Invariance par translation** : Ajouter une constante à tous les
+termes des vecteurs ne change pas le produit scalaire ni la norme
+euclidienne, et donc ne modifie pas la distance de SoftTFIDF. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de SoftTFIDF représente une avancée significative dans le
+domaine de la mesure de similarité textuelle. En introduisant une
+pondération douce pour les termes absents, elle permet de capturer plus
+précisément la similarité sémantique entre documents. Les propriétés et
+théorèmes présentés dans cet article montrent que cette distance est
+bien définie, symétrique, bornée et continue, ce qui en fait un outil
+puissant pour les applications pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

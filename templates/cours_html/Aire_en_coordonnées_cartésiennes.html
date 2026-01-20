@@ -1,0 +1,321 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’aire en coordonnées cartésiennes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’aire en coordonnées cartésiennes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’aire d’une surface plane est une notion fondamentale en
+mathématiques, en physique et dans de nombreuses applications pratiques.
+En coordonnées cartésiennes, le calcul de l’aire s’appuie sur des
+concepts géométriques et analytiques qui remontent aux travaux des
+anciens Grecs, comme Archimède, et se sont développés avec le calcul
+infinitésimal grâce à Newton et Leibniz. Comprendre comment calculer
+l’aire en utilisant les coordonnées cartésiennes permet de résoudre des
+problèmes concrets, comme déterminer la superficie d’un champ ou
+calculer l’intégrale d’une fonction. Ce chapitre explore les
+définitions, théorèmes et propriétés liés au calcul de l’aire dans le
+plan cartésien.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir l’aire d’une région dans le plan cartésien, nous devons
+d’abord comprendre ce que nous cherchons à mesurer. Imaginons une région
+délimitée par des courbes dans le plan. Nous voulons quantifier la
+superficie de cette région. Une manière intuitive de procéder est de
+diviser cette région en petites parties dont l’aire est facile à
+calculer, puis de faire la somme de ces aires. Cette idée mène
+naturellement au concept d’intégrale.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f : [a, b] \rightarrow
+\mathbb{R}\)</span> une fonction continue et positive sur l’intervalle
+<span class="math inline">\([a, b]\)</span>. L’aire <span
+class="math inline">\(A\)</span> sous la courbe <span
+class="math inline">\(y = f(x)\)</span> entre les points <span
+class="math inline">\(x = a\)</span> et <span class="math inline">\(x =
+b\)</span> est donnée par l’intégrale définie : <span
+class="math display">\[A = \int_{a}^{b} f(x) \, dx\]</span></p>
+</div>
+<p>Cette définition peut être généralisée à des régions plus complexes.
+Par exemple, si la région est bornée par deux courbes <span
+class="math inline">\(y = f(x)\)</span> et <span class="math inline">\(y
+= g(x)\)</span>, avec <span class="math inline">\(f(x) \geq
+g(x)\)</span> pour tout <span class="math inline">\(x\)</span> dans
+<span class="math inline">\([a, b]\)</span>, alors l’aire <span
+class="math inline">\(A\)</span> entre ces deux courbes est donnée par :
+<span class="math display">\[A = \int_{a}^{b} (f(x) - g(x)) \,
+dx\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en analyse est le théorème de la valeur
+moyenne pour les intégrales, qui joue un rôle crucial dans le calcul des
+aires.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f : [a, b] \rightarrow
+\mathbb{R}\)</span> une fonction continue sur l’intervalle <span
+class="math inline">\([a, b]\)</span>. Il existe un point <span
+class="math inline">\(c\)</span> dans <span class="math inline">\([a,
+b]\)</span> tel que : <span class="math display">\[\int_{a}^{b} f(x) \,
+dx = f(c) (b - a)\]</span></p>
+</div>
+<p>Ce théorème est particulièrement utile pour estimer l’aire sous une
+courbe lorsque la fonction est continue. Il permet de dire qu’il existe
+un rectangle dont l’aire est égale à celle sous la courbe, avec une
+hauteur égale à la valeur de la fonction en un point <span
+class="math inline">\(c\)</span> et une largeur égale à la longueur de
+l’intervalle.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la valeur moyenne pour les intégrales,
+nous utilisons le théorème des valeurs intermédiaires.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(f : [a, b]
+\rightarrow \mathbb{R}\)</span> une fonction continue sur <span
+class="math inline">\([a, b]\)</span>. Définissons la fonction <span
+class="math inline">\(F : [a, b] \rightarrow \mathbb{R}\)</span> par :
+<span class="math display">\[F(x) = f(x) - \frac{1}{b - a} \int_{a}^{b}
+f(t) \, dt\]</span> La fonction <span class="math inline">\(F\)</span>
+est continue sur <span class="math inline">\([a, b]\)</span>. D’après le
+théorème des valeurs intermédiaires, il existe un point <span
+class="math inline">\(c\)</span> dans <span class="math inline">\([a,
+b]\)</span> tel que <span class="math inline">\(F(c) = 0\)</span>. Cela
+signifie que : <span class="math display">\[f(c) = \frac{1}{b - a}
+\int_{a}^{b} f(t) \, dt\]</span> En multipliant les deux côtés par <span
+class="math inline">\(b - a\)</span>, nous obtenons : <span
+class="math display">\[\int_{a}^{b} f(x) \, dx = f(c) (b - a)\]</span>
+Ce qui achève la démonstration. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes liées au
+calcul de l’aire en coordonnées cartésiennes.</p>
+<ol>
+<li><p><strong>Additivité de l’aire</strong> : Si une région <span
+class="math inline">\(R\)</span> est divisée en deux sous-régions <span
+class="math inline">\(R_1\)</span> et <span
+class="math inline">\(R_2\)</span> qui ne se chevauchent pas, alors
+l’aire de <span class="math inline">\(R\)</span> est la somme des aires
+de <span class="math inline">\(R_1\)</span> et <span
+class="math inline">\(R_2\)</span>. Formellement, si <span
+class="math inline">\(A(R)\)</span>, <span
+class="math inline">\(A(R_1)\)</span> et <span
+class="math inline">\(A(R_2)\)</span> désignent les aires respectives,
+alors : <span class="math display">\[A(R) = A(R_1) +
+A(R_2)\]</span></p></li>
+<li><p><strong>Invariance par translation</strong> : L’aire d’une région
+ne change pas si nous translatons cette région dans le plan. Si <span
+class="math inline">\(R\)</span> est une région et <span
+class="math inline">\(R&#39;\)</span> est la translation de <span
+class="math inline">\(R\)</span> par un vecteur <span
+class="math inline">\((h, k)\)</span>, alors : <span
+class="math display">\[A(R&#39;) = A(R)\]</span></p></li>
+<li><p><strong>Invariance par rotation</strong> : L’aire d’une région ne
+change pas si nous faisons tourner cette région autour d’un point fixe.
+Si <span class="math inline">\(R\)</span> est une région et <span
+class="math inline">\(R&#39;\)</span> est la rotation de <span
+class="math inline">\(R\)</span> d’un angle <span
+class="math inline">\(\theta\)</span>, alors : <span
+class="math display">\[A(R&#39;) = A(R)\]</span></p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le calcul de l’aire en coordonnées cartésiennes est un sujet riche et
+fondamental, avec des applications dans de nombreux domaines. En
+comprenant les définitions, théorèmes et propriétés associés à ce sujet,
+nous pouvons résoudre une variété de problèmes pratiques et théoriques.
+Les concepts présentés dans ce chapitre fournissent une base solide pour
+des études plus avancées en analyse mathématique et en géométrie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

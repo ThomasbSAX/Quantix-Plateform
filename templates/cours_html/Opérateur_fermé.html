@@ -1,0 +1,329 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’opérateur fermé : une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’opérateur fermé : une exploration mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des opérateurs fermés constitue un pilier fondamental en
+analyse fonctionnelle et en théorie spectrale. Ces opérateurs, qui
+généralisent les notions classiques de fonctions continues et
+différentiables, jouent un rôle crucial dans la résolution d’équations
+différentielles et intégrales. Leur importance émerge notamment dans le
+cadre des espaces de Hilbert, où ils permettent une compréhension
+approfondie des propriétés spectrales et des conditions aux limites.
+L’opérateur fermé se distingue par sa stabilité sous certaines
+transformations et son comportement vis-à-vis des suites convergentes,
+ce qui en fait un outil indispensable pour l’analyse des systèmes
+dynamiques et la physique mathématique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion d’opérateur fermé, commençons par rappeler
+quelques concepts préliminaires. Considérons un espace de Banach <span
+class="math inline">\((X, \|\cdot\|)\)</span> et un opérateur linéaire
+<span class="math inline">\(T : D(T) \subset X \to X\)</span>, où <span
+class="math inline">\(D(T)\)</span> désigne le domaine de <span
+class="math inline">\(T\)</span>. Nous cherchons à définir une propriété
+qui garantit que l’opérateur <span class="math inline">\(T\)</span>
+préserve certaines formes de convergence.</p>
+<div class="definition">
+<p>Un opérateur linéaire <span class="math inline">\(T\)</span> est dit
+<em>fermé</em> si pour toute suite <span class="math inline">\((x_n)
+\subset D(T)\)</span> telle que : <span class="math display">\[\lim_{n
+\to \infty} x_n = x \quad \text{et} \quad \lim_{n \to \infty} T x_n =
+y,\]</span> on a nécessairement <span class="math inline">\(x \in
+D(T)\)</span> et <span class="math inline">\(T x = y\)</span>. En
+d’autres termes, le graphe de <span class="math inline">\(T\)</span>,
+défini par : <span class="math display">\[\Gamma(T) = \{ (x, Tx) \in X
+\times X \mid x \in D(T) \},\]</span> est un sous-espace fermé de <span
+class="math inline">\(X \times X\)</span>.</p>
+</div>
+<p>Cette définition peut être reformulée en termes de topologie. Un
+opérateur <span class="math inline">\(T\)</span> est fermé si et
+seulement si son graphe <span class="math inline">\(\Gamma(T)\)</span>
+est un ensemble fermé dans l’espace produit <span
+class="math inline">\(X \times X\)</span>. Cette propriété est
+particulièrement utile pour étudier les extensions d’opérateurs et les
+conditions de closabilité.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’un des résultats fondamentaux concernant les opérateurs fermés est
+le théorème de fermeture, qui fournit une condition suffisante pour
+qu’un opérateur soit fermé.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(T\)</span> un opérateur linéaire. Si
+<span class="math inline">\(T\)</span> est closable et si pour toute
+suite <span class="math inline">\((x_n) \subset D(T)\)</span> telle que
+<span class="math inline">\(x_n \to 0\)</span> et <span
+class="math inline">\(T x_n \to y\)</span>, on a nécessairement <span
+class="math inline">\(y = 0\)</span>, alors <span
+class="math inline">\(T\)</span> est fermé.</p>
+</div>
+<p>La démonstration de ce théorème repose sur le lemme de
+Banach-Steinhaus et la notion d’adjoint. En effet, si <span
+class="math inline">\(T\)</span> est closable, son adjoint <span
+class="math inline">\(T^*\)</span> existe et est fermé. La condition
+supplémentaire garantit que le graphe de <span
+class="math inline">\(T\)</span> est fermé, ce qui implique que <span
+class="math inline">\(T\)</span> lui-même est fermé.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de fermeture, procédons par étapes.
+Supposons que <span class="math inline">\(T\)</span> soit closable et
+considérons une suite <span class="math inline">\((x_n) \subset
+D(T)\)</span> telle que <span class="math inline">\(x_n \to x\)</span>
+et <span class="math inline">\(T x_n \to y\)</span>. Nous devons montrer
+que <span class="math inline">\(x \in D(T)\)</span> et <span
+class="math inline">\(T x = y\)</span>.</p>
+<p>1. **Closabilité de <span class="math inline">\(T\)</span>** :
+Puisque <span class="math inline">\(T\)</span> est closable, il existe
+une extension fermée <span class="math inline">\(\overline{T}\)</span>
+de <span class="math inline">\(T\)</span>. Par définition, <span
+class="math inline">\(\Gamma(\overline{T})\)</span> est fermé.</p>
+<p>2. **Convergence des suites** : Comme <span class="math inline">\(x_n
+\to x\)</span> et <span class="math inline">\(T x_n \to y\)</span>, on a
+<span class="math inline">\((x_n, T x_n) \to (x, y)\)</span>. Puisque
+<span class="math inline">\(\Gamma(\overline{T})\)</span> est fermé, il
+s’ensuit que <span class="math inline">\((x, y) \in
+\Gamma(\overline{T})\)</span>.</p>
+<p>3. **Extension fermée** : Par définition de <span
+class="math inline">\(\overline{T}\)</span>, on a <span
+class="math inline">\(x \in D(\overline{T})\)</span> et <span
+class="math inline">\(\overline{T} x = y\)</span>. Comme <span
+class="math inline">\(T \subset \overline{T}\)</span>, il existe une
+suite <span class="math inline">\((x&#39;_n) \subset D(T)\)</span> telle
+que <span class="math inline">\(x&#39;_n \to x\)</span> et <span
+class="math inline">\(T x&#39;_n \to y\)</span>.</p>
+<p>4. **Conclusion** : Puisque <span class="math inline">\(T\)</span>
+est closable, on peut identifier <span class="math inline">\(y = T
+x\)</span>, ce qui montre que <span class="math inline">\(T\)</span> est
+fermé.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les opérateurs fermés possèdent plusieurs propriétés intéressantes,
+que nous énumérons ci-dessous :</p>
+<ol>
+<li><p>**Stabilité sous composition** : Si <span
+class="math inline">\(T_1\)</span> et <span
+class="math inline">\(T_2\)</span> sont des opérateurs fermés tels que
+<span class="math inline">\(D(T_1) \supset D(T_2)\)</span>, alors la
+composition <span class="math inline">\(T_1 \circ T_2\)</span> est
+fermée.</p></li>
+<li><p>**Adjoint d’un opérateur fermé** : Si <span
+class="math inline">\(T\)</span> est un opérateur fermé dans un espace
+de Hilbert, alors son adjoint <span class="math inline">\(T^*\)</span>
+est également fermé.</p></li>
+<li><p>**Théorème du graphe fermé** : Un opérateur linéaire <span
+class="math inline">\(T\)</span> est fermé si et seulement si son graphe
+<span class="math inline">\(\Gamma(T)\)</span> est fermé dans l’espace
+produit <span class="math inline">\(X \times X\)</span>.</p></li>
+</ol>
+<p>Chacune de ces propriétés peut être démontrée en utilisant les outils
+de l’analyse fonctionnelle et la théorie des espaces de Banach. Par
+exemple, pour montrer que l’adjoint d’un opérateur fermé est également
+fermé, on peut utiliser la définition de l’adjoint et les propriétés des
+formes sesquilinéaires.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’étude des opérateurs fermés offre une compréhension approfondie des
+structures sous-jacentes aux espaces de Banach et de Hilbert. Leur
+importance dans la résolution des équations différentielles et l’analyse
+spectrale ne peut être sous-estimée. Les résultats présentés dans cet
+article soulignent la richesse et la complexité de ces objets
+mathématiques, tout en ouvrant des perspectives pour de futures
+recherches dans ce domaine fascinant.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,364 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Loi de Fisher a posteriori : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Loi de Fisher a posteriori : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La loi de Fisher a posteriori émerge dans le cadre des modèles
+statistiques bayésiens, où l’on cherche à inférer les paramètres d’un
+modèle à partir de données observées. Cette loi joue un rôle central
+dans l’analyse des modèles hiérarchiques et des modèles à effets
+aléatoires, notamment en biostatistique et en économétrie. Son
+importance réside dans sa capacité à fournir une distribution de
+probabilité pour les paramètres inconnus, intégrant à la fois
+l’information a priori et les données observées.</p>
+<p>L’origine de cette loi remonte aux travaux de Ronald Fisher, pionnier
+de la statistique moderne. Cependant, c’est dans le cadre bayésien que
+cette loi a trouvé une application particulièrement fructueuse. Elle
+permet de résoudre des problèmes complexes d’inférence statistique, où
+les méthodes classiques peuvent s’avérer insuffisantes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la loi de Fisher a posteriori, il est essentiel de
+définir les concepts fondamentaux qui la sous-tendent. Nous commençons
+par expliquer pédagogiquement ce que nous cherchons à obtenir, de
+manière à ce que le lecteur puisse deviner la définition.</p>
+<p>Supposons que nous ayons un modèle statistique paramétré par un
+vecteur de paramètres <span class="math inline">\(\theta\)</span>. Nous
+disposons de données observées <span class="math inline">\(X\)</span> et
+nous souhaitons inférer la distribution de <span
+class="math inline">\(\theta\)</span> conditionnellement à ces données.
+La loi a posteriori de <span class="math inline">\(\theta\)</span> est
+la distribution de probabilité qui capture cette incertitude.</p>
+<p>Formellement, la loi de Fisher a posteriori peut être définie comme
+suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> un vecteur de données
+observées, et <span class="math inline">\(\theta\)</span> un vecteur de
+paramètres inconnus. La loi a posteriori de <span
+class="math inline">\(\theta\)</span> conditionnellement à <span
+class="math inline">\(X\)</span> est donnée par : <span
+class="math display">\[p(\theta | X) = \frac{p(X | \theta)
+p(\theta)}{p(X)}\]</span> où :</p>
+<ul>
+<li><p><span class="math inline">\(p(X | \theta)\)</span> est la
+vraisemblance des données <span class="math inline">\(X\)</span>
+conditionnellement à <span
+class="math inline">\(\theta\)</span>,</p></li>
+<li><p><span class="math inline">\(p(\theta)\)</span> est la
+distribution a priori de <span
+class="math inline">\(\theta\)</span>,</p></li>
+<li><p><span class="math inline">\(p(X)\)</span> est la probabilité
+marginale des données, également appelée evidence.</p></li>
+</ul>
+</div>
+<p>Cette définition peut être reformulée en utilisant des
+quantificateurs : <span class="math display">\[\forall \theta \in
+\Theta, \quad p(\theta | X) = \frac{\int_{\Theta} p(X | \theta&#39;)
+p(\theta&#39;) d\theta&#39;}{p(X)} p(X | \theta) p(\theta)\]</span> où
+<span class="math inline">\(\Theta\)</span> est l’espace des
+paramètres.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la loi de Fisher a posteriori est le
+théorème de Bayes, qui fournit la base théorique pour l’inférence
+bayésienne.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> un vecteur de données
+observées, et <span class="math inline">\(\theta\)</span> un vecteur de
+paramètres inconnus. Alors, la loi a posteriori de <span
+class="math inline">\(\theta\)</span> conditionnellement à <span
+class="math inline">\(X\)</span> est donnée par : <span
+class="math display">\[p(\theta | X) = \frac{p(X | \theta)
+p(\theta)}{p(X)}\]</span></p>
+</div>
+<p>La démonstration de ce théorème repose sur des principes fondamentaux
+de la théorie des probabilités. Nous commençons par rappeler que, pour
+toute partition de l’espace des événements, la loi totale des
+probabilités s’écrit : <span class="math display">\[p(X) = \int_{\Theta}
+p(X | \theta) p(\theta) d\theta\]</span> En utilisant cette identité,
+nous pouvons réécrire la loi a posteriori comme : <span
+class="math display">\[p(\theta | X) = \frac{p(X | \theta)
+p(\theta)}{\int_{\Theta} p(X | \theta&#39;) p(\theta&#39;)
+d\theta&#39;}\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour illustrer l’application de la loi de Fisher a posteriori,
+considérons un exemple simple où les données <span
+class="math inline">\(X\)</span> suivent une distribution normale de
+moyenne <span class="math inline">\(\theta\)</span> et de variance
+connue <span class="math inline">\(\sigma^2\)</span>. La vraisemblance
+des données est alors : <span class="math display">\[p(X | \theta) =
+\frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(X -
+\theta)^2}{2\sigma^2}\right)\]</span> Supposons que la distribution a
+priori de <span class="math inline">\(\theta\)</span> est une
+distribution normale de moyenne <span class="math inline">\(\mu\)</span>
+et de variance <span class="math inline">\(\tau^2\)</span>. La loi a
+posteriori de <span class="math inline">\(\theta\)</span>
+conditionnellement à <span class="math inline">\(X\)</span> est alors
+donnée par : <span class="math display">\[p(\theta | X) = \frac{p(X |
+\theta) p(\theta)}{p(X)}\]</span> En substituant les expressions de la
+vraisemblance et de la distribution a priori, nous obtenons : <span
+class="math display">\[p(\theta | X) \propto \exp\left(-\frac{(X -
+\theta)^2}{2\sigma^2}\right) \exp\left(-\frac{(\theta -
+\mu)^2}{2\tau^2}\right)\]</span> En combinant les exponentielles, nous
+pouvons réécrire cette expression comme : <span
+class="math display">\[p(\theta | X) \propto \exp\left(-\frac{1}{2}
+\left( \frac{(X - \theta)^2}{\sigma^2} + \frac{(\theta - \mu)^2}{\tau^2}
+\right)\right)\]</span> Cette expression peut être simplifiée en
+utilisant des techniques d’algèbre linéaire, conduisant à une
+distribution normale pour la loi a posteriori.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La loi de Fisher a posteriori possède plusieurs propriétés
+intéressantes, que nous énumérons et développons ci-dessous.</p>
+<ol>
+<li><p>La loi a posteriori est une distribution de probabilité valide,
+c’est-à-dire qu’elle intègre à 1 sur l’espace des paramètres.</p>
+<div class="proof">
+<p><em>Proof.</em> Par définition, la loi a posteriori est
+proportionnelle à la vraisemblance multipliée par la distribution a
+priori. La normalisation garantit que l’intégrale sur l’espace des
+paramètres est égale à 1. ◻</p>
+</div></li>
+<li><p>La loi a posteriori est invariante sous des transformations
+bijectives de l’espace des paramètres.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span class="math inline">\(\phi =
+g(\theta)\)</span> est une transformation bijective de l’espace des
+paramètres. La loi a posteriori de <span
+class="math inline">\(\phi\)</span> conditionnellement à <span
+class="math inline">\(X\)</span> est donnée par : <span
+class="math display">\[p(\phi | X) = p(g(\theta) | X) = p(\theta | X)
+\left| \frac{dg}{d\theta} \right|\]</span> En utilisant la définition de
+la loi a posteriori, nous pouvons montrer que cette expression est
+équivalente à : <span class="math display">\[p(\phi | X) = \frac{p(X |
+g^{-1}(\phi)) p(g^{-1}(\phi))}{p(X)} \left| \frac{dg}{d\theta}
+\right|\]</span> Cette expression montre que la loi a posteriori est
+invariante sous des transformations bijectives de l’espace des
+paramètres. ◻</p>
+</div></li>
+<li><p>La loi a posteriori peut être utilisée pour calculer des
+intervalles de crédibilité pour les paramètres inconnus.</p>
+<div class="proof">
+<p><em>Proof.</em> Un intervalle de crédibilité à <span
+class="math inline">\(100(1-\alpha)\%\)</span> pour un paramètre <span
+class="math inline">\(\theta\)</span> est défini comme l’ensemble des
+valeurs de <span class="math inline">\(\theta\)</span> pour lesquelles
+la densité a posteriori dépasse un certain seuil. Plus précisément,
+l’intervalle de crédibilité est donné par : <span
+class="math display">\[\left\{ \theta : p(\theta | X) \geq c
+\right\}\]</span> où <span class="math inline">\(c\)</span> est choisi
+de telle sorte que : <span class="math display">\[\int_{\left\{ \theta :
+p(\theta | X) \geq c \right\}} p(\theta | X) d\theta = 1 -
+\alpha\]</span> Cette définition garantit que l’intervalle de
+crédibilité contient la vraie valeur du paramètre avec une probabilité
+de <span class="math inline">\(100(1-\alpha)\%\)</span>. ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La loi de Fisher a posteriori est un outil puissant pour l’inférence
+statistique dans le cadre bayésien. Elle permet de combiner
+l’information a priori avec les données observées pour obtenir une
+distribution de probabilité pour les paramètres inconnus. Les propriétés
+et les applications de cette loi sont vastes, allant de l’analyse des
+modèles hiérarchiques à la construction d’intervalles de crédibilité.
+Les développements futurs dans ce domaine pourraient inclure des
+méthodes computationnelles avancées pour calculer la loi a posteriori
+dans des modèles complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traducteur - Traduction de Documents</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background: #ffffff;
+            color: #212121;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .main-content {
+            min-height: 100vh;
+            padding: 120px 20px 80px;
+        }
+
+        .logos-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .logos-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .logos-header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+            opacity: 0;
+        }
+
+        .logos-header p {
+            font-size: 1rem;
+            color: #565869;
+            font-weight: 300;
+        }
+
+        /* Zone de dépôt */
+        .upload-section {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 60px 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-section:hover {
+            border-color: #0066ff;
+            background: #f7f7f8;
+        }
+
+        .upload-section.drag-over {
+            border-color: #0066ff;
+            background: #f7f7f8;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #8e8ea0;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: #565869;
+            margin-bottom: 8px;
+        }
+
+        .upload-hint {
+            font-size: 0.9rem;
+            color: #8e8ea0;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Informations fichier */
+        .file-info-section {
+            display: none;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .file-info-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .file-icon {
+            font-size: 2rem;
+            color: #0066ff;
+        }
+
+        .file-details h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #212121;
+        }
+
+        .file-meta {
+            font-size: 0.9rem;
+            color: #8e8ea0;
+        }
+
+        /* Configuration traduction */
+        .translation-config {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .config-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .config-group label {
+            font-size: 0.9rem;
+            color: #565869;
+            font-weight: 500;
+        }
+
+        .config-group select {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 12px;
+            color: #212121;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .config-group select:hover {
+            border-color: #0066ff;
+        }
+
+        .config-group select:focus {
+            outline: none;
+            border-color: #0066ff;
+        }
+
+        /* Options avancées */
+        .advanced-options {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .option-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .option-toggle input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #0066ff;
+        }
+
+        .option-toggle label {
+            font-size: 0.9rem;
+            color: #565869;
+            cursor: pointer;
+        }
+
+        /* Bouton traduire */
+        .translate-button {
+            width: 100%;
+            background: #0066ff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 20px;
+        }
+
+        .translate-button:hover {
+            background: #0052cc;
+        }
+
+        .translate-button:disabled {
+            background: #e5e5e5;
+            color: #8e8ea0;
+            cursor: not-allowed;
+        }
+
+        /* Section de traitement */
+        .processing-section {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        .spinner {
+            border: 3px solid #e5e5e5;
+            border-top: 3px solid #0066ff;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .processing-text {
+            color: #565869;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .progress-details {
+            color: #8e8ea0;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .stop-button {
+            margin-top: 20px;
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .stop-button:hover {
+            background: #c82333;
+        }
+
+        /* Section résultats */
+        .results-section {
+            display: none;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 30px;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .results-header i {
+            color: #0066ff;
+            font-size: 1.5rem;
+        }
+
+        .results-header h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #212121;
+        }
+
+        .download-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            background: #0066ff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .download-button:hover {
+            background: #0052cc;
+        }
+
+        /* Mode switch */
+        .mode-switch {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0 20px;
+        }
+
+        .mode-pill {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 10px 12px;
+            cursor: pointer;
+            color: #565869;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .mode-pill:hover {
+            border-color: #0066ff;
+            background: #f7f7f8;
+        }
+
+        .mode-pill.active {
+            border-color: #0066ff;
+            background: #ffffff;
+            color: #212121;
+        }
+
+        .mode-pill input {
+            display: none;
+        }
+
+        .table-column-config {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .table-column-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .config-group input[type="text"],
+        .config-group input[type="number"] {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 12px;
+            color: #212121;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .config-group input[type="text"]:hover,
+        .config-group input[type="number"]:hover {
+            border-color: #0066ff;
+        }
+
+        .config-group input[type="text"]:focus,
+        .config-group input[type="number"]:focus {
+            outline: none;
+            border-color: #0066ff;
+        }
+
+        .hint {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #8e8ea0;
+        }
+
+        .warning {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #b45309;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .result-details {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid #e5e5e5;
+            color: #565869;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .translation-config {
+                grid-template-columns: 1fr;
+            }
+
+            .table-column-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'header.html' %}
+    
+    <main class="main-content">
+        <div class="logos-container">
+            <!-- En-tête -->
+            <div class="logos-header">
+                <h1>TRADUCTEUR</h1>
+                <p>Traduction multiformat (limitation actuelle : formules et images non préservées)</p>
+            </div>
+
+            <!-- Zone de dépôt -->
+            <div class="upload-section" id="upload-zone">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <div class="upload-text">Déposer un document à traduire</div>
+                <div class="upload-hint">TXT, PDF, DOCX, HTML, MD, CSV, JSON, Images (JPG, PNG), Tables (XLSX, TSV)</div>
+                <input type="file" id="file-input" accept=".txt,.pdf,.docx,.html,.htm,.md,.markdown,.csv,.tsv,.xlsx,.json,.jpg,.jpeg,.png,.bmp,.tiff,.tif,.parquet">
+            </div>
+
+            <!-- Informations fichier et configuration -->
+            <div class="file-info-section" id="file-info">
+                <div class="file-info-header">
+                    <i class="fas fa-file file-icon" id="file-icon"></i>
+                    <div class="file-details">
+                        <h3 id="file-name"></h3>
+                        <div class="file-meta">
+                            <span id="file-size"></span> • <span id="file-type"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mode -->
+                <div class="mode-switch" aria-label="Mode de traduction">
+                    <label class="mode-pill active" id="mode-pill-document">
+                        <input type="radio" name="translate-mode" value="document" checked>
+                        <i class="fas fa-file-lines"></i>
+                        Document complet
+                    </label>
+                    <label class="mode-pill" id="mode-pill-table">
+                        <input type="radio" name="translate-mode" value="table">
+                        <i class="fas fa-table"></i>
+                        Colonne tabulaire
+                    </label>
+                </div>
+
+                <!-- Configuration traduction -->
+                <div class="translation-config">
+                    <div class="config-group">
+                        <label for="source-lang">Langue source</label>
+                        <select id="source-lang">
+                            <option value="auto">Détection automatique</option>
+                            <option value="af">Afrikaans</option>
+                            <option value="sq">Albanais</option>
+                            <option value="de">Allemand</option>
+                            <option value="en">Anglais</option>
+                            <option value="ar">Arabe</option>
+                            <option value="hy">Arménien</option>
+                            <option value="az">Azerbaïdjanais</option>
+                            <option value="eu">Basque</option>
+                            <option value="bn">Bengali</option>
+                            <option value="be">Biélorusse</option>
+                            <option value="my">Birman</option>
+                            <option value="bs">Bosniaque</option>
+                            <option value="bg">Bulgare</option>
+                            <option value="ca">Catalan</option>
+                            <option value="ceb">Cebuano</option>
+                            <option value="zh-CN">Chinois (simplifié)</option>
+                            <option value="zh-TW">Chinois (traditionnel)</option>
+                            <option value="ko">Coréen</option>
+                            <option value="co">Corse</option>
+                            <option value="hr">Croate</option>
+                            <option value="da">Danois</option>
+                            <option value="es">Espagnol</option>
+                            <option value="eo">Espéranto</option>
+                            <option value="et">Estonien</option>
+                            <option value="fi">Finnois</option>
+                            <option value="fr">Français</option>
+                            <option value="fy">Frison</option>
+                            <option value="gd">Gaélique écossais</option>
+                            <option value="gl">Galicien</option>
+                            <option value="cy">Gallois</option>
+                            <option value="ka">Géorgien</option>
+                            <option value="el">Grec</option>
+                            <option value="gu">Gujarati</option>
+                            <option value="ht">Haïtien</option>
+                            <option value="ha">Hausa</option>
+                            <option value="haw">Hawaïen</option>
+                            <option value="iw">Hébreu</option>
+                            <option value="hi">Hindi</option>
+                            <option value="hmn">Hmong</option>
+                            <option value="hu">Hongrois</option>
+                            <option value="ig">Igbo</option>
+                            <option value="id">Indonésien</option>
+                            <option value="ga">Irlandais</option>
+                            <option value="is">Islandais</option>
+                            <option value="it">Italien</option>
+                            <option value="ja">Japonais</option>
+                            <option value="jw">Javanais</option>
+                            <option value="kn">Kannada</option>
+                            <option value="kk">Kazakh</option>
+                            <option value="km">Khmer</option>
+                            <option value="ku">Kurde</option>
+                            <option value="ky">Kirghize</option>
+                            <option value="lo">Lao</option>
+                            <option value="la">Latin</option>
+                            <option value="lv">Letton</option>
+                            <option value="lt">Lituanien</option>
+                            <option value="lb">Luxembourgeois</option>
+                            <option value="mk">Macédonien</option>
+                            <option value="ms">Malais</option>
+                            <option value="ml">Malayalam</option>
+                            <option value="mg">Malgache</option>
+                            <option value="mt">Maltais</option>
+                            <option value="mi">Maori</option>
+                            <option value="mr">Marathi</option>
+                            <option value="mn">Mongol</option>
+                            <option value="ne">Népalais</option>
+                            <option value="no">Norvégien</option>
+                            <option value="ny">Nyanja</option>
+                            <option value="uz">Ouïghour</option>
+                            <option value="ur">Ourdou</option>
+                            <option value="ps">Pachto</option>
+                            <option value="pa">Pendjabi</option>
+                            <option value="fa">Persan</option>
+                            <option value="pl">Polonais</option>
+                            <option value="pt">Portugais</option>
+                            <option value="ro">Roumain</option>
+                            <option value="ru">Russe</option>
+                            <option value="sm">Samoan</option>
+                            <option value="sr">Serbe</option>
+                            <option value="st">Sesotho</option>
+                            <option value="sn">Shona</option>
+                            <option value="sd">Sindhi</option>
+                            <option value="si">Cingalais</option>
+                            <option value="sk">Slovaque</option>
+                            <option value="sl">Slovène</option>
+                            <option value="so">Somali</option>
+                            <option value="su">Soundanais</option>
+                            <option value="sv">Suédois</option>
+                            <option value="sw">Swahili</option>
+                            <option value="tg">Tadjik</option>
+                            <option value="tl">Tagalog</option>
+                            <option value="ta">Tamoul</option>
+                            <option value="cs">Tchèque</option>
+                            <option value="te">Télougou</option>
+                            <option value="th">Thaï</option>
+                            <option value="tr">Turc</option>
+                            <option value="uk">Ukrainien</option>
+                            <option value="vi">Vietnamien</option>
+                            <option value="xh">Xhosa</option>
+                            <option value="yi">Yiddish</option>
+                            <option value="yo">Yoruba</option>
+                            <option value="zu">Zoulou</option>
+                        </select>
+                    </div>
+
+                    <div class="config-group">
+                        <label for="target-lang">Langue cible</label>
+                        <select id="target-lang">
+                            <option value="fr" selected>Français</option>
+                            <option value="af">Afrikaans</option>
+                            <option value="sq">Albanais</option>
+                            <option value="de">Allemand</option>
+                            <option value="en">Anglais</option>
+                            <option value="ar">Arabe</option>
+                            <option value="hy">Arménien</option>
+                            <option value="az">Azerbaïdjanais</option>
+                            <option value="eu">Basque</option>
+                            <option value="bn">Bengali</option>
+                            <option value="be">Biélorusse</option>
+                            <option value="my">Birman</option>
+                            <option value="bs">Bosniaque</option>
+                            <option value="bg">Bulgare</option>
+                            <option value="ca">Catalan</option>
+                            <option value="ceb">Cebuano</option>
+                            <option value="zh-CN">Chinois (simplifié)</option>
+                            <option value="zh-TW">Chinois (traditionnel)</option>
+                            <option value="ko">Coréen</option>
+                            <option value="co">Corse</option>
+                            <option value="hr">Croate</option>
+                            <option value="da">Danois</option>
+                            <option value="es">Espagnol</option>
+                            <option value="eo">Espéranto</option>
+                            <option value="et">Estonien</option>
+                            <option value="fi">Finnois</option>
+                            <option value="fy">Frison</option>
+                            <option value="gd">Gaélique écossais</option>
+                            <option value="gl">Galicien</option>
+                            <option value="cy">Gallois</option>
+                            <option value="ka">Géorgien</option>
+                            <option value="el">Grec</option>
+                            <option value="gu">Gujarati</option>
+                            <option value="ht">Haïtien</option>
+                            <option value="ha">Hausa</option>
+                            <option value="haw">Hawaïen</option>
+                            <option value="iw">Hébreu</option>
+                            <option value="hi">Hindi</option>
+                            <option value="hmn">Hmong</option>
+                            <option value="hu">Hongrois</option>
+                            <option value="ig">Igbo</option>
+                            <option value="id">Indonésien</option>
+                            <option value="ga">Irlandais</option>
+                            <option value="is">Islandais</option>
+                            <option value="it">Italien</option>
+                            <option value="ja">Japonais</option>
+                            <option value="jw">Javanais</option>
+                            <option value="kn">Kannada</option>
+                            <option value="kk">Kazakh</option>
+                            <option value="km">Khmer</option>
+                            <option value="ku">Kurde</option>
+                            <option value="ky">Kirghize</option>
+                            <option value="lo">Lao</option>
+                            <option value="la">Latin</option>
+                            <option value="lv">Letton</option>
+                            <option value="lt">Lituanien</option>
+                            <option value="lb">Luxembourgeois</option>
+                            <option value="mk">Macédonien</option>
+                            <option value="ms">Malais</option>
+                            <option value="ml">Malayalam</option>
+                            <option value="mg">Malgache</option>
+                            <option value="mt">Maltais</option>
+                            <option value="mi">Maori</option>
+                            <option value="mr">Marathi</option>
+                            <option value="mn">Mongol</option>
+                            <option value="ne">Népalais</option>
+                            <option value="no">Norvégien</option>
+                            <option value="ny">Nyanja</option>
+                            <option value="uz">Ouïghour</option>
+                            <option value="ur">Ourdou</option>
+                            <option value="ps">Pachto</option>
+                            <option value="pa">Pendjabi</option>
+                            <option value="fa">Persan</option>
+                            <option value="pl">Polonais</option>
+                            <option value="pt">Portugais</option>
+                            <option value="ro">Roumain</option>
+                            <option value="ru">Russe</option>
+                            <option value="sm">Samoan</option>
+                            <option value="sr">Serbe</option>
+                            <option value="st">Sesotho</option>
+                            <option value="sn">Shona</option>
+                            <option value="sd">Sindhi</option>
+                            <option value="si">Cingalais</option>
+                            <option value="sk">Slovaque</option>
+                            <option value="sl">Slovène</option>
+                            <option value="so">Somali</option>
+                            <option value="su">Soundanais</option>
+                            <option value="sv">Suédois</option>
+                            <option value="sw">Swahili</option>
+                            <option value="tg">Tadjik</option>
+                            <option value="tl">Tagalog</option>
+                            <option value="ta">Tamoul</option>
+                            <option value="cs">Tchèque</option>
+                            <option value="te">Télougou</option>
+                            <option value="th">Thaï</option>
+                            <option value="tr">Turc</option>
+                            <option value="uk">Ukrainien</option>
+                            <option value="vi">Vietnamien</option>
+                            <option value="xh">Xhosa</option>
+                            <option value="yi">Yiddish</option>
+                            <option value="yo">Yoruba</option>
+                            <option value="zu">Zoulou</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Options avancées -->
+                <div class="advanced-options">
+                    <div class="option-toggle">
+                        <input type="checkbox" id="preserve-quotes" checked>
+                        <label for="preserve-quotes">Préserver les citations en langue étrangère</label>
+                    </div>
+                    <div class="warning">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        <span>Pour l’instant, les formules et les images ne sont pas préservées de façon fiable (fonctionnalité en développement).</span>
+                    </div>
+                </div>
+
+                <!-- Configuration colonne tabulaire -->
+                <div class="table-column-config" id="table-column-config">
+                    <div class="table-column-grid">
+                        <div class="config-group">
+                            <label for="table-column-name">Colonne (nom)</label>
+                            <input type="text" id="table-column-name" placeholder="Ex: Commentaire" list="table-columns-datalist">
+                            <datalist id="table-columns-datalist"></datalist>
+                            <div class="hint" id="table-columns-hint">Saisir le nom exact de la colonne (CSV/XLSX).</div>
+                            <div id="table-columns-suggestions" class="hint" style="margin-top:6px;"></div>
+                        </div>
+                        <div class="config-group">
+                            <label for="table-columns-multi">Colonnes (multi)</label>
+                            <select id="table-columns-multi" multiple size="6" style="width:100%;"></select>
+                            <div class="hint">Optionnel : sélectionnez une ou plusieurs colonnes (prioritaire sur nom/index).</div>
+                        </div>
+                        <div class="config-group">
+                            <label for="table-column-index">Colonne (index 0-based)</label>
+                            <input type="number" id="table-column-index" min="0" step="1" placeholder="Ex: 0">
+                            <div class="hint">Alternative au nom. Laisser vide si non utilisé.</div>
+                        </div>
+                        <div class="config-group">
+                            <label for="table-output-column">Nom de colonne de sortie (optionnel)</label>
+                            <input type="text" id="table-output-column" placeholder="Ex: Commentaire_traduit_en">
+                            <div class="hint">Si vide, une colonne *_translated_<lang> est créée. En multi-colonnes, ce champ sert de suffixe (ex: translated_en).</div>
+                        </div>
+                        <div class="config-group" style="justify-content:flex-end;">
+                            <div class="option-toggle" style="margin-top: 28px;">
+                                <input type="checkbox" id="table-replace">
+                                <label for="table-replace">Remplacer la colonne d'origine</label>
+                            </div>
+                            <div class="hint">Sinon, le fichier conserve la colonne originale.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bouton traduire -->
+                <button class="translate-button" id="translate-btn">
+                    <i class="fas fa-language"></i> Traduire le document
+                </button>
+            </div>
+
+            <!-- Section de traitement -->
+            <div class="processing-section" id="processing">
+                <div class="spinner"></div>
+                <div class="processing-text">Traduction en cours...</div>
+                <div class="progress-details" id="processing-hint" style="color:#6b7280; font-size:0.95rem; margin-top:8px;">
+                    Cela peut prendre de quelques secondes à quelques minutes selon la longueur du document.
+                </div>
+                <div class="progress-details" id="progress-details"></div>
+                <button class="stop-button" id="stop-btn">
+                    <i class="fas fa-stop"></i> Arrêter la traduction
+                </button>
+            </div>
+
+            <!-- Section résultats -->
+            <div class="results-section" id="results">
+                <div class="results-header">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Traduction terminée</h3>
+                </div>
+                <button class="download-button" id="download-btn">
+                    <i class="fas fa-download"></i>
+                    Télécharger le document traduit
+                </button>
+                <div class="result-details" id="result-details"></div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+
+    <script>
+        let currentFile = null;
+        let translatedFilePath = null;
+        let currentTaskId = null;
+        let currentMode = 'document';
+
+        // Éléments DOM
+        const uploadZone = document.getElementById('upload-zone');
+        const fileInput = document.getElementById('file-input');
+        const fileInfo = document.getElementById('file-info');
+        const processing = document.getElementById('processing');
+        const results = document.getElementById('results');
+        const translateBtn = document.getElementById('translate-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const resultDetails = document.getElementById('result-details');
+
+        const modePillDocument = document.getElementById('mode-pill-document');
+        const modePillTable = document.getElementById('mode-pill-table');
+        const tableConfig = document.getElementById('table-column-config');
+
+        const tableColumnNameInput = document.getElementById('table-column-name');
+        const tableColumnsDatalist = document.getElementById('table-columns-datalist');
+        const tableColumnsHint = document.getElementById('table-columns-hint');
+        const tableColumnsSuggestions = document.getElementById('table-columns-suggestions');
+        const tableColumnsMultiSelect = document.getElementById('table-columns-multi');
+
+        async function fetchTableColumns() {
+            if (!currentFile) return;
+            if (!tableColumnsDatalist || !tableColumnsHint || !tableColumnsSuggestions) return;
+
+            tableColumnsHint.textContent = 'Chargement des colonnes…';
+            tableColumnsSuggestions.textContent = '';
+            tableColumnsDatalist.innerHTML = '';
+            if (tableColumnsMultiSelect) tableColumnsMultiSelect.innerHTML = '';
+
+            const fd = new FormData();
+            fd.append('file', currentFile);
+
+            try {
+                const resp = await fetch('/api/translate/table-columns', { method: 'POST', body: fd });
+                const data = await resp.json().catch(() => null);
+                if (!resp.ok || !data || !data.success) {
+                    const msg = (data && data.error) ? data.error : `HTTP ${resp.status}`;
+                    tableColumnsHint.textContent = `Colonnes indisponibles (${msg})`;
+                    return;
+                }
+
+                const cols = Array.isArray(data.columns) ? data.columns : [];
+                for (const c of cols) {
+                    const opt = document.createElement('option');
+                    opt.value = c.name;
+                    tableColumnsDatalist.appendChild(opt);
+
+                    if (tableColumnsMultiSelect) {
+                        const opt2 = document.createElement('option');
+                        opt2.value = c.name;
+                        opt2.textContent = c.name;
+                        tableColumnsMultiSelect.appendChild(opt2);
+                    }
+                }
+
+                const suggested = Array.isArray(data.suggested) ? data.suggested : [];
+                if (suggested.length) {
+                    tableColumnsHint.textContent = 'Suggestions (cliquez pour remplir) :';
+                    tableColumnsSuggestions.innerHTML = suggested.map(n =>
+                        `<button type="button" class="mode-pill" style="margin:4px 6px 0 0;" data-col="${String(n).replace(/"/g, '&quot;')}">${String(n)}</button>`
+                    ).join('');
+                    tableColumnsSuggestions.querySelectorAll('button[data-col]').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const v = btn.getAttribute('data-col') || '';
+                            if (tableColumnNameInput) tableColumnNameInput.value = v;
+                            const idxInput = document.getElementById('table-column-index');
+                            if (idxInput) idxInput.value = '';
+
+                            if (tableColumnsMultiSelect) {
+                                for (const o of Array.from(tableColumnsMultiSelect.options)) {
+                                    o.selected = (o.value === v);
+                                }
+                            }
+                        });
+                    });
+                    if (tableColumnNameInput && !tableColumnNameInput.value && suggested[0]) {
+                        tableColumnNameInput.value = suggested[0];
+                    }
+                } else {
+                    tableColumnsHint.textContent = 'Colonnes détectées (vous pouvez commencer à taper pour voir les propositions).';
+                    tableColumnsSuggestions.textContent = '';
+                }
+            } catch (e) {
+                tableColumnsHint.textContent = `Colonnes indisponibles (${e.message || 'erreur'})`;
+            }
+        }
+
+        // Formatage temps
+        function formatTime(seconds) {
+            if (!seconds && seconds !== 0) return '';
+            seconds = Math.round(seconds);
+            if (seconds < 60) return seconds + 's';
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return m + 'm' + (s > 0 ? ' ' + s + 's' : '');
+        }
+
+        // Icônes par type de fichier
+        const fileIcons = {
+            'txt': 'fa-file-alt',
+            'pdf': 'fa-file-pdf',
+            'docx': 'fa-file-word',
+            'html': 'fa-file-code',
+            'htm': 'fa-file-code',
+            'md': 'fa-file-alt',
+            'markdown': 'fa-file-alt',
+            'csv': 'fa-file-csv',
+            'json': 'fa-file-code',
+            'jpg': 'fa-file-image',
+            'jpeg': 'fa-file-image',
+            'png': 'fa-file-image',
+            'bmp': 'fa-file-image',
+            'tiff': 'fa-file-image',
+            'tif': 'fa-file-image'
+        };
+
+        // Gestion du drag & drop
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // Gérer le fichier sélectionné
+        function handleFile(file) {
+            currentFile = file;
+            
+            const fileName = file.name;
+            const fileSize = formatFileSize(file.size);
+            const fileExt = fileName.split('.').pop().toLowerCase();
+            const fileType = fileExt.toUpperCase();
+            
+            // Icône selon le type
+            const iconClass = fileIcons[fileExt] || 'fa-file';
+            document.getElementById('file-icon').className = `fas ${iconClass} file-icon`;
+            
+            // Afficher les infos
+            document.getElementById('file-name').textContent = fileName;
+            document.getElementById('file-size').textContent = fileSize;
+            document.getElementById('file-type').textContent = fileType;
+            
+            // Afficher la section de configuration
+            uploadZone.style.display = 'none';
+            fileInfo.style.display = 'block';
+            results.style.display = 'none';
+
+            // Mode par défaut selon extension
+            if (['xlsx', 'parquet'].includes(fileExt) || fileExt === 'tsv') {
+                setMode('table');
+            } else {
+                setMode('document');
+            }
+
+            // Si on est en mode table, proposer immédiatement les colonnes
+            if (currentMode === 'table') {
+                try { fetchTableColumns(); } catch (e) {}
+            }
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            const isTable = mode === 'table';
+
+            modePillDocument.classList.toggle('active', !isTable);
+            modePillTable.classList.toggle('active', isTable);
+
+            const docRadio = modePillDocument.querySelector('input');
+            const tableRadio = modePillTable.querySelector('input');
+            if (docRadio) docRadio.checked = !isTable;
+            if (tableRadio) tableRadio.checked = isTable;
+
+            // Affichage section colonne
+            tableConfig.style.display = isTable ? 'block' : 'none';
+
+            // Stop/progression uniquement pour document complet
+            stopBtn.style.display = isTable ? 'none' : 'inline-flex';
+            document.getElementById('progress-details').style.display = isTable ? 'none' : 'block';
+
+            // Libellés
+            translateBtn.innerHTML = isTable
+                ? '<i class="fas fa-language"></i> Traduire une colonne'
+                : '<i class="fas fa-language"></i> Traduire le document';
+            downloadBtn.innerHTML = isTable
+                ? '<i class="fas fa-download"></i> Télécharger le fichier traduit'
+                : '<i class="fas fa-download"></i> Télécharger le document traduit';
+
+            // Reset détails
+            resultDetails.textContent = '';
+
+            // Si mode table + fichier présent, proposer automatiquement les colonnes
+            if (isTable && currentFile) {
+                fetchTableColumns();
+            }
+        }
+
+        modePillDocument.addEventListener('click', () => setMode('document'));
+        modePillTable.addEventListener('click', () => setMode('table'));
+
+        // Formater la taille du fichier
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // Traduire le document
+        translateBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+
+            const targetLang = document.getElementById('target-lang').value;
+            const sourceLang = document.getElementById('source-lang').value;
+            const preserveQuotes = document.getElementById('preserve-quotes').checked;
+
+            // Afficher le traitement
+            fileInfo.style.display = 'none';
+            processing.style.display = 'block';
+            document.getElementById('progress-details').textContent = '';
+            document.querySelector('.processing-text').textContent = currentMode === 'table' ? 'Traitement en cours...' : 'Traduction en cours...';
+            const hintEl = document.getElementById('processing-hint');
+            if (hintEl) {
+                const hasSize = currentFile && typeof currentFile.size === 'number' && isFinite(currentFile.size) && currentFile.size > 0;
+                const sizeTxt = hasSize ? ` (${formatFileSize(currentFile.size)})` : '';
+                hintEl.textContent = 'Cela peut prendre de quelques secondes à quelques minutes selon la longueur du document' + sizeTxt + '.';
+            }
+            stopBtn.disabled = false;
+            stopBtn.innerHTML = '<i class="fas fa-stop"></i> Arrêter la traduction';
+            currentTaskId = null;
+            translatedFilePath = null;
+            resultDetails.textContent = '';
+
+            try {
+                if (currentMode === 'table') {
+                    // Traduction colonne tabulaire (synchrone)
+                    const columnName = document.getElementById('table-column-name').value.trim();
+                    const columnIndex = document.getElementById('table-column-index').value;
+                    const replaceColumn = document.getElementById('table-replace').checked;
+                    const outputColumn = document.getElementById('table-output-column').value.trim();
+
+                    const multiCols = tableColumnsMultiSelect
+                        ? Array.from(tableColumnsMultiSelect.selectedOptions).map(o => (o && o.value) ? o.value : '').filter(v => v)
+                        : [];
+
+                    if (multiCols.length > 0) {
+                        // Traduction multi-colonnes en une passe
+                        const tableForm = new FormData();
+                        tableForm.append('file', currentFile);
+                        tableForm.append('target_lang', targetLang);
+                        tableForm.append('source_lang', sourceLang);
+                        tableForm.append('replace', replaceColumn ? 'true' : 'false');
+                        if (outputColumn) tableForm.append('output_suffix', outputColumn);
+                        tableForm.append('columns', JSON.stringify(multiCols));
+
+                        const response = await fetch('/api/translate/table-columns-batch', {
+                            method: 'POST',
+                            body: tableForm
+                        });
+
+                        const result = await response.json();
+                        if (response.ok && result.success) {
+                            translatedFilePath = result.output_path;
+                            processing.style.display = 'none';
+                            results.style.display = 'block';
+                            document.querySelector('.results-header h3').textContent = 'Traduction terminée';
+
+                            const rep = (result.report && result.report.translation) ? result.report.translation : null;
+                            if (rep && Array.isArray(rep.reports)) {
+                                const totalTranslated = rep.reports.reduce((acc, r) => acc + (r.translated_cells ?? 0), 0);
+                                const totalSkippedEmpty = rep.reports.reduce((acc, r) => acc + (r.skipped_empty ?? 0), 0);
+                                const totalSkippedMath = rep.reports.reduce((acc, r) => acc + (r.skipped_math ?? 0), 0);
+                                const lines = [];
+                                lines.push(`Colonnes: ${(rep.columns && rep.columns.length) ? rep.columns.length : rep.reports.length}`);
+                                lines.push(`Cellules traduites: ${totalTranslated}`);
+                                if (totalSkippedEmpty) lines.push(`Vides ignorées: ${totalSkippedEmpty}`);
+                                if (totalSkippedMath) lines.push(`Formules ignorées: ${totalSkippedMath}`);
+                                if (typeof rep.shared_cache_size === 'number') lines.push(`Cache partagé: ${rep.shared_cache_size}`);
+                                resultDetails.textContent = lines.join(' • ');
+                            } else {
+                                resultDetails.textContent = '';
+                            }
+                        } else {
+                            alert('Erreur lors de la traduction: ' + (result.error || 'Erreur inconnue'));
+                            processing.style.display = 'none';
+                            fileInfo.style.display = 'block';
+                        }
+
+                        return;
+                    }
+
+                    if (!columnName && (columnIndex === null || String(columnIndex).trim() === '')) {
+                        alert("Veuillez renseigner 'Colonne (nom)' ou 'Colonne (index)'.");
+                        processing.style.display = 'none';
+                        fileInfo.style.display = 'block';
+                        return;
+                    }
+
+                    const tableForm = new FormData();
+                    tableForm.append('file', currentFile);
+                    tableForm.append('target_lang', targetLang);
+                    tableForm.append('source_lang', sourceLang);
+                    tableForm.append('replace', replaceColumn ? 'true' : 'false');
+                    if (outputColumn) tableForm.append('output_column', outputColumn);
+                    if (columnName) tableForm.append('column', columnName);
+                    if (!columnName && String(columnIndex).trim() !== '') tableForm.append('column_index', String(columnIndex));
+
+                    const response = await fetch('/api/translate/table-column', {
+                        method: 'POST',
+                        body: tableForm
+                    });
+
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        translatedFilePath = result.output_path;
+                        processing.style.display = 'none';
+                        results.style.display = 'block';
+                        document.querySelector('.results-header h3').textContent = 'Traduction terminée';
+
+                        const rep = (result.report && result.report.translation) ? result.report.translation : null;
+                        if (rep) {
+                            const translated = rep.translated_cells ?? 0;
+                            const uniques = rep.unique_values ?? null;
+                            const skipped = rep.skipped_cells ?? null;
+                            const lines = [];
+                            lines.push(`Cellules traduites: ${translated}`);
+                            if (uniques !== null) lines.push(`Valeurs uniques: ${uniques}`);
+                            if (skipped !== null) lines.push(`Cellules ignorées: ${skipped}`);
+                            resultDetails.textContent = lines.join(' • ');
+                        } else {
+                            resultDetails.textContent = '';
+                        }
+                    } else {
+                        alert('Erreur lors de la traduction: ' + (result.error || 'Erreur inconnue'));
+                        processing.style.display = 'none';
+                        fileInfo.style.display = 'block';
+                    }
+                } else {
+                    // Traduction document complet (asynchrone)
+                    const formData = new FormData();
+                    formData.append('file', currentFile);
+                    formData.append('target_lang', targetLang);
+                    formData.append('preserve_foreign_quotes', preserveQuotes);
+
+                    const response = await fetch('/api/translate', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok && result.success) {
+                        currentTaskId = result.task_id;
+
+                        // Interroger la progression régulièrement
+                        const checkProgress = async () => {
+                            try {
+                                const progressResponse = await fetch(`/api/translate/progress/${encodeURIComponent(currentTaskId)}`);
+                                const progressData = await progressResponse.json();
+
+                                if (progressData.success) {
+                                    if (progressData.status === 'missing') {
+                                        alert(progressData.message || 'La tâche de traduction n\'est plus disponible. Relancez la traduction.');
+                                        processing.style.display = 'none';
+                                        fileInfo.style.display = 'block';
+                                        return;
+                                    }
+                                    if (progressData.status === 'processing') {
+                                        if (progressData.total_pages > 0) {
+                                            let info = `Page ${progressData.current_page} sur ${progressData.total_pages}`;
+                                            if (progressData.avg_per_page) {
+                                                const avg = progressData.avg_per_page;
+                                                const remainingPages = Math.max(0, progressData.total_pages - progressData.current_page);
+                                                const remainingSeconds = Math.round(remainingPages * avg);
+                                                info += ` — env. ${formatTime(remainingSeconds)} restant (${formatTime(avg)}/page)`;
+                                            } else if (progressData.elapsed_seconds) {
+                                                info += ` — ${formatTime(progressData.elapsed_seconds)} écoulé`;
+                                            }
+                                            document.getElementById('progress-details').textContent = info;
+                                        }
+                                        setTimeout(checkProgress, 500);
+                                    } else if (progressData.status === 'completed') {
+                                        translatedFilePath = progressData.output_path;
+                                        processing.style.display = 'none';
+                                        results.style.display = 'block';
+                                        document.querySelector('.results-header h3').textContent = 'Traduction terminée';
+                                    } else if (progressData.status === 'stopped') {
+                                        translatedFilePath = progressData.output_path;
+                                        processing.style.display = 'none';
+                                        results.style.display = 'block';
+                                        document.querySelector('.results-header h3').textContent = 'Traduction partielle disponible';
+                                    } else if (progressData.status === 'error') {
+                                        alert('Erreur lors de la traduction: ' + (progressData.error || 'Erreur inconnue'));
+                                        processing.style.display = 'none';
+                                        fileInfo.style.display = 'block';
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('Erreur récupération progression:', error);
+                                setTimeout(checkProgress, 1000);
+                            }
+                        };
+
+                        checkProgress();
+                    } else {
+                        alert('Erreur lors du lancement de la traduction: ' + (result.error || 'Erreur inconnue'));
+                        processing.style.display = 'none';
+                        fileInfo.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la traduction');
+                processing.style.display = 'none';
+                fileInfo.style.display = 'block';
+            }
+        });
+
+        // Arrêter la traduction
+        stopBtn.addEventListener('click', async () => {
+            if (!currentTaskId) return;
+            
+            try {
+                const response = await fetch(`/api/translate/stop/${encodeURIComponent(currentTaskId)}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (result && result.success) {
+                    document.querySelector('.processing-text').textContent = 'Arrêt en cours, sauvegarde du fichier partiel...';
+                    stopBtn.disabled = true;
+                    stopBtn.textContent = 'Arrêt en cours...';
+                } else {
+                    // Si le backend renvoie un message, l'afficher; sinon fallback.
+                    alert('Erreur lors de l\'arrêt: ' + ((result && (result.error || result.message)) || 'Erreur inconnue'));
+                }
+            } catch (error) {
+                console.error('Erreur arrêt:', error);
+                alert('Erreur lors de l\'arrêt de la traduction');
+            }
+        });
+
+        // Télécharger le résultat
+        downloadBtn.addEventListener('click', () => {
+            if (translatedFilePath) {
+                window.location.href = `/download/${encodeURIComponent(translatedFilePath)}`;
+            }
+        });
+
+        // Effet typewriter pour le titre
+        function typeWriter(element, text, speed, callback) {
+            let i = 0;
+            element.textContent = '';
+            element.style.opacity = '1';
+            
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else if (callback) {
+                    setTimeout(callback, 300);
+                }
+            }
+            type();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const title = document.querySelector('.logos-header h1');
+            if (title) {
+                typeWriter(title, 'TRADUCTEUR', 80);
+            }
+        });
+    </script>
+</body>
+</html>

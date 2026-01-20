@@ -1,0 +1,318 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Anderson-Darling : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Anderson-Darling : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La divergence de Anderson-Darling émerge comme un outil fondamental
+dans l’analyse statistique, particulièrement dans le cadre des tests
+d’ajustement. Son origine remonte aux travaux pionniers de Anderson et
+Darling en 1952, qui cherchaient à améliorer les tests d’ajustement de
+Kolmogorov-Smirnov. La motivation principale derrière cette divergence
+est de fournir une métrique plus sensible aux écarts dans les queues des
+distributions, là où les tests traditionnels peuvent montrer des
+lacunes.</p>
+<p>Cette divergence est indispensable dans de nombreux domaines,
+notamment en finance pour l’évaluation des risques, en ingénierie pour
+la fiabilité des systèmes, et en sciences naturelles pour l’analyse des
+données environnementales. Son importance réside dans sa capacité à
+détecter des écarts subtils entre une distribution empirique et une
+distribution théorique, ce qui est crucial pour la validation des
+modèles statistiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre la divergence de Anderson-Darling, il est essentiel
+de définir quelques concepts préliminaires. Considérons une distribution
+empirique <span class="math inline">\(F_n(x)\)</span> basée sur un
+échantillon de taille <span class="math inline">\(n\)</span>, et une
+distribution théorique <span class="math inline">\(F(x)\)</span>. Nous
+cherchons à mesurer l’écart entre ces deux distributions.</p>
+<p>La divergence de Anderson-Darling est une mesure de la distance entre
+<span class="math inline">\(F_n(x)\)</span> et <span
+class="math inline">\(F(x)\)</span>, pondérée pour accentuer les écarts
+dans les queues. Intuitivement, nous voulons une mesure qui soit
+sensible aux différences dans les régions où <span
+class="math inline">\(F(x)\)</span> est proche de 0 ou de 1.</p>
+<p>Formellement, la divergence de Anderson-Darling <span
+class="math inline">\(A^2\)</span> est définie comme suit :</p>
+<p><span class="math display">\[A^2 = n \int_{-\infty}^{\infty}
+\frac{(F_n(x) - F(x))^2}{F(x)(1-F(x))} dF(x)\]</span></p>
+<p>Cette intégrale peut être réécrite en utilisant les points de rupture
+<span class="math inline">\(x_{(i)}\)</span> de l’échantillon trié :</p>
+<p><span class="math display">\[A^2 = -n - \frac{1}{n} \sum_{i=1}^n (2i
+- 1) \left[ \ln(F(x_{(i)})) + \ln(1 - F(x_{(n+1-i)}))
+\right]\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la divergence de Anderson-Darling est
+celui de sa distribution asymptotique sous l’hypothèse nulle. Ce
+théorème permet de déterminer les valeurs critiques pour les tests
+d’ajustement.</p>
+<div class="theorem">
+<p>Sous l’hypothèse nulle que l’échantillon provient d’une distribution
+<span class="math inline">\(F\)</span>, la statistique de
+Anderson-Darling <span class="math inline">\(A^2\)</span> converge en
+loi vers une distribution connue, indépendante de <span
+class="math inline">\(F\)</span>.</p>
+<p>Formellement, si <span class="math inline">\(F_n(x)\)</span> est la
+fonction de répartition empirique d’un échantillon aléatoire de taille
+<span class="math inline">\(n\)</span> provenant d’une distribution
+<span class="math inline">\(F\)</span>, alors :</p>
+<p><span class="math display">\[A^2 \xrightarrow{d}
+A^2_{\infty}\]</span></p>
+<p>où <span class="math inline">\(A^2_{\infty}\)</span> est une variable
+aléatoire dont la distribution peut être approchée par des tables de
+valeurs critiques.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>La preuve du théorème de la distribution asymptotique de
+Anderson-Darling repose sur des résultats avancés en théorie des
+probabilités et en statistique mathématique. Nous allons esquisser les
+étapes principales.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la statistique de Anderson-Darling :</p>
+<p><span class="math display">\[A^2 = n \int_{-\infty}^{\infty}
+\frac{(F_n(x) - F(x))^2}{F(x)(1-F(x))} dF(x)\]</span></p>
+<p>Nous pouvons réécrire cette intégrale en utilisant les points de
+rupture <span class="math inline">\(x_{(i)}\)</span> :</p>
+<p><span class="math display">\[A^2 = -n - \frac{1}{n} \sum_{i=1}^n (2i
+- 1) \left[ \ln(F(x_{(i)})) + \ln(1 - F(x_{(n+1-i)}))
+\right]\]</span></p>
+<p>Pour établir la distribution asymptotique, nous utilisons le fait que
+<span class="math inline">\(F_n(x)\)</span> converge uniformément vers
+<span class="math inline">\(F(x)\)</span> presque sûrement. En outre,
+nous appliquons le théorème central limite pour les processus
+empiriques.</p>
+<p>En utilisant des résultats de Billingsley (1968) sur la convergence
+des processus empiriques, nous pouvons montrer que :</p>
+<p><span class="math display">\[\sqrt{n} (F_n(x) - F(x)) \xrightarrow{d}
+B(F(x))\]</span></p>
+<p>où <span class="math inline">\(B\)</span> est le pont brownien. En
+combinant ces résultats, nous obtenons la convergence en loi de <span
+class="math inline">\(A^2\)</span> vers une distribution connue. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La divergence de Anderson-Darling possède plusieurs propriétés
+intéressantes qui en font un outil puissant pour les tests
+d’ajustement.</p>
+<ol>
+<li><p>Sensibilité aux queues : La divergence de Anderson-Darling est
+particulièrement sensible aux écarts dans les queues des distributions,
+ce qui la rend supérieure aux tests de Kolmogorov-Smirnov pour certaines
+applications.</p></li>
+<li><p>Indépendance de la distribution : La distribution asymptotique de
+<span class="math inline">\(A^2\)</span> est indépendante de la
+distribution théorique <span class="math inline">\(F\)</span>, ce qui
+simplifie l’utilisation des tables de valeurs critiques.</p></li>
+<li><p>Consistance : La statistique <span
+class="math inline">\(A^2\)</span> est consistante contre toutes les
+alternatives, c’est-à-dire qu’elle détecte tout écart entre <span
+class="math inline">\(F_n(x)\)</span> et <span
+class="math inline">\(F(x)\)</span> lorsque la taille de l’échantillon
+tend vers l’infini.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La divergence de Anderson-Darling est un outil essentiel dans
+l’arsenal des statisticiens pour les tests d’ajustement. Sa capacité à
+détecter les écarts dans les queues des distributions en fait un choix
+privilégié pour de nombreuses applications pratiques. En comprenant ses
+définitions, théorèmes et propriétés, nous pouvons mieux apprécier son
+importance et son utilité dans l’analyse statistique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

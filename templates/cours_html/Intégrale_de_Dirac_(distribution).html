@@ -1,0 +1,339 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Intégrale de Dirac : Une Exploration des Distributions</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Intégrale de Dirac : Une Exploration des
+Distributions</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’intégrale de Dirac, souvent associée à la fameuse <em>fonction</em>
+<span class="math inline">\(\delta\)</span>, est un concept fondamental
+en analyse mathématique et physique théorique. Introduite par le
+physicien Paul Dirac dans les années 1920 pour modéliser des phénomènes
+quantiques, cette notion a évolué vers une théorie rigoureuse des
+distributions grâce aux travaux de Laurent Schwartz dans les années
+1940.</p>
+<p>L’intégrale de Dirac émerge comme une réponse à la nécessité de
+modéliser des phénomènes physiques où des sources ponctuelles ou des
+impulsions instantanées jouent un rôle crucial. Par exemple, en
+électromagnétisme, une charge ponctuelle peut être modélisée par une
+distribution de Dirac. En traitement du signal, l’intégrale de Dirac est
+utilisée pour représenter des impulsions unitaires.</p>
+<p>Dans ce chapitre, nous explorerons les fondements mathématiques de
+l’intégrale de Dirac, ses définitions formelles, ses propriétés et ses
+applications. Nous verrons comment cette notion permet de résoudre des
+problèmes qui seraient autrement inaccessibles avec les outils
+classiques de l’analyse.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’intégrale de Dirac, commençons par explorer ce que
+nous cherchons à capturer. Imaginons une fonction qui est nulle partout
+sauf en un point, où elle prend une valeur infinie, mais de telle sorte
+que l’aire sous la courbe reste finie et égale à un. Cette idée
+intuitive est au cœur de l’intégrale de Dirac.</p>
+<p>Formellement, la distribution de Dirac <span
+class="math inline">\(\delta\)</span> est définie par les propriétés
+suivantes :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mathcal{D}(\mathbb{R})\)</span>
+l’espace des fonctions tests infiniment dérivables à support compact. La
+distribution de Dirac <span class="math inline">\(\delta\)</span> est
+l’application linéaire continue <span class="math inline">\(\delta :
+\mathcal{D}(\mathbb{R}) \rightarrow \mathbb{R}\)</span> définie par :
+<span class="math display">\[\delta(\phi) = \phi(0), \quad \forall \phi
+\in \mathcal{D}(\mathbb{R}).\]</span></p>
+</div>
+<p>Une autre manière de formuler cette définition est la suivante :</p>
+<div class="definition">
+<p>La distribution de Dirac <span class="math inline">\(\delta\)</span>
+est l’élément de <span
+class="math inline">\(\mathcal{D}&#39;(\mathbb{R})\)</span> (l’espace
+des distributions sur <span class="math inline">\(\mathbb{R}\)</span>)
+tel que pour toute fonction test <span class="math inline">\(\phi \in
+\mathcal{D}(\mathbb{R})\)</span>, <span class="math display">\[\langle
+\delta, \phi \rangle = \int_{\mathbb{R}} \delta(x) \phi(x) \, dx =
+\phi(0).\]</span></p>
+</div>
+<p>Cette définition montre que l’intégrale de Dirac agit comme un
+évaluateur en zéro pour les fonctions tests.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux liés à l’intégrale de Dirac est le
+théorème de représentation, qui montre comment la distribution de Dirac
+peut être approchée par des fonctions régulières.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(\{\delta_n\}\)</span> une suite de
+fonctions dans <span class="math inline">\(L^1(\mathbb{R})\)</span>
+telle que : <span class="math display">\[\delta_n \geq 0, \quad
+\int_{\mathbb{R}} \delta_n(x) \, dx = 1, \quad \text{et} \quad \lim_{n
+\rightarrow \infty} \int_{\mathbb{R}} |x| \delta_n(x) \, dx =
+0.\]</span> Alors, pour toute fonction test <span
+class="math inline">\(\phi \in \mathcal{D}(\mathbb{R})\)</span>, <span
+class="math display">\[\lim_{n \rightarrow \infty} \int_{\mathbb{R}}
+\delta_n(x) \phi(x) \, dx = \phi(0).\]</span></p>
+</div>
+<p>Ce théorème montre que la distribution de Dirac peut être approchée
+par des fonctions régulières dont le support se concentre autour de
+zéro.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de représentation, nous procédons comme suit
+:</p>
+<div class="preuve">
+<p>Soit <span class="math inline">\(\phi \in
+\mathcal{D}(\mathbb{R})\)</span>. Nous avons : <span
+class="math display">\[\left| \int_{\mathbb{R}} \delta_n(x) \phi(x) \,
+dx - \phi(0) \right| = \left| \int_{\mathbb{R}} \delta_n(x) (\phi(x) -
+\phi(0)) \, dx \right|.\]</span> En utilisant l’inégalité de
+Cauchy-Schwarz, nous obtenons : <span class="math display">\[\left|
+\int_{\mathbb{R}} \delta_n(x) (\phi(x) - \phi(0)) \, dx \right| \leq
+\left( \int_{\mathbb{R}} \delta_n(x) \, dx \right)^{1/2} \left(
+\int_{\mathbb{R}} \delta_n(x) |\phi(x) - \phi(0)|^2 \, dx
+\right)^{1/2}.\]</span> Puisque <span
+class="math inline">\(\int_{\mathbb{R}} \delta_n(x) \, dx = 1\)</span>,
+cela se simplifie en : <span class="math display">\[\left|
+\int_{\mathbb{R}} \delta_n(x) (\phi(x) - \phi(0)) \, dx \right| \leq
+\left( \int_{\mathbb{R}} \delta_n(x) |\phi(x) - \phi(0)|^2 \, dx
+\right)^{1/2}.\]</span> Comme <span class="math inline">\(\phi\)</span>
+est continuellement dérivable et à support compact, elle est bornée. De
+plus, pour tout <span class="math inline">\(\epsilon &gt; 0\)</span>, il
+existe un voisinage <span class="math inline">\(V\)</span> de zéro tel
+que pour tout <span class="math inline">\(x \in V\)</span>, <span
+class="math inline">\(|\phi(x) - \phi(0)| &lt; \epsilon\)</span>. En
+utilisant l’hypothèse <span class="math inline">\(\lim_{n \rightarrow
+\infty} \int_{\mathbb{R}} |x| \delta_n(x) \, dx = 0\)</span>, nous
+pouvons montrer que : <span class="math display">\[\lim_{n \rightarrow
+\infty} \int_{\mathbb{R}} \delta_n(x) |\phi(x) - \phi(0)|^2 \, dx =
+0.\]</span> Ainsi, nous avons : <span class="math display">\[\lim_{n
+\rightarrow \infty} \left| \int_{\mathbb{R}} \delta_n(x) (\phi(x) -
+\phi(0)) \, dx \right| = 0,\]</span> ce qui prouve le théorème.</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’intégrale de Dirac possède plusieurs propriétés intéressantes. En
+voici quelques-unes :</p>
+<ul>
+<li><p><strong>Propriété de translation</strong> : Pour tout <span
+class="math inline">\(a \in \mathbb{R}\)</span>, <span
+class="math display">\[\langle \delta_{a}, \phi \rangle = \phi(a), \quad
+\forall \phi \in \mathcal{D}(\mathbb{R}).\]</span> Cette propriété
+montre que la distribution de Dirac peut être translatée.</p></li>
+<li><p><strong>Propriété de dérivation</strong> : La dérivée de la
+distribution de Dirac <span class="math inline">\(\delta&#39;\)</span>
+est définie par : <span class="math display">\[\langle \delta&#39;, \phi
+\rangle = -\langle \delta, \phi&#39; \rangle = -\phi&#39;(0), \quad
+\forall \phi \in \mathcal{D}(\mathbb{R}).\]</span> Cette propriété est
+cruciale pour résoudre des équations différentielles avec des conditions
+aux limites ponctuelles.</p></li>
+<li><p><strong>Propriété de convolution</strong> : Pour toute fonction
+<span class="math inline">\(f \in L^1(\mathbb{R})\)</span>, <span
+class="math display">\[(f * \delta)(x) = f(x), \quad \forall x \in
+\mathbb{R}.\]</span> Cette propriété montre que la convolution avec la
+distribution de Dirac laisse les fonctions invariantes.</p></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’intégrale de Dirac, bien que simple en apparence, est un outil
+puissant et polyvalent en analyse mathématique et physique théorique.
+Ses propriétés uniques permettent de modéliser des phénomènes complexes
+et de résoudre des problèmes qui seraient autrement inaccessibles. Grâce
+aux travaux rigoureux de Laurent Schwartz, la distribution de Dirac est
+désormais un concept bien établi dans la théorie des distributions.</p>
+<p>En conclusion, l’intégrale de Dirac reste un sujet d’étude fascinant
+et continue d’inspirer des recherches dans divers domaines des
+mathématiques et de la physique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

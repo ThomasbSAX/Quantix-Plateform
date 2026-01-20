@@ -1,0 +1,301 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Aire de surface d’un ellipsoïde</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Aire de surface d’un ellipsoïde</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’ellipsoïde, surface quadrique généralisant la sphère, est
+omniprésent en physique et en ingénierie. Son aire de surface, bien que
+simple à définir intuitivement, pose des défis mathématiques subtils. Ce
+problème, abordé dès le 19ème siècle par des géomètres comme Carl
+Friedrich Gauss, trouve des applications en astronomie (modélisation de
+planètes), en mécanique des fluides (écoulements autour d’obstacles) et
+même en imagerie médicale.</p>
+<p>L’aire de surface d’un ellipsoïde standardisé est donnée par une
+formule élégante mais non triviale, impliquant des fonctions
+elliptiques. Comprendre cette formule et ses implications ouvre des
+perspectives sur la géométrie différentielle et les intégrales
+elliptiques.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Considérons d’abord un ellipsoïde dans <span
+class="math inline">\(\mathbb{R}^3\)</span> centré à l’origine.
+Intuitivement, nous voulons une surface où chaque point est à une
+distance proportionnelle de l’origine, mais avec des coefficients
+différents selon les axes.</p>
+<div class="definition">
+<p>Un ellipsoïde standardisé est l’ensemble des points <span
+class="math inline">\((x,y,z) \in \mathbb{R}^3\)</span> tels que <span
+class="math display">\[\frac{x^2}{a^2} + \frac{y^2}{b^2} +
+\frac{z^2}{c^2} = 1\]</span> où <span class="math inline">\(a, b, c &gt;
+0\)</span> sont les demi-axes de l’ellipsoïde.</p>
+</div>
+<p>Pour généraliser, nous introduisons la notion d’aire de surface. Pour
+une surface paramétrée <span
+class="math inline">\(\mathbf{r}(u,v)\)</span>, l’aire est donnée par
+<span class="math display">\[A = \iint_D \|\mathbf{r}_u \times
+\mathbf{r}_v\| \, du \, dv\]</span> où <span
+class="math inline">\(D\)</span> est le domaine de paramétrisation.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Le théorème suivant, dû à Carl Friedrich Gauss, donne une formule
+pour l’aire de surface d’un ellipsoïde.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(E\)</span> un ellipsoïde standardisé
+avec demi-axes <span class="math inline">\(a, b, c\)</span>. L’aire de
+surface <span class="math inline">\(A\)</span> est donnée par <span
+class="math display">\[A = 2\pi \left( c^2 \sin^{-1}\left(\frac{a}{c}
+\sqrt{\frac{c^2 - b^2}{a^2 - c^2}}\right) + a b
+\sin^{-1}\left(\frac{c}{a} \sqrt{\frac{a^2 - b^2}{c^2 - a^2}}\right) +
+\frac{a b c}{\sqrt{b^2 - c^2}} \left( \tan^{-1}\left(\frac{a}{c}
+\sqrt{\frac{b^2 - c^2}{a^2 - c^2}}\right) + \tan^{-1}\left(\frac{a}{b}
+\sqrt{\frac{b^2 - c^2}{a^2 - b^2}}\right) \right) \right)\]</span> sous
+les conditions <span class="math inline">\(a &gt; b &gt; c\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous utilisons une paramétrisation de
+l’ellipsoïde et calculons l’intégrale de surface.</p>
+<div class="preuve">
+<p>Considérons la paramétrisation suivante de l’ellipsoïde : <span
+class="math display">\[\mathbf{r}(\theta, \phi) = (a \sin\theta
+\cos\phi, b \sin\theta \sin\phi, c \cos\theta)\]</span> où <span
+class="math inline">\(\theta \in [0, \pi]\)</span> et <span
+class="math inline">\(\phi \in [0, 2\pi]\)</span>.</p>
+<p>Calculons les dérivées partielles : <span
+class="math display">\[\mathbf{r}_\theta = (a \cos\theta \cos\phi, b
+\cos\theta \sin\phi, -c \sin\theta)\]</span> <span
+class="math display">\[\mathbf{r}_\phi = (-a \sin\theta \sin\phi, b
+\sin\theta \cos\phi, 0)\]</span></p>
+<p>Le produit vectoriel est : <span
+class="math display">\[\mathbf{r}_\theta \times \mathbf{r}_\phi = (b c
+\sin^2\theta \cos\phi, a c \sin^2\theta \sin\phi, a b \sin\theta
+\cos\theta)\]</span></p>
+<p>La norme du produit vectoriel est : <span
+class="math display">\[\|\mathbf{r}_\theta \times \mathbf{r}_\phi\| =
+\sqrt{(b c \sin^2\theta \cos\phi)^2 + (a c \sin^2\theta \sin\phi)^2 + (a
+b \sin\theta \cos\theta)^2}\]</span> <span class="math display">\[= a b
+c \sin\theta \sqrt{\sin^2\theta + \frac{\cos^2\theta}{b^2} +
+\frac{\cos^2\theta}{a^2}}\]</span></p>
+<p>L’aire de surface est alors : <span class="math display">\[A =
+\int_0^{2\pi} \int_0^\pi a b c \sin\theta \sqrt{\sin^2\theta +
+\frac{\cos^2\theta}{b^2} + \frac{\cos^2\theta}{a^2}} \, d\theta \,
+d\phi\]</span></p>
+<p>En utilisant des transformations trigonométriques et des intégrales
+elliptiques, nous obtenons la formule donnée par Gauss.</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<ol>
+<li><p>Si <span class="math inline">\(a = b = c\)</span>, l’ellipsoïde
+est une sphère de rayon <span class="math inline">\(a\)</span> et son
+aire est <span class="math inline">\(4\pi a^2\)</span>.</p></li>
+<li><p>Si deux des demi-axes sont égaux, par exemple <span
+class="math inline">\(a = b \neq c\)</span>, l’aire se simplifie en :
+<span class="math display">\[A = 2\pi a^2 \left(1 + \frac{c}{a}
+\arcsin\left(\sqrt{1 - \frac{c^2}{a^2}}\right)\right)\]</span></p></li>
+<li><p>L’aire est symétrique en <span class="math inline">\(a, b,
+c\)</span>, c’est-à-dire que le résultat ne change pas si nous permutons
+les demi-axes.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’aire de surface d’un ellipsoïde, bien que complexe à calculer, est
+une notion fondamentale en géométrie différentielle et trouve des
+applications pratiques dans divers domaines scientifiques. La formule de
+Gauss, bien que non triviale, offre une compréhension approfondie des
+propriétés géométriques de l’ellipsoïde.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

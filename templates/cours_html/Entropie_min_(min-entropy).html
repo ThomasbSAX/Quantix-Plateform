@@ -1,0 +1,373 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Entropie min (min-entropy)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Entropie min (min-entropy)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’entropie min, ou <em>min-entropy</em>, est une notion centrale en
+théorie de l’information et en cryptographie. Elle émerge comme une
+réponse aux limitations de l’entropie de Shannon dans les contextes où
+l’on cherche à garantir des bornes inférieures robustes sur la quantité
+d’information. Contrairement à l’entropie de Shannon, qui mesure en
+moyenne la quantité d’information contenue dans une source aléatoire,
+l’entropie min fournit une garantie sur le pire des cas. Cette notion
+est indispensable dans les protocoles cryptographiques où l’on doit
+s’assurer que même dans le pire scénario, une certaine quantité
+d’information est présente.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’entropie min, commençons par nous interroger sur ce
+que nous cherchons à capturer. Imaginons une source aléatoire <span
+class="math inline">\(X\)</span> prenant ses valeurs dans un ensemble
+fini <span class="math inline">\(\mathcal{X}\)</span>. Nous voulons
+mesurer la quantité d’information minimale que l’on peut garantir pour
+<span class="math inline">\(X\)</span>, indépendamment de la
+distribution sous-jacente. Cela signifie que nous cherchons une quantité
+qui, pour toute distribution possible de <span
+class="math inline">\(X\)</span>, nous donne une borne inférieure sur
+l’information.</p>
+<p>Formellement, l’entropie min de <span
+class="math inline">\(X\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+prenant ses valeurs dans un ensemble fini <span
+class="math inline">\(\mathcal{X}\)</span>. L’entropie min de <span
+class="math inline">\(X\)</span>, notée <span
+class="math inline">\(H_{\infty}(X)\)</span>, est définie par : <span
+class="math display">\[H_{\infty}(X) = -\log \left( \max_{x \in
+\mathcal{X}} P(X = x) \right)\]</span></p>
+</div>
+<p>Cette définition peut également être exprimée en utilisant des
+quantificateurs : <span class="math display">\[H_{\infty}(X) = -\log
+\left( \max_{x \in \mathcal{X}} P(X = x) \right) = -\log \left( \max_{x
+\in \mathcal{X}} P_X(x) \right)\]</span> où <span
+class="math inline">\(P_X(x)\)</span> représente la fonction de masse de
+probabilité de <span class="math inline">\(X\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’entropie min est le théorème de la
+chaîne de Markov, qui relie l’entropie min de deux variables aléatoires
+conditionnellement indépendantes.</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X, Y, Z\)</span> des variables
+aléatoires telles que <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont conditionnellement indépendantes
+étant donné <span class="math inline">\(Z\)</span>. Alors, on a : <span
+class="math display">\[H_{\infty}(X, Y | Z) = H_{\infty}(X | Z) +
+H_{\infty}(Y | Z)\]</span></p>
+</div>
+<p>Pour démontrer ce théorème, nous procédons comme suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Nous voulons montrer que pour toute distribution de
+<span class="math inline">\(X, Y, Z\)</span> vérifiant l’hypothèse
+d’indépendance conditionnelle, l’égalité ci-dessus tient. Commençons par
+rappeler que <span class="math inline">\(H_{\infty}(X, Y | Z)\)</span>
+est défini comme : <span class="math display">\[H_{\infty}(X, Y | Z) =
+-\log \left( \max_{x, y, z} P(X = x, Y = y | Z = z) \right)\]</span> En
+utilisant l’hypothèse d’indépendance conditionnelle, nous avons : <span
+class="math display">\[P(X = x, Y = y | Z = z) = P(X = x | Z = z) \cdot
+P(Y = y | Z = z)\]</span> Ainsi, nous pouvons réécrire <span
+class="math inline">\(H_{\infty}(X, Y | Z)\)</span> comme : <span
+class="math display">\[H_{\infty}(X, Y | Z) = -\log \left( \max_{x, y,
+z} P(X = x | Z = z) \cdot P(Y = y | Z = z) \right)\]</span> En utilisant
+les propriétés des logarithmes, nous obtenons : <span
+class="math display">\[H_{\infty}(X, Y | Z) = -\log \left( \max_{x, y,
+z} P(X = x | Z = z) \right) - \log \left( \max_{x, y, z} P(Y = y | Z =
+z) \right)\]</span> Or, <span class="math inline">\(\max_{x, y, z} P(X =
+x | Z = z) = \max_{z} \left( \max_{x} P(X = x | Z = z) \right)\)</span>,
+et de même pour <span class="math inline">\(Y\)</span>. Par conséquent,
+nous avons : <span class="math display">\[H_{\infty}(X, Y | Z) =
+H_{\infty}(X | Z) + H_{\infty}(Y | Z)\]</span> Ce qui achève la
+démonstration. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de l’entropie
+min :</p>
+<ol>
+<li><p><em>Monotonicité</em> : Pour toute fonction <span
+class="math inline">\(f: \mathcal{X} \rightarrow \mathcal{Y}\)</span>,
+on a : <span class="math display">\[H_{\infty}(f(X)) \leq
+H_{\infty}(X)\]</span> Cette propriété signifie que l’entropie min ne
+peut qu’augmenter lorsque nous passons à une variable aléatoire plus
+grossière.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la fonction <span
+class="math inline">\(f: \mathcal{X} \rightarrow \mathcal{Y}\)</span>.
+Nous voulons montrer que <span class="math inline">\(H_{\infty}(f(X))
+\leq H_{\infty}(X)\)</span>. Par définition, nous avons : <span
+class="math display">\[H_{\infty}(f(X)) = -\log \left( \max_{y \in
+\mathcal{Y}} P(f(X) = y) \right)\]</span> Or, pour tout <span
+class="math inline">\(y \in \mathcal{Y}\)</span>, nous avons : <span
+class="math display">\[P(f(X) = y) = \sum_{x \in f^{-1}(y)} P(X =
+x)\]</span> En particulier, il existe un <span class="math inline">\(x
+\in f^{-1}(y)\)</span> tel que <span class="math inline">\(P(X = x) \geq
+\frac{P(f(X) = y)}{|f^{-1}(y)|}\)</span>. Par conséquent, nous avons :
+<span class="math display">\[\max_{x \in \mathcal{X}} P(X = x) \geq
+\frac{\max_{y \in \mathcal{Y}} P(f(X) = y)}{|f^{-1}(y)|}\]</span> En
+prenant le logarithme et en changeant de signe, nous obtenons : <span
+class="math display">\[H_{\infty}(f(X)) \leq H_{\infty}(X) + \log
+|f^{-1}(y)|\]</span> Comme <span class="math inline">\(\log |f^{-1}(y)|
+\geq 0\)</span>, nous concluons que : <span
+class="math display">\[H_{\infty}(f(X)) \leq
+H_{\infty}(X)\]</span> ◻</p>
+</div></li>
+<li><p><em>Additivité</em> : Pour deux variables aléatoires
+indépendantes <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, on a : <span
+class="math display">\[H_{\infty}(X, Y) = H_{\infty}(X) +
+H_{\infty}(Y)\]</span> Cette propriété montre que l’entropie min est
+additive pour les variables indépendantes.</p>
+<div class="proof">
+<p><em>Proof.</em> Soient <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> deux variables aléatoires
+indépendantes. Nous voulons montrer que : <span
+class="math display">\[H_{\infty}(X, Y) = H_{\infty}(X) +
+H_{\infty}(Y)\]</span> Par définition, nous avons : <span
+class="math display">\[H_{\infty}(X, Y) = -\log \left( \max_{x, y} P(X =
+x, Y = y) \right)\]</span> En utilisant l’indépendance de <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, nous avons : <span
+class="math display">\[P(X = x, Y = y) = P(X = x) \cdot P(Y =
+y)\]</span> Ainsi, nous pouvons réécrire <span
+class="math inline">\(H_{\infty}(X, Y)\)</span> comme : <span
+class="math display">\[H_{\infty}(X, Y) = -\log \left( \max_{x, y} P(X =
+x) \cdot P(Y = y) \right)\]</span> En utilisant les propriétés des
+logarithmes, nous obtenons : <span class="math display">\[H_{\infty}(X,
+Y) = -\log \left( \max_{x} P(X = x) \right) - \log \left( \max_{y} P(Y =
+y) \right)\]</span> Par conséquent, nous avons : <span
+class="math display">\[H_{\infty}(X, Y) = H_{\infty}(X) +
+H_{\infty}(Y)\]</span> ◻</p>
+</div></li>
+<li><p><em>Loi des grands nombres</em> : Pour une suite de variables
+aléatoires indépendantes et identiquement distribuées <span
+class="math inline">\(X_1, X_2, \ldots, X_n\)</span>, on a : <span
+class="math display">\[H_{\infty}(X_1, X_2, \ldots, X_n) = n \cdot
+H_{\infty}(X_1)\]</span> Cette propriété montre que l’entropie min est
+multiplicative pour les variables i.i.d.</p>
+<div class="proof">
+<p><em>Proof.</em> Soient <span class="math inline">\(X_1, X_2, \ldots,
+X_n\)</span> des variables aléatoires indépendantes et identiquement
+distribuées. Nous voulons montrer que : <span
+class="math display">\[H_{\infty}(X_1, X_2, \ldots, X_n) = n \cdot
+H_{\infty}(X_1)\]</span> Par définition, nous avons : <span
+class="math display">\[H_{\infty}(X_1, X_2, \ldots, X_n) = -\log \left(
+\max_{x_1, x_2, \ldots, x_n} P(X_1 = x_1, X_2 = x_2, \ldots, X_n = x_n)
+\right)\]</span> En utilisant l’indépendance et l’identicité de
+distribution, nous avons : <span class="math display">\[P(X_1 = x_1, X_2
+= x_2, \ldots, X_n = x_n) = \prod_{i=1}^n P(X_i = x_i)\]</span> Ainsi,
+nous pouvons réécrire <span class="math inline">\(H_{\infty}(X_1, X_2,
+\ldots, X_n)\)</span> comme : <span
+class="math display">\[H_{\infty}(X_1, X_2, \ldots, X_n) = -\log \left(
+\max_{x_1, x_2, \ldots, x_n} \prod_{i=1}^n P(X_i = x_i) \right)\]</span>
+En utilisant les propriétés des logarithmes, nous obtenons : <span
+class="math display">\[H_{\infty}(X_1, X_2, \ldots, X_n) = -\sum_{i=1}^n
+\log \left( \max_{x_i} P(X_i = x_i) \right)\]</span> Par conséquent,
+nous avons : <span class="math display">\[H_{\infty}(X_1, X_2, \ldots,
+X_n) = n \cdot H_{\infty}(X_1)\]</span> ◻</p>
+</div></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’entropie min est une notion puissante et flexible, essentielle en
+théorie de l’information et en cryptographie. Elle fournit des garanties
+robustes sur la quantité d’information minimale présente dans une source
+aléatoire, ce qui est crucial pour les protocoles cryptographiques. Les
+propriétés et théorèmes associés à l’entropie min, tels que la
+monotonicité, l’additivité et la loi des grands nombres, en font un
+outil indispensable pour l’analyse des systèmes sécurisés.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

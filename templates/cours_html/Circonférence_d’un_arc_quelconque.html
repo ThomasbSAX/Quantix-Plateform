@@ -1,0 +1,354 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Circonférence d’un arc quelconque</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Circonférence d’un arc quelconque</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des courbes et de leurs propriétés géométriques a toujours
+captivé les mathématiciens. Parmi ces propriétés, la circonférence d’un
+arc quelconque se distingue par son utilité dans divers domaines tels
+que l’ingénierie, la physique et l’informatique graphique. La notion de
+circonférence d’un arc quelconque émerge naturellement lorsque l’on
+cherche à généraliser le concept classique de circonférence d’un cercle
+à des courbes plus complexes.</p>
+<p>La motivation principale derrière cette généralisation est la
+nécessité de calculer des longueurs d’arcs pour des courbes non
+linéaires, ce qui est indispensable dans de nombreuses applications
+pratiques. Par exemple, en ingénierie mécanique, la compréhension des
+trajectoires non linéaires est cruciale pour le design et l’analyse des
+systèmes mécaniques. De même, en physique, la modélisation des
+trajectoires des particules ou des ondes nécessite souvent une
+compréhension approfondie des courbes et de leurs propriétés.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la circonférence d’un arc quelconque, il est
+essentiel de définir quelques concepts préliminaires. Considérons une
+courbe paramétrée dans le plan ou dans l’espace. Nous cherchons à
+mesurer la longueur de cette courbe entre deux points donnés.</p>
+<div class="definition">
+<p>Une courbe paramétrée est une application <span
+class="math inline">\(\gamma : [a, b] \rightarrow \mathbb{R}^n\)</span>
+qui associe à chaque <span class="math inline">\(t \in [a, b]\)</span>
+un point <span class="math inline">\(\gamma(t)\)</span> dans l’espace
+euclidien <span class="math inline">\(\mathbb{R}^n\)</span>.</p>
+</div>
+<p>Nous cherchons à définir la longueur de cette courbe entre deux
+points <span class="math inline">\(\gamma(a)\)</span> et <span
+class="math inline">\(\gamma(b)\)</span>. Pour cela, nous devons
+introduire la notion de longueur d’arc.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\gamma : [a, b] \rightarrow
+\mathbb{R}^n\)</span> une courbe paramétrée de classe <span
+class="math inline">\(C^1\)</span>. La longueur d’arc de <span
+class="math inline">\(\gamma\)</span> entre les points <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> est donnée par : <span
+class="math display">\[L = \int_{a}^{b} \|\gamma&#39;(t)\| \,
+dt\]</span> où <span class="math inline">\(\gamma&#39;(t)\)</span> est
+la dérivée de <span class="math inline">\(\gamma\)</span> par rapport à
+<span class="math inline">\(t\)</span>, et <span
+class="math inline">\(\|\cdot\|\)</span> désigne la norme
+euclidienne.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Pour calculer la longueur d’arc, nous avons besoin de quelques
+théorèmes fondamentaux. Le premier théorème que nous allons présenter
+est le théorème de la longueur d’arc.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\gamma : [a, b] \rightarrow
+\mathbb{R}^n\)</span> une courbe paramétrée de classe <span
+class="math inline">\(C^1\)</span>. La longueur d’arc <span
+class="math inline">\(L\)</span> de <span
+class="math inline">\(\gamma\)</span> entre les points <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> est donnée par : <span
+class="math display">\[L = \int_{a}^{b} \sqrt{\sum_{i=1}^n \left(
+\frac{d\gamma_i}{dt} \right)^2} \, dt\]</span> où <span
+class="math inline">\(\gamma_i\)</span> désigne la <span
+class="math inline">\(i\)</span>-ème composante de <span
+class="math inline">\(\gamma\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve de ce théorème repose sur la définition de
+la longueur d’arc et les propriétés des intégrales. Considérons une
+partition <span class="math inline">\(P\)</span> de l’intervalle <span
+class="math inline">\([a, b]\)</span> en sous-intervalles <span
+class="math inline">\([t_{k-1}, t_k]\)</span>. La longueur de la courbe
+entre <span class="math inline">\(t_{k-1}\)</span> et <span
+class="math inline">\(t_k\)</span> peut être approchée par la longueur
+du segment de droite reliant <span
+class="math inline">\(\gamma(t_{k-1})\)</span> et <span
+class="math inline">\(\gamma(t_k)\)</span>. En utilisant la formule de
+la distance euclidienne, nous avons : <span
+class="math display">\[\|\gamma(t_k) - \gamma(t_{k-1})\| =
+\sqrt{\sum_{i=1}^n (\gamma_i(t_k) - \gamma_i(t_{k-1}))^2}\]</span> En
+utilisant le théorème des accroissements finis, il existe un point <span
+class="math inline">\(c_k \in [t_{k-1}, t_k]\)</span> tel que : <span
+class="math display">\[\gamma_i(t_k) - \gamma_i(t_{k-1}) =
+\gamma_i&#39;(c_k)(t_k - t_{k-1})\]</span> En substituant cette
+expression dans la formule de la distance, nous obtenons : <span
+class="math display">\[\|\gamma(t_k) - \gamma(t_{k-1})\| =
+\sqrt{\sum_{i=1}^n (\gamma_i&#39;(c_k))^2} (t_k - t_{k-1})\]</span> En
+prenant la limite lorsque la taille des sous-intervalles tend vers zéro,
+nous retrouvons l’expression intégrale pour la longueur d’arc. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous allons maintenant examiner quelques propriétés importantes de la
+longueur d’arc.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\gamma : [a, b] \rightarrow
+\mathbb{R}^n\)</span> une courbe paramétrée de classe <span
+class="math inline">\(C^1\)</span>. Si <span class="math inline">\(c \in
+[a, b]\)</span>, alors la longueur d’arc de <span
+class="math inline">\(\gamma\)</span> entre <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> est la somme des longueurs d’arc entre
+<span class="math inline">\(a\)</span> et <span
+class="math inline">\(c\)</span>, et entre <span
+class="math inline">\(c\)</span> et <span
+class="math inline">\(b\)</span> : <span class="math display">\[L =
+L_{[a, c]} + L_{[c, b]}\]</span> où <span class="math inline">\(L_{[a,
+c]}\)</span> et <span class="math inline">\(L_{[c, b]}\)</span>
+désignent respectivement les longueurs d’arc entre <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(c\)</span>, et entre <span
+class="math inline">\(c\)</span> et <span
+class="math inline">\(b\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété découle directement de la définition
+de l’intégrale. En effet, nous avons : <span class="math display">\[L =
+\int_{a}^{b} \|\gamma&#39;(t)\| \, dt = \int_{a}^{c} \|\gamma&#39;(t)\|
+\, dt + \int_{c}^{b} \|\gamma&#39;(t)\| \, dt = L_{[a, c]} + L_{[c,
+b]}\]</span> ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\gamma : [a, b] \rightarrow
+\mathbb{R}^n\)</span> une courbe paramétrée de classe <span
+class="math inline">\(C^1\)</span>, et soit <span
+class="math inline">\(\phi : [\alpha, \beta] \rightarrow [a, b]\)</span>
+une fonction de classe <span class="math inline">\(C^1\)</span> et
+bijective. La longueur d’arc de la courbe reparamétrée <span
+class="math inline">\(\gamma \circ \phi : [\alpha, \beta] \rightarrow
+\mathbb{R}^n\)</span> est égale à la longueur d’arc de <span
+class="math inline">\(\gamma\)</span> : <span class="math display">\[L =
+\int_{\alpha}^{\beta} \|(\gamma \circ \phi)&#39;(s)\| \, ds =
+\int_{a}^{b} \|\gamma&#39;(t)\| \, dt\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> En utilisant le changement de variable <span
+class="math inline">\(t = \phi(s)\)</span>, nous avons : <span
+class="math display">\[L = \int_{\alpha}^{\beta} \|(\gamma \circ
+\phi)&#39;(s)\| \, ds = \int_{\alpha}^{\beta} \|\gamma&#39;(\phi(s))
+\phi&#39;(s)\| \, ds = \int_{a}^{b} \|\gamma&#39;(t)\| \, dt\]</span> où
+nous avons utilisé le théorème de changement de variable pour les
+intégrales. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La circonférence d’un arc quelconque est un concept fondamental en
+mathématiques et en physique. Elle permet de généraliser le concept
+classique de circonférence d’un cercle à des courbes plus complexes, ce
+qui est indispensable dans de nombreuses applications pratiques. Les
+théorèmes et les propriétés présentés dans cet article fournissent une
+base solide pour l’étude des courbes et de leurs propriétés
+géométriques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

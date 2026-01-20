@@ -1,0 +1,371 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthodes de Runge-Kutta adaptatives : une approche avancée pour la résolution numérique des équations différentielles ordinaires</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthodes de Runge-Kutta adaptatives : une approche
+avancée pour la résolution numérique des équations différentielles
+ordinaires</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les méthodes de Runge-Kutta sont des schémas numériques largement
+utilisés pour la résolution d’équations différentielles ordinaires
+(EDO). Leur popularité découle de leur stabilité, précision et
+simplicité d’implémentation. Cependant, dans de nombreuses applications
+pratiques, la solution des EDO peut présenter des variations brutales ou
+des comportements oscillatoires. Les méthodes de Runge-Kutta adaptatives
+(RK) offrent une solution élégante à ce problème en ajustant
+dynamiquement le pas de temps pour capturer les caractéristiques
+essentielles de la solution.</p>
+<p>L’origine des méthodes RK remonte aux travaux de Carl Runge et
+Wilhelm Kutta à la fin du XIXème siècle. Ces méthodes ont été
+développées pour surmonter les limitations des schémas à un seul pas,
+tels que la méthode d’Euler. L’idée clé est d’utiliser plusieurs
+évaluations de la fonction dérivée pour obtenir une approximation plus
+précise de la solution.</p>
+<p>Les méthodes RK adaptatives sont particulièrement utiles dans les
+domaines où les solutions des EDO peuvent varier rapidement, comme en
+dynamique des fluides, en mécanique quantique ou en biologie. Elles
+permettent de réduire le nombre d’évaluations de la fonction dérivée
+tout en maintenant une précision élevée, ce qui est crucial pour les
+simulations numériques complexes.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de définir formellement les méthodes RK adaptatives, il est
+essentiel de comprendre le contexte dans lequel elles s’inscrivent.
+Considérons une EDO de la forme :</p>
+<p><span class="math display">\[\frac{dy}{dt} = f(t, y), \quad y(t_0) =
+y_0\]</span></p>
+<p>Notre objectif est de trouver une approximation numérique de la
+solution <span class="math inline">\(y(t)\)</span> sur un intervalle
+<span class="math inline">\([t_0, T]\)</span>. Pour ce faire, nous
+divisons l’intervalle en sous-intervalles de longueur <span
+class="math inline">\(h\)</span>, appelés pas de temps. L’idée est
+d’ajuster dynamiquement ce pas de temps en fonction des variations de la
+solution.</p>
+<h2 id="définition-formelle">Définition formelle</h2>
+<p>Une méthode RK adaptative est définie par un schéma de la forme :</p>
+<p><span class="math display">\[y_{n+1} = y_n + h \sum_{i=1}^s b_i
+k_i\]</span></p>
+<p>où les <span class="math inline">\(k_i\)</span> sont des évaluations
+de la fonction dérivée <span class="math inline">\(f\)</span>, définies
+par :</p>
+<p><span class="math display">\[k_i = f\left(t_n + c_i h, y_n + h
+\sum_{j=1}^{i-1} a_{ij} k_j\right), \quad i = 1, \ldots, s\]</span></p>
+<p>Les coefficients <span class="math inline">\(a_{ij}, b_i,
+c_i\)</span> sont déterminés par des conditions de consistance et de
+stabilité. Le pas de temps <span class="math inline">\(h\)</span> est
+ajusté dynamiquement en fonction d’une estimation de l’erreur
+locale.</p>
+<h2 id="estimation-de-lerreur">Estimation de l’erreur</h2>
+<p>L’estimation de l’erreur est cruciale pour les méthodes RK
+adaptatives. Elle permet de déterminer si le pas de temps actuel est
+suffisamment petit pour capturer les variations de la solution. Une
+estimation courante de l’erreur locale est donnée par :</p>
+<p><span class="math display">\[E = \left| y_{n+1} - \tilde{y}_{n+1}
+\right|\]</span></p>
+<p>où <span class="math inline">\(y_{n+1}\)</span> est l’approximation
+obtenue avec un schéma RK d’ordre <span
+class="math inline">\(p\)</span>, et <span
+class="math inline">\(\tilde{y}_{n+1}\)</span> est une approximation
+obtenue avec un schéma RK d’ordre <span
+class="math inline">\(p-1\)</span>. Si l’erreur est supérieure à une
+tolérance donnée, le pas de temps est réduit. Sinon, il peut être
+augmenté.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-convergence">Théorème de convergence</h2>
+<p>Le théorème de convergence des méthodes RK adaptatives est un
+résultat fondamental qui garantit la précision des approximations
+obtenues.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(y(t)\)</span> la solution exacte de
+l’EDO <span class="math inline">\(\frac{dy}{dt} = f(t, y)\)</span>, et
+soit <span class="math inline">\(y_n\)</span> l’approximation obtenue
+par une méthode RK adaptative avec un pas de temps <span
+class="math inline">\(h\)</span>. Si la fonction <span
+class="math inline">\(f\)</span> est Lipschitzienne et si le pas de
+temps est choisi de manière à ce que l’erreur locale soit contrôlée,
+alors :</p>
+<p><span class="math display">\[\max_{0 \leq n \leq N} \left| y(t_n) -
+y_n \right| \leq C h^p\]</span></p>
+<p>où <span class="math inline">\(C\)</span> est une constante
+indépendante de <span class="math inline">\(h\)</span>, et <span
+class="math inline">\(p\)</span> est l’ordre de la méthode RK.</p>
+</div>
+<h2 id="démonstration-du-théorème-de-convergence">Démonstration du
+théorème de convergence</h2>
+<p>La démonstration du théorème de convergence repose sur plusieurs
+étapes clés. Tout d’abord, nous utilisons le fait que la fonction <span
+class="math inline">\(f\)</span> est Lipschitzienne, ce qui implique que
+:</p>
+<p><span class="math display">\[\left| y(t_{n+1}) - y_n \right| \leq L
+\left| t_{n+1} - t_n \right|\]</span></p>
+<p>où <span class="math inline">\(L\)</span> est la constante de
+Lipschitz. Ensuite, nous utilisons l’estimation de l’erreur locale pour
+montrer que :</p>
+<p><span class="math display">\[\left| y_{n+1} - y_n \right| \leq C
+h^{p+1}\]</span></p>
+<p>En combinant ces résultats, nous obtenons la convergence globale de
+la méthode RK adaptative.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-de-lestimation-de-lerreur-locale">Preuve de l’estimation
+de l’erreur locale</h2>
+<p>Pour prouver l’estimation de l’erreur locale, nous utilisons le
+développement de Taylor de la solution exacte autour de <span
+class="math inline">\(t_n\)</span>. Nous avons :</p>
+<p><span class="math display">\[y(t_{n+1}) = y(t_n) + h f(t_n, y(t_n)) +
+\frac{h^2}{2} \frac{d}{dt} f(t_n, y(t_n)) + O(h^3)\]</span></p>
+<p>En comparant cette expression avec l’approximation RK, nous obtenons
+:</p>
+<p><span class="math display">\[E = \left| y(t_{n+1}) - y_{n+1} \right|
+= O(h^{p+1})\]</span></p>
+<p>Cette estimation montre que l’erreur locale est contrôlée par le pas
+de temps <span class="math inline">\(h\)</span>.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-dadaptabilité">Propriété d’adaptabilité</h2>
+<p>Les méthodes RK adaptatives possèdent plusieurs propriétés
+importantes qui les rendent particulièrement utiles pour la résolution
+numérique des EDO.</p>
+<div class="proposition">
+<p>Soit <span class="math inline">\(\epsilon\)</span> une tolérance
+donnée pour l’erreur locale. Alors, il existe un pas de temps <span
+class="math inline">\(h\)</span> tel que :</p>
+<p><span class="math display">\[E \leq \epsilon\]</span></p>
+<p>Cette propriété garantit que les méthodes RK adaptatives peuvent
+capturer les variations de la solution avec une précision
+arbitraire.</p>
+</div>
+<h2 id="démonstration-de-la-propriété-dadaptabilité">Démonstration de la
+propriété d’adaptabilité</h2>
+<p>La démonstration de cette propriété repose sur l’estimation de
+l’erreur locale. En effet, si l’erreur est supérieure à la tolérance
+<span class="math inline">\(\epsilon\)</span>, le pas de temps peut être
+réduit jusqu’à ce que l’erreur soit inférieure à <span
+class="math inline">\(\epsilon\)</span>. Cette adaptabilité est une
+caractéristique clé des méthodes RK.</p>
+<h2 id="corollaire-de-stabilité">Corollaire de stabilité</h2>
+<p>Un corollaire important des méthodes RK adaptatives est leur
+stabilité. En effet, le contrôle de l’erreur locale permet de garantir
+que les approximations restent stables même pour des pas de temps
+relativement grands.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(y_n\)</span> l’approximation obtenue
+par une méthode RK adaptative. Si le pas de temps <span
+class="math inline">\(h\)</span> est choisi de manière à ce que l’erreur
+locale soit contrôlée, alors :</p>
+<p><span class="math display">\[\left| y_n \right| \leq C\]</span></p>
+<p>où <span class="math inline">\(C\)</span> est une constante
+indépendante de <span class="math inline">\(n\)</span>.</p>
+</div>
+<h2 id="démonstration-du-corollaire-de-stabilité">Démonstration du
+corollaire de stabilité</h2>
+<p>La démonstration de ce corollaire repose sur le théorème de
+convergence. En effet, si les approximations <span
+class="math inline">\(y_n\)</span> convergent vers la solution exacte
+<span class="math inline">\(y(t)\)</span>, alors elles sont
+nécessairement bornées. Cette stabilité est une conséquence directe du
+contrôle de l’erreur locale.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les méthodes RK adaptatives offrent une approche puissante et
+flexible pour la résolution numérique des EDO. Leur capacité à ajuster
+dynamiquement le pas de temps en fonction des variations de la solution
+les rend particulièrement utiles dans les domaines où les solutions
+peuvent présenter des comportements complexes. Les théorèmes et
+propriétés présentés dans cet article fournissent une base solide pour
+l’utilisation de ces méthodes dans les applications pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

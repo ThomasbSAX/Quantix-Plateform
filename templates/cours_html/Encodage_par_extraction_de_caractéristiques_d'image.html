@@ -1,0 +1,324 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques d’image</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques
+d’image</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques d’image est une
+technique fondamentale en traitement d’images et en vision par
+ordinateur. Cette approche permet de représenter des images sous forme
+de vecteurs de caractéristiques, facilitant ainsi des tâches telles que
+la classification, la reconnaissance d’objets et la recherche d’images
+similaires.</p>
+<p>L’origine de cette technique remonte aux années 1960 avec les travaux
+pionniers de Seong-Chul Shin et de Kenneth N. Levitt sur la
+reconnaissance de motifs. Depuis, cette méthode a évolué pour inclure
+des techniques avancées telles que les réseaux de neurones convolutifs
+(CNN) et les transformées de Fourier.</p>
+<p>L’importance de l’encodage par extraction de caractéristiques réside
+dans sa capacité à réduire la dimensionnalité des données tout en
+préservant les informations essentielles. Cela permet de traiter
+efficacement de grandes bases de données d’images et d’améliorer les
+performances des algorithmes de vision par ordinateur.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’énoncer formellement la définition de l’encodage par
+extraction de caractéristiques, nous allons expliquer ce que nous
+cherchons à obtenir.</p>
+<p>Nous voulons transformer une image, qui est une matrice de pixels, en
+un vecteur de caractéristiques. Ce vecteur doit capturer les
+informations essentielles de l’image, telles que les contours, les
+textures et les couleurs, tout en réduisant la dimensionnalité.</p>
+<p>Formellement, soit <span class="math inline">\(I\)</span> une image
+de taille <span class="math inline">\(m \times n\)</span>. Nous
+cherchons une fonction d’extraction de caractéristiques <span
+class="math inline">\(f\)</span> telle que:</p>
+<p><span class="math display">\[f: I \mapsto \mathbf{x} \in
+\mathbb{R}^d\]</span></p>
+<p>où <span class="math inline">\(d \ll m \times n\)</span>.</p>
+<p>Une des méthodes classiques pour extraire des caractéristiques est
+l’utilisation de filtres de Gabor. Les filtres de Gabor sont des
+fonctions qui capturent les informations de texture et d’orientation
+dans une image. Ils sont définis par:</p>
+<p><span class="math display">\[g(x, y; \lambda, \theta, \psi, \sigma,
+\gamma) = \exp\left(-\frac{x&#39;^2 + \gamma^2
+y&#39;^2}{2\sigma^2}\right) \cos\left(2\pi \frac{x&#39;}{\lambda} +
+\psi\right)\]</span></p>
+<p>où <span class="math inline">\(x&#39; = x \cos \theta + y \sin
+\theta\)</span> et <span class="math inline">\(y&#39; = -x \sin \theta +
+y \cos \theta\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes importants dans le domaine de l’extraction de
+caractéristiques est le théorème de Nyquist-Shannon. Ce théorème stipule
+que pour reconstruire parfaitement un signal à partir de ses
+échantillons, la fréquence d’échantillonnage doit être au moins deux
+fois supérieure à la fréquence maximale du signal.</p>
+<p>Formellement, soit <span class="math inline">\(f(t)\)</span> un
+signal de bande limitée avec une fréquence maximale <span
+class="math inline">\(B\)</span>. Le théorème de Nyquist-Shannon énonce
+que:</p>
+<p><span class="math display">\[f(t) = \sum_{n=-\infty}^{\infty}
+f\left(\frac{n}{2B}\right) \cdot \text{sinc}\left(2Bt -
+n\right)\]</span></p>
+<p>où <span class="math inline">\(\text{sinc}(x) = \frac{\sin(\pi
+x)}{\pi x}\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Nyquist-Shannon, nous allons utiliser la
+transformée de Fourier. La transformée de Fourier d’un signal <span
+class="math inline">\(f(t)\)</span> est définie par:</p>
+<p><span class="math display">\[F(\omega) = \int_{-\infty}^{\infty} f(t)
+e^{-i\omega t} dt\]</span></p>
+<p>Si <span class="math inline">\(f(t)\)</span> est un signal de bande
+limitée avec une fréquence maximale <span
+class="math inline">\(B\)</span>, alors <span
+class="math inline">\(F(\omega) = 0\)</span> pour <span
+class="math inline">\(|\omega| &gt; B\)</span>.</p>
+<p>L’échantillonnage du signal <span class="math inline">\(f(t)\)</span>
+à une fréquence <span class="math inline">\(2B\)</span> donne:</p>
+<p><span class="math display">\[f_n =
+f\left(\frac{n}{2B}\right)\]</span></p>
+<p>La transformée de Fourier discrète du signal échantillonné est:</p>
+<p><span class="math display">\[F_k = \sum_{n=-\infty}^{\infty} f_n
+e^{-i\frac{2\pi k n}{N}}\]</span></p>
+<p>où <span class="math inline">\(N\)</span> est le nombre total
+d’échantillons.</p>
+<p>En utilisant la transformée de Fourier inverse, nous pouvons
+reconstruire le signal original:</p>
+<p><span class="math display">\[f(t) = \frac{1}{2B}
+\sum_{n=-\infty}^{\infty} f_n \cdot \text{sinc}\left(2Bt -
+n\right)\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<ol>
+<li><p>La transformée de Fourier d’un signal échantillonné est
+périodique avec une période <span class="math inline">\(2B\)</span>.</p>
+<p>Preuve: La transformée de Fourier d’un signal échantillonné est
+donnée par:</p>
+<p><span class="math display">\[F_k = \sum_{n=-\infty}^{\infty} f_n
+e^{-i\frac{2\pi k n}{N}}\]</span></p>
+<p>En utilisant la périodicité de l’exponentielle complexe, nous
+avons:</p>
+<p><span class="math display">\[F_{k+N} = \sum_{n=-\infty}^{\infty} f_n
+e^{-i\frac{2\pi (k+N) n}{N}} = \sum_{n=-\infty}^{\infty} f_n
+e^{-i\frac{2\pi k n}{N}} e^{-i2\pi n} = F_k\]</span></p></li>
+<li><p>La transformée de Fourier d’un signal échantillonné est nulle
+pour <span class="math inline">\(|\omega| &gt; B\)</span>.</p>
+<p>Preuve: Puisque <span class="math inline">\(f(t)\)</span> est un
+signal de bande limitée avec une fréquence maximale <span
+class="math inline">\(B\)</span>, sa transformée de Fourier <span
+class="math inline">\(F(\omega)\)</span> est nulle pour <span
+class="math inline">\(|\omega| &gt; B\)</span>. En échantillonnant le
+signal à une fréquence <span class="math inline">\(2B\)</span>, nous
+obtenons:</p>
+<p><span class="math display">\[F_k = \sum_{n=-\infty}^{\infty} f_n
+e^{-i\frac{2\pi k n}{N}}\]</span></p>
+<p>En utilisant la transformée de Fourier inverse, nous avons:</p>
+<p><span class="math display">\[f(t) = \frac{1}{2B}
+\sum_{n=-\infty}^{\infty} f_n \cdot \text{sinc}\left(2Bt -
+n\right)\]</span></p>
+<p>Puisque <span class="math inline">\(f(t)\)</span> est un signal de
+bande limitée avec une fréquence maximale <span
+class="math inline">\(B\)</span>, sa transformée de Fourier <span
+class="math inline">\(F(\omega)\)</span> est nulle pour <span
+class="math inline">\(|\omega| &gt; B\)</span>. Par conséquent, <span
+class="math inline">\(F_k = 0\)</span> pour <span
+class="math inline">\(|k| &gt; N/2\)</span>.</p></li>
+</ol>
+</body>
+</html>
+{% include "footer.html" %}
+

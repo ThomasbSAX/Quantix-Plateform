@@ -1,0 +1,335 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Persistent Homology: A Robust Tool for Topological Data Analysis</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Persistent Homology: A Robust Tool for Topological
+Data Analysis</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-and-motivations">Introduction and Motivations</h1>
+<p>Persistent homology, a cornerstone of topological data analysis
+(TDA), emerges from the confluence of algebraic topology and
+computational geometry. Its inception is rooted in the quest to extract
+meaningful topological features from complex datasets, often
+high-dimensional and noisy. The foundational idea is to study the
+multiscale topological structure of data by considering a nested
+sequence of simplicial complexes, known as a filtration. This approach
+reveals robust topological features that persist across multiple scales,
+thereby distinguishing significant structures from noise.</p>
+<p>The motivation for persistent homology is manifold. In data science,
+it provides a powerful framework to analyze the shape of data, revealing
+hidden patterns and structures that traditional statistical methods
+might overlook. In computational biology, it aids in the study of
+molecular structures and protein folding. In sensor networks, it helps
+in understanding the coverage and connectivity of nodes. The versatility
+of persistent homology makes it indispensable in various fields,
+bridging the gap between abstract mathematical theory and practical
+applications.</p>
+<h1 id="definitions">Definitions</h1>
+<p>To understand persistent homology, we first need to grasp the concept
+of a filtration. Imagine you have a dataset in some Euclidean space. We
+want to study how the topological features of this data evolve as we
+vary a scale parameter.</p>
+<div class="definition">
+<p>A filtration is a nested sequence of simplicial complexes: <span
+class="math display">\[K^0 \subseteq K^1 \subseteq \cdots \subseteq K^n
+\subseteq \cdots\]</span> where each <span
+class="math inline">\(K^i\)</span> is a simplicial complex, and the
+inclusion maps are simplicial.</p>
+</div>
+<p>Given a filtration, we can study how the homology groups of these
+complexes change as we move along the sequence. The key idea is to track
+the birth and death of homology classes.</p>
+<div class="definition">
+<p>Given a filtration <span class="math inline">\(\{K^i\}_{i \in
+\mathbb{N}}\)</span>, the persistent homology groups are defined as:
+<span class="math display">\[H_n(K^i, K^j) = \frac{\text{Im}(H_n(K^i)
+\rightarrow H_n(K^j))}{\text{Ker}(H_n(K^i) \rightarrow
+H_n(K^j))}\]</span> for <span class="math inline">\(i \leq j\)</span>,
+where <span class="math inline">\(H_n\)</span> denotes the nth homology
+group.</p>
+</div>
+<p>This definition captures the essence of persistent homology: it
+tracks how homology classes are born and die as we vary the scale
+parameter <span class="math inline">\(i\)</span>.</p>
+<h1 id="theorems">Theorems</h1>
+<p>One of the most fundamental results in persistent homology is the
+stability theorem, which ensures that the persistence diagram, a
+multiset of points encoding the birth and death times of homology
+classes, is stable under small perturbations of the data.</p>
+<div class="theorem">
+<p>Let <span class="math inline">\(f\)</span> and <span
+class="math inline">\(g\)</span> be two real-valued functions on a
+topological space <span class="math inline">\(X\)</span>, and let <span
+class="math inline">\(D(f)\)</span> and <span
+class="math inline">\(D(g)\)</span> be their respective persistence
+diagrams. Then, the bottleneck distance between these diagrams
+satisfies: <span class="math display">\[d_B(D(f), D(g)) \leq \|f -
+g\|_{\infty}\]</span> where <span class="math inline">\(\|f -
+g\|_{\infty}\)</span> is the supremum norm of the difference between
+<span class="math inline">\(f\)</span> and <span
+class="math inline">\(g\)</span>.</p>
+</div>
+<p>This theorem is crucial as it guarantees that small changes in the
+input data result in small changes in the topological features
+extracted, making persistent homology a robust tool for data
+analysis.</p>
+<h1 id="proofs">Proofs</h1>
+<p>To prove the stability theorem, we need to establish a relationship
+between the persistence diagrams of two functions and their supremum
+norm. The proof relies on the concept of interleaving, where we consider
+how the sublevel sets of two functions can be related.</p>
+<div class="proof">
+<p><em>Proof.</em> Let <span class="math inline">\(f\)</span> and <span
+class="math inline">\(g\)</span> be two real-valued functions on a
+topological space <span class="math inline">\(X\)</span>. We define the
+sublevel sets as: <span class="math display">\[X_u^f = \{x \in X \mid
+f(x) \leq u\}\]</span> <span class="math display">\[X_u^g = \{x \in X
+\mid g(x) \leq u\}\]</span></p>
+<p>For any <span class="math inline">\(\epsilon &gt; 0\)</span>, we can
+consider the functions <span class="math inline">\(f - \epsilon\)</span>
+and <span class="math inline">\(g + \epsilon\)</span>. The sublevel sets
+of these functions satisfy: <span class="math display">\[X_u^{f -
+\epsilon} \subseteq X_{u + \epsilon}^g \quad \text{and} \quad X_u^{g +
+\epsilon} \subseteq X_{u + \epsilon}^f\]</span></p>
+<p>This interleaving of sublevel sets induces a map between the
+persistence modules of <span class="math inline">\(f\)</span> and <span
+class="math inline">\(g\)</span>, which in turn implies that the
+bottleneck distance between their persistence diagrams is bounded by
+<span class="math inline">\(\epsilon\)</span>. Since <span
+class="math inline">\(\|f - g\|_{\infty}\)</span> is the smallest <span
+class="math inline">\(\epsilon\)</span> for which this interleaving
+holds, we conclude that: <span class="math display">\[d_B(D(f), D(g))
+\leq \|f - g\|_{\infty}\]</span> ◻</p>
+</div>
+<h1 id="properties-and-corollaries">Properties and Corollaries</h1>
+<p>Persistent homology enjoys several important properties that make it
+a powerful tool for data analysis.</p>
+<ol>
+<li><p><strong>Commutativity with Direct Sums</strong>: The persistent
+homology of a disjoint union of spaces is the direct sum of their
+individual persistent homologies.</p>
+<div class="proof">
+<p><em>Proof.</em> This property follows from the fact that homology
+groups are additive with respect to disjoint unions. If <span
+class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> are topological spaces, then: <span
+class="math display">\[H_n(X \sqcup Y) = H_n(X) \oplus H_n(Y)\]</span>
+and similarly for their persistent homologies. ◻</p>
+</div></li>
+<li><p><strong>Finiteness</strong>: For a finite filtration, the
+persistence diagram is finite. This means that only a finite number of
+homology classes are born and die within the filtration.</p>
+<div class="proof">
+<p><em>Proof.</em> Since the filtration is finite, there are only
+finitely many simplicial complexes and hence finitely many homology
+classes that can be born or die. ◻</p>
+</div></li>
+<li><p><strong>Stability</strong>: The stability theorem, as discussed
+earlier, ensures that small changes in the input data result in small
+changes in the topological features extracted.</p>
+<div class="proof">
+<p><em>Proof.</em> The proof of this property was provided in the
+previous section. ◻</p>
+</div></li>
+</ol>
+<p>These properties highlight the robustness and versatility of
+persistent homology, making it an indispensable tool in topological data
+analysis.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

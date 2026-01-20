@@ -1,0 +1,323 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Fonction d’autocovariance (ACVF)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Fonction d’autocovariance (ACVF)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des phénomènes aléatoires en temps continu ou discret est au
+cœur de nombreuses disciplines scientifiques, allant de la physique à
+l’économie en passant par les sciences sociales. Parmi les outils
+essentiels pour comprendre ces phénomènes, la fonction d’autocovariance
+(ACVF) occupe une place centrale. L’ACVF permet de mesurer la dépendance
+d’une variable aléatoire par rapport à elle-même en fonction du temps ou
+de l’espace, offrant ainsi une description quantitative des corrélations
+internes d’un processus stochastique.</p>
+<p>L’origine de l’ACVF remonte aux travaux pionniers de Norbert Wiener
+et Andrei Kolmogorov dans les années 1930-1940, qui ont jeté les bases
+de la théorie des processus stochastiques. L’ACVF émerge comme une
+réponse naturelle à la nécessité de modéliser et d’analyser les
+dépendances temporelles ou spatiales dans des systèmes complexes. Elle
+est indispensable pour la prédiction, le filtrage et l’analyse spectrale
+des signaux, ainsi que pour la compréhension des structures
+sous-jacentes dans les données.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir l’ACVF, commençons par comprendre ce que nous cherchons
+à capturer. Supposons que nous ayons un processus stochastique <span
+class="math inline">\(\{X_t\}_{t \in T}\)</span>, où <span
+class="math inline">\(T\)</span> est un ensemble d’indices (par exemple,
+le temps). Nous voulons mesurer à quel point la valeur de <span
+class="math inline">\(X_t\)</span> est corrélée avec sa propre valeur à
+un autre instant <span class="math inline">\(t + h\)</span>, pour un
+certain décalage <span class="math inline">\(h\)</span>.</p>
+<p>Formellement, la fonction d’autocovariance est définie comme suit
+:</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\{X_t\}_{t \in T}\)</span> un
+processus stochastique de moyenne <span class="math inline">\(\mu(t) =
+\mathbb{E}[X_t]\)</span>. La fonction d’autocovariance <span
+class="math inline">\(\gamma(t_1, t_2)\)</span> est définie par : <span
+class="math display">\[\gamma(t_1, t_2) = \text{Cov}(X_{t_1}, X_{t_2}) =
+\mathbb{E}\left[\left(X_{t_1} - \mu(t_1)\right)\left(X_{t_2} -
+\mu(t_2)\right)\right].\]</span></p>
+</div>
+<p>Pour un processus stationnaire au second ordre, où la moyenne <span
+class="math inline">\(\mu(t) = \mu\)</span> est constante et la
+covariance ne dépend que de la différence <span class="math inline">\(h
+= t_2 - t_1\)</span>, l’ACVF peut être simplifiée en : <span
+class="math display">\[\gamma(h) = \text{Cov}(X_t, X_{t+h}) =
+\mathbb{E}\left[\left(X_t - \mu\right)\left(X_{t+h} -
+\mu\right)\right].\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’ACVF est le théorème de Bochner, qui
+caractérise les fonctions d’autocovariance positives définies.</p>
+<div class="theorem">
+<p>Une fonction <span class="math inline">\(\gamma: \mathbb{R}
+\rightarrow \mathbb{C}\)</span> est une fonction d’autocovariance si et
+seulement si elle est positive définie, c’est-à-dire que pour tout <span
+class="math inline">\(n \in \mathbb{N}\)</span>, pour tous <span
+class="math inline">\(t_1, \ldots, t_n \in \mathbb{R}\)</span> et pour
+tous <span class="math inline">\(c_1, \ldots, c_n \in
+\mathbb{C}\)</span>, on a : <span class="math display">\[\sum_{i=1}^n
+\sum_{j=1}^n c_i \overline{c_j} \gamma(t_i - t_j) \geq 0.\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Bochner, nous devons montrer que toute
+fonction d’autocovariance est positive définie et que toute fonction
+positive définie peut être réalisée comme une fonction
+d’autocovariance.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span
+class="math inline">\(\gamma\)</span> soit une fonction
+d’autocovariance. Alors, il existe un processus stochastique <span
+class="math inline">\(\{X_t\}_{t \in \mathbb{R}}\)</span> tel que :
+<span class="math display">\[\gamma(h) = \text{Cov}(X_t,
+X_{t+h}).\]</span> Pour tout <span class="math inline">\(n \in
+\mathbb{N}\)</span>, pour tous <span class="math inline">\(t_1, \ldots,
+t_n \in \mathbb{R}\)</span> et pour tous <span
+class="math inline">\(c_1, \ldots, c_n \in \mathbb{C}\)</span>, nous
+avons : <span class="math display">\[\sum_{i=1}^n \sum_{j=1}^n c_i
+\overline{c_j} \gamma(t_i - t_j) = \mathbb{E}\left[\left|\sum_{i=1}^n
+c_i (X_{t_i} - \mu)\right|^2\right] \geq 0.\]</span> Cela montre que
+<span class="math inline">\(\gamma\)</span> est positive définie.</p>
+<p>Réciproquement, supposons que <span
+class="math inline">\(\gamma\)</span> soit une fonction positive
+définie. Par le théorème de Bochner, il existe une mesure de probabilité
+<span class="math inline">\(\mu\)</span> sur <span
+class="math inline">\(\mathbb{R}\)</span> telle que : <span
+class="math display">\[\gamma(h) = \int_{\mathbb{R}} e^{i h \lambda}
+d\mu(\lambda).\]</span> Nous pouvons alors définir un processus
+stochastique <span class="math inline">\(\{X_t\}_{t \in
+\mathbb{R}}\)</span> par : <span class="math display">\[X_t =
+\int_{\mathbb{R}} e^{i t \lambda} dZ(\lambda),\]</span> où <span
+class="math inline">\(Z\)</span> est un processus de Fourier
+stochastique. Alors, pour tout <span class="math inline">\(t, h \in
+\mathbb{R}\)</span>, nous avons : <span
+class="math display">\[\text{Cov}(X_t, X_{t+h}) = \int_{\mathbb{R}} e^{i
+h \lambda} d\mu(\lambda) = \gamma(h).\]</span> Cela montre que <span
+class="math inline">\(\gamma\)</span> est une fonction
+d’autocovariance. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’ACVF possède plusieurs propriétés importantes :</p>
+<ol>
+<li><p>Symétrie : <span class="math inline">\(\gamma(h) =
+\gamma(-h)\)</span>.</p></li>
+<li><p>Valeur maximale : <span class="math inline">\(\gamma(0) =
+\text{Var}(X_t)\)</span>.</p></li>
+<li><p>Inégalité de Cauchy-Schwarz : <span
+class="math inline">\(|\gamma(h)| \leq \gamma(0)\)</span>.</p></li>
+</ol>
+<div class="proof">
+<p><em>Proof.</em> La symétrie découle du fait que <span
+class="math inline">\(\text{Cov}(X_t, X_{t+h}) = \text{Cov}(X_{t+h},
+X_t)\)</span>. La valeur maximale est obtenue en prenant <span
+class="math inline">\(h = 0\)</span>, ce qui donne la variance du
+processus. L’inégalité de Cauchy-Schwarz s’applique car l’ACVF est une
+covariance. ◻</p>
+</div>
+<p>En conclusion, la fonction d’autocovariance est un outil puissant
+pour l’analyse des processus stochastiques, offrant des insights
+précieux sur les dépendances temporelles ou spatiales. Son étude
+approfondie permet de mieux comprendre et modéliser les phénomènes
+aléatoires complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

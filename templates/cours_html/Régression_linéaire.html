@@ -1,0 +1,324 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Régression linéaire : Une analyse approfondie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Régression linéaire : Une analyse approfondie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La régression linéaire est un outil fondamental en statistique et en
+apprentissage automatique. Elle trouve ses racines dans les travaux de
+Francis Galton au XIXe siècle, qui cherchait à modéliser la relation
+entre la taille des parents et celle de leurs enfants. Aujourd’hui, la
+régression linéaire est indispensable dans de nombreux domaines, allant
+de l’économie à la biologie, en passant par les sciences sociales. Elle
+permet de comprendre et de prédire des relations linéaires entre des
+variables, offrant ainsi des insights précieux pour la prise de
+décision.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la régression linéaire, commençons par comprendre ce
+que nous cherchons à modéliser. Supposons que nous avons un ensemble de
+données <span class="math inline">\((x_i, y_i)\)</span> où <span
+class="math inline">\(x_i\)</span> est une variable indépendante et
+<span class="math inline">\(y_i\)</span> est une variable dépendante.
+Nous voulons trouver une relation linéaire entre <span
+class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span>.</p>
+<p>Formellement, nous cherchons une fonction linéaire <span
+class="math inline">\(f(x) = \beta_0 + \beta_1 x\)</span> qui minimise
+l’erreur entre les valeurs prédites <span
+class="math inline">\(f(x_i)\)</span> et les valeurs observées <span
+class="math inline">\(y_i\)</span>. Cette erreur est souvent mesurée par
+la somme des carrés des résidus.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((x_i, y_i)_{i=1}^n\)</span> un
+ensemble de données. Le modèle de régression linéaire simple cherche à
+estimer les paramètres <span class="math inline">\(\beta_0\)</span> et
+<span class="math inline">\(\beta_1\)</span> tels que : <span
+class="math display">\[y_i = \beta_0 + \beta_1 x_i + \epsilon_i, \quad i
+= 1, \ldots, n\]</span> où <span
+class="math inline">\(\epsilon_i\)</span> sont les résidus, supposés
+être des variables aléatoires indépendantes et identiquement distribuées
+(i.i.d.) avec une espérance nulle et une variance constante.</p>
+</div>
+<p>Pour généraliser ce modèle à plusieurs variables indépendantes, nous
+introduisons le modèle de régression linéaire multiple.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\((x_{ij},
+y_i)_{i=1,j=1}^{n,p}\)</span> un ensemble de données avec <span
+class="math inline">\(p\)</span> variables indépendantes. Le modèle de
+régression linéaire multiple cherche à estimer les paramètres <span
+class="math inline">\(\beta_0, \beta_1, \ldots, \beta_p\)</span> tels
+que : <span class="math display">\[y_i = \beta_0 + \beta_1 x_{i1} +
+\beta_2 x_{i2} + \ldots + \beta_p x_{ip} + \epsilon_i, \quad i = 1,
+\ldots, n\]</span> où <span class="math inline">\(\epsilon_i\)</span>
+sont les résidus, supposés être des variables aléatoires i.i.d. avec une
+espérance nulle et une variance constante.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental en régression linéaire est celui des moindres
+carrés, qui fournit une méthode pour estimer les paramètres du
+modèle.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((x_i, y_i)_{i=1}^n\)</span> un
+ensemble de données. Les estimateurs des moindres carrés <span
+class="math inline">\(\hat{\beta}_0\)</span> et <span
+class="math inline">\(\hat{\beta}_1\)</span> qui minimisent la somme des
+carrés des résidus sont donnés par : <span
+class="math display">\[\hat{\beta}_1 = \frac{\sum_{i=1}^n (x_i -
+\bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2}, \quad
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}\]</span> où <span
+class="math inline">\(\bar{x}\)</span> et <span
+class="math inline">\(\bar{y}\)</span> sont les moyennes des variables
+<span class="math inline">\(x\)</span> et <span
+class="math inline">\(y\)</span> respectivement.</p>
+</div>
+<p>Pour le modèle de régression linéaire multiple, les estimateurs des
+moindres carrés sont donnés par la solution de l’équation normale.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((x_{ij},
+y_i)_{i=1,j=1}^{n,p}\)</span> un ensemble de données. Les estimateurs
+des moindres carrés <span class="math inline">\(\hat{\beta} =
+(\hat{\beta}_0, \hat{\beta}_1, \ldots, \hat{\beta}_p)^T\)</span> sont
+obtenus en résolvant le système d’équations : <span
+class="math display">\[X^T X \hat{\beta} = X^T y\]</span> où <span
+class="math inline">\(X\)</span> est la matrice de design et <span
+class="math inline">\(y\)</span> est le vecteur des observations.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème des moindres carrés, nous commençons par
+exprimer la somme des carrés des résidus.</p>
+<p><span class="math display">\[S(\beta_0, \beta_1) = \sum_{i=1}^n (y_i
+- \beta_0 - \beta_1 x_i)^2\]</span></p>
+<p>Pour minimiser <span class="math inline">\(S(\beta_0,
+\beta_1)\)</span>, nous prenons les dérivées partielles par rapport à
+<span class="math inline">\(\beta_0\)</span> et <span
+class="math inline">\(\beta_1\)</span> et les mettons à zéro.</p>
+<p><span class="math display">\[\frac{\partial S}{\partial \beta_0} = -2
+\sum_{i=1}^n (y_i - \beta_0 - \beta_1 x_i) = 0\]</span> <span
+class="math display">\[\frac{\partial S}{\partial \beta_1} = -2
+\sum_{i=1}^n x_i (y_i - \beta_0 - \beta_1 x_i) = 0\]</span></p>
+<p>En résolvant ce système d’équations, nous obtenons les estimateurs
+des moindres carrés.</p>
+<p><span class="math display">\[\hat{\beta}_1 = \frac{\sum_{i=1}^n (x_i
+- \bar{x})(y_i - \bar{y})}{\sum_{i=1}^n (x_i - \bar{x})^2}, \quad
+\hat{\beta}_0 = \bar{y} - \hat{\beta}_1 \bar{x}\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<ol>
+<li><p>Les estimateurs des moindres carrés sont linéaires et sans biais.
+Cela signifie que <span class="math inline">\(E[\hat{\beta}] =
+\beta\)</span>.</p></li>
+<li><p>La variance des estimateurs des moindres carrés est donnée par :
+<span class="math display">\[\text{Var}(\hat{\beta}) = \sigma^2 (X^T
+X)^{-1}\]</span> où <span class="math inline">\(\sigma^2\)</span> est la
+variance des résidus.</p></li>
+<li><p>Le modèle de régression linéaire suppose que les résidus sont
+indépendants et identiquement distribués avec une espérance nulle et une
+variance constante. Cette hypothèse est cruciale pour la validité des
+estimateurs et des tests statistiques.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La régression linéaire est un outil puissant pour modéliser et
+prédire des relations linéaires entre des variables. Elle trouve des
+applications dans de nombreux domaines et reste un sujet de recherche
+actif en statistique et en apprentissage automatique. Les théorèmes et
+propriétés présentés dans cet article fournissent une base solide pour
+comprendre et appliquer la régression linéaire dans des contextes
+pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

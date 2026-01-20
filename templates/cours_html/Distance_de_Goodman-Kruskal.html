@@ -1,0 +1,384 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Goodman-Kruskal : Une mesure d’ordre pour les données catégorielles</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Goodman-Kruskal : Une mesure d’ordre pour
+les données catégorielles</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La distance de Goodman-Kruskal émerge dans le contexte de l’analyse
+des données catégorielles, où les méthodes traditionnelles de distance
+euclidienne ou de corrélation ne sont pas applicables. Cette mesure,
+introduite par les statisticiens Leo A. Goodman et William H. Kruskal
+dans les années 1950, répond à un besoin crucial : quantifier la
+dissimilarité entre des objets décrits par des variables
+catégorielles.</p>
+<p>L’analyse des données catégorielles est indispensable dans de
+nombreux domaines, tels que la sociologie, la biologie et le marketing.
+La distance de Goodman-Kruskal permet de comparer des objets en tenant
+compte de l’ordre sous-jacent des catégories, offrant ainsi une
+alternative robuste aux mesures basées sur la fréquence ou la
+similarité.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Goodman-Kruskal, considérons deux
+objets décrits par des variables catégorielles. Nous cherchons une
+mesure qui capture la dissimilarité entre ces objets en tenant compte de
+l’ordre des catégories. Supposons que nous avons deux variables
+catégorielles <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, chacune avec un ensemble fini de
+catégories ordonnées.</p>
+<p>La distance de Goodman-Kruskal est définie comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> deux variables catégorielles avec <span
+class="math inline">\(k\)</span> catégories chacune, ordonnées de
+manière croissante. La distance de Goodman-Kruskal entre deux objets
+<span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> est donnée par : <span
+class="math display">\[d_{GK}(i, j) = \frac{1}{k} \sum_{l=1}^{k} |x_{il}
+- x_{jl}| + \frac{1}{k} \sum_{l=1}^{k} |y_{il} - y_{jl}|\]</span> où
+<span class="math inline">\(x_{il}\)</span> et <span
+class="math inline">\(y_{il}\)</span> représentent les catégories des
+objets <span class="math inline">\(i\)</span> et <span
+class="math inline">\(j\)</span> pour la variable <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> respectivement, codées numériquement
+selon leur ordre.</p>
+</div>
+<p>Une autre formulation équivalente est : <span
+class="math display">\[d_{GK}(i, j) = \frac{1}{k} \sum_{l=1}^{k} |x_{il}
+- x_{jl}| + \frac{1}{k} \sum_{l=1}^{k} |y_{il} - y_{jl}| = \frac{1}{k}
+\left( \sum_{l=1}^{k} |x_{il} - x_{jl}| + \sum_{l=1}^{k} |y_{il} -
+y_{jl}| \right)\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la distance de Goodman-Kruskal est celui
+de la métrique. Nous cherchons à montrer que cette distance satisfait
+les propriétés d’une métrique.</p>
+<div class="theorem">
+<p>La distance de Goodman-Kruskal <span
+class="math inline">\(d_{GK}\)</span> est une métrique, c’est-à-dire
+qu’elle satisfait les propriétés suivantes pour tous objets <span
+class="math inline">\(i, j, k\)</span> :</p>
+<ol>
+<li><p><span class="math inline">\(d_{GK}(i, j) \geq 0\)</span>
+(non-négativité)</p></li>
+<li><p><span class="math inline">\(d_{GK}(i, j) = 0\)</span> si et
+seulement si <span class="math inline">\(i = j\)</span> (identité des
+indiscernables)</p></li>
+<li><p><span class="math inline">\(d_{GK}(i, j) = d_{GK}(j, i)\)</span>
+(symétrie)</p></li>
+<li><p><span class="math inline">\(d_{GK}(i, k) \leq d_{GK}(i, j) +
+d_{GK}(j, k)\)</span> (inégalité triangulaire)</p></li>
+</ol>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver que la distance de Goodman-Kruskal est une métrique,
+nous devons vérifier chacune des propriétés mentionnées.</p>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p><strong>Non-négativité</strong> : Pour tout <span
+class="math inline">\(i, j\)</span>, les termes <span
+class="math inline">\(|x_{il} - x_{jl}|\)</span> et <span
+class="math inline">\(|y_{il} - y_{jl}|\)</span> sont non-négatifs. Par
+conséquent, leur somme est également non-négative. <span
+class="math display">\[d_{GK}(i, j) = \frac{1}{k} \sum_{l=1}^{k} |x_{il}
+- x_{jl}| + \frac{1}{k} \sum_{l=1}^{k} |y_{il} - y_{jl}| \geq
+0\]</span></p></li>
+<li><p><strong>Identité des indiscernables</strong> : Si <span
+class="math inline">\(i = j\)</span>, alors <span
+class="math inline">\(x_{il} = x_{jl}\)</span> et <span
+class="math inline">\(y_{il} = y_{jl}\)</span> pour tout <span
+class="math inline">\(l\)</span>. Par conséquent, les termes <span
+class="math inline">\(|x_{il} - x_{jl}|\)</span> et <span
+class="math inline">\(|y_{il} - y_{jl}|\)</span> sont tous égaux à zéro.
+<span class="math display">\[d_{GK}(i, j) = \frac{1}{k} \sum_{l=1}^{k} 0
++ \frac{1}{k} \sum_{l=1}^{k} 0 = 0\]</span> Réciproquement, si <span
+class="math inline">\(d_{GK}(i, j) = 0\)</span>, alors chaque terme
+<span class="math inline">\(|x_{il} - x_{jl}|\)</span> et <span
+class="math inline">\(|y_{il} - y_{jl}|\)</span> doit être égal à zéro,
+ce qui implique que <span class="math inline">\(i = j\)</span>.</p></li>
+<li><p><strong>Symétrie</strong> : La distance de Goodman-Kruskal est
+symétrique car l’ordre des objets <span class="math inline">\(i\)</span>
+et <span class="math inline">\(j\)</span> n’affecte pas les termes <span
+class="math inline">\(|x_{il} - x_{jl}|\)</span> et <span
+class="math inline">\(|y_{il} - y_{jl}|\)</span>. <span
+class="math display">\[d_{GK}(i, j) = \frac{1}{k} \sum_{l=1}^{k} |x_{il}
+- x_{jl}| + \frac{1}{k} \sum_{l=1}^{k} |y_{il} - y_{jl}| = \frac{1}{k}
+\sum_{l=1}^{k} |x_{jl} - x_{il}| + \frac{1}{k} \sum_{l=1}^{k} |y_{jl} -
+y_{il}| = d_{GK}(j, i)\]</span></p></li>
+<li><p><strong>Inégalité triangulaire</strong> : Pour tout <span
+class="math inline">\(l\)</span>, nous avons : <span
+class="math display">\[|x_{il} - x_{kl}| \leq |x_{il} - x_{jl}| +
+|x_{jl} - x_{kl}|\]</span> <span class="math display">\[|y_{il} -
+y_{kl}| \leq |y_{il} - y_{jl}| + |y_{jl} - y_{kl}|\]</span> En sommant
+sur <span class="math inline">\(l\)</span> et en divisant par <span
+class="math inline">\(k\)</span>, nous obtenons : <span
+class="math display">\[d_{GK}(i, k) \leq d_{GK}(i, j) + d_{GK}(j,
+k)\]</span></p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+distance de Goodman-Kruskal :</p>
+<ol>
+<li><p><strong>Invariance par translation</strong> : La distance de
+Goodman-Kruskal est invariante par translation des catégories. Cela
+signifie que si nous ajoutons une constante à toutes les catégories
+d’une variable, la distance reste inchangée.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(c\)</span> une
+constante. Alors, pour tout <span class="math inline">\(l\)</span>, nous
+avons : <span class="math display">\[|(x_{il} + c) - (x_{jl} + c)| =
+|x_{il} - x_{jl}|\]</span> <span class="math display">\[|(y_{il} + c) -
+(y_{jl} + c)| = |y_{il} - y_{jl}|\]</span> Par conséquent, la distance
+de Goodman-Kruskal reste inchangée : <span
+class="math display">\[d_{GK}(i, j) = \frac{1}{k} \sum_{l=1}^{k} |x_{il}
+- x_{jl}| + \frac{1}{k} \sum_{l=1}^{k} |y_{il} - y_{jl}| = \frac{1}{k}
+\sum_{l=1}^{k} |(x_{il} + c) - (x_{jl} + c)| + \frac{1}{k}
+\sum_{l=1}^{k} |(y_{il} + c) - (y_{jl} + c)| = d_{GK}(i,
+j)\]</span> ◻</p>
+</div></li>
+<li><p><strong>Sensibilité à l’ordre</strong> : La distance de
+Goodman-Kruskal est sensible à l’ordre des catégories. Si l’ordre des
+catégories d’une variable est inversé, la distance change.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(\sigma\)</span> une
+permutation qui inverse l’ordre des catégories. Alors, pour tout <span
+class="math inline">\(l\)</span>, nous avons : <span
+class="math display">\[|x_{il} - x_{jl}| \neq |\sigma(x_{il}) -
+\sigma(x_{jl})|\]</span> <span class="math display">\[|y_{il} - y_{jl}|
+\neq |\sigma(y_{il}) - \sigma(y_{jl})|\]</span> Par conséquent, la
+distance de Goodman-Kruskal change : <span
+class="math display">\[d_{GK}(i, j) = \frac{1}{k} \sum_{l=1}^{k} |x_{il}
+- x_{jl}| + \frac{1}{k} \sum_{l=1}^{k} |y_{il} - y_{jl}| \neq
+\frac{1}{k} \sum_{l=1}^{k} |\sigma(x_{il}) - \sigma(x_{jl})| +
+\frac{1}{k} \sum_{l=1}^{k} |\sigma(y_{il}) -
+\sigma(y_{jl})|\]</span> ◻</p>
+</div></li>
+<li><p><strong>Normalisation</strong> : La distance de Goodman-Kruskal
+est normalisée par le nombre de catégories <span
+class="math inline">\(k\)</span>. Cela permet de comparer des distances
+entre des variables avec un nombre différent de catégories.</p>
+<div class="proof">
+<p><em>Proof.</em> La normalisation par <span
+class="math inline">\(k\)</span> garantit que la distance est
+indépendante du nombre de catégories. Pour toute constante <span
+class="math inline">\(c &gt; 0\)</span>, nous avons : <span
+class="math display">\[d_{GK}(i, j) = \frac{1}{k} \sum_{l=1}^{k} |x_{il}
+- x_{jl}| + \frac{1}{k} \sum_{l=1}^{k} |y_{il} - y_{jl}| = \frac{1}{c k}
+\sum_{l=1}^{k} |x_{il} - x_{jl}| + \frac{1}{c k} \sum_{l=1}^{k} |y_{il}
+- y_{jl}| = \frac{1}{c} d_{GK}(i, j)\]</span> Cependant, en pratique, la
+distance est normalisée par <span class="math inline">\(k\)</span> pour
+faciliter l’interprétation. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Goodman-Kruskal est une mesure puissante et flexible
+pour l’analyse des données catégorielles. Son utilisation permet de
+capturer la dissimilarité entre des objets décrits par des variables
+catégorielles, tout en tenant compte de l’ordre sous-jacent des
+catégories. Les propriétés mathématiques de cette distance en font un
+outil précieux pour les statisticiens et les chercheurs dans divers
+domaines.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

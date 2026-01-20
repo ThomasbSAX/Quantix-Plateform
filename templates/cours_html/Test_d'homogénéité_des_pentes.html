@@ -1,0 +1,293 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Test d’homogénéité des pentes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Test d’homogénéité des pentes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Le test d’homogénéité des pentes est un outil statistique fondamental
+dans l’analyse de régressions multiples. Il permet de vérifier si les
+pentes de plusieurs droites de régression sont égales, c’est-à-dire si
+elles proviennent d’une même population. Cette question est cruciale
+dans de nombreux domaines, notamment en économie, en biologie et en
+sciences sociales, où l’on cherche à comparer des modèles de régression
+sur différents sous-groupes d’une population.</p>
+<p>L’origine historique de ce test remonte aux travaux pionniers de
+Ronald Fisher et Frank Yates dans les années 1930, qui ont posé les
+bases de l’analyse de la variance (ANOVA). Le test d’homogénéité des
+pentes est une extension naturelle de ces idées à la régression linéaire
+multiple. Il est indispensable pour valider l’hypothèse d’homogénéité
+des pentes, ce qui permet de simplifier les modèles et d’améliorer leur
+interprétabilité.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le test d’homogénéité des pentes, commençons par
+définir les concepts clés.</p>
+<h2 id="modèle-de-régression-linéaire-multiple">Modèle de régression
+linéaire multiple</h2>
+<p>Considérons un modèle de régression linéaire multiple pour chaque
+sous-groupe <span class="math inline">\(i\)</span> : <span
+class="math display">\[Y_{ij} = \beta_{0i} + \beta_{1i} X_{ij} +
+\epsilon_{ij}, \quad j = 1, \ldots, n_i\]</span> où <span
+class="math inline">\(Y_{ij}\)</span> est la variable dépendante, <span
+class="math inline">\(X_{ij}\)</span> est la variable indépendante,
+<span class="math inline">\(\beta_{0i}\)</span> et <span
+class="math inline">\(\beta_{1i}\)</span> sont les coefficients de
+régression, et <span class="math inline">\(\epsilon_{ij}\)</span> est le
+terme d’erreur.</p>
+<h2 id="hypothèse-dhomogénéité-des-pentes">Hypothèse d’homogénéité des
+pentes</h2>
+<p>L’hypothèse d’homogénéité des pentes stipule que les pentes <span
+class="math inline">\(\beta_{1i}\)</span> sont égales pour tous les
+sous-groupes : <span class="math display">\[H_0: \beta_{11} = \beta_{12}
+= \ldots = \beta_{1k}\]</span> contre l’hypothèse alternative : <span
+class="math display">\[H_1: \text{au moins deux } \beta_{1i} \text{ sont
+différents}\]</span></p>
+<h2 id="statistique-de-test">Statistique de test</h2>
+<p>La statistique de test pour l’homogénéité des pentes est basée sur
+une analyse de la variance (ANOVA). Elle compare la variance des pentes
+estimées entre les sous-groupes à la variance des erreurs.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-fisher-pour-lanova">Théorème de Fisher pour
+l’ANOVA</h2>
+<p>Le théorème de Fisher pour l’ANOVA stipule que, sous l’hypothèse
+nulle d’homogénéité des pentes, la statistique de test suit une loi du
+rapport de variances de Fisher : <span class="math display">\[F =
+\frac{MS_{entre}}{MS_{dans}} \sim F_{(k-1), (N-k)}\]</span> où <span
+class="math inline">\(MS_{entre}\)</span> est la moyenne des carrés
+entre les sous-groupes, <span class="math inline">\(MS_{dans}\)</span>
+est la moyenne des carrés dans les sous-groupes, <span
+class="math inline">\(k\)</span> est le nombre de sous-groupes, et <span
+class="math inline">\(N\)</span> est le nombre total d’observations.</p>
+<h2 id="preuve-du-théorème-de-fisher">Preuve du théorème de Fisher</h2>
+<p>La preuve repose sur les propriétés des estimateurs des moindres
+carrés et la distribution de Fisher. Sous l’hypothèse nulle, les pentes
+sont égales, ce qui permet de décomposer la somme des carrés totaux en
+une somme des carrés entre les sous-groupes et une somme des carrés dans
+les sous-groupes. La statistique <span class="math inline">\(F\)</span>
+est alors le rapport de ces deux sommes, ajustées par leurs degrés de
+liberté respectifs.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-1-invariance-sous-transformation-linéaire">Propriété
+1: Invariance sous transformation linéaire</h2>
+<p>La statistique de test <span class="math inline">\(F\)</span> est
+invariante sous toute transformation linéaire des variables dépendantes
+et indépendantes. Cela signifie que multiplier <span
+class="math inline">\(Y\)</span> ou <span
+class="math inline">\(X\)</span> par une constante non nulle ne change
+pas la valeur de <span class="math inline">\(F\)</span>.</p>
+<h2 id="propriété-2-robustesse-aux-erreurs-non-normales">Propriété 2:
+Robustesse aux erreurs non normales</h2>
+<p>Bien que le théorème de Fisher suppose des erreurs normalement
+distribuées, la statistique <span class="math inline">\(F\)</span> est
+assez robuste aux violations de cette hypothèse, notamment pour des
+échantillons de taille modérée à grande.</p>
+<h2 id="corollaire-test-de-lhomogénéité-des-interceptes">Corollaire:
+Test de l’homogénéité des interceptes</h2>
+<p>Si les pentes sont homogènes, on peut tester l’homogénéité des
+interceptes <span class="math inline">\(\beta_{0i}\)</span> en utilisant
+une ANOVA similaire. Cela permet de simplifier davantage le modèle de
+régression.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Le test d’homogénéité des pentes est un outil puissant pour comparer
+les modèles de régression sur différents sous-groupes. Il repose sur des
+fondements théoriques solides, notamment le théorème de Fisher pour
+l’ANOVA. Ses propriétés et sa robustesse en font un outil indispensable
+dans l’analyse statistique moderne.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,337 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Entropie de Shannon généralisée : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Entropie de Shannon généralisée : Fondements et
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’entropie de Shannon, introduite par Claude E. Shannon en 1948 dans
+son article fondateur “A Mathematical Theory of Communication”, a
+révolutionné la théorie de l’information. Cette notion, empruntée à la
+thermodynamique via les travaux de Ludwig Boltzmann, mesure
+l’incertitude ou l’information contenue dans un ensemble de données.
+Cependant, l’entropie de Shannon classique présente des limitations dans
+certains contextes, notamment lorsqu’il s’agit de capturer des
+dépendances complexes entre variables ou d’intégrer des contraintes
+supplémentaires.</p>
+<p>L’entropie de Shannon généralisée émerge comme une réponse à ces
+défis. Elle étend le cadre classique en incorporant des paramètres
+supplémentaires qui permettent de moduler la sensibilité de l’entropie à
+différentes formes d’information. Cette généralisation ouvre des
+perspectives nouvelles dans divers domaines, allant de la théorie de
+l’information à la physique statistique, en passant par le traitement du
+signal et l’apprentissage automatique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire l’entropie de Shannon généralisée, commençons par
+rappeler la définition classique de l’entropie de Shannon. Supposons que
+nous ayons un ensemble de variables aléatoires discrètes <span
+class="math inline">\(X_1, X_2, \ldots, X_n\)</span> avec une
+distribution conjointe <span class="math inline">\(p(x_1, x_2, \ldots,
+x_n)\)</span>. L’entropie de Shannon est définie comme :</p>
+<p><span class="math display">\[H(X_1, X_2, \ldots, X_n) = -\sum_{x_1,
+x_2, \ldots, x_n} p(x_1, x_2, \ldots, x_n) \log p(x_1, x_2, \ldots,
+x_n)\]</span></p>
+<p>Cette mesure quantifie l’incertitude totale associée à l’ensemble des
+variables. Cependant, elle ne tient pas compte de la structure interne
+des données ou des dépendances entre les variables.</p>
+<p>Pour généraliser cette notion, introduisons un paramètre <span
+class="math inline">\(q\)</span> qui permet de moduler la sensibilité de
+l’entropie. L’entropie de Shannon généralisée, également connue sous le
+nom d’entropie de Tsallis, est définie comme suit :</p>
+<p><span class="math display">\[H_q(X_1, X_2, \ldots, X_n) =
+\frac{1}{q-1} \left( \sum_{x_1, x_2, \ldots, x_n} p(x_1, x_2, \ldots,
+x_n)^q - 1 \right)\]</span></p>
+<p>où <span class="math inline">\(q\)</span> est un paramètre réel.
+Lorsque <span class="math inline">\(q = 1\)</span>, cette expression se
+réduit à l’entropie de Shannon classique. Pour <span
+class="math inline">\(q &gt; 1\)</span>, l’entropie généralisée devient
+plus sensible aux événements rares, tandis que pour <span
+class="math inline">\(q &lt; 1\)</span>, elle met davantage l’accent sur
+les événements fréquents.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à l’entropie de Shannon généralisée est
+le théorème de la limite centrale généralisée. Ce théorème étend le
+résultat classique de la théorie des probabilités en tenant compte de la
+structure des dépendances entre les variables.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> un
+ensemble de variables aléatoires indépendantes et identiquement
+distribuées (i.i.d.) avec une espérance <span
+class="math inline">\(\mu\)</span> et une variance <span
+class="math inline">\(\sigma^2\)</span>. Pour tout <span
+class="math inline">\(q &gt; 0\)</span>, la somme normalisée</p>
+<p><span class="math display">\[S_n = \frac{1}{\sigma \sqrt{n}}
+\sum_{i=1}^n (X_i - \mu)\]</span></p>
+<p>converge en loi vers une distribution stable généralisée lorsque
+<span class="math inline">\(n \to \infty\)</span>.</p>
+</div>
+<p>La démonstration de ce théorème repose sur des techniques avancées de
+théorie des probabilités et d’analyse fonctionnelle. Elle met en
+évidence le rôle crucial du paramètre <span
+class="math inline">\(q\)</span> dans la caractérisation des propriétés
+asymptotiques des sommes de variables aléatoires.</p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de la limite centrale généralisée, nous
+utilisons des outils issus de l’analyse de Fourier et de la théorie des
+processus stochastiques. La preuve suit les grandes lignes suivantes
+:</p>
+<p>1. **Transformation de Fourier** : Nous commençons par appliquer la
+transformation de Fourier à la fonction caractéristique des variables
+<span class="math inline">\(X_i\)</span>. Cette étape permet de passer
+du domaine des probabilités au domaine des fréquences, facilitant
+l’analyse des propriétés asymptotiques.</p>
+<p>2. **Développement en série de Taylor** : Nous développons la
+fonction caractéristique en série de Taylor autour du point zéro. Ce
+développement nous permet d’isoler les termes dominants qui
+détermineront le comportement asymptotique de la somme <span
+class="math inline">\(S_n\)</span>.</p>
+<p>3. **Convergence en loi** : En utilisant des résultats classiques de
+la théorie des probabilités, nous montrons que la somme normalisée <span
+class="math inline">\(S_n\)</span> converge en loi vers une distribution
+stable généralisée. Cette convergence est établie en utilisant des
+critères de convergence tels que le théorème de Lévy-Cramér.</p>
+<p>4. **Rôle du paramètre <span class="math inline">\(q\)</span>** :
+Nous analysons l’impact du paramètre <span
+class="math inline">\(q\)</span> sur la forme de la distribution limite.
+Nous montrons que pour différents valeurs de <span
+class="math inline">\(q\)</span>, la distribution stable généralisée
+peut prendre des formes variées, reflétant ainsi les différentes
+structures de dépendance entre les variables.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’entropie de Shannon généralisée possède plusieurs propriétés
+intéressantes qui en font un outil puissant pour l’analyse des données.
+Nous en listons quelques-unes ci-dessous :</p>
+<ol>
+<li><p>**Continuité** : L’entropie généralisée est une fonction continue
+du paramètre <span class="math inline">\(q\)</span>. Cela signifie que
+de petites variations de <span class="math inline">\(q\)</span>
+entraînent des changements continus dans la mesure d’entropie.</p></li>
+<li><p>**Concavité** : Pour <span class="math inline">\(q &gt;
+0\)</span>, l’entropie généralisée est une fonction concave de la
+distribution de probabilité. Cette propriété est cruciale pour
+l’application de l’entropie dans des contextes d’optimisation.</p></li>
+<li><p>**Symétrie** : L’entropie généralisée est symétrique par rapport
+aux permutations des variables. Cela signifie que l’ordre des variables
+n’a pas d’impact sur la valeur de l’entropie.</p></li>
+<li><p>**Inégalité de subadditivité** : Pour <span
+class="math inline">\(q &gt; 0\)</span>, l’entropie généralisée
+satisfait une inégalité de subadditivité. Cette propriété est
+essentielle pour l’analyse des dépendances entre les variables.</p></li>
+</ol>
+<p>Chacune de ces propriétés peut être démontrée en utilisant des
+techniques d’analyse fonctionnelle et de théorie des probabilités. Elles
+jouent un rôle clé dans les applications pratiques de l’entropie
+généralisée.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’entropie de Shannon généralisée représente une avancée
+significative dans la théorie de l’information. En introduisant un
+paramètre supplémentaire, elle permet de capturer des aspects complexes
+des données qui échappent à l’entropie classique. Les théorèmes et
+propriétés associés à cette notion ouvrent des perspectives nouvelles
+dans divers domaines, allant de la physique statistique à
+l’apprentissage automatique.</p>
+<p>Les travaux futurs pourraient explorer davantage les applications
+pratiques de l’entropie généralisée, notamment dans le traitement des
+données massives et l’analyse des réseaux complexes. En outre, une
+meilleure compréhension des propriétés mathématiques de cette entropie
+pourrait conduire à de nouvelles découvertes fondamentales en théorie de
+l’information.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

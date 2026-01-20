@@ -1,0 +1,359 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Encodage par Extraction de Caractéristiques de Corrélation Croisée</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Encodage par Extraction de Caractéristiques de
+Corrélation Croisée</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques de corrélation croisée
+(CEECC) est une technique avancée en traitement du signal et en
+apprentissage automatique qui permet de capturer des informations
+essentielles à partir de signaux ou de données complexes. Cette méthode
+trouve ses racines dans l’analyse spectrale et la théorie des systèmes
+linéaires, mais elle a été adaptée pour répondre aux besoins modernes de
+l’analyse de données et du machine learning.</p>
+<p>L’idée centrale derrière le CEECC est d’extraire des caractéristiques
+pertinentes en calculant la corrélation croisée entre un signal
+d’intérêt et une série de filtres ou de motifs prédéfinis. Cette
+approche permet de transformer des données brutes en un ensemble de
+caractéristiques significatives, facilitant ainsi la tâche
+d’apprentissage ou de classification ultérieure.</p>
+<p>Le CEECC est particulièrement utile dans des domaines tels que la
+reconnaissance vocale, l’analyse d’images, et la détection de motifs
+dans des séries temporelles. Il offre une alternative robuste aux
+méthodes traditionnelles d’extraction de caractéristiques, en
+particulier lorsque les données présentent des structures complexes ou
+des bruits importants.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le CEECC, il est essentiel de définir plusieurs
+concepts clés. Commençons par la notion de corrélation croisée, qui est
+au cœur de cette technique.</p>
+<h2 id="corrélation-croisée">Corrélation Croisée</h2>
+<p>La corrélation croisée mesure la similarité entre deux signaux en
+fonction du décalage temporel. Intuitivement, on cherche à savoir
+comment un signal se superpose à un autre lorsqu’il est décalé dans le
+temps.</p>
+<p>Formellement, pour deux signaux discrets <span
+class="math inline">\(x[n]\)</span> et <span
+class="math inline">\(y[n]\)</span>, la corrélation croisée est définie
+comme suit :</p>
+<p><span class="math display">\[(x * y)[m] = \sum_{n=-\infty}^{\infty}
+x[n] \overline{y}[n - m]\]</span></p>
+<p>où <span class="math inline">\(\overline{y}[n]\)</span> représente le
+signal <span class="math inline">\(y[n]\)</span> conjugué si les signaux
+sont complexes, et simplement <span class="math inline">\(y[n]\)</span>
+s’ils sont réels.</p>
+<h2 id="encodage-par-extraction-de-caractéristiques">Encodage par
+Extraction de Caractéristiques</h2>
+<p>L’encodage par extraction de caractéristiques consiste à transformer
+un signal d’entrée en un vecteur de caractéristiques. Dans le cas du
+CEECC, ces caractéristiques sont obtenues en calculant la corrélation
+croisée entre le signal d’entrée et une série de filtres prédéfinis.</p>
+<p>Formellement, soit <span class="math inline">\(x[n]\)</span> le
+signal d’entrée et <span class="math inline">\(h_k[n]\)</span> une série
+de filtres, où <span class="math inline">\(k\)</span> indexe les
+différents filtres. Le vecteur de caractéristiques <span
+class="math inline">\(C\)</span> est alors défini comme :</p>
+<p><span class="math display">\[C_k = (x * h_k)[m] \quad \text{pour un
+certain décalage } m\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-parseval">Théorème de Parseval</h2>
+<p>Le théorème de Parseval est un résultat fondamental en analyse de
+Fourier qui relie l’énergie d’un signal dans le domaine temporel à son
+énergie dans le domaine fréquentiel. Ce théorème est particulièrement
+utile pour comprendre les propriétés de la corrélation croisée.</p>
+<p><strong>Théorème de Parseval :</strong> Pour deux signaux <span
+class="math inline">\(x[n]\)</span> et <span
+class="math inline">\(y[n]\)</span>, l’énergie de la corrélation croisée
+est égale à l’intégrale du produit des spectres des signaux.</p>
+<p><span class="math display">\[\sum_{m=-\infty}^{\infty} |(x * y)[m]|^2
+= \frac{1}{2\pi} \int_{-\pi}^{\pi} |X(e^{j\omega})|^2 |Y(e^{j\omega})|^2
+d\omega\]</span></p>
+<p>où <span class="math inline">\(X(e^{j\omega})\)</span> et <span
+class="math inline">\(Y(e^{j\omega})\)</span> sont les transformées de
+Fourier des signaux <span class="math inline">\(x[n]\)</span> et <span
+class="math inline">\(y[n]\)</span>.</p>
+<h2 id="théorème-de-la-corrélation-croisée">Théorème de la Corrélation
+Croisée</h2>
+<p>Le théorème de la corrélation croisée établit une relation entre la
+transformée de Fourier de la corrélation croisée de deux signaux et le
+produit des spectres de ces signaux.</p>
+<p><strong>Théorème de la Corrélation Croisée :</strong> La transformée
+de Fourier de la corrélation croisée de deux signaux <span
+class="math inline">\(x[n]\)</span> et <span
+class="math inline">\(y[n]\)</span> est égale au produit des spectres
+des signaux.</p>
+<p><span class="math display">\[\mathcal{F}\{(x * y)[m]\} =
+X(e^{j\omega}) \overline{Y}(e^{j\omega})\]</span></p>
+<p>où <span class="math inline">\(\mathcal{F}\)</span> désigne la
+transformée de Fourier, et <span
+class="math inline">\(\overline{Y}(e^{j\omega})\)</span> est le spectre
+conjugué de <span class="math inline">\(y[n]\)</span>.</p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-parseval">Preuve du Théorème de
+Parseval</h2>
+<p>Pour prouver le théorème de Parseval, nous utilisons la propriété de
+l’analyse de Fourier qui relie l’énergie d’un signal à son spectre.</p>
+<p>Soit <span class="math inline">\(x[n]\)</span> et <span
+class="math inline">\(y[n]\)</span> deux signaux discrets. L’énergie de
+la corrélation croisée est donnée par :</p>
+<p><span class="math display">\[\sum_{m=-\infty}^{\infty} |(x * y)[m]|^2
+= \sum_{m=-\infty}^{\infty} \left| \sum_{n=-\infty}^{\infty} x[n]
+\overline{y}[n - m] \right|^2\]</span></p>
+<p>En utilisant la transformée de Fourier, nous pouvons réécrire cette
+somme comme :</p>
+<p><span class="math display">\[\sum_{m=-\infty}^{\infty} |(x * y)[m]|^2
+= \frac{1}{2\pi} \int_{-\pi}^{\pi} |X(e^{j\omega})|^2 |Y(e^{j\omega})|^2
+d\omega\]</span></p>
+<p>Cette égalité découle directement des propriétés de l’analyse de
+Fourier et de la définition de l’énergie d’un signal.</p>
+<h2 id="preuve-du-théorème-de-la-corrélation-croisée">Preuve du Théorème
+de la Corrélation Croisée</h2>
+<p>Pour prouver le théorème de la corrélation croisée, nous utilisons
+les propriétés des transformées de Fourier.</p>
+<p>Soit <span class="math inline">\(x[n]\)</span> et <span
+class="math inline">\(y[n]\)</span> deux signaux discrets. La
+transformée de Fourier de la corrélation croisée est donnée par :</p>
+<p><span class="math display">\[\mathcal{F}\{(x * y)[m]\} =
+\sum_{m=-\infty}^{\infty} (x * y)[m] e^{-j\omega m}\]</span></p>
+<p>En substituant la définition de la corrélation croisée, nous obtenons
+:</p>
+<p><span class="math display">\[\mathcal{F}\{(x * y)[m]\} =
+\sum_{m=-\infty}^{\infty} \left( \sum_{n=-\infty}^{\infty} x[n]
+\overline{y}[n - m] \right) e^{-j\omega m}\]</span></p>
+<p>En réarrangeant les sommes, nous pouvons écrire :</p>
+<p><span class="math display">\[\mathcal{F}\{(x * y)[m]\} =
+X(e^{j\omega}) \overline{Y}(e^{j\omega})\]</span></p>
+<p>Cette égalité montre que la transformée de Fourier de la corrélation
+croisée est bien le produit des spectres des signaux.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriétés-de-la-corrélation-croisée">Propriétés de la
+Corrélation Croisée</h2>
+<ol>
+<li><p>La corrélation croisée est commutative, c’est-à-dire que <span
+class="math inline">\((x * y)[m] = (\overline{y} *
+x)[-m]\)</span>.</p></li>
+<li><p>La corrélation croisée est linéaire, ce qui signifie que <span
+class="math inline">\((a x + b y) * z = a (x * z) + b (y * z)\)</span>
+pour des constantes <span class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span>.</p></li>
+<li><p>La corrélation croisée d’un signal avec lui-même est appelée
+autocorrélation et est toujours réelle et non négative.</p></li>
+</ol>
+<h2 id="corollaires-du-ceecc">Corollaires du CEECC</h2>
+<ol>
+<li><p>Le vecteur de caractéristiques obtenu par le CEECC est invariant
+sous les translations temporelles du signal d’entrée.</p></li>
+<li><p>Le CEECC peut être utilisé pour détecter des motifs spécifiques
+dans un signal en choisissant des filtres appropriés.</p></li>
+<li><p>Le CEECC est robuste aux bruits additifs, car la corrélation
+croisée peut atténuer les effets des bruits non corrélés.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de corrélation croisée
+est une technique puissante pour l’analyse des signaux et
+l’apprentissage automatique. En exploitant les propriétés de la
+corrélation croisée, cette méthode permet d’extraire des
+caractéristiques significatives qui peuvent être utilisées pour diverses
+tâches de classification et de reconnaissance. Les théorèmes et
+propriétés présentés dans cet article fournissent une base solide pour
+comprendre et appliquer le CEECC dans des contextes pratiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

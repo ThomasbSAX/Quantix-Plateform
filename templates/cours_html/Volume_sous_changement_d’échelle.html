@@ -1,0 +1,382 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Volume sous changement d’échelle : une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Volume sous changement d’échelle : une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude des transformations géométriques et de leurs effets sur les
+grandeurs associées est un sujet central en mathématiques. Parmi ces
+transformations, le changement d’échelle occupe une place particulière
+en raison de son universalité et de ses applications variées, allant de
+la physique à l’informatique graphique. Ce chapitre explore une question
+fondamentale : comment le volume d’un objet est-il affecté par un
+changement d’échelle ? Cette interrogation, bien que simple en
+apparence, ouvre la voie à une compréhension profonde des propriétés
+invariantes sous transformation et des implications dimensionnelles en
+analyse.</p>
+<p>L’échelle est une notion intuitive que nous rencontrons
+quotidiennement. Que ce soit en cartographie, où les distances sont
+réduites pour tenir sur une feuille de papier, ou en modélisation 3D, où
+les objets sont agrandis ou réduits pour des raisons pratiques, le
+changement d’échelle est omniprésent. Mathématiquement, cette opération
+correspond à une homothétie, une transformation qui multiplie toutes les
+distances par un facteur constant. L’effet d’une telle transformation
+sur le volume est loin d’être trivial et révèle des propriétés
+fascinantes liées à la dimension de l’espace dans lequel nous
+évoluons.</p>
+<p>Ce chapitre se propose d’explorer cette question à travers une
+approche rigoureuse, en introduisant les concepts nécessaires, en
+énonçant et démontrant les théorèmes clés, et en discutant des
+implications de ces résultats. Nous commencerons par définir
+formellement le changement d’échelle et le volume, puis nous examinerons
+comment ces deux notions interagissent. Enfin, nous généraliserons nos
+résultats à des dimensions supérieures pour en apprécier toute la
+portée.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’aborder le cœur du sujet, il est essentiel de poser les
+définitions nécessaires pour une compréhension claire et précise des
+concepts en jeu.</p>
+<h2 class="unnumbered" id="changement-déchelle">Changement
+d’échelle</h2>
+<p>Considérons un objet géométrique dans l’espace euclidien <span
+class="math inline">\(\mathbb{R}^n\)</span>. Un changement d’échelle, ou
+homothétie, est une transformation qui multiplie toutes les distances
+par un facteur constant <span class="math inline">\(k &gt; 0\)</span>.
+Pour un point <span class="math inline">\(x \in \mathbb{R}^n\)</span>,
+l’image de ce point par une homothétie centrée en l’origine est donnée
+par :</p>
+<p><span class="math display">\[h_k(x) = kx\]</span></p>
+<p>Cette transformation préserve la structure géométrique de l’objet
+tout en modifiant ses dimensions. Le facteur <span
+class="math inline">\(k\)</span> est appelé <em>facteur d’échelle</em>
+et détermine la nature de la transformation : si <span
+class="math inline">\(k &gt; 1\)</span>, l’objet est agrandi ; si <span
+class="math inline">\(0 &lt; k &lt; 1\)</span>, il est réduit.</p>
+<h2 class="unnumbered" id="volume">Volume</h2>
+<p>Le volume est une mesure de l’espace occupé par un objet dans <span
+class="math inline">\(\mathbb{R}^n\)</span>. Pour un ensemble mesurable
+<span class="math inline">\(A \subset \mathbb{R}^n\)</span>, le volume
+de <span class="math inline">\(A\)</span> est noté <span
+class="math inline">\(\text{Vol}(A)\)</span> et correspond à l’intégrale
+de la fonction constante égale à 1 sur <span
+class="math inline">\(A\)</span> :</p>
+<p><span class="math display">\[\text{Vol}(A) = \int_A dx\]</span></p>
+<p>En dimension 3, par exemple, le volume d’un parallélépipède rectangle
+de côtés <span class="math inline">\(a\)</span>, <span
+class="math inline">\(b\)</span> et <span
+class="math inline">\(c\)</span> est donné par le produit <span
+class="math inline">\(abc\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Nous allons maintenant énoncer et démontrer le théorème central de ce
+chapitre, qui établit la relation entre le volume d’un objet et son
+image par une homothétie.</p>
+<h2 class="unnumbered" id="théorème-de-léchelle">Théorème de
+l’échelle</h2>
+<p><strong>Théorème 1.</strong> Soit <span class="math inline">\(A
+\subset \mathbb{R}^n\)</span> un ensemble mesurable et <span
+class="math inline">\(k &gt; 0\)</span>. Alors, le volume de l’image de
+<span class="math inline">\(A\)</span> par une homothétie de facteur
+<span class="math inline">\(k\)</span> est donné par :</p>
+<p><span class="math display">\[\text{Vol}(h_k(A)) = k^n
+\text{Vol}(A)\]</span></p>
+<p>Ce théorème montre que le volume est multiplié par <span
+class="math inline">\(k^n\)</span>, où <span
+class="math inline">\(n\)</span> est la dimension de l’espace. Cette
+dépendance en <span class="math inline">\(n\)</span> est cruciale et
+révèle une propriété fondamentale des transformations d’échelle.</p>
+<h2 class="unnumbered" id="preuve-du-théorème-de-léchelle">Preuve du
+théorème de l’échelle</h2>
+<p>Pour démontrer ce théorème, nous allons procéder par étapes, en
+utilisant les propriétés de l’intégrale et de la transformation
+linéaire.</p>
+<p><strong>Preuve.</strong> Soit <span class="math inline">\(A \subset
+\mathbb{R}^n\)</span> un ensemble mesurable et <span
+class="math inline">\(k &gt; 0\)</span>. L’image de <span
+class="math inline">\(A\)</span> par une homothétie de facteur <span
+class="math inline">\(k\)</span> est donnée par :</p>
+<p><span class="math display">\[h_k(A) = \{ kx \mid x \in A
+\}\]</span></p>
+<p>Nous cherchons à calculer le volume de <span
+class="math inline">\(h_k(A)\)</span>. Pour ce faire, nous utilisons le
+changement de variable <span class="math inline">\(y = kx\)</span>, ce
+qui implique que <span class="math inline">\(x = y/k\)</span> et que le
+jacobien de la transformation est <span
+class="math inline">\(k^n\)</span>. Par conséquent, nous avons :</p>
+<p><span class="math display">\[\text{Vol}(h_k(A)) = \int_{h_k(A)} dy =
+\int_A k^n dx = k^n \text{Vol}(A)\]</span></p>
+<p>Cette démonstration repose sur le fait que l’homothétie est une
+transformation linéaire et que son jacobien est donné par <span
+class="math inline">\(k^n\)</span>. Ainsi, le volume de l’image de <span
+class="math inline">\(A\)</span> par une homothétie de facteur <span
+class="math inline">\(k\)</span> est bien multiplié par <span
+class="math inline">\(k^n\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous allons maintenant explorer quelques propriétés et corollaires du
+théorème de l’échelle, qui illustrent son importance et ses
+applications.</p>
+<h2 class="unnumbered"
+id="propriété-1-invariance-du-volume-sous-homothétie-unitaire">Propriété
+1 : Invariance du volume sous homothétie unitaire</h2>
+<p><strong>Propriété 1.</strong> Soit <span class="math inline">\(A
+\subset \mathbb{R}^n\)</span> un ensemble mesurable. Si <span
+class="math inline">\(k = 1\)</span>, alors :</p>
+<p><span class="math display">\[\text{Vol}(h_1(A)) =
+\text{Vol}(A)\]</span></p>
+<p><strong>Preuve.</strong> En appliquant le théorème de l’échelle avec
+<span class="math inline">\(k = 1\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\text{Vol}(h_1(A)) = 1^n \text{Vol}(A) =
+\text{Vol}(A)\]</span></p>
+<p>Cette propriété montre que l’homothétie unitaire, qui laisse toutes
+les distances inchangées, est une transformation isométrique pour le
+volume.</p>
+<h2 class="unnumbered"
+id="propriété-2-effet-de-la-réduction-déchelle">Propriété 2 : Effet de
+la réduction d’échelle</h2>
+<p><strong>Propriété 2.</strong> Soit <span class="math inline">\(A
+\subset \mathbb{R}^n\)</span> un ensemble mesurable et <span
+class="math inline">\(0 &lt; k &lt; 1\)</span>. Alors :</p>
+<p><span class="math display">\[\text{Vol}(h_k(A)) &lt;
+\text{Vol}(A)\]</span></p>
+<p><strong>Preuve.</strong> En appliquant le théorème de l’échelle avec
+<span class="math inline">\(0 &lt; k &lt; 1\)</span>, nous avons :</p>
+<p><span class="math display">\[\text{Vol}(h_k(A)) = k^n \text{Vol}(A)
+&lt; \text{Vol}(A)\]</span></p>
+<p>puisque <span class="math inline">\(k^n &lt; 1\)</span> pour tout
+<span class="math inline">\(0 &lt; k &lt; 1\)</span>. Cette propriété
+montre que la réduction d’échelle diminue le volume de l’objet.</p>
+<h2 class="unnumbered"
+id="propriété-3-effet-de-lagrandissement-déchelle">Propriété 3 : Effet
+de l’agrandissement d’échelle</h2>
+<p><strong>Propriété 3.</strong> Soit <span class="math inline">\(A
+\subset \mathbb{R}^n\)</span> un ensemble mesurable et <span
+class="math inline">\(k &gt; 1\)</span>. Alors :</p>
+<p><span class="math display">\[\text{Vol}(h_k(A)) &gt;
+\text{Vol}(A)\]</span></p>
+<p><strong>Preuve.</strong> En appliquant le théorème de l’échelle avec
+<span class="math inline">\(k &gt; 1\)</span>, nous avons :</p>
+<p><span class="math display">\[\text{Vol}(h_k(A)) = k^n \text{Vol}(A)
+&gt; \text{Vol}(A)\]</span></p>
+<p>puisque <span class="math inline">\(k^n &gt; 1\)</span> pour tout
+<span class="math inline">\(k &gt; 1\)</span>. Cette propriété montre
+que l’agrandissement d’échelle augmente le volume de l’objet.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Dans ce chapitre, nous avons exploré la relation entre le volume d’un
+objet et son image par une homothétie. Nous avons démontré que le volume
+est multiplié par <span class="math inline">\(k^n\)</span>, où <span
+class="math inline">\(n\)</span> est la dimension de l’espace, et nous
+avons discuté des implications de ce résultat. Les propriétés et
+corollaires que nous avons dérivés illustrent l’importance du théorème
+de l’échelle dans divers contextes mathématiques et appliqués.</p>
+<p>Ce résultat est non seulement fondamental pour la compréhension des
+transformations géométriques, mais il trouve également des applications
+pratiques dans des domaines tels que la physique, l’ingénierie et
+l’informatique graphique. En particulier, il permet de calculer
+facilement le volume d’objets transformés par des homothéties, ce qui
+est essentiel pour la modélisation et la simulation.</p>
+<p>Enfin, l’étude du volume sous changement d’échelle ouvre la voie à
+des généralisations et des extensions dans des espaces de dimensions
+supérieures ou dans des contextes plus abstraits. Ces explorations
+futures promettent de révéler encore davantage les richesses et les
+subtilités des transformations géométriques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

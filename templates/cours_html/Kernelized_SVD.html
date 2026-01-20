@@ -1,0 +1,369 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized Singular Value Decomposition: Theory and Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized Singular Value Decomposition: Theory and
+Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La décomposition en valeurs singulières (SVD) est un outil
+fondamental en analyse des données et en traitement du signal. Elle
+permet de représenter une matrice sous forme de produits de matrices
+orthogonales et diagonales, facilitant ainsi l’extraction d’informations
+pertinentes. Cependant, la SVD classique est limitée aux données
+linéairement séparables.</p>
+<p>L’émergence des méthodes de noyau (kernel methods) a permis d’étendre
+la SVD à des espaces de caractéristiques non linéaires. La Kernelized
+Singular Value Decomposition (Kernel SVD) combine les avantages de la
+SVD et des méthodes de noyau, permettant ainsi d’analyser des données
+complexes et non linéaires.</p>
+<p>Dans cet article, nous explorons les fondements théoriques de la
+Kernel SVD, ses définitions formelles, et ses applications pratiques.
+Nous mettons en lumière les théorèmes clés qui sous-tendent cette
+méthode, ainsi que leurs preuves détaillées.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant d’aborder la Kernel SVD, il est essentiel de comprendre les
+concepts de base de la SVD et des méthodes de noyau.</p>
+<h2 id="singular-value-decomposition-svd">Singular Value Decomposition
+(SVD)</h2>
+<p>Considérons une matrice <span class="math inline">\(A \in
+\mathbb{R}^{m \times n}\)</span>. La SVD de <span
+class="math inline">\(A\)</span> est une factorisation de la forme :</p>
+<p><span class="math display">\[A = U \Sigma V^T\]</span></p>
+<p>où <span class="math inline">\(U \in \mathbb{R}^{m \times m}\)</span>
+et <span class="math inline">\(V \in \mathbb{R}^{n \times n}\)</span>
+sont des matrices orthogonales, et <span class="math inline">\(\Sigma
+\in \mathbb{R}^{m \times n}\)</span> est une matrice diagonale dont les
+éléments diagonaux sont les valeurs singulières de <span
+class="math inline">\(A\)</span>.</p>
+<h2 id="methodes-de-noyau">Methodes de Noyau</h2>
+<p>Les méthodes de noyau permettent de mapper les données d’un espace
+d’entrée <span class="math inline">\(\mathcal{X}\)</span> vers un espace
+de caractéristiques <span class="math inline">\(\mathcal{F}\)</span>
+potentiellement de haute dimension. Soit <span
+class="math inline">\(\phi: \mathcal{X} \rightarrow \mathcal{F}\)</span>
+une fonction de mapping. Le noyau associé <span class="math inline">\(k:
+\mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}\)</span> est
+défini par :</p>
+<p><span class="math display">\[k(x, y) = \langle \phi(x), \phi(y)
+\rangle_{\mathcal{F}}\]</span></p>
+<p>où <span class="math inline">\(\langle \cdot, \cdot
+\rangle_{\mathcal{F}}\)</span> désigne le produit scalaire dans <span
+class="math inline">\(\mathcal{F}\)</span>.</p>
+<h2 id="kernelized-singular-value-decomposition-kernel-svd">Kernelized
+Singular Value Decomposition (Kernel SVD)</h2>
+<p>La Kernel SVD étend la SVD à l’espace de caractéristiques induit par
+un noyau. Soit <span class="math inline">\(K \in \mathbb{R}^{n \times
+n}\)</span> la matrice de Gram associée à un ensemble de données <span
+class="math inline">\(\{x_1, x_2, \dots, x_n\} \subset
+\mathcal{X}\)</span>, définie par :</p>
+<p><span class="math display">\[K_{ij} = k(x_i, x_j)\]</span></p>
+<p>La Kernel SVD de <span class="math inline">\(K\)</span> est une
+factorisation de la forme :</p>
+<p><span class="math display">\[K = U \Sigma V^T\]</span></p>
+<p>où <span class="math inline">\(U \in \mathbb{R}^{n \times n}\)</span>
+et <span class="math inline">\(V \in \mathbb{R}^{n \times n}\)</span>
+sont des matrices orthogonales, et <span class="math inline">\(\Sigma
+\in \mathbb{R}^{n \times n}\)</span> est une matrice diagonale dont les
+éléments diagonaux sont les valeurs singulières de <span
+class="math inline">\(K\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-mercer">Théorème de Mercer</h2>
+<p>Le théorème de Mercer est fondamental pour les méthodes de noyau. Il
+énonce que si <span class="math inline">\(k\)</span> est un noyau
+positif défini, alors il existe une décomposition de <span
+class="math inline">\(k\)</span> en série de fonctions propres :</p>
+<p><span class="math display">\[k(x, y) = \sum_{i=1}^{\infty} \lambda_i
+\phi_i(x) \phi_i(y)\]</span></p>
+<p>où <span class="math inline">\(\{\lambda_i\}_{i=1}^{\infty}\)</span>
+sont les valeurs propres de <span class="math inline">\(k\)</span> et
+<span class="math inline">\(\{\phi_i\}_{i=1}^{\infty}\)</span> sont les
+fonctions propres associées.</p>
+<h2 id="théorème-de-la-kernel-svd">Théorème de la Kernel SVD</h2>
+<p>Le théorème de la Kernel SVD établit que la factorisation <span
+class="math inline">\(K = U \Sigma V^T\)</span> est équivalente à la
+décomposition en valeurs singulières de <span
+class="math inline">\(K\)</span>. Plus précisément, si <span
+class="math inline">\(K\)</span> est une matrice de Gram symétrique
+définie positive, alors il existe des matrices orthogonales <span
+class="math inline">\(U\)</span> et <span
+class="math inline">\(V\)</span>, et une matrice diagonale <span
+class="math inline">\(\Sigma\)</span> telles que :</p>
+<p><span class="math display">\[K = U \Sigma V^T\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-mercer">Preuve du Théorème de Mercer</h2>
+<p>Pour prouver le théorème de Mercer, nous utilisons la théorie des
+opérateurs intégrales. Soit <span class="math inline">\(k\)</span> un
+noyau positif défini. Considérons l’opérateur intégral <span
+class="math inline">\(T_k\)</span> défini par :</p>
+<p><span class="math display">\[(T_k f)(x) = \int_{\mathcal{X}} k(x, y)
+f(y) dy\]</span></p>
+<p>L’opérateur <span class="math inline">\(T_k\)</span> est compact et
+auto-adjoint. Par le théorème spectral, il admet une décomposition en
+valeurs propres et fonctions propres :</p>
+<p><span class="math display">\[(T_k f)(x) = \sum_{i=1}^{\infty}
+\lambda_i \langle f, \phi_i \rangle \phi_i(x)\]</span></p>
+<p>En prenant <span class="math inline">\(f(y) = k(x, y)\)</span>, nous
+obtenons :</p>
+<p><span class="math display">\[k(x, y) = \sum_{i=1}^{\infty} \lambda_i
+\phi_i(x) \phi_i(y)\]</span></p>
+<h2 id="preuve-du-théorème-de-la-kernel-svd">Preuve du Théorème de la
+Kernel SVD</h2>
+<p>Pour prouver le théorème de la Kernel SVD, nous utilisons les
+propriétés des matrices symétriques définies positives. Soit <span
+class="math inline">\(K\)</span> une matrice de Gram symétrique définie
+positive. Par le théorème spectral, il existe une décomposition en
+valeurs propres et vecteurs propres :</p>
+<p><span class="math display">\[K = V \Lambda V^T\]</span></p>
+<p>où <span class="math inline">\(V\)</span> est une matrice orthogonale
+et <span class="math inline">\(\Lambda\)</span> est une matrice
+diagonale dont les éléments diagonaux sont les valeurs propres de <span
+class="math inline">\(K\)</span>. En notant <span
+class="math inline">\(\Sigma = \sqrt{\Lambda}\)</span>, nous obtenons
+:</p>
+<p><span class="math display">\[K = V \Sigma \Sigma V^T = (V \Sigma)
+(\Sigma V^T)\]</span></p>
+<p>En posant <span class="math inline">\(U = V \Sigma\)</span>, nous
+avons :</p>
+<p><span class="math display">\[K = U \Sigma V^T\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-la-kernel-svd">Propriété de la Kernel SVD</h2>
+<p>La Kernel SVD possède plusieurs propriétés intéressantes :</p>
+<ol>
+<li><p>Les valeurs singulières de <span class="math inline">\(K\)</span>
+sont les racines carrées des valeurs propres de <span
+class="math inline">\(K\)</span>.</p></li>
+<li><p>Les vecteurs singuliers à gauche et à droite de <span
+class="math inline">\(K\)</span> sont les vecteurs propres de <span
+class="math inline">\(K\)</span>.</p></li>
+<li><p>La Kernel SVD est invariante par translation et rotation dans
+l’espace de caractéristiques.</p></li>
+</ol>
+<h2 id="corollaire-de-la-kernel-svd">Corollaire de la Kernel SVD</h2>
+<p>Le corollaire suivant établit une relation entre la Kernel SVD et la
+SVD classique :</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(K\)</span> une matrice de Gram
+symétrique définie positive. Si <span class="math inline">\(K = U \Sigma
+V^T\)</span> est la Kernel SVD de <span
+class="math inline">\(K\)</span>, alors <span
+class="math inline">\(\sqrt{K} = U \Sigma^{1/2} V^T\)</span> est la SVD
+de <span class="math inline">\(\sqrt{K}\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve découle directement de la définition de
+<span class="math inline">\(\sqrt{K}\)</span> et des propriétés de la
+Kernel SVD. En effet, si <span class="math inline">\(K = U \Sigma
+V^T\)</span>, alors :</p>
+<p><span class="math display">\[\sqrt{K} = U \Sigma^{1/2}
+V^T\]</span></p>
+<p>où <span class="math inline">\(\Sigma^{1/2}\)</span> est la matrice
+diagonale dont les éléments diagonaux sont les racines carrées des
+valeurs singulières de <span class="math inline">\(K\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La Kernelized Singular Value Decomposition est un outil puissant pour
+l’analyse des données non linéaires. En combinant les avantages de la
+SVD et des méthodes de noyau, elle permet de capturer des structures
+complexes dans les données. Les théorèmes et propriétés présentés dans
+cet article fournissent une base solide pour l’utilisation de la Kernel
+SVD dans diverses applications, allant du traitement du signal à
+l’apprentissage automatique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,343 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance between-group : Mesure de l’hétérogénéité des groupes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance between-group : Mesure de l’hétérogénéité des
+groupes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La variance between-group, ou variance intergroupes, est une notion
+centrale en statistique descriptive et inférentielle. Elle quantifie la
+dispersion des moyennes de différents groupes autour de la moyenne
+globale, offrant ainsi une mesure de l’hétérogénéité entre ces groupes.
+Cette notion est indispensable dans l’analyse de variance (ANOVA), où
+elle permet de tester l’hypothèse nulle selon laquelle les moyennes des
+groupes sont égales.</p>
+<p>L’émergence de cette notion est étroitement liée au développement des
+méthodes statistiques pour l’analyse des données catégorielles. Elle
+trouve ses racines dans les travaux de Ronald Fisher, qui a introduit
+l’ANOVA au début du XXème siècle. La variance between-group est
+indispensable pour évaluer l’effet d’un facteur catégoriel sur une
+variable continue, ce qui en fait un outil fondamental en recherche
+scientifique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir la variance between-group, commençons par comprendre ce
+que nous cherchons à mesurer. Supposons que nous avons un ensemble de
+données divisées en <span class="math inline">\(k\)</span> groupes
+distincts. Nous voulons quantifier à quel point les moyennes de ces
+groupes diffèrent les unes des autres par rapport à la moyenne
+globale.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> une
+variable aléatoire continue, et supposons que nous avons <span
+class="math inline">\(k\)</span> groupes de tailles <span
+class="math inline">\(n_1, n_2, \ldots, n_k\)</span>, avec <span
+class="math inline">\(N = n_1 + n_2 + \ldots + n_k\)</span> le nombre
+total d’observations. Notons <span
+class="math inline">\(\bar{X}_i\)</span> la moyenne du groupe <span
+class="math inline">\(i\)</span>, et <span
+class="math inline">\(\bar{X}\)</span> la moyenne globale.</p>
+<p>La variance between-group est définie comme suit :</p>
+<p><span class="math display">\[SB = \sum_{i=1}^{k} n_i (\bar{X}_i -
+\bar{X})^2\]</span></p>
+<p>où <span class="math inline">\(SB\)</span> représente la somme des
+carrés entre les groupes.</p>
+<p>Une autre formulation, plus explicite, est :</p>
+<p><span class="math display">\[SB = \sum_{i=1}^{k} n_i \bar{X}_i^2 - N
+\bar{X}^2\]</span></p>
+<p>Cette formulation met en évidence la différence entre la somme des
+carrés des moyennes pondérées par les tailles des groupes et le carré de
+la moyenne globale multiplié par le nombre total d’observations.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la variance between-group est le
+théorème de l’analyse de variance, qui décompose la variance totale en
+deux composantes : la variance between-group et la variance within-group
+(ou variance intragroupe).</p>
+<p>Commençons par comprendre ce que nous cherchons à démontrer. Nous
+voulons montrer que la variance totale peut être exprimée comme la somme
+de deux variances : celle entre les groupes et celle au sein des
+groupes.</p>
+<p>Formellement, le théorème de l’analyse de variance s’énonce comme
+suit :</p>
+<p><span class="math display">\[SST = SB + SW\]</span></p>
+<p>où <span class="math inline">\(SST\)</span> est la somme totale des
+carrés, <span class="math inline">\(SB\)</span> est la somme des carrés
+entre les groupes, et <span class="math inline">\(SW\)</span> est la
+somme des carrés au sein des groupes.</p>
+<p>La démonstration de ce théorème repose sur l’identité suivante :</p>
+<p><span class="math display">\[\sum_{i=1}^{k} \sum_{j=1}^{n_i} (X_{ij}
+- \bar{X})^2 = \sum_{i=1}^{k} n_i (\bar{X}_i - \bar{X})^2 +
+\sum_{i=1}^{k} \sum_{j=1}^{n_i} (X_{ij} - \bar{X}_i)^2\]</span></p>
+<p>où <span class="math inline">\(X_{ij}\)</span> représente
+l’observation <span class="math inline">\(j\)</span> du groupe <span
+class="math inline">\(i\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de l’analyse de variance, commençons par
+développer le terme de gauche :</p>
+<p><span class="math display">\[\sum_{i=1}^{k} \sum_{j=1}^{n_i} (X_{ij}
+- \bar{X})^2 = \sum_{i=1}^{k} \sum_{j=1}^{n_i} (X_{ij}^2 -
+2X_{ij}\bar{X} + \bar{X}^2)\]</span></p>
+<p>En réarrangeant les termes, nous obtenons :</p>
+<p><span class="math display">\[\sum_{i=1}^{k} \sum_{j=1}^{n_i} X_{ij}^2
+- 2\bar{X} \sum_{i=1}^{k} \sum_{j=1}^{n_i} X_{ij} +
+N\bar{X}^2\]</span></p>
+<p>Nous savons que <span class="math inline">\(\sum_{i=1}^{k}
+\sum_{j=1}^{n_i} X_{ij} = N\bar{X}\)</span>, donc le terme du milieu
+s’annule :</p>
+<p><span class="math display">\[\sum_{i=1}^{k} \sum_{j=1}^{n_i} X_{ij}^2
+- N\bar{X}^2\]</span></p>
+<p>Maintenant, considérons le terme <span
+class="math inline">\(\sum_{i=1}^{k} n_i (\bar{X}_i -
+\bar{X})^2\)</span> :</p>
+<p><span class="math display">\[\sum_{i=1}^{k} n_i (\bar{X}_i^2 -
+2\bar{X}_i\bar{X} + \bar{X}^2) = \sum_{i=1}^{k} n_i \bar{X}_i^2 -
+2\bar{X} \sum_{i=1}^{k} n_i \bar{X}_i + N\bar{X}^2\]</span></p>
+<p>En utilisant le fait que <span class="math inline">\(\sum_{i=1}^{k}
+n_i \bar{X}_i = N\bar{X}\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\sum_{i=1}^{k} n_i \bar{X}_i^2 -
+N\bar{X}^2\]</span></p>
+<p>Enfin, considérons le terme <span
+class="math inline">\(\sum_{i=1}^{k} \sum_{j=1}^{n_i} (X_{ij} -
+\bar{X}_i)^2\)</span> :</p>
+<p><span class="math display">\[\sum_{i=1}^{k} \sum_{j=1}^{n_i}
+(X_{ij}^2 - 2X_{ij}\bar{X}_i + \bar{X}_i^2) = \sum_{i=1}^{k}
+\sum_{j=1}^{n_i} X_{ij}^2 - 2\sum_{i=1}^{k} \bar{X}_i \sum_{j=1}^{n_i}
+X_{ij} + \sum_{i=1}^{k} n_i \bar{X}_i^2\]</span></p>
+<p>En utilisant le fait que <span class="math inline">\(\sum_{j=1}^{n_i}
+X_{ij} = n_i \bar{X}_i\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\sum_{i=1}^{k} \sum_{j=1}^{n_i} X_{ij}^2
+- 2\sum_{i=1}^{k} n_i \bar{X}_i^2 + \sum_{i=1}^{k} n_i \bar{X}_i^2 =
+\sum_{i=1}^{k} \sum_{j=1}^{n_i} X_{ij}^2 - \sum_{i=1}^{k} n_i
+\bar{X}_i^2\]</span></p>
+<p>En combinant tous ces résultats, nous obtenons bien l’identité
+souhaitée :</p>
+<p><span class="math display">\[\sum_{i=1}^{k} \sum_{j=1}^{n_i} (X_{ij}
+- \bar{X})^2 = \sum_{i=1}^{k} n_i (\bar{X}_i - \bar{X})^2 +
+\sum_{i=1}^{k} \sum_{j=1}^{n_i} (X_{ij} - \bar{X}_i)^2\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La variance between-group possède plusieurs propriétés intéressantes,
+que nous allons énumérer et démontrer.</p>
+<ol>
+<li><p>La variance between-group est toujours non négative. En effet,
+pour tout <span class="math inline">\(i\)</span>, <span
+class="math inline">\((\bar{X}_i - \bar{X})^2 \geq 0\)</span>, et comme
+<span class="math inline">\(n_i &gt; 0\)</span>, il s’ensuit que <span
+class="math inline">\(SB \geq 0\)</span>.</p></li>
+<li><p>La variance between-group est nulle si et seulement si toutes les
+moyennes des groupes sont égales à la moyenne globale. En effet, <span
+class="math inline">\(SB = 0\)</span> si et seulement si <span
+class="math inline">\(\bar{X}_i = \bar{X}\)</span> pour tout <span
+class="math inline">\(i\)</span>.</p></li>
+<li><p>La variance between-group est maximale lorsque les moyennes des
+groupes sont les plus éloignées possible de la moyenne globale. Plus
+précisément, <span class="math inline">\(SB\)</span> est maximisé
+lorsque les <span class="math inline">\(\bar{X}_i\)</span> sont tels que
+<span class="math inline">\((\bar{X}_i - \bar{X})^2\)</span> est
+maximisé pour chaque groupe.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La variance between-group est un outil puissant pour mesurer
+l’hétérogénéité entre différents groupes de données. Elle joue un rôle
+central dans l’analyse de variance et permet de tester des hypothèses
+sur les différences entre les moyennes des groupes. En comprenant cette
+notion et ses propriétés, nous pouvons mieux analyser et interpréter les
+données dans divers domaines de la recherche scientifique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

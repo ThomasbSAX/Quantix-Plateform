@@ -1,0 +1,305 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Random Projections: A Journey Through High-Dimensional Spaces</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Random Projections: A Journey Through High-Dimensional
+Spaces</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>In the vast landscape of high-dimensional data analysis, the concept
+of random projections emerges as a beacon of efficiency and simplicity.
+The curse of dimensionality has long plagued researchers, making
+traditional methods computationally infeasible. Random projections offer
+a remedy by allowing us to work in lower-dimensional spaces without
+significant loss of structure.</p>
+<p>The origins of random projections can be traced back to the
+Johnson-Lindenstrauss lemma, a seminal result that laid the foundation
+for dimensionality reduction techniques. This lemma asserts that a set
+of points in a high-dimensional space can be projected into a
+lower-dimensional space while preserving the distances between the
+points up to a small error.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Before delving into the formalities, let us intuitively grasp what
+random projections entail. Imagine you have a high-dimensional vector,
+and you want to represent it in a lower-dimensional space. Random
+projections achieve this by multiplying the vector with a random matrix.
+The key idea is that this random multiplication preserves the essential
+structure of the data.</p>
+<p>Formally, let <span class="math inline">\(\mathbf{X} \in
+\mathbb{R}^n\)</span> be a high-dimensional vector, and let <span
+class="math inline">\(\mathbf{R} \in \mathbb{R}^{d \times n}\)</span> be
+a random matrix where <span class="math inline">\(d \ll n\)</span>. The
+random projection of <span class="math inline">\(\mathbf{X}\)</span> is
+given by:</p>
+<p><span class="math display">\[\mathbf{Y} = \mathbf{R}
+\mathbf{X}\]</span></p>
+<p>Here, <span class="math inline">\(\mathbf{Y} \in
+\mathbb{R}^d\)</span> is the lower-dimensional representation of <span
+class="math inline">\(\mathbf{X}\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>The Johnson-Lindenstrauss lemma is the cornerstone of random
+projections. It states that for any set of <span
+class="math inline">\(N\)</span> points in <span
+class="math inline">\(\mathbb{R}^n\)</span>, there exists a projection
+into <span class="math inline">\(\mathbb{R}^d\)</span> such that the
+distances between any two points are preserved up to a factor of <span
+class="math inline">\((1 + \epsilon)\)</span>, where <span
+class="math inline">\(\epsilon &gt; 0\)</span>.</p>
+<p>Formally, the Johnson-Lindenstrauss lemma can be stated as
+follows:</p>
+<div class="theorem">
+<p>For any <span class="math inline">\(0 &lt; \epsilon &lt; 1\)</span>
+and any integer <span class="math inline">\(N\)</span>, let <span
+class="math inline">\(k\)</span> be a positive integer such that:</p>
+<p><span class="math display">\[k \geq \frac{4 + 2 \log N}{\epsilon^2 /
+2 - \epsilon^3 / 3}\]</span></p>
+<p>Then for any set <span class="math inline">\(S\)</span> of <span
+class="math inline">\(N\)</span> points in <span
+class="math inline">\(\mathbb{R}^n\)</span>, there exists a map <span
+class="math inline">\(f: \mathbb{R}^n \rightarrow \mathbb{R}^k\)</span>
+such that for all <span class="math inline">\(\mathbf{x}, \mathbf{y} \in
+S\)</span>:</p>
+<p><span class="math display">\[(1 - \epsilon) \| \mathbf{x} -
+\mathbf{y} \|_2^2 \leq \| f(\mathbf{x}) - f(\mathbf{y}) \|_2^2 \leq (1 +
+\epsilon) \| \mathbf{x} - \mathbf{y} \|_2^2\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>The proof of the Johnson-Lindenstrauss lemma is non-trivial and
+involves probabilistic methods. Here, we outline the key steps:</p>
+<p>1. **Random Projection Construction**: Consider a random projection
+matrix <span class="math inline">\(\mathbf{R}\)</span> where each entry
+is independently chosen from a Gaussian distribution with mean 0 and
+variance <span class="math inline">\(1/d\)</span>.</p>
+<p>2. **Distance Preservation**: For any two points <span
+class="math inline">\(\mathbf{x}, \mathbf{y} \in S\)</span>, the
+projected distance is given by:</p>
+<p><span class="math display">\[\| f(\mathbf{x}) - f(\mathbf{y}) \|_2^2
+= \| \mathbf{R} (\mathbf{x} - \mathbf{y}) \|_2^2\]</span></p>
+<p>3. **Expectation and Variance**: Using properties of Gaussian random
+variables, we can compute the expectation and variance of <span
+class="math inline">\(\| \mathbf{R} (\mathbf{x} - \mathbf{y})
+\|_2^2\)</span>.</p>
+<p>4. **Concentration Inequalities**: Applying concentration
+inequalities, we can show that with high probability, the projected
+distance is close to the original distance.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Random projections possess several desirable properties that make
+them useful in various applications:</p>
+<ol>
+<li><p>**Dimensionality Reduction**: Random projections allow us to
+reduce the dimensionality of data while preserving essential
+structure.</p></li>
+<li><p>**Computational Efficiency**: The projection operation is
+computationally efficient, making it suitable for large-scale data
+analysis.</p></li>
+<li><p>**Universal Applicability**: Random projections can be applied to
+any dataset, regardless of its underlying distribution.</p></li>
+</ol>
+<p>Each of these properties can be rigorously proven using the
+Johnson-Lindenstrauss lemma and other probabilistic tools.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Random projections have revolutionized the field of high-dimensional
+data analysis by providing a simple yet powerful tool for dimensionality
+reduction. The Johnson-Lindenstrauss lemma serves as the theoretical
+backbone, ensuring that distances are preserved with high probability.
+As we continue to explore the intricacies of random projections, their
+applications in machine learning, signal processing, and other domains
+are bound to expand.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

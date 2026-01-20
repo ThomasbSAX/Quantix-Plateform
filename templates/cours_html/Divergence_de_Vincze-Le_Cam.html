@@ -1,0 +1,311 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Divergence de Vincze-Le Cam : Un outil fondamental en théorie des tests statistiques</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Divergence de Vincze-Le Cam : Un outil fondamental en
+théorie des tests statistiques</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La divergence de Vincze-Le Cam émerge dans le cadre des tests
+statistiques, notamment pour comparer les performances asymptotiques de
+deux tests. Introduite par les mathématiciens Vincze et Le Cam, cette
+notion permet d’évaluer la puissance d’un test statistique en fonction
+de sa capacité à détecter des alternatives locales.</p>
+<p>L’importance de cette divergence réside dans sa capacité à fournir
+une mesure quantitative de la distance entre deux distributions, ce qui
+est crucial pour l’analyse des tests statistiques. Elle permet notamment
+de comparer différentes procédures de test et d’optimiser leur
+puissance.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la divergence de Vincze-Le Cam, considérons deux
+distributions de probabilité <span class="math inline">\(P\)</span> et
+<span class="math inline">\(Q\)</span>. Nous cherchons à mesurer la
+distance entre ces deux distributions de manière à évaluer leur
+séparabilité.</p>
+<p>La divergence de Vincze-Le Cam est définie comme suit :</p>
+<div class="definition">
+<p>Soient <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité sur
+un espace mesurable <span class="math inline">\((\Omega,
+\mathcal{A})\)</span>. La divergence de Vincze-Le Cam entre <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> est donnée par : <span
+class="math display">\[D_{VLC}(P, Q) = \sup_{\substack{\phi: \Omega \to
+\mathbb{R} \\ \mathbb{E}_P[\phi] = 0, \mathbb{E}_Q[\phi^2] \leq 1}}
+\left( \mathbb{E}_P[\phi] - \mathbb{E}_Q[\phi] \right)^2\]</span> où
+<span class="math inline">\(\mathbb{E}_P\)</span> et <span
+class="math inline">\(\mathbb{E}_Q\)</span> désignent les espérances
+sous les distributions <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> respectivement.</p>
+</div>
+<p>Une autre formulation équivalente est : <span
+class="math display">\[D_{VLC}(P, Q) = \inf_{\substack{T: \Omega \to
+\mathbb{R} \\ T \text{ mesurable}}} \sup_{\theta \in \Theta} \left(
+\mathbb{E}_P[T] - \mathbb{E}_{Q_\theta}[T] \right)^2\]</span> où <span
+class="math inline">\(Q_\theta\)</span> est une famille de distributions
+paramétrée par <span class="math inline">\(\theta\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la divergence de Vincze-Le Cam est le
+suivant :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(P_n\)</span> et <span
+class="math inline">\(Q_n\)</span> deux suites de distributions de
+probabilité. Si la divergence de Vincze-Le Cam entre <span
+class="math inline">\(P_n\)</span> et <span
+class="math inline">\(Q_n\)</span> tend vers zéro, alors les tests basés
+sur ces distributions deviennent asymptotiquement équivalents.</p>
+</div>
+<p>Une autre formulation de ce théorème est :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> deux distributions de probabilité. La
+divergence de Vincze-Le Cam <span class="math inline">\(D_{VLC}(P,
+Q)\)</span> est nulle si et seulement si les tests basés sur <span
+class="math inline">\(P\)</span> et <span
+class="math inline">\(Q\)</span> sont asymptotiquement équivalents.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Le Cam, nous procédons comme suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons deux suites de distributions <span
+class="math inline">\(P_n\)</span> et <span
+class="math inline">\(Q_n\)</span>. Supposons que <span
+class="math inline">\(D_{VLC}(P_n, Q_n) \to 0\)</span>. Nous devons
+montrer que les tests basés sur <span class="math inline">\(P_n\)</span>
+et <span class="math inline">\(Q_n\)</span> deviennent asymptotiquement
+équivalents.</p>
+<p>Soit <span class="math inline">\(T_n\)</span> une statistique de
+test. Nous avons : <span class="math display">\[\mathbb{E}_{P_n}[T_n] -
+\mathbb{E}_{Q_n}[T_n] \to 0\]</span> en vertu de la définition de la
+divergence de Vincze-Le Cam.</p>
+<p>Réciproquement, supposons que les tests basés sur <span
+class="math inline">\(P_n\)</span> et <span
+class="math inline">\(Q_n\)</span> sont asymptotiquement équivalents.
+Alors, pour toute statistique de test <span
+class="math inline">\(T_n\)</span>, nous avons : <span
+class="math display">\[\mathbb{E}_{P_n}[T_n] - \mathbb{E}_{Q_n}[T_n] \to
+0\]</span> Ce qui implique que <span class="math inline">\(D_{VLC}(P_n,
+Q_n) \to 0\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+divergence de Vincze-Le Cam :</p>
+<ol>
+<li><p>La divergence de Vincze-Le Cam est toujours non négative : <span
+class="math display">\[D_{VLC}(P, Q) \geq 0\]</span> et elle est nulle
+si et seulement si <span class="math inline">\(P = Q\)</span>.</p></li>
+<li><p>La divergence de Vincze-Le Cam est invariante sous les
+transformations mesurables. Si <span class="math inline">\(\phi: \Omega
+\to \Omega&#39;\)</span> est une transformation mesurable, alors : <span
+class="math display">\[D_{VLC}(P \circ \phi^{-1}, Q \circ \phi^{-1}) =
+D_{VLC}(P, Q)\]</span></p></li>
+<li><p>La divergence de Vincze-Le Cam satisfait l’inégalité
+triangulaire. Pour trois distributions <span class="math inline">\(P, Q,
+R\)</span>, nous avons : <span class="math display">\[D_{VLC}(P, R) \leq
+D_{VLC}(P, Q) + D_{VLC}(Q, R)\]</span></p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La divergence de Vincze-Le Cam est un outil puissant pour l’analyse
+des tests statistiques. Elle permet de comparer les performances
+asymptotiques de différentes procédures de test et d’optimiser leur
+puissance. Les propriétés et théorèmes associés à cette divergence
+offrent une compréhension profonde des limites et des possibilités des
+tests statistiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

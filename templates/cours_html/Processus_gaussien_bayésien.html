@@ -1,0 +1,325 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Processus gaussien bayésien</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Processus gaussien bayésien</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>Les processus gaussiens bayésiens représentent une avancée majeure
+dans le domaine de l’apprentissage statistique et des modèles
+probabilistes. Ils émergent comme une solution élégante pour modéliser
+des fonctions complexes à partir de données observées, en intégrant
+naturellement l’incertitude et la régularisation. Leur origine remonte
+aux travaux fondateurs de Kolmogorov sur les processus stochastiques et
+a été popularisée par l’approche bayésienne en statistique. Ces
+processus sont indispensables dans des domaines variés tels que la
+régression non paramétrique, l’optimisation bayésienne et
+l’apprentissage automatique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Nous cherchons à modéliser une fonction <span
+class="math inline">\(f\)</span> qui dépend d’un certain nombre de
+paramètres et qui est soumise à des contraintes de régularité. L’idée
+est d’introduire une distribution a priori sur l’espace des fonctions,
+qui reflète nos croyances initiales sur la forme de <span
+class="math inline">\(f\)</span>. Ensuite, nous mettons à jour cette
+distribution en utilisant les données observées pour obtenir une
+distribution a posteriori.</p>
+<div class="definition">
+<p>Un processus gaussien est un ensemble de variables aléatoires <span
+class="math inline">\(\{X_t\}_{t \in T}\)</span> indexées par un
+ensemble <span class="math inline">\(T\)</span>, tel que pour tout
+sous-ensemble fini <span class="math inline">\(\{t_1, t_2, \ldots, t_n\}
+\subseteq T\)</span>, la loi conjointe de <span
+class="math inline">\((X_{t_1}, X_{t_2}, \ldots, X_{t_n})\)</span> est
+une distribution gaussienne multivariée.</p>
+</div>
+<p>Formellement, un processus gaussien est défini par une moyenne <span
+class="math inline">\(m(t)\)</span> et une fonction de covariance <span
+class="math inline">\(k(t, t&#39;)\)</span>, tels que pour tout ensemble
+fini <span class="math inline">\(\{t_1, t_2, \ldots, t_n\}\)</span>,
+nous avons : <span class="math display">\[(X_{t_1}, X_{t_2}, \ldots,
+X_{t_n}) \sim \mathcal{N}\left( (m(t_1), m(t_2), \ldots, m(t_n)),
+\begin{pmatrix} k(t_1, t_1) &amp; \cdots &amp; k(t_1, t_n) \\ \vdots
+&amp; \ddots &amp; \vdots \\ k(t_n, t_1) &amp; \cdots &amp; k(t_n, t_n)
+\end{pmatrix} \right)\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Nous cherchons à obtenir une distribution a posteriori qui soit
+également gaussienne, ce qui permet de bénéficier des propriétés
+analytiques des distributions gaussiennes. Pour cela, nous devons
+montrer que la distribution conjointe de <span
+class="math inline">\(f\)</span> et des observations <span
+class="math inline">\(y\)</span> est gaussienne, et que la distribution
+conditionnelle de <span class="math inline">\(f\)</span> sachant <span
+class="math inline">\(y\)</span> est également gaussienne.</p>
+<div class="theoreme">
+<p>Soit <span class="math inline">\(f\)</span> un processus gaussien
+avec moyenne <span class="math inline">\(m(t)\)</span> et fonction de
+covariance <span class="math inline">\(k(t, t&#39;)\)</span>. Soit <span
+class="math inline">\(y = (y_1, y_2, \ldots, y_n)\)</span> un vecteur
+d’observations tel que <span class="math inline">\(y_i = f(t_i) +
+\epsilon_i\)</span>, où <span class="math inline">\(\epsilon_i \sim
+\mathcal{N}(0, \sigma^2)\)</span>. Alors la distribution a posteriori de
+<span class="math inline">\(f\)</span> sachant <span
+class="math inline">\(y\)</span> est un processus gaussien avec moyenne
+et fonction de covariance données par : <span
+class="math display">\[m_{\text{post}}(t) = m(t) + k(t, T)(K + \sigma^2
+I)^{-1}(y - m(T))\]</span> <span
+class="math display">\[k_{\text{post}}(t, t&#39;) = k(t, t&#39;) - k(t,
+T)(K + \sigma^2 I)^{-1}k(T, t&#39;)\]</span> où <span
+class="math inline">\(m(T) = (m(t_1), m(t_2), \ldots, m(t_n))\)</span>
+et <span class="math inline">\(K\)</span> est la matrice de covariance
+de <span class="math inline">\(f\)</span> évaluée en <span
+class="math inline">\(T\)</span>.</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Nous allons prouver le théorème de l’a posteriori gaussien en
+utilisant les propriétés des distributions gaussiennes multivariées.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la distribution conjointe de <span
+class="math inline">\(f\)</span> et <span
+class="math inline">\(y\)</span>. Puisque <span
+class="math inline">\(y_i = f(t_i) + \epsilon_i\)</span>, nous avons :
+<span class="math display">\[(y | f) \sim \mathcal{N}(f(T), \sigma^2
+I)\]</span> où <span class="math inline">\(f(T) = (f(t_1), f(t_2),
+\ldots, f(t_n))\)</span>. La distribution conjointe de <span
+class="math inline">\((f(T), y)\)</span> est alors : <span
+class="math display">\[\begin{pmatrix} f(T) \\ y \end{pmatrix} \sim
+\mathcal{N}\left( \begin{pmatrix} m(T) \\ m(T) \end{pmatrix},
+\begin{pmatrix} K &amp; K \\ K &amp; K + \sigma^2 I \end{pmatrix}
+\right)\]</span> où <span class="math inline">\(K\)</span> est la
+matrice de covariance de <span class="math inline">\(f(T)\)</span>. La
+distribution conditionnelle de <span class="math inline">\(f(T)\)</span>
+sachant <span class="math inline">\(y\)</span> est alors donnée par :
+<span class="math display">\[(f(T) | y) \sim \mathcal{N}\left( m(T) +
+K(K + \sigma^2 I)^{-1}(y - m(T)), K - K(K + \sigma^2 I)^{-1}K
+\right)\]</span> En utilisant les propriétés des processus gaussiens,
+nous pouvons étendre cette distribution à tout <span
+class="math inline">\(t \in T\)</span>, ce qui donne la distribution a
+posteriori de <span class="math inline">\(f\)</span> sachant <span
+class="math inline">\(y\)</span>. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ici quelques propriétés importantes des processus
+gaussiens bayésiens.</p>
+<ol>
+<li><p>La moyenne a posteriori <span
+class="math inline">\(m_{\text{post}}(t)\)</span> est une combinaison
+linéaire des observations <span class="math inline">\(y_i\)</span>,
+pondérée par la fonction de covariance <span class="math inline">\(k(t,
+t&#39;)\)</span>.</p></li>
+<li><p>La variance a posteriori <span
+class="math inline">\(k_{\text{post}}(t, t)\)</span> est toujours
+inférieure ou égale à la variance a priori <span
+class="math inline">\(k(t, t)\)</span>, ce qui reflète l’incertitude
+réduite après observation des données.</p></li>
+<li><p>Les processus gaussiens bayésiens sont invariants par translation
+et par rotation, ce qui signifie que les résultats ne dépendent pas du
+choix de l’origine ou de l’orientation des axes.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>Les processus gaussiens bayésiens offrent un cadre puissant et
+flexible pour modéliser des fonctions complexes à partir de données
+observées. Leur capacité à intégrer naturellement l’incertitude et la
+régularisation en fait un outil indispensable dans de nombreux domaines
+de l’apprentissage statistique et de l’optimisation bayésienne. Les
+propriétés analytiques des distributions gaussiennes permettent de
+développer des algorithmes efficaces pour l’inférence et la
+prédiction.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

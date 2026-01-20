@@ -1,0 +1,373 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La constante de Feigenbaum : une fenêtre sur le chaos déterministe</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La constante de Feigenbaum : une fenêtre sur le chaos
+déterministe</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le chaos déterministe, phénomène où des systèmes simples peuvent
+produire un comportement imprévisible et complexe, a fasciné les
+mathématiciens depuis des décennies. Au cœur de cette étude se trouve la
+constante de Feigenbaum, découverte par le physicien Mitchell Feigenbaum
+en 1975. Cette constante universelle apparaît dans l’analyse des
+bifurcations de doublement de période, un processus par lequel un
+système dynamique passe d’un comportement périodique à un comportement
+chaotique.</p>
+<p>La constante de Feigenbaum émerge comme une réponse à la question
+suivante : comment un système simple, gouverné par des équations
+déterministes, peut-il générer une complexité apparemment aléatoire ? La
+réponse réside dans la structure fine des bifurcations, où une séquence
+de doublements de période conduit à un comportement chaotique. La
+constante de Feigenbaum quantifie la vitesse à laquelle cette séquence
+converge vers le chaos, révélant une universalité frappante dans des
+systèmes aussi divers que les équations logistiques et les oscillations
+d’un pendule forcé.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la constante de Feigenbaum, commençons par explorer
+le concept de bifurcation de doublement de période. Imaginons un système
+dynamique gouverné par une équation récurrente <span
+class="math inline">\(f_\mu : x_{n+1} = \mu f(x_n)\)</span>, où <span
+class="math inline">\(\mu\)</span> est un paramètre de contrôle. À
+mesure que <span class="math inline">\(\mu\)</span> augmente, le système
+peut subir une série de bifurcations où la période double à chaque
+étape. Notre objectif est de quantifier la distance entre ces
+bifurcations successives.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f_\mu\)</span> une famille
+d’applications dépendant d’un paramètre <span
+class="math inline">\(\mu\)</span>. On dit que <span
+class="math inline">\(f_\mu\)</span> subit une bifurcation de doublement
+de période en <span class="math inline">\(\mu = \mu_c\)</span> si, pour
+<span class="math inline">\(\mu\)</span> proche de <span
+class="math inline">\(\mu_c\)</span>, l’application <span
+class="math inline">\(f_\mu\)</span> possède un point fixe périodique de
+période <span class="math inline">\(2^n\)</span>, où <span
+class="math inline">\(n\)</span> tend vers l’infini lorsque <span
+class="math inline">\(\mu\)</span> approche <span
+class="math inline">\(\mu_c\)</span>.</p>
+</div>
+<p>La constante de Feigenbaum est alors définie comme le ratio limite
+des distances entre les valeurs critiques <span
+class="math inline">\(\mu_n\)</span> correspondant à ces
+bifurcations.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\mu_n\)</span> la suite des valeurs
+critiques du paramètre <span class="math inline">\(\mu\)</span> pour
+lesquelles l’application <span class="math inline">\(f_\mu\)</span>
+subit une bifurcation de doublement de période. La constante de
+Feigenbaum <span class="math inline">\(\delta\)</span> est définie par :
+<span class="math display">\[\delta = \lim_{n \to \infty} \frac{\mu_n -
+\mu_{n-1}}{\mu_{n+1} - \mu_n}\]</span></p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Le théorème fondamental associé à la constante de Feigenbaum est le
+suivant :</p>
+<div class="theoreme">
+<p>Pour une large classe d’applications unimodales, la suite <span
+class="math inline">\(\mu_n\)</span> des valeurs critiques converge vers
+une limite finie <span class="math inline">\(\mu_\infty\)</span>, et le
+ratio <span class="math inline">\(\frac{\mu_n - \mu_{n-1}}{\mu_{n+1} -
+\mu_n}\)</span> converge vers une constante universelle <span
+class="math inline">\(\delta \approx 4.6692016091\)</span>.</p>
+</div>
+<p>Pour démontrer ce théorème, nous avons besoin de quelques lemmes
+préliminaires.</p>
+<div class="lemme">
+<p>Soit <span class="math inline">\(f_\mu\)</span> une application
+unimodale avec un point critique unique. Si <span
+class="math inline">\(f_\mu\)</span> subit une série de bifurcations de
+doublement de période, alors la suite <span
+class="math inline">\(\mu_n\)</span> converge vers une limite finie
+<span class="math inline">\(\mu_\infty\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La convergence de la suite <span
+class="math inline">\(\mu_n\)</span> peut être démontrée en utilisant
+les propriétés des applications unimodales et le théorème du point fixe
+de Banach. En effet, l’application <span
+class="math inline">\(f_\mu\)</span> peut être linéarisée autour de son
+point critique, et la convergence des bifurcations suit alors de
+l’analyse des points fixes de cette application linéarisée. ◻</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Nous allons maintenant démontrer le théorème de Feigenbaum en
+utilisant les lemmes précédents.</p>
+<div class="proof">
+<p><em>Preuve du théorème de Feigenbaum.</em> Considérons une
+application unimodale <span class="math inline">\(f_\mu\)</span> avec un
+point critique unique. Par le lemme de convergence des bifurcations, la
+suite <span class="math inline">\(\mu_n\)</span> converge vers une
+limite finie <span class="math inline">\(\mu_\infty\)</span>. Nous
+voulons montrer que le ratio <span class="math inline">\(\frac{\mu_n -
+\mu_{n-1}}{\mu_{n+1} - \mu_n}\)</span> converge vers une constante
+universelle <span class="math inline">\(\delta\)</span>.</p>
+<p>Pour ce faire, nous utilisons la renormalisation, une technique qui
+consiste à transformer l’application <span
+class="math inline">\(f_\mu\)</span> de manière à éliminer les
+dépendances en <span class="math inline">\(n\)</span>. En appliquant la
+renormalisation, nous obtenons une suite d’applications <span
+class="math inline">\(g_n\)</span> qui converge vers une application
+limite <span class="math inline">\(g_\infty\)</span>. La constante de
+Feigenbaum <span class="math inline">\(\delta\)</span> est alors le
+facteur de scaling qui rend cette convergence possible.</p>
+<p>Plus précisément, nous définissons <span
+class="math inline">\(g_n\)</span> par : <span
+class="math display">\[g_n(x) = \frac{f_{\mu_n}(x /
+\lambda_n)}{\lambda_n}\]</span> où <span
+class="math inline">\(\lambda_n\)</span> est choisi de manière à ce que
+<span class="math inline">\(g_n\)</span> converge vers une application
+fixe. En analysant la convergence de cette suite, nous trouvons que
+<span class="math inline">\(\lambda_n\)</span> converge vers une
+constante <span class="math inline">\(\delta\)</span>, qui est
+précisément la constante de Feigenbaum. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+constante de Feigenbaum.</p>
+<ol>
+<li><p>La constante de Feigenbaum est universelle, c’est-à-dire qu’elle
+apparaît dans une large classe d’applications unimodales, indépendamment
+des détails spécifiques de l’application.</p>
+<div class="proof">
+<p><em>Proof.</em> L’universalité de la constante de Feigenbaum découle
+du fait que la renormalisation élimine les détails spécifiques de
+l’application, ne laissant que les propriétés générales qui sont
+responsables du comportement chaotique. Cela est démontré rigoureusement
+en utilisant les techniques de la théorie des groupes de
+renormalisation. ◻</p>
+</div></li>
+<li><p>La constante de Feigenbaum est indépendante du type de
+bifurcation, qu’il s’agisse de bifurcations de doublement de période ou
+d’autres types de bifurcations.</p>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété découle du fait que la
+renormalisation est une technique générale qui peut être appliquée à
+diverses types de bifurcations. La constante de Feigenbaum émerge comme
+un facteur de scaling universel, indépendamment du type spécifique de
+bifurcation. ◻</p>
+</div></li>
+<li><p>La constante de Feigenbaum peut être calculée numériquement avec
+une grande précision en utilisant des méthodes itératives.</p>
+<div class="proof">
+<p><em>Proof.</em> Les méthodes numériques pour calculer la constante de
+Feigenbaum reposent sur l’itération de l’application <span
+class="math inline">\(f_\mu\)</span> et la mesure des distances entre
+les bifurcations successives. En utilisant des techniques de précision
+arbitraire, on peut obtenir une valeur numérique très précise pour <span
+class="math inline">\(\delta\)</span>. ◻</p>
+</div></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La constante de Feigenbaum est un exemple frappant d’universalité
+dans les systèmes dynamiques. Elle révèle une structure profonde et
+cachée dans le chaos déterministe, montrant que des systèmes apparemment
+différents peuvent partager des propriétés fondamentales. Cette
+découverte a ouvert de nouvelles voies de recherche en physique, en
+mathématiques et en sciences du vivant, où le chaos et les bifurcations
+jouent un rôle crucial.</p>
+<p>En conclusion, la constante de Feigenbaum est non seulement un outil
+puissant pour comprendre le chaos, mais aussi une fenêtre sur les lois
+universelles qui gouvernent les systèmes complexes. Son étude continue
+d’inspirer des recherches en théorie du chaos, en renormalisation et
+dans de nombreux autres domaines des sciences mathématiques.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

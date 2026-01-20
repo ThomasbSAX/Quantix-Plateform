@@ -1,0 +1,405 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Dérivée distributionnelle : Une généralisation puissante de la dérivée classique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Dérivée distributionnelle : Une généralisation
+puissante de la dérivée classique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La notion de dérivée est fondamentale en analyse mathématique. Elle
+permet de modéliser des variations instantanées et est à la base du
+calcul différentiel. Cependant, la dérivée classique présente des
+limitations importantes : elle n’est pas définie pour les fonctions
+discontinues ou non dérivables au sens classique. La théorie des
+distributions, développée par Laurent Schwartz dans les années
+1940-1950, a permis de surmonter ces limitations en introduisant la
+dérivée distributionnelle.</p>
+<p>Cette généralisation élargit considérablement le champ d’application
+de l’analyse mathématique. Elle permet, par exemple, de définir la
+dérivée de fonctions discontinues comme l’onde carrée ou la fonction de
+Heaviside, qui jouent un rôle crucial en traitement du signal et en
+physique théorique. De plus, la dérivée distributionnelle est
+essentielle dans l’étude des équations aux dérivées partielles, où elle
+permet de traiter des solutions faibles et de formuler des problèmes
+variés.</p>
+<p>Dans cet article, nous explorerons la définition rigoureuse de la
+dérivée distributionnelle, ses propriétés fondamentales et ses
+applications. Nous verrons comment cette notion unifie et étend les
+concepts classiques de dérivée et d’intégration.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de dérivée distributionnelle, commençons
+par rappeler ce qu’est une distribution. Intuitivement, une distribution
+est un objet qui peut être intégré contre des fonctions test,
+c’est-à-dire des fonctions lisses à support compact.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\Omega\)</span> un ouvert de <span
+class="math inline">\(\mathbb{R}^n\)</span>. On note <span
+class="math inline">\(\mathcal{D}(\Omega)\)</span> l’espace des
+fonctions test sur <span class="math inline">\(\Omega\)</span>,
+c’est-à-dire l’ensemble des fonctions <span
+class="math inline">\(C^\infty\)</span> à support compact dans <span
+class="math inline">\(\Omega\)</span>. Formellement, <span
+class="math display">\[\mathcal{D}(\Omega) = \{ \phi \in
+C^\infty(\Omega) : \text{supp}(\phi) \subset \subset \Omega
+\}.\]</span></p>
+</div>
+<p>Une distribution est alors un objet qui agit linéairement et
+continument sur les fonctions test.</p>
+<div class="definition">
+<p>Une distribution <span class="math inline">\(T\)</span> sur <span
+class="math inline">\(\Omega\)</span> est une forme linéaire continue
+sur <span class="math inline">\(\mathcal{D}(\Omega)\)</span>. Cela
+signifie que <span class="math inline">\(T\)</span> satisfait les
+propriétés suivantes :</p>
+<ol>
+<li><p>Linéarité : Pour tout <span class="math inline">\(\phi, \psi \in
+\mathcal{D}(\Omega)\)</span> et tout <span class="math inline">\(\lambda
+\in \mathbb{C}\)</span>, <span class="math display">\[T(\phi + \psi) =
+T(\phi) + T(\psi), \quad T(\lambda \phi) = \lambda
+T(\phi).\]</span></p></li>
+<li><p>Continuité : Si <span class="math inline">\(\{\phi_j\}\)</span>
+est une suite dans <span
+class="math inline">\(\mathcal{D}(\Omega)\)</span> qui converge vers 0
+dans <span class="math inline">\(C^\infty\)</span>, alors <span
+class="math inline">\(T(\phi_j) \to 0\)</span>.</p></li>
+</ol>
+</div>
+<p>Maintenant, nous sommes prêts à définir la dérivée distributionnelle.
+L’idée est de généraliser le théorème d’intégration par parties, qui
+relie la dérivée et l’intégrale.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(T\)</span> une distribution sur
+<span class="math inline">\(\Omega\)</span>. La dérivée partielle de
+<span class="math inline">\(T\)</span> par rapport à la variable <span
+class="math inline">\(x_i\)</span>, notée <span
+class="math inline">\(\partial_i T\)</span>, est définie par <span
+class="math display">\[\langle \partial_i T, \phi \rangle = -\langle T,
+\partial_i \phi \rangle \quad \text{pour tout } \phi \in
+\mathcal{D}(\Omega).\]</span> Plus généralement, pour un multi-indice
+<span class="math inline">\(\alpha = (\alpha_1, \dots,
+\alpha_n)\)</span>, la dérivée d’ordre <span
+class="math inline">\(\alpha\)</span> de <span
+class="math inline">\(T\)</span> est définie par <span
+class="math display">\[\langle \partial^\alpha T, \phi \rangle =
+(-1)^{|\alpha|} \langle T, \partial^\alpha \phi \rangle \quad \text{pour
+tout } \phi \in \mathcal{D}(\Omega),\]</span> où <span
+class="math inline">\(|\alpha| = \alpha_1 + \dots + \alpha_n\)</span> et
+<span class="math inline">\(\partial^\alpha = \partial_1^{\alpha_1}
+\dots \partial_n^{\alpha_n}\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>La dérivée distributionnelle possède de nombreuses propriétés
+intéressantes. Nous en présentons quelques-unes dans cette section.</p>
+<div class="theorem">
+<p>La dérivée distributionnelle est linéaire. Plus précisément, pour
+toute distribution <span class="math inline">\(T_1, T_2\)</span> et tout
+<span class="math inline">\(\lambda \in \mathbb{C}\)</span>, <span
+class="math display">\[\partial_i (T_1 + T_2) = \partial_i T_1 +
+\partial_i T_2, \quad \partial_i (\lambda T) = \lambda \partial_i
+T.\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La preuve suit directement de la définition. Pour
+tout <span class="math inline">\(\phi \in \mathcal{D}(\Omega)\)</span>,
+<span class="math display">\[\langle \partial_i (T_1 + T_2), \phi
+\rangle = -\langle T_1 + T_2, \partial_i \phi \rangle = -\langle T_1,
+\partial_i \phi \rangle - \langle T_2, \partial_i \phi \rangle = \langle
+\partial_i T_1, \phi \rangle + \langle \partial_i T_2, \phi
+\rangle.\]</span> De même, <span class="math display">\[\langle
+\partial_i (\lambda T), \phi \rangle = -\langle \lambda T, \partial_i
+\phi \rangle = \lambda (-\langle T, \partial_i \phi \rangle) = \lambda
+\langle \partial_i T, \phi \rangle.\]</span> ◻</p>
+</div>
+<div class="theorem">
+<p>Soient <span class="math inline">\(T_1\)</span> et <span
+class="math inline">\(T_2\)</span> deux distributions sur <span
+class="math inline">\(\Omega\)</span>. Alors, pour tout <span
+class="math inline">\(i = 1, \dots, n\)</span>, <span
+class="math display">\[\partial_i (T_1 T_2) = (\partial_i T_1) T_2 + T_1
+(\partial_i T_2).\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Pour tout <span class="math inline">\(\phi \in
+\mathcal{D}(\Omega)\)</span>, <span class="math display">\[\langle
+\partial_i (T_1 T_2), \phi \rangle = -\langle T_1 T_2, \partial_i \phi
+\rangle.\]</span> En utilisant l’intégration par parties et la
+définition du produit de distributions, <span
+class="math display">\[\langle T_1 T_2, \partial_i \phi \rangle =
+-\langle (\partial_i T_1) T_2 + T_1 (\partial_i T_2), \phi
+\rangle.\]</span> Donc, <span class="math display">\[\langle \partial_i
+(T_1 T_2), \phi \rangle = \langle (\partial_i T_1) T_2 + T_1 (\partial_i
+T_2), \phi \rangle.\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Dans cette section, nous fournissons des preuves détaillées pour les
+théorèmes présentés.</p>
+<div class="proof">
+<p><em>Preuve du Théorème 1.</em> La linéarité de la dérivée
+distributionnelle est une conséquence directe de la définition. En
+effet, pour toute distribution <span class="math inline">\(T\)</span> et
+tout <span class="math inline">\(\lambda \in \mathbb{C}\)</span>, <span
+class="math display">\[\langle \partial_i (\lambda T), \phi \rangle =
+-\langle \lambda T, \partial_i \phi \rangle = \lambda (-\langle T,
+\partial_i \phi \rangle) = \lambda \langle \partial_i T, \phi
+\rangle.\]</span> De même, <span class="math display">\[\langle
+\partial_i (T_1 + T_2), \phi \rangle = -\langle T_1 + T_2, \partial_i
+\phi \rangle = -\langle T_1, \partial_i \phi \rangle - \langle T_2,
+\partial_i \phi \rangle = \langle \partial_i T_1, \phi \rangle + \langle
+\partial_i T_2, \phi \rangle.\]</span> ◻</p>
+</div>
+<div class="proof">
+<p><em>Preuve du Théorème 2.</em> Pour toute fonction test <span
+class="math inline">\(\phi \in \mathcal{D}(\Omega)\)</span>, nous avons
+<span class="math display">\[\langle T_1 T_2, \partial_i \phi \rangle =
+-\int_{\Omega} (T_1 T_2)(x) \partial_i \phi(x) \, dx.\]</span> En
+utilisant l’intégration par parties et la définition du produit de
+distributions, <span class="math display">\[\int_{\Omega} (T_1 T_2)(x)
+\partial_i \phi(x) \, dx = -\int_{\Omega} [(\partial_i T_1)(x) T_2(x) +
+T_1(x) (\partial_i T_2)(x)] \phi(x) \, dx.\]</span> Donc, <span
+class="math display">\[\langle T_1 T_2, \partial_i \phi \rangle =
+\int_{\Omega} [(\partial_i T_1)(x) T_2(x) + T_1(x) (\partial_i T_2)(x)]
+\phi(x) \, dx.\]</span> En passant à la notation duale, <span
+class="math display">\[\langle \partial_i (T_1 T_2), \phi \rangle =
+\langle (\partial_i T_1) T_2 + T_1 (\partial_i T_2), \phi
+\rangle.\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons ici quelques propriétés importantes de la dérivée
+distributionnelle.</p>
+<ol>
+<li><p>La dérivée d’une fonction localement intégrable est une
+distribution. Plus précisément, si <span class="math inline">\(f \in
+L^1_{\text{loc}}(\Omega)\)</span>, alors la distribution associée à
+<span class="math inline">\(f\)</span> est dérivable au sens des
+distributions, et sa dérivée est donnée par <span
+class="math display">\[\langle \partial_i f, \phi \rangle =
+-\int_{\Omega} f(x) \partial_i \phi(x) \, dx.\]</span></p></li>
+<li><p>La dérivée distributionnelle est compatible avec la dérivée
+classique. Si <span class="math inline">\(f\)</span> est une fonction de
+classe <span class="math inline">\(C^1\)</span>, alors sa dérivée
+distributionnelle coïncide avec sa dérivée classique. Plus précisément,
+<span class="math display">\[\langle \partial_i f, \phi \rangle =
+-\int_{\Omega} f(x) \partial_i \phi(x) \, dx = \int_{\Omega} (\partial_i
+f)(x) \phi(x) \, dx.\]</span></p></li>
+<li><p>La dérivée distributionnelle est un opérateur local. Cela
+signifie que si deux distributions <span
+class="math inline">\(T_1\)</span> et <span
+class="math inline">\(T_2\)</span> coïncident sur un ouvert <span
+class="math inline">\(\Omega&#39; \subset \Omega\)</span>, alors leurs
+dérivées <span class="math inline">\(\partial_i T_1\)</span> et <span
+class="math inline">\(\partial_i T_2\)</span> coïncident également sur
+<span class="math inline">\(\Omega&#39;\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La dérivée distributionnelle est un outil puissant qui permet de
+généraliser la notion classique de dérivée. Elle joue un rôle central
+dans l’analyse des équations aux dérivées partielles et dans de
+nombreuses applications en physique et en ingénierie. En élargissant le
+champ des fonctions dérivables, elle offre une flexibilité et une
+puissance accrues pour résoudre des problèmes complexes.</p>
+<p>Dans cet article, nous avons présenté les définitions fondamentales,
+les théorèmes clés et les propriétés de la dérivée distributionnelle.
+Nous avons également fourni des preuves détaillées pour illustrer ces
+concepts. La théorie des distributions, et en particulier la dérivée
+distributionnelle, reste un domaine actif de recherche avec de
+nombreuses applications potentielles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

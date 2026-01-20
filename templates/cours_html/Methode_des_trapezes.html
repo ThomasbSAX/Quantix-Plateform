@@ -1,0 +1,299 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode des trapèzes</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode des trapèzes</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La méthode des trapèzes est une technique numérique fondamentale pour
+l’approximation des intégrales définies. Son origine remonte aux
+premiers développements du calcul infinitésimal, où les mathématiciens
+cherchaient à évaluer des aires sous des courbes de manière pratique.
+Cette méthode est indispensable dans de nombreux domaines scientifiques
+et techniques, où les intégrales ne peuvent être évaluées
+analytiquement. Elle offre un compromis entre simplicité et précision,
+faisant d’elle un outil de choix pour les calculs numériques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la méthode des trapèzes, considérons une fonction
+<span class="math inline">\(f\)</span> continue sur l’intervalle <span
+class="math inline">\([a, b]\)</span>. Nous cherchons à approcher
+l’intégrale <span class="math inline">\(\int_{a}^{b} f(x) \,
+dx\)</span>. L’idée sous-jacente est de décomposer l’intervalle <span
+class="math inline">\([a, b]\)</span> en sous-intervalles plus petits et
+d’approximer l’aire sous la courbe par des trapèzes.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(f : [a, b] \rightarrow
+\mathbb{R}\)</span> une fonction continue et <span
+class="math inline">\(n \in \mathbb{N}^*\)</span>. On considère une
+subdivision régulière de <span class="math inline">\([a, b]\)</span> en
+<span class="math inline">\(n\)</span> sous-intervalles de longueur
+<span class="math inline">\(\Delta x = \frac{b - a}{n}\)</span>. On note
+<span class="math inline">\(x_i = a + i \Delta x\)</span> pour <span
+class="math inline">\(i = 0, 1, \ldots, n\)</span>. L’approximation de
+l’intégrale <span class="math inline">\(\int_{a}^{b} f(x) \, dx\)</span>
+par la méthode des trapèzes est donnée par : <span
+class="math display">\[T_n(f) = \frac{\Delta x}{2} \left( f(x_0) + 2
+\sum_{i=1}^{n-1} f(x_i) + f(x_n) \right).\]</span></p>
+</div>
+<p>Cette formule peut également s’écrire sous la forme : <span
+class="math display">\[T_n(f) = \frac{b - a}{2n} \left( f(a) + 2
+\sum_{i=1}^{n-1} f\left(a + i \frac{b - a}{n}\right) + f(b)
+\right).\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la méthode des trapèzes est celui
+de l’erreur d’approximation. Ce théorème donne une borne supérieure sur
+l’erreur commise en utilisant cette méthode.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f : [a, b] \rightarrow
+\mathbb{R}\)</span> une fonction deux fois continûment dérivable. On
+note <span class="math inline">\(M_2 = \max_{x \in [a, b]}
+|f&#39;&#39;(x)|\)</span>. Alors, l’erreur d’approximation <span
+class="math inline">\(E_n(f) = \int_{a}^{b} f(x) \, dx - T_n(f)\)</span>
+satisfait : <span class="math display">\[|E_n(f)| \leq \frac{(b -
+a)^3}{12n^2} M_2.\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer ce théorème, nous utilisons le théorème de Taylor avec
+reste intégral. Considérons une fonction <span
+class="math inline">\(f\)</span> deux fois continûment dérivable sur
+<span class="math inline">\([a, b]\)</span>. Pour tout <span
+class="math inline">\(x \in [x_i, x_{i+1}]\)</span>, nous avons : <span
+class="math display">\[f(x) = f(x_i) + f&#39;(x_i)(x - x_i) +
+\int_{x_i}^{x} (x - t) f&#39;&#39;(t) \, dt.\]</span></p>
+<p>En intégrant cette égalité sur <span class="math inline">\([x_i,
+x_{i+1}]\)</span>, nous obtenons : <span
+class="math display">\[\int_{x_i}^{x_{i+1}} f(x) \, dx = \frac{f(x_i) +
+f(x_{i+1})}{2} \Delta x - \int_{x_i}^{x_{i+1}} \int_{x_i}^{x} (x - t)
+f&#39;&#39;(t) \, dt \, dx.\]</span></p>
+<p>En sommant sur tous les sous-intervalles et en utilisant l’inégalité
+triangulaire, nous obtenons : <span class="math display">\[\left|
+\int_{a}^{b} f(x) \, dx - T_n(f) \right| \leq \sum_{i=0}^{n-1}
+\int_{x_i}^{x_{i+1}} \int_{x_i}^{x} |x - t| \, dt \, dx \cdot
+M_2.\]</span></p>
+<p>En calculant les intégrales, nous trouvons : <span
+class="math display">\[\int_{x_i}^{x_{i+1}} \int_{x_i}^{x} |x - t| \, dt
+\, dx = \frac{\Delta x^3}{12}.\]</span></p>
+<p>En sommant sur tous les sous-intervalles, nous obtenons finalement :
+<span class="math display">\[|E_n(f)| \leq \frac{(b - a)^3}{12n^2}
+M_2.\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<ol>
+<li><p>La méthode des trapèzes est exacte pour les fonctions
+polynomiales de degré inférieur ou égal à 1. C’est-à-dire que si <span
+class="math inline">\(f\)</span> est une fonction affine, alors <span
+class="math inline">\(T_n(f) = \int_{a}^{b} f(x) \,
+dx\)</span>.</p></li>
+<li><p>L’erreur d’approximation diminue lorsque <span
+class="math inline">\(n\)</span> augmente. Plus précisément, l’erreur
+est de l’ordre de <span
+class="math inline">\(O\left(\frac{1}{n^2}\right)\)</span>.</p></li>
+<li><p>La méthode des trapèzes peut être généralisée à des fonctions de
+plusieurs variables en utilisant des produits de subdivisions.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La méthode des trapèzes est un outil puissant et largement utilisé
+pour l’approximation numérique des intégrales. Sa simplicité et sa
+précision en font un choix privilégié dans de nombreuses applications
+pratiques. Les théorèmes et propriétés présentés montrent son efficacité
+et ses limites, ouvrant la voie à des améliorations et des
+généralisations.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

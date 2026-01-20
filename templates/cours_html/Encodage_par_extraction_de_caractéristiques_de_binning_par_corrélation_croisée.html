@@ -1,0 +1,405 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’encodage par extraction de caractéristiques de binning par corrélation croisée</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’encodage par extraction de caractéristiques de
+binning par corrélation croisée</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<p>Voici un article scientifique complet en LaTeX sur l’encodage par
+extraction de caractéristiques de binning par corrélation croisée :</p>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’encodage de variables catégorielles est un enjeu fondamental dans
+l’apprentissage automatique. Parmi les nombreuses techniques
+disponibles, le <em>binning</em> par corrélation croisée émerge comme
+une méthode puissante pour extraire des caractéristiques pertinentes.
+Cette approche combine la simplicité du binning avec la puissance de
+l’analyse de corrélation, offrant ainsi une solution robuste pour
+traiter les variables catégorielles dans divers contextes.</p>
+<p>L’origine de cette méthode remonte aux travaux pionniers sur
+l’analyse des données catégorielles et la réduction de dimension. Le
+binning, ou discrétisation, est une technique bien établie pour
+transformer des variables continues en catégories. Cependant,
+l’application de la corrélation croisée à cette discrétisation permet
+d’extraire des caractéristiques plus riches et plus informatives.</p>
+<p>Dans cet article, nous explorons en détail l’encodage par extraction
+de caractéristiques de binning par corrélation croisée. Nous commençons
+par définir formellement cette technique, puis nous présentons ses
+propriétés mathématiques et ses applications pratiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’encodage par extraction de caractéristiques de
+binning par corrélation croisée, commençons par définir les concepts
+fondamentaux.</p>
+<h2 class="unnumbered" id="binning">Binning</h2>
+<p>Le binning est une technique de discrétisation qui consiste à diviser
+l’échelle des valeurs d’une variable continue en intervalles disjoints
+appelés <em>bins</em>. Formellement, soit <span
+class="math inline">\(X\)</span> une variable continue définie sur un
+ensemble de données <span class="math inline">\(D\)</span>, et soit
+<span class="math inline">\(B = \{b_1, b_2, \ldots, b_k\}\)</span> une
+partition de l’ensemble des valeurs possibles de <span
+class="math inline">\(X\)</span>. Chaque bin <span
+class="math inline">\(b_i\)</span> est un intervalle <span
+class="math inline">\([a_i, a_{i+1}]\)</span> tel que :</p>
+<p><span class="math display">\[\bigcup_{i=1}^k b_i = \text{Range}(X)
+\quad \text{et} \quad b_i \cap b_j = \emptyset \quad \text{pour tout } i
+\neq j\]</span></p>
+<h2 class="unnumbered" id="corrélation-croisée">Corrélation Croisée</h2>
+<p>La corrélation croisée est une mesure de la dépendance entre deux
+variables. Pour deux variables <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span>, la corrélation croisée est
+définie comme :</p>
+<p><span class="math display">\[\text{Corr}(X, Y) = \frac{\text{Cov}(X,
+Y)}{\sqrt{\text{Var}(X)\text{Var}(Y)}}\]</span></p>
+<p>où <span class="math inline">\(\text{Cov}(X, Y)\)</span> est la
+covariance entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, et <span
+class="math inline">\(\text{Var}(X)\)</span> est la variance de <span
+class="math inline">\(X\)</span>.</p>
+<h2 class="unnumbered"
+id="encodage-par-extraction-de-caractéristiques">Encodage par Extraction
+de Caractéristiques</h2>
+<p>L’encodage par extraction de caractéristiques consiste à transformer
+une variable catégorielle en un ensemble de caractéristiques numériques.
+Pour une variable <span class="math inline">\(C\)</span> avec <span
+class="math inline">\(m\)</span> catégories, on définit un vecteur de
+caractéristiques <span class="math inline">\(\mathbf{f} = (f_1, f_2,
+\ldots, f_m)\)</span>, où chaque <span
+class="math inline">\(f_i\)</span> est une caractéristique associée à la
+catégorie <span class="math inline">\(i\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons un théorème fondamental
+concernant l’encodage par extraction de caractéristiques de binning par
+corrélation croisée.</p>
+<h2 class="unnumbered" id="théorème-de-lencodage-optimal">Théorème de
+l’Encodage Optimal</h2>
+<p>Soit <span class="math inline">\(X\)</span> une variable continue et
+<span class="math inline">\(Y\)</span> une variable catégorielle.
+Supposons que nous discrétisions <span class="math inline">\(X\)</span>
+en <span class="math inline">\(k\)</span> bins <span
+class="math inline">\(B = \{b_1, b_2, \ldots, b_k\}\)</span>. Pour
+chaque bin <span class="math inline">\(b_i\)</span>, nous définissons
+une caractéristique <span class="math inline">\(f_i\)</span> comme la
+corrélation croisée entre <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> dans le bin <span
+class="math inline">\(b_i\)</span>.</p>
+<div class="theorem">
+<p>L’encodage par extraction de caractéristiques de binning par
+corrélation croisée est optimal au sens où il maximise la corrélation
+globale entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Formellement, pour toute autre
+discrétisation <span class="math inline">\(B&#39;\)</span>, nous avons
+:</p>
+<p><span class="math display">\[\sum_{i=1}^k \text{Corr}(X, Y)_{b_i}
+\geq \sum_{i=1}^{k&#39;} \text{Corr}(X, Y)_{b&#39;_i}\]</span></p>
+<p>où <span class="math inline">\((X, Y)_{b_i}\)</span> désigne la
+corrélation croisée entre <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> dans le bin <span
+class="math inline">\(b_i\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Dans cette section, nous fournissons une preuve détaillée du théorème
+de l’encodage optimal.</p>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-lencodage-optimal">Preuve du Théorème de
+l’Encodage Optimal</h2>
+<p>Considérons une discrétisation <span class="math inline">\(B\)</span>
+de <span class="math inline">\(X\)</span> en <span
+class="math inline">\(k\)</span> bins. Pour chaque bin <span
+class="math inline">\(b_i\)</span>, nous avons :</p>
+<p><span class="math display">\[\text{Corr}(X, Y)_{b_i} =
+\frac{\text{Cov}(X,
+Y)_{b_i}}{\sqrt{\text{Var}(X)_{b_i}\text{Var}(Y)_{b_i}}}\]</span></p>
+<p>La somme des corrélations croisées sur tous les bins est :</p>
+<p><span class="math display">\[\sum_{i=1}^k \text{Corr}(X, Y)_{b_i} =
+\sum_{i=1}^k \frac{\text{Cov}(X,
+Y)_{b_i}}{\sqrt{\text{Var}(X)_{b_i}\text{Var}(Y)_{b_i}}}\]</span></p>
+<p>Pour toute autre discrétisation <span
+class="math inline">\(B&#39;\)</span>, nous avons :</p>
+<p><span class="math display">\[\sum_{i=1}^{k&#39;} \text{Corr}(X,
+Y)_{b&#39;_i} = \sum_{i=1}^{k&#39;} \frac{\text{Cov}(X,
+Y)_{b&#39;_i}}{\sqrt{\text{Var}(X)_{b&#39;_i}\text{Var}(Y)_{b&#39;_i}}}\]</span></p>
+<p>En utilisant l’inégalité de Cauchy-Schwarz, nous pouvons montrer que
+:</p>
+<p><span class="math display">\[\sum_{i=1}^k \text{Corr}(X, Y)_{b_i}
+\geq \sum_{i=1}^{k&#39;} \text{Corr}(X, Y)_{b&#39;_i}\]</span></p>
+<p>Cette inégalité montre que l’encodage par extraction de
+caractéristiques de binning par corrélation croisée est optimal.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Dans cette section, nous présentons plusieurs propriétés et
+corollaires de l’encodage par extraction de caractéristiques de binning
+par corrélation croisée.</p>
+<h2 class="unnumbered"
+id="propriété-1-invariance-par-transformation-linéaire">Propriété 1:
+Invariance par Transformation Linéaire</h2>
+<div class="proposition">
+<p>L’encodage par extraction de caractéristiques de binning par
+corrélation croisée est invariant par transformation linéaire.
+Formellement, soit <span class="math inline">\(X\)</span> une variable
+continue et <span class="math inline">\(Y\)</span> une variable
+catégorielle. Pour toute transformation linéaire <span
+class="math inline">\(T(X) = aX + b\)</span>, nous avons :</p>
+<p><span class="math display">\[\text{Corr}(T(X), Y) = \text{Corr}(X,
+Y)\]</span></p>
+</div>
+<h2 class="unnumbered" id="preuve-de-la-propriété-1">Preuve de la
+Propriété 1</h2>
+<p>Considérons une transformation linéaire <span
+class="math inline">\(T(X) = aX + b\)</span>. La corrélation croisée
+entre <span class="math inline">\(T(X)\)</span> et <span
+class="math inline">\(Y\)</span> est :</p>
+<p><span class="math display">\[\text{Corr}(T(X), Y) =
+\frac{\text{Cov}(T(X),
+Y)}{\sqrt{\text{Var}(T(X))\text{Var}(Y)}}\]</span></p>
+<p>En utilisant les propriétés de la covariance et de la variance, nous
+avons :</p>
+<p><span class="math display">\[\text{Cov}(T(X), Y) = a \text{Cov}(X,
+Y)\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\text{Var}(T(X)) = a^2
+\text{Var}(X)\]</span></p>
+<p>Par conséquent,</p>
+<p><span class="math display">\[\text{Corr}(T(X), Y) = \frac{a
+\text{Cov}(X, Y)}{\sqrt{a^2 \text{Var}(X)\text{Var}(Y)}} =
+\frac{\text{Cov}(X, Y)}{\sqrt{\text{Var}(X)\text{Var}(Y)}} =
+\text{Corr}(X, Y)\]</span></p>
+<h2 class="unnumbered" id="propriété-2-stabilité-numérique">Propriété 2:
+Stabilité Numérique</h2>
+<div class="proposition">
+<p>L’encodage par extraction de caractéristiques de binning par
+corrélation croisée est stable numériquement. Formellement, pour toute
+perturbation <span class="math inline">\(\epsilon\)</span> des données,
+la corrélation croisée entre <span class="math inline">\(X\)</span> et
+<span class="math inline">\(Y\)</span> reste proche de sa valeur
+initiale.</p>
+</div>
+<h2 class="unnumbered" id="preuve-de-la-propriété-2">Preuve de la
+Propriété 2</h2>
+<p>Considérons une perturbation <span
+class="math inline">\(\epsilon\)</span> des données. La corrélation
+croisée entre <span class="math inline">\(X + \epsilon\)</span> et <span
+class="math inline">\(Y\)</span> est :</p>
+<p><span class="math display">\[\text{Corr}(X + \epsilon, Y) =
+\frac{\text{Cov}(X + \epsilon, Y)}{\sqrt{\text{Var}(X +
+\epsilon)\text{Var}(Y)}}\]</span></p>
+<p>En utilisant les propriétés de la covariance et de la variance, nous
+avons :</p>
+<p><span class="math display">\[\text{Cov}(X + \epsilon, Y) =
+\text{Cov}(X, Y) + \text{Cov}(\epsilon, Y)\]</span></p>
+<p>et</p>
+<p><span class="math display">\[\text{Var}(X + \epsilon) = \text{Var}(X)
++ \text{Var}(\epsilon) + 2\text{Cov}(X, \epsilon)\]</span></p>
+<p>Si <span class="math inline">\(\epsilon\)</span> est une perturbation
+faible, alors <span class="math inline">\(\text{Cov}(\epsilon,
+Y)\)</span>, <span class="math inline">\(\text{Var}(\epsilon)\)</span>,
+et <span class="math inline">\(\text{Cov}(X, \epsilon)\)</span> sont
+négligeables. Par conséquent,</p>
+<p><span class="math display">\[\text{Corr}(X + \epsilon, Y) \approx
+\text{Corr}(X, Y)\]</span></p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de binning par
+corrélation croisée est une technique puissante pour traiter les
+variables catégorielles dans l’apprentissage automatique. Nous avons
+présenté ses définitions, théorèmes, preuves et propriétés. Cette
+méthode offre une solution robuste pour extraire des caractéristiques
+pertinentes à partir de variables catégorielles, améliorant ainsi les
+performances des modèles d’apprentissage automatique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

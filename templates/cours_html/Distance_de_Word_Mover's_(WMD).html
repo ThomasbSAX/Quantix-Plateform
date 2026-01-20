@@ -1,0 +1,352 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La Distance de Word Mover’s (WMD)</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La Distance de Word Mover’s (WMD)</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance de Word Mover’s (WMD) émerge dans le contexte des
+traitements automatiques du langage naturel, où la compréhension fine et
+nuancée des textes est cruciale. Inspirée par les travaux en
+optimisation de transport, cette notion révolutionne la manière dont
+nous comparons des documents textuels. L’idée centrale est de modéliser
+le texte comme un ensemble de mots déplaçables, où chaque mot a une
+position dans l’espace sémantique. La WMD mesure alors le coût minimal
+pour transformer un texte en un autre, en tenant compte des similarités
+sémantiques entre les mots.</p>
+<p>Cette approche est indispensable dans un cadre où la simple
+comparaison de sacs de mots (bag-of-words) se révèle insuffisante. En
+effet, l’ordre des mots et leur contexte sémantique jouent un rôle
+crucial dans la compréhension du texte. La WMD permet de capturer ces
+subtilités, ouvrant ainsi des perspectives nouvelles dans la
+classification de textes, la recherche d’information et l’analyse de
+sentiments.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la distance de Word Mover’s, commençons par
+comprendre ce que nous cherchons à capturer. Imaginons deux textes comme
+des ensembles de mots dans un espace vectoriel, où chaque mot est
+représenté par un vecteur dense. Nous voulons mesurer le coût minimal
+pour transformer un texte en un autre, en déplaçant les mots de l’un à
+l’autre.</p>
+<p>Formellement, soit <span class="math inline">\(\mathcal{X} = \{x_1,
+x_2, \dots, x_m\}\)</span> et <span class="math inline">\(\mathcal{Y} =
+\{y_1, y_2, \dots, y_n\}\)</span> deux ensembles de mots représentés par
+des vecteurs dans un espace métrique <span
+class="math inline">\((\mathcal{M}, d)\)</span>, où <span
+class="math inline">\(d\)</span> est une distance entre les mots. Nous
+cherchons à trouver un couplage optimal <span
+class="math inline">\(T\)</span> entre les mots de <span
+class="math inline">\(\mathcal{X}\)</span> et <span
+class="math inline">\(\mathcal{Y}\)</span> qui minimise le coût total de
+transport.</p>
+<p>La distance de Word Mover’s est définie comme suit :</p>
+<p><span class="math display">\[\text{WMD}(\mathcal{X}, \mathcal{Y}) =
+\min_{T \geq 0} \sum_{i=1}^{m} \sum_{j=1}^{n} T_{ij} d(x_i,
+y_j)\]</span></p>
+<p>sous les contraintes :</p>
+<p><span class="math display">\[\sum_{j=1}^{n} T_{ij} \leq 1 \quad
+\forall i \in \{1, \dots, m\}\]</span></p>
+<p><span class="math display">\[\sum_{i=1}^{m} T_{ij} \leq 1 \quad
+\forall j \in \{1, \dots, n\}\]</span></p>
+<p><span class="math display">\[\sum_{i=1}^{m} \sum_{j=1}^{n} T_{ij} =
+\min(m, n)\]</span></p>
+<p>où <span class="math inline">\(T\)</span> est une matrice de
+transport de dimensions <span class="math inline">\(m \times
+n\)</span>.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Pour établir les propriétés fondamentales de la WMD, considérons le
+théorème suivant, qui relie la WMD à la distance de terre (Earth Mover’s
+Distance, EMD) dans un espace métrique.</p>
+<p>Soit <span class="math inline">\(\mathcal{X}\)</span> et <span
+class="math inline">\(\mathcal{Y}\)</span> deux ensembles de mots dans
+un espace métrique <span class="math inline">\((\mathcal{M},
+d)\)</span>. La distance de Word Mover’s entre <span
+class="math inline">\(\mathcal{X}\)</span> et <span
+class="math inline">\(\mathcal{Y}\)</span> est égale à la distance de
+terre entre les distributions empiriques des mots dans <span
+class="math inline">\(\mathcal{X}\)</span> et <span
+class="math inline">\(\mathcal{Y}\)</span>.</p>
+<p>Formellement, soit <span
+class="math inline">\(\mu_{\mathcal{X}}\)</span> et <span
+class="math inline">\(\mu_{\mathcal{Y}}\)</span> les distributions
+empiriques définies par :</p>
+<p><span class="math display">\[\mu_{\mathcal{X}}(x_i) = \frac{1}{m}
+\quad \forall i \in \{1, \dots, m\}\]</span></p>
+<p><span class="math display">\[\mu_{\mathcal{Y}}(y_j) = \frac{1}{n}
+\quad \forall j \in \{1, \dots, n\}\]</span></p>
+<p>Alors,</p>
+<p><span class="math display">\[\text{WMD}(\mathcal{X}, \mathcal{Y}) =
+\text{EMD}(\mu_{\mathcal{X}}, \mu_{\mathcal{Y}})\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème précédent, nous devons montrer que la WMD
+est équivalente à la EMD dans ce contexte. Commençons par rappeler que
+la EMD entre deux distributions <span class="math inline">\(\mu\)</span>
+et <span class="math inline">\(\nu\)</span> dans un espace métrique
+<span class="math inline">\((\mathcal{M}, d)\)</span> est définie comme
+:</p>
+<p><span class="math display">\[\text{EMD}(\mu, \nu) = \min_{T \geq 0}
+\int_{\mathcal{M}} \int_{\mathcal{M}} d(x, y) T(dx, dy)\]</span></p>
+<p>sous les contraintes :</p>
+<p><span class="math display">\[\int_{\mathcal{M}} T(x, dy) =
+\mu(x)\]</span></p>
+<p><span class="math display">\[\int_{\mathcal{M}} T(dx, y) =
+\nu(y)\]</span></p>
+<p>Pour les distributions empiriques <span
+class="math inline">\(\mu_{\mathcal{X}}\)</span> et <span
+class="math inline">\(\mu_{\mathcal{Y}}\)</span>, la EMD devient :</p>
+<p><span class="math display">\[\text{EMD}(\mu_{\mathcal{X}},
+\mu_{\mathcal{Y}}) = \min_{T \geq 0} \sum_{i=1}^{m} \sum_{j=1}^{n}
+T_{ij} d(x_i, y_j)\]</span></p>
+<p>sous les contraintes :</p>
+<p><span class="math display">\[\sum_{j=1}^{n} T_{ij} = \frac{1}{m}
+\quad \forall i \in \{1, \dots, m\}\]</span></p>
+<p><span class="math display">\[\sum_{i=1}^{m} T_{ij} = \frac{1}{n}
+\quad \forall j \in \{1, \dots, n\}\]</span></p>
+<p>En multipliant les contraintes par <span
+class="math inline">\(m\)</span> et <span
+class="math inline">\(n\)</span> respectivement, nous obtenons :</p>
+<p><span class="math display">\[\sum_{j=1}^{n} T_{ij} \leq 1 \quad
+\forall i \in \{1, \dots, m\}\]</span></p>
+<p><span class="math display">\[\sum_{i=1}^{m} T_{ij} \leq 1 \quad
+\forall j \in \{1, \dots, n\}\]</span></p>
+<p><span class="math display">\[\sum_{i=1}^{m} \sum_{j=1}^{n} T_{ij} =
+\min(m, n)\]</span></p>
+<p>Ce qui est exactement les contraintes de la WMD. Par conséquent,</p>
+<p><span class="math display">\[\text{WMD}(\mathcal{X}, \mathcal{Y}) =
+\text{EMD}(\mu_{\mathcal{X}}, \mu_{\mathcal{Y}})\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la WMD
+:</p>
+<ol>
+<li><p>La WMD est une distance métrique. C’est-à-dire qu’elle satisfait
+les propriétés de non-négativité, d’identité des indiscernables, de
+symétrie et d’inégalité triangulaire.</p></li>
+<li><p>La WMD est invariante par permutation des mots dans les ensembles
+<span class="math inline">\(\mathcal{X}\)</span> et <span
+class="math inline">\(\mathcal{Y}\)</span>. Cela signifie que l’ordre
+des mots n’affecte pas la valeur de la WMD.</p></li>
+<li><p>La WMD peut être calculée efficacement en utilisant des
+algorithmes d’optimisation de transport, tels que l’algorithme du
+simplexe ou des méthodes basées sur la programmation linéaire.</p></li>
+</ol>
+<p>Pour prouver la propriété (i), nous devons vérifier les quatre
+propriétés d’une distance métrique :</p>
+<ol>
+<li><p>Non-négativité : <span
+class="math inline">\(\text{WMD}(\mathcal{X}, \mathcal{Y}) \geq
+0\)</span> pour tout <span class="math inline">\(\mathcal{X},
+\mathcal{Y}\)</span>.</p></li>
+<li><p>Identité des indiscernables : <span
+class="math inline">\(\text{WMD}(\mathcal{X}, \mathcal{Y}) = 0\)</span>
+si et seulement si <span class="math inline">\(\mathcal{X} =
+\mathcal{Y}\)</span>.</p></li>
+<li><p>Symétrie : <span class="math inline">\(\text{WMD}(\mathcal{X},
+\mathcal{Y}) = \text{WMD}(\mathcal{Y}, \mathcal{X})\)</span> pour tout
+<span class="math inline">\(\mathcal{X}, \mathcal{Y}\)</span>.</p></li>
+<li><p>Inégalité triangulaire : <span
+class="math inline">\(\text{WMD}(\mathcal{X}, \mathcal{Z}) \leq
+\text{WMD}(\mathcal{X}, \mathcal{Y}) + \text{WMD}(\mathcal{Y},
+\mathcal{Z})\)</span> pour tout <span class="math inline">\(\mathcal{X},
+\mathcal{Y}, \mathcal{Z}\)</span>.</p></li>
+</ol>
+<p>La preuve de ces propriétés découle directement des propriétés
+équivalentes pour la distance de terre, en utilisant le théorème établi
+précédemment.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

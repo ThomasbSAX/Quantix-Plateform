@@ -1,0 +1,344 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’Entropie Floue : Une Mesure de l’Incertitude dans les Systèmes Flous</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’Entropie Floue : Une Mesure de l’Incertitude dans
+les Systèmes Flous</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’entropie floue émerge comme une extension naturelle des concepts
+d’entropie classique et de théorie des ensembles flous. Introduite pour
+la première fois par De Luca et Termini en 1972, cette notion vise à
+quantifier l’incertitude inhérente aux systèmes flous. Dans un monde où
+les données sont souvent imprécises ou incomplètes, l’entropie floue
+offre un cadre rigoureux pour évaluer la complexité et l’ambiguïté des
+informations.</p>
+<p>L’entropie floue est indispensable dans divers domaines tels que
+l’intelligence artificielle, la prise de décision multicritère, et le
+traitement du signal. Elle permet de mesurer l’incertitude non pas
+seulement en termes binaires, mais aussi en tenant compte des degrés de
+appartenance partielle caractéristiques des ensembles flous.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre l’entropie floue, il est essentiel de revenir aux
+concepts fondamentaux des ensembles flous et de l’entropie
+classique.</p>
+<h2 class="unnumbered" id="ensembles-flous">Ensembles Flous</h2>
+<p>Considérons un ensemble flou <span class="math inline">\(A\)</span>
+défini sur un univers <span class="math inline">\(X\)</span>. Une
+fonction d’appartenance <span class="math inline">\(\mu_A : X
+\rightarrow [0,1]\)</span> associe à chaque élément <span
+class="math inline">\(x \in X\)</span> un degré d’appartenance <span
+class="math inline">\(\mu_A(x)\)</span>.</p>
+<p>Formellement, un ensemble flou <span class="math inline">\(A\)</span>
+est défini par : <span class="math display">\[A = \{ (x, \mu_A(x)) \mid
+x \in X \}\]</span></p>
+<h2 class="unnumbered" id="entropie-floue">Entropie Floue</h2>
+<p>L’entropie floue mesure l’incertitude associée à un ensemble flou.
+Elle doit satisfaire plusieurs propriétés fondamentales :</p>
+<ol>
+<li><p><strong>Non-négativité</strong> : <span
+class="math inline">\(E(A) \geq 0\)</span></p></li>
+<li><p><strong>Maximum à l’incertitude maximale</strong> : <span
+class="math inline">\(E(A)\)</span> est maximal lorsque <span
+class="math inline">\(\mu_A(x) = 0.5\)</span> pour tout <span
+class="math inline">\(x \in X\)</span></p></li>
+<li><p><strong>Minimum à la certitude</strong> : <span
+class="math inline">\(E(A) = 0\)</span> lorsque <span
+class="math inline">\(A\)</span> est un ensemble classique (i.e., <span
+class="math inline">\(\mu_A(x) \in \{0,1\}\)</span> pour tout <span
+class="math inline">\(x \in X\)</span>)</p></li>
+<li><p><strong>Invariance par complémentation</strong> : <span
+class="math inline">\(E(A) = E(A^c)\)</span>, où <span
+class="math inline">\(A^c\)</span> est le complément de <span
+class="math inline">\(A\)</span></p></li>
+</ol>
+<p>Une définition formelle de l’entropie floue est donnée par : <span
+class="math display">\[E(A) = -K \sum_{x \in X} [\mu_A(x)
+\log_2(\mu_A(x)) + (1 - \mu_A(x)) \log_2(1 - \mu_A(x))]\]</span> où
+<span class="math inline">\(K\)</span> est une constante de
+normalisation.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-de-luca-et-termini">Théorème de
+De Luca et Termini</h2>
+<p>Le théorème fondamental de l’entropie floue, dû à De Luca et Termini,
+énonce que toute fonction <span class="math inline">\(E\)</span>
+satisfaisant les propriétés énoncées ci-dessus peut être exprimée sous
+la forme : <span class="math display">\[E(A) = -K \sum_{x \in X}
+[\mu_A(x) \log_2(\mu_A(x)) + (1 - \mu_A(x)) \log_2(1 -
+\mu_A(x))]\]</span></p>
+<h2 class="unnumbered" id="preuve-du-théorème">Preuve du Théorème</h2>
+<p>Pour prouver ce théorème, nous devons montrer que la forme donnée est
+la seule qui satisfait toutes les propriétés requises.</p>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p><strong>Non-négativité</strong> : La fonction <span
+class="math inline">\(f(t) = -t \log_2 t - (1-t) \log_2(1-t)\)</span>
+est non-négative pour <span class="math inline">\(t \in [0,1]\)</span>,
+car <span class="math inline">\(f(t) \geq 0\)</span>.</p></li>
+<li><p><strong>Maximum à l’incertitude maximale</strong> : La fonction
+<span class="math inline">\(f(t)\)</span> atteint son maximum en <span
+class="math inline">\(t = 0.5\)</span>, car <span
+class="math inline">\(f(0.5) = 1\)</span>.</p></li>
+<li><p><strong>Minimum à la certitude</strong> : Si <span
+class="math inline">\(\mu_A(x) \in \{0,1\}\)</span>, alors <span
+class="math inline">\(f(\mu_A(x)) = 0\)</span>.</p></li>
+<li><p><strong>Invariance par complémentation</strong> : <span
+class="math inline">\(f(t) = f(1-t)\)</span>, donc <span
+class="math inline">\(E(A) = E(A^c)\)</span>.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-1-additivité">Propriété 1 :
+Additivité</h2>
+<p>L’entropie floue est additive pour les ensembles flous disjoints. Si
+<span class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span> sont deux ensembles flous disjoints,
+alors : <span class="math display">\[E(A \cup B) = E(A) +
+E(B)\]</span></p>
+<h2 class="unnumbered" id="preuve-de-la-propriété-1">Preuve de la
+Propriété 1</h2>
+<div class="proof">
+<p><em>Proof.</em> Puisque <span class="math inline">\(A\)</span> et
+<span class="math inline">\(B\)</span> sont disjoints, <span
+class="math inline">\(\mu_{A \cup B}(x) = \mu_A(x) + \mu_B(x)\)</span>.
+En utilisant la définition de l’entropie floue, nous avons : <span
+class="math display">\[E(A \cup B) = -K \sum_{x \in X} [\mu_{A \cup
+B}(x) \log_2(\mu_{A \cup B}(x)) + (1 - \mu_{A \cup B}(x)) \log_2(1 -
+\mu_{A \cup B}(x))]\]</span> En développant, nous obtenons : <span
+class="math display">\[E(A \cup B) = -K \sum_{x \in X} [\mu_A(x)
+\log_2(\mu_A(x)) + \mu_B(x) \log_2(\mu_B(x)) + (1 - \mu_A(x) - \mu_B(x))
+\log_2(1 - \mu_A(x) - \mu_B(x))]\]</span> Ce qui peut être séparé en :
+<span class="math display">\[E(A \cup B) = -K \sum_{x \in X} [\mu_A(x)
+\log_2(\mu_A(x)) + (1 - \mu_A(x)) \log_2(1 - \mu_A(x))] + -K \sum_{x \in
+X} [\mu_B(x) \log_2(\mu_B(x)) + (1 - \mu_B(x)) \log_2(1 -
+\mu_B(x))]\]</span> Donc : <span class="math display">\[E(A \cup B) =
+E(A) + E(B)\]</span> ◻</p>
+</div>
+<h2 class="unnumbered" id="propriété-2-continuité">Propriété 2 :
+Continuité</h2>
+<p>L’entropie floue est une fonction continue de la fonction
+d’appartenance. Si <span class="math inline">\(\mu_A^n\)</span> converge
+uniformément vers <span class="math inline">\(\mu_A\)</span>, alors
+<span class="math inline">\(E(A^n)\)</span> converge vers <span
+class="math inline">\(E(A)\)</span>.</p>
+<h2 class="unnumbered" id="preuve-de-la-propriété-2">Preuve de la
+Propriété 2</h2>
+<div class="proof">
+<p><em>Proof.</em> La continuité découle du fait que la fonction <span
+class="math inline">\(f(t) = -t \log_2 t - (1-t) \log_2(1-t)\)</span>
+est continue sur <span class="math inline">\([0,1]\)</span>. Par le
+théorème de convergence dominée, si <span
+class="math inline">\(\mu_A^n\)</span> converge uniformément vers <span
+class="math inline">\(\mu_A\)</span>, alors : <span
+class="math display">\[\lim_{n \to \infty} E(A^n) = E(A)\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’entropie floue constitue un outil puissant pour quantifier
+l’incertitude dans les systèmes flous. Son utilisation permet de mieux
+comprendre et manipuler les informations imprécises, ouvrant ainsi de
+nouvelles perspectives dans divers domaines scientifiques et techniques.
+Les propriétés et théorèmes présentés ici montrent la rigueur
+mathématique sous-jacente à cette notion, consolidant son importance
+dans le cadre plus large de la théorie des ensembles flous.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

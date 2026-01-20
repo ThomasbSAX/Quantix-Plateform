@@ -1,0 +1,371 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Le théorème d’Egorov : Un pont entre la convergence ponctuelle et la convergence en mesure</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Le théorème d’Egorov : Un pont entre la convergence
+ponctuelle et la convergence en mesure</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le théorème d’Egorov, dû au mathématicien russe Dmitri Egorov
+(1878-1931), occupe une place centrale dans l’analyse réelle et la
+théorie de la mesure. Ce résultat, d’une élégance remarquable, établit
+un lien profond entre deux notions fondamentales : la convergence
+ponctuelle et la convergence en mesure. Il permet de transformer une
+propriété locale (convergence ponctuelle) en une propriété globale
+(convergence en mesure), ouvrant ainsi des perspectives riches pour
+l’étude des suites de fonctions.</p>
+<p>L’intérêt historique du théorème d’Egorov réside dans sa capacité à
+réconcilier deux approches apparemment distinctes de la convergence. En
+effet, alors que la convergence ponctuelle examine le comportement des
+fonctions en chaque point d’un ensemble, la convergence en mesure
+s’intéresse à la taille des ensembles où ce comportement se manifeste.
+Le théorème d’Egorov montre que ces deux perspectives peuvent être
+harmonisées, sous certaines conditions.</p>
+<p>Dans cet article, nous explorerons en détail le théorème d’Egorov,
+ses implications et ses applications. Nous commencerons par introduire
+les concepts préliminaires nécessaires à sa compréhension, puis nous
+énoncerons le théorème et en fournirons une démonstration rigoureuse.
+Enfin, nous illustrerons son utilité par des exemples concrets.</p>
+<h1 class="unnumbered" id="préliminaires">Préliminaires</h1>
+<p>Avant d’énoncer le théorème d’Egorov, il est essentiel de rappeler
+quelques notions fondamentales de la théorie de la mesure et de
+l’analyse réelle.</p>
+<h2 class="unnumbered" id="espaces-mesurés">Espaces mesurés</h2>
+<p>Un espace mesuré est un triplet <span class="math inline">\((X,
+\mathcal{A}, \mu)\)</span> où <span class="math inline">\(X\)</span> est
+un ensemble, <span class="math inline">\(\mathcal{A}\)</span> une tribu
+sur <span class="math inline">\(X\)</span>, et <span
+class="math inline">\(\mu\)</span> une mesure définie sur <span
+class="math inline">\(\mathcal{A}\)</span>. La tribu <span
+class="math inline">\(\mathcal{A}\)</span> est une collection de
+sous-ensembles de <span class="math inline">\(X\)</span> stable par
+complémentaire et union dénombrable, tandis que la mesure <span
+class="math inline">\(\mu\)</span> associe à chaque ensemble mesurable
+<span class="math inline">\(A \in \mathcal{A}\)</span> un nombre réel
+<span class="math inline">\(\mu(A)\)</span> compris entre 0 et l’infini,
+satisfaisant certaines propriétés.</p>
+<h2 class="unnumbered" id="convergence-ponctuelle">Convergence
+ponctuelle</h2>
+<p>Soit <span class="math inline">\((f_n)\)</span> une suite de
+fonctions mesurables définies sur un espace mesuré <span
+class="math inline">\((X, \mathcal{A}, \mu)\)</span>. On dit que la
+suite <span class="math inline">\((f_n)\)</span> converge ponctuellement
+vers une fonction <span class="math inline">\(f\)</span> si, pour tout
+<span class="math inline">\(x \in X\)</span>, la suite <span
+class="math inline">\((f_n(x))\)</span> converge vers <span
+class="math inline">\(f(x)\)</span>.</p>
+<h2 class="unnumbered" id="convergence-en-mesure">Convergence en
+mesure</h2>
+<p>La suite <span class="math inline">\((f_n)\)</span> converge en
+mesure vers <span class="math inline">\(f\)</span> si, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, on a <span
+class="math display">\[\lim_{n \to \infty} \mu(\{x \in X : |f_n(x) -
+f(x)| \geq \epsilon\}) = 0.\]</span></p>
+<h1 class="unnumbered" id="énoncé-du-théorème-degorov">Énoncé du
+théorème d’Egorov</h1>
+<p>Le théorème d’Egorov peut être énoncé comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\((X, \mathcal{A}, \mu)\)</span> un
+espace mesuré tel que <span class="math inline">\(\mu(X) &lt;
++\infty\)</span>. Soit <span class="math inline">\((f_n)\)</span> une
+suite de fonctions mesurables définies sur <span
+class="math inline">\(X\)</span> qui converge ponctuellement vers une
+fonction <span class="math inline">\(f\)</span>. Alors, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, il existe un ensemble
+mesurable <span class="math inline">\(A \in \mathcal{A}\)</span> tel que
+<span class="math inline">\(\mu(A) &lt; \epsilon\)</span> et que la
+suite <span class="math inline">\((f_n)\)</span> converge uniformément
+vers <span class="math inline">\(f\)</span> sur le complémentaire de
+<span class="math inline">\(A\)</span>, c’est-à-dire sur <span
+class="math inline">\(X \setminus A\)</span>.</p>
+</div>
+<p>En d’autres termes, le théorème affirme que la convergence ponctuelle
+peut être "localisée" sur un ensemble de mesure arbitrairement petite,
+au-delà duquel la convergence devient uniforme.</p>
+<h1 class="unnumbered"
+id="démonstration-du-théorème-degorov">Démonstration du théorème
+d’Egorov</h1>
+<p>Pour démontrer le théorème d’Egorov, nous allons procéder par
+étapes.</p>
+<h2 class="unnumbered"
+id="étape-1-construction-des-ensembles-e_nk">Étape 1 : Construction des
+ensembles <span class="math inline">\(E_{n,k}\)</span></h2>
+<p>Pour chaque entier <span class="math inline">\(k \geq 1\)</span> et
+chaque entier <span class="math inline">\(n \geq 1\)</span>, définissons
+l’ensemble <span class="math display">\[E_{n,k} = \{x \in X : |f_m(x) -
+f(x)| &lt; \frac{1}{k} \text{ pour tout } m \geq n\}.\]</span> Par
+définition de la convergence ponctuelle, on a <span
+class="math display">\[\bigcup_{n=1}^{\infty} E_{n,k} = X.\]</span></p>
+<h2 class="unnumbered"
+id="étape-2-application-du-lemme-de-borel-cantelli">Étape 2 :
+Application du lemme de Borel-Cantelli</h2>
+<p>Pour chaque <span class="math inline">\(k \geq 1\)</span>,
+choisissons un entier <span class="math inline">\(n_k\)</span> tel que
+<span class="math display">\[\mu(X \setminus E_{n_k,k}) &lt;
+\frac{\epsilon}{2^k}.\]</span> Un tel choix est possible grâce au lemme
+de Borel-Cantelli, qui garantit que la mesure des ensembles <span
+class="math inline">\(X \setminus E_{n_k,k}\)</span> peut être rendue
+arbitrairement petite.</p>
+<h2 class="unnumbered" id="étape-3-définition-de-lensemble-a">Étape 3 :
+Définition de l’ensemble <span class="math inline">\(A\)</span></h2>
+<p>Posons <span class="math display">\[A = \bigcup_{k=1}^{\infty} (X
+\setminus E_{n_k,k}).\]</span> Par construction, on a <span
+class="math display">\[\mu(A) \leq \sum_{k=1}^{\infty} \mu(X \setminus
+E_{n_k,k}) &lt; \sum_{k=1}^{\infty} \frac{\epsilon}{2^k} =
+\epsilon.\]</span></p>
+<h2 class="unnumbered"
+id="étape-4-convergence-uniforme-sur-x-setminus-a">Étape 4 : Convergence
+uniforme sur <span class="math inline">\(X \setminus A\)</span></h2>
+<p>Soit <span class="math inline">\(x \in X \setminus A\)</span>. Alors,
+pour tout <span class="math inline">\(k \geq 1\)</span>, on a <span
+class="math inline">\(x \in E_{n_k,k}\)</span>. Cela signifie que, pour
+tout <span class="math inline">\(m \geq n_k\)</span>, on a <span
+class="math display">\[|f_m(x) - f(x)| &lt; \frac{1}{k}.\]</span> En
+particulier, pour tout <span class="math inline">\(\epsilon&#39; &gt;
+0\)</span>, choisissons <span class="math inline">\(k\)</span> tel que
+<span class="math inline">\(\frac{1}{k} &lt; \epsilon&#39;\)</span>.
+Alors, pour tout <span class="math inline">\(m \geq n_k\)</span>, on a
+<span class="math display">\[|f_m(x) - f(x)| &lt;
+\epsilon&#39;.\]</span> Cela montre que la suite <span
+class="math inline">\((f_n)\)</span> converge uniformément vers <span
+class="math inline">\(f\)</span> sur <span class="math inline">\(X
+\setminus A\)</span>.</p>
+<h1 class="unnumbered" id="conséquences-et-applications">Conséquences et
+applications</h1>
+<p>Le théorème d’Egorov a de nombreuses conséquences importantes en
+analyse réelle. En voici quelques-unes :</p>
+<h2 class="unnumbered"
+id="conséquence-1-passage-à-la-limite-sous-le-signe-intégral">Conséquence
+1 : Passage à la limite sous le signe intégral</h2>
+<p>Le théorème d’Egorov permet de justifier le passage à la limite sous
+le signe intégral dans certains cas. Plus précisément, si <span
+class="math inline">\((f_n)\)</span> est une suite de fonctions
+intégrables qui converge ponctuellement vers <span
+class="math inline">\(f\)</span>, et si les fonctions <span
+class="math inline">\(f_n\)</span> sont dominées par une fonction
+intégrable <span class="math inline">\(g\)</span>, alors <span
+class="math display">\[\lim_{n \to \infty} \int_X f_n \, d\mu = \int_X f
+\, d\mu.\]</span></p>
+<h2 class="unnumbered"
+id="conséquence-2-convergence-en-norme-lp">Conséquence 2 : Convergence
+en norme <span class="math inline">\(L^p\)</span></h2>
+<p>Le théorème d’Egorov joue un rôle clé dans l’étude de la convergence
+en norme <span class="math inline">\(L^p\)</span>. En particulier, il
+permet de montrer que si une suite <span
+class="math inline">\((f_n)\)</span> converge ponctuellement vers <span
+class="math inline">\(f\)</span> et est bornée dans <span
+class="math inline">\(L^p\)</span>, alors <span
+class="math inline">\((f_n)\)</span> converge vers <span
+class="math inline">\(f\)</span> en norme <span
+class="math inline">\(L^p\)</span>.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Le théorème d’Egorov est un résultat fondamental de l’analyse réelle,
+qui établit un pont entre la convergence ponctuelle et la convergence en
+mesure. Sa démonstration repose sur des outils classiques de la théorie
+de la mesure, tels que le lemme de Borel-Cantelli. Les conséquences du
+théorème sont nombreuses et variées, allant du passage à la limite sous
+le signe intégral à l’étude de la convergence en norme <span
+class="math inline">\(L^p\)</span>.</p>
+<p>En conclusion, le théorème d’Egorov illustre parfaitement la
+puissance et l’élégance de la théorie de la mesure, qui permet de
+réconcilier des notions apparemment distinctes et d’en tirer des
+résultats profonds et utiles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

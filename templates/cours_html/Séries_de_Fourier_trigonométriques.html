@@ -1,0 +1,389 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Séries de Fourier trigonométriques : Une exploration mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Séries de Fourier trigonométriques : Une exploration
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les séries de Fourier trigonométriques constituent un pilier
+fondamental dans l’analyse mathématique, offrant une méthode puissante
+pour décomposer des fonctions périodiques en sommes infinies de
+sinusoïdes et cosinusoïdes. Cette notion, introduite par Joseph Fourier
+au début du XIXème siècle, a révolutionné notre compréhension des
+phénomènes périodiques et ouvert la voie à de nombreuses applications en
+physique, ingénierie, traitement du signal, et bien d’autres
+domaines.</p>
+<p>L’idée centrale derrière les séries de Fourier est de représenter une
+fonction périodique comme une superposition de fonctions
+trigonométriques simples. Cette décomposition permet non seulement de
+simplifier l’analyse des fonctions complexes, mais aussi d’étudier leurs
+propriétés spectrales, c’est-à-dire comment ces fonctions se comportent
+en termes de fréquences. Les séries de Fourier sont indispensables pour
+comprendre les phénomènes ondulatoires, résoudre des équations
+différentielles aux limites périodiques, et analyser des signaux
+périodiques dans le domaine fréquentiel.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire les séries de Fourier, commençons par comprendre ce
+que nous cherchons à accomplir. Supposons que nous ayons une fonction
+<span class="math inline">\(f\)</span> périodique de période <span
+class="math inline">\(2\pi\)</span>. Nous voulons exprimer cette
+fonction comme une somme infinie de sinusoïdes et cosinusoïdes.
+Intuitivement, cela ressemble à une décomposition en ondes de base, où
+chaque onde a une fréquence spécifique.</p>
+<p>Formellement, la série de Fourier d’une fonction <span
+class="math inline">\(f\)</span> périodique de période <span
+class="math inline">\(2\pi\)</span> est donnée par :</p>
+<p><span class="math display">\[f(x) = \frac{a_0}{2} +
+\sum_{n=1}^{\infty} \left( a_n \cos(nx) + b_n \sin(nx)
+\right)\]</span></p>
+<p>où les coefficients <span class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span> sont définis par :</p>
+<p><span class="math display">\[a_n = \frac{1}{\pi} \int_{-\pi}^{\pi}
+f(x) \cos(nx) \, dx, \quad n \geq 0\]</span></p>
+<p><span class="math display">\[b_n = \frac{1}{\pi} \int_{-\pi}^{\pi}
+f(x) \sin(nx) \, dx, \quad n \geq 1\]</span></p>
+<p>Ces coefficients sont calculés en utilisant les propriétés
+d’orthogonalité des fonctions trigonométriques. Plus précisément, pour
+tout <span class="math inline">\(n \neq m\)</span>, nous avons :</p>
+<p><span class="math display">\[\int_{-\pi}^{\pi} \cos(nx) \cos(mx) \,
+dx = 0\]</span></p>
+<p><span class="math display">\[\int_{-\pi}^{\pi} \sin(nx) \sin(mx) \,
+dx = 0\]</span></p>
+<p><span class="math display">\[\int_{-\pi}^{\pi} \cos(nx) \sin(mx) \,
+dx = 0\]</span></p>
+<p>Ces propriétés d’orthogonalité sont essentielles pour garantir que
+les coefficients <span class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span> capturent correctement les
+contributions de chaque fréquence dans la décomposition.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux concernant les séries de Fourier est le
+théorème de Dirichlet, qui donne des conditions suffisantes pour qu’une
+fonction périodique puisse être représentée par une série de Fourier
+convergente. Ce théorème est crucial pour comprendre dans quels cas la
+décomposition en série de Fourier est valide.</p>
+<p>Commençons par expliquer intuitivement ce que nous cherchons à
+établir. Nous voulons savoir sous quelles conditions la série de Fourier
+d’une fonction <span class="math inline">\(f\)</span> converge vers
+<span class="math inline">\(f\)</span> elle-même. Pour cela, nous devons
+imposer certaines conditions de régularité sur <span
+class="math inline">\(f\)</span>.</p>
+<p>Formellement, le théorème de Dirichlet s’énonce comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> une fonction périodique
+de période <span class="math inline">\(2\pi\)</span>, continue par
+morceaux sur <span class="math inline">\([-\pi, \pi]\)</span>, et de
+variation bornée. Alors la série de Fourier de <span
+class="math inline">\(f\)</span> converge vers <span
+class="math inline">\(f(x)\)</span> en tout point <span
+class="math inline">\(x\)</span> où <span
+class="math inline">\(f\)</span> est continue. De plus, si <span
+class="math inline">\(f\)</span> présente une discontinuité en <span
+class="math inline">\(x\)</span>, la série de Fourier converge vers la
+valeur moyenne des limites gauches et droites de <span
+class="math inline">\(f\)</span> en ce point.</p>
+</div>
+<p>Pour démontrer ce théorème, nous utilisons plusieurs propriétés et
+outils mathématiques. Tout d’abord, nous rappelons que <span
+class="math inline">\(f\)</span> est continue par morceaux, ce qui
+signifie qu’elle admet un nombre fini de discontinuités dans tout
+intervalle borné. Ensuite, nous utilisons le fait que <span
+class="math inline">\(f\)</span> est de variation bornée, ce qui
+implique que la somme des variations de <span
+class="math inline">\(f\)</span> sur tout intervalle est bornée.</p>
+<p>La démonstration du théorème de Dirichlet repose également sur
+l’utilisation des propriétés d’orthogonalité des fonctions
+trigonométriques, ainsi que sur le théorème de Riemann-Lebesgue, qui
+affirme que les coefficients <span class="math inline">\(a_n\)</span> et
+<span class="math inline">\(b_n\)</span> tendent vers zéro lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Dirichlet, commençons par rappeler
+quelques lemmes et propriétés intermédiaires. Tout d’abord, nous avons
+le lemme suivant :</p>
+<div class="lemma">
+<p>Soit <span class="math inline">\(f\)</span> une fonction périodique
+de période <span class="math inline">\(2\pi\)</span>, continue par
+morceaux sur <span class="math inline">\([-\pi, \pi]\)</span>. Alors les
+coefficients de Fourier <span class="math inline">\(a_n\)</span> et
+<span class="math inline">\(b_n\)</span> sont donnés par :</p>
+<p><span class="math display">\[a_n = \frac{1}{\pi} \int_{-\pi}^{\pi}
+f(x) \cos(nx) \, dx, \quad n \geq 0\]</span></p>
+<p><span class="math display">\[b_n = \frac{1}{\pi} \int_{-\pi}^{\pi}
+f(x) \sin(nx) \, dx, \quad n \geq 1\]</span></p>
+</div>
+<p>La preuve de ce lemme repose sur les propriétés d’orthogonalité des
+fonctions trigonométriques, que nous avons déjà mentionnées. En
+utilisant ces propriétés, nous pouvons projeter <span
+class="math inline">\(f\)</span> sur les fonctions de base <span
+class="math inline">\(\cos(nx)\)</span> et <span
+class="math inline">\(\sin(nx)\)</span> pour obtenir les coefficients
+<span class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span>.</p>
+<p>Ensuite, nous utilisons le théorème de Riemann-Lebesgue, qui s’énonce
+comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f\)</span> une fonction intégrable
+sur <span class="math inline">\([-\pi, \pi]\)</span>. Alors les
+coefficients de Fourier <span class="math inline">\(a_n\)</span> et
+<span class="math inline">\(b_n\)</span> tendent vers zéro lorsque <span
+class="math inline">\(n\)</span> tend vers l’infini.</p>
+</div>
+<p>Ce théorème est crucial pour établir la convergence de la série de
+Fourier. En effet, il garantit que les termes de la série de Fourier
+deviennent négligeables lorsque <span class="math inline">\(n\)</span>
+devient grand, ce qui est une condition nécessaire pour la
+convergence.</p>
+<p>Enfin, nous utilisons le fait que <span
+class="math inline">\(f\)</span> est de variation bornée pour contrôler
+les oscillations de la série de Fourier. En combinant ces résultats,
+nous pouvons conclure que la série de Fourier converge vers <span
+class="math inline">\(f(x)\)</span> en tout point de continuité de <span
+class="math inline">\(f\)</span>, et vers la valeur moyenne des limites
+gauches et droites en cas de discontinuité.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les séries de Fourier possèdent plusieurs propriétés intéressantes,
+que nous allons maintenant explorer. Ces propriétés découlent
+directement des définitions et des théorèmes que nous avons établis
+précédemment.</p>
+<ol>
+<li><p><strong>Convergence en moyenne quadratique</strong> : La série de
+Fourier d’une fonction <span class="math inline">\(f\)</span> converge
+vers <span class="math inline">\(f\)</span> en moyenne quadratique. Cela
+signifie que l’erreur entre <span class="math inline">\(f\)</span> et sa
+série de Fourier tend vers zéro lorsque le nombre de termes dans la
+série augmente.</p></li>
+<li><p><strong>Unicité des coefficients</strong> : Les coefficients
+<span class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span> de la série de Fourier sont uniques.
+Cela signifie qu’il n’existe pas d’autres coefficients qui pourraient
+représenter <span class="math inline">\(f\)</span> de la même
+manière.</p></li>
+<li><p><strong>Stabilité</strong> : Les séries de Fourier sont stables
+sous certaines transformations. Par exemple, si <span
+class="math inline">\(f\)</span> est dérivable, alors les coefficients
+<span class="math inline">\(a_n\)</span> et <span
+class="math inline">\(b_n\)</span> de sa série de Fourier décroissent
+rapidement.</p></li>
+<li><p><strong>Convolution</strong> : Les séries de Fourier peuvent être
+utilisées pour étudier les propriétés de convolution des fonctions. En
+particulier, le produit de convolution de deux fonctions peut être
+exprimé en termes de leurs séries de Fourier.</p></li>
+</ol>
+<p>Chacune de ces propriétés peut être démontrée en utilisant les outils
+et les théorèmes que nous avons présentés précédemment. Par exemple,
+pour démontrer la convergence en moyenne quadratique, nous utilisons le
+théorème de Parseval, qui relie l’énergie d’une fonction à l’énergie de
+ses coefficients de Fourier.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les séries de Fourier trigonométriques sont un outil puissant et
+polyvalent en analyse mathématique. Elles permettent de décomposer des
+fonctions périodiques en sommes infinies de sinusoïdes et cosinusoïdes,
+offrant ainsi une méthode puissante pour étudier les propriétés des
+fonctions périodiques. Les théorèmes et les propriétés que nous avons
+présentés dans cet article montrent la richesse et la profondeur de
+cette théorie, ainsi que son importance dans de nombreux domaines des
+mathématiques et des sciences appliquées.</p>
+<p>En conclusion, les séries de Fourier constituent une avancée majeure
+dans l’histoire des mathématiques, et leur étude continue de fasciner
+les chercheurs et les étudiants du monde entier.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,394 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Inférence bayésienne : Fondements et Applications</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Inférence bayésienne : Fondements et Applications</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’inférence bayésienne émerge comme un paradigme puissant pour
+traiter l’incertitude et la prise de décision sous contraintes
+informationnelles. Historiquement, les travaux de Thomas Bayes au XVIIIe
+siècle ont posé les bases d’une approche probabiliste révolutionnaire,
+où les croyances a priori sont mises à jour par l’observation de
+données. Ce cadre conceptuel s’est révélé indispensable dans des
+domaines aussi variés que la statistique, l’apprentissage automatique,
+ou encore les sciences cognitives.</p>
+<p>L’inférence bayésienne résout un problème fondamental : comment
+incorporer des connaissances préexistantes dans l’analyse de données, et
+comment quantifier l’incertitude associée à nos estimations. Dans un
+monde où les données sont souvent bruitées et incomplètes, cette
+approche offre une rigueur mathématique pour naviguer dans
+l’incertitude.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’inférence bayésienne, commençons par définir les
+concepts clés.</p>
+<h2 id="probabilité-a-priori-et-a-posteriori">Probabilité a priori et a
+posteriori</h2>
+<p>Nous cherchons à modéliser notre croyance sur un paramètre inconnu
+<span class="math inline">\(\theta\)</span> avant et après l’observation
+des données. Supposons que nous ayons une variable aléatoire <span
+class="math inline">\(X\)</span> dont la distribution dépend de <span
+class="math inline">\(\theta\)</span>. Notre objectif est de mettre à
+jour notre croyance sur <span class="math inline">\(\theta\)</span> en
+fonction des observations <span class="math inline">\(X =
+x\)</span>.</p>
+<div class="definition">
+<p>La probabilité a priori de <span
+class="math inline">\(\theta\)</span>, notée <span
+class="math inline">\(p(\theta)\)</span>, représente notre croyance
+initiale sur la valeur de <span class="math inline">\(\theta\)</span>
+avant toute observation des données. Formellement, <span
+class="math inline">\(p(\theta)\)</span> est une fonction de densité de
+probabilité définie sur l’espace des paramètres <span
+class="math inline">\(\Theta\)</span>.</p>
+</div>
+<div class="definition">
+<p>La probabilité a posteriori de <span
+class="math inline">\(\theta\)</span>, notée <span
+class="math inline">\(p(\theta | x)\)</span>, représente notre croyance
+mise à jour sur la valeur de <span class="math inline">\(\theta\)</span>
+après l’observation des données <span class="math inline">\(X =
+x\)</span>. Elle est donnée par le théorème de Bayes : <span
+class="math display">\[p(\theta | x) = \frac{p(x | \theta)
+p(\theta)}{p(x)}\]</span> où <span class="math inline">\(p(x |
+\theta)\)</span> est la vraisemblance des données, et <span
+class="math inline">\(p(x)\)</span> est la probabilité marginale des
+données.</p>
+</div>
+<h2 id="vraisemblance">Vraisemblance</h2>
+<p>La vraisemblance est un concept central en inférence bayésienne.</p>
+<div class="definition">
+<p>La vraisemblance des données <span class="math inline">\(x\)</span>
+sous le modèle paramétré par <span
+class="math inline">\(\theta\)</span>, notée <span
+class="math inline">\(p(x | \theta)\)</span>, est une fonction qui
+mesure la plausibilité des données observées pour différentes valeurs de
+<span class="math inline">\(\theta\)</span>. Formellement, <span
+class="math inline">\(p(x | \theta)\)</span> est une fonction de densité
+de probabilité conditionnelle.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-bayes">Théorème de Bayes</h2>
+<p>Le théorème de Bayes est le fondement de l’inférence bayésienne.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\theta\)</span> un paramètre
+inconnu, et <span class="math inline">\(X\)</span> une variable
+aléatoire dont la distribution dépend de <span
+class="math inline">\(\theta\)</span>. Alors, pour tout <span
+class="math inline">\(x\)</span> dans l’espace des observations, nous
+avons : <span class="math display">\[p(\theta | x) = \frac{p(x | \theta)
+p(\theta)}{p(x)}\]</span> où <span
+class="math inline">\(p(\theta)\)</span> est la probabilité a priori de
+<span class="math inline">\(\theta\)</span>, <span
+class="math inline">\(p(x | \theta)\)</span> est la vraisemblance des
+données, et <span class="math inline">\(p(x)\)</span> est la probabilité
+marginale des données.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Le théorème de Bayes découle directement de la
+définition de la probabilité conditionnelle. En effet, par définition,
+nous avons : <span class="math display">\[p(\theta | x) = \frac{p(x,
+\theta)}{p(x)}\]</span> où <span class="math inline">\(p(x,
+\theta)\)</span> est la probabilité jointe de <span
+class="math inline">\(\theta\)</span> et <span
+class="math inline">\(x\)</span>. En utilisant la formule de la
+probabilité totale, nous pouvons écrire : <span
+class="math display">\[p(x) = \int_{\Theta} p(x | \theta) p(\theta)
+d\theta\]</span> En substituant cette expression dans la définition de
+<span class="math inline">\(p(\theta | x)\)</span>, nous obtenons :
+<span class="math display">\[p(\theta | x) = \frac{p(x | \theta)
+p(\theta)}{\int_{\Theta} p(x | \theta) p(\theta) d\theta}\]</span> Ce
+qui est équivalent à la formulation donnée dans le théorème. ◻</p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="mise-à-jour-de-la-croyance-a-posteriori">Mise à jour de la
+croyance a posteriori</h2>
+<p>Supposons que nous disposions d’un ensemble de données <span
+class="math inline">\(x_1, x_2, \ldots, x_n\)</span> indépendantes et
+identiquement distribuées (i.i.d.) selon une distribution conditionnelle
+<span class="math inline">\(p(x | \theta)\)</span>. Nous voulons mettre
+à jour notre croyance a priori <span
+class="math inline">\(p(\theta)\)</span> en utilisant ces données.</p>
+<div class="proof">
+<p><em>Proof.</em> Par le théorème de Bayes, la probabilité a posteriori
+de <span class="math inline">\(\theta\)</span> après l’observation des
+données est donnée par : <span class="math display">\[p(\theta | x_1,
+x_2, \ldots, x_n) = \frac{p(x_1, x_2, \ldots, x_n | \theta)
+p(\theta)}{p(x_1, x_2, \ldots, x_n)}\]</span> où <span
+class="math inline">\(p(x_1, x_2, \ldots, x_n | \theta)\)</span> est la
+vraisemblance des données, et <span class="math inline">\(p(x_1, x_2,
+\ldots, x_n)\)</span> est la probabilité marginale des données. En
+supposant que les observations sont indépendantes, nous avons : <span
+class="math display">\[p(x_1, x_2, \ldots, x_n | \theta) = \prod_{i=1}^n
+p(x_i | \theta)\]</span> Ainsi, la probabilité a posteriori peut être
+écrite comme : <span class="math display">\[p(\theta | x_1, x_2, \ldots,
+x_n) \propto p(\theta) \prod_{i=1}^n p(x_i | \theta)\]</span> où la
+constante de normalisation est donnée par : <span
+class="math display">\[p(x_1, x_2, \ldots, x_n) = \int_{\Theta}
+p(\theta) \prod_{i=1}^n p(x_i | \theta) d\theta\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-conjugaison">Propriété de conjugaison</h2>
+<p>Une propriété importante en inférence bayésienne est la notion de
+familles conjuguées.</p>
+<div class="property">
+<p>Une famille de distributions a priori est dite conjuguée pour un
+modèle donné si la distribution a posteriori appartient à la même
+famille que la distribution a priori. Formellement, une famille de
+distributions <span class="math inline">\(P\)</span> est conjuguée pour
+un modèle paramétré par <span class="math inline">\(\theta\)</span> si,
+pour toute distribution a priori <span class="math inline">\(p(\theta)
+\in P\)</span>, la distribution a posteriori <span
+class="math inline">\(p(\theta | x)\)</span> appartient également à
+<span class="math inline">\(P\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Supposons que la famille de distributions a priori
+<span class="math inline">\(P\)</span> est conjuguée pour le modèle.
+Alors, par définition, la distribution a posteriori <span
+class="math inline">\(p(\theta | x)\)</span> appartient à <span
+class="math inline">\(P\)</span>. Cela signifie que nous pouvons
+exprimer <span class="math inline">\(p(\theta | x)\)</span> sous la
+forme : <span class="math display">\[p(\theta | x) = \frac{p(x | \theta)
+p(\theta)}{p(x)} \in P\]</span> où <span
+class="math inline">\(p(x)\)</span> est la constante de normalisation.
+En utilisant les propriétés des familles conjuguées, nous pouvons
+montrer que <span class="math inline">\(p(\theta | x)\)</span> peut être
+exprimée en termes des paramètres de la distribution a priori et des
+données observées. ◻</p>
+</div>
+<h2 id="corollaire-mise-à-jour-des-hyperparamètres">Corollaire : Mise à
+jour des hyperparamètres</h2>
+<p>Un corollaire important de la propriété de conjugaison est la mise à
+jour des hyperparamètres.</p>
+<div class="corollary">
+<p>Supposons que la distribution a priori <span
+class="math inline">\(p(\theta)\)</span> est une distribution conjuguée
+pour le modèle, avec des hyperparamètres <span
+class="math inline">\(\alpha\)</span> et <span
+class="math inline">\(\beta\)</span>. Alors, la distribution a
+posteriori <span class="math inline">\(p(\theta | x)\)</span> peut être
+exprimée en termes des hyperparamètres mis à jour <span
+class="math inline">\(\alpha&#39;\)</span> et <span
+class="math inline">\(\beta&#39;\)</span>.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> En utilisant la propriété de conjugaison, nous savons
+que la distribution a posteriori <span class="math inline">\(p(\theta |
+x)\)</span> appartient à la même famille que la distribution a priori.
+Ainsi, nous pouvons écrire : <span class="math display">\[p(\theta | x)
+= \text{Distribution}(\alpha&#39;, \beta&#39;)\]</span> où <span
+class="math inline">\(\alpha&#39;\)</span> et <span
+class="math inline">\(\beta&#39;\)</span> sont les hyperparamètres mis à
+jour. En utilisant le théorème de Bayes, nous pouvons montrer que :
+<span class="math display">\[\alpha&#39; = \alpha + \sum_{i=1}^n x_i
+\quad \text{et} \quad \beta&#39; = \beta + n\]</span> où <span
+class="math inline">\(n\)</span> est le nombre d’observations. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’inférence bayésienne offre un cadre rigoureux pour traiter
+l’incertitude et la prise de décision sous contraintes
+informationnelles. En incorporant des connaissances a priori et en
+mettant à jour ces croyances par l’observation de données, cette
+approche permet de quantifier l’incertitude associée à nos estimations.
+Les propriétés mathématiques sous-jacentes, telles que le théorème de
+Bayes et les familles conjuguées, fournissent des outils puissants pour
+l’analyse statistique et l’apprentissage automatique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

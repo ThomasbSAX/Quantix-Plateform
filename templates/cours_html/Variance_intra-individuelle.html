@@ -1,0 +1,299 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance intra-individuelle : Une analyse mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance intra-individuelle : Une analyse
+mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La variance intra-individuelle est un concept fondamental en
+statistique et en analyse des données. Elle mesure la dispersion des
+observations autour de la moyenne pour un même individu au fil du temps.
+Cette notion est cruciale dans de nombreux domaines, tels que la
+biologie, l’économie et les sciences sociales, où il est essentiel de
+comprendre la variabilité des mesures au sein d’un même sujet.</p>
+<p>L’étude de la variance intra-individuelle permet de distinguer les
+variations dues aux fluctuations naturelles des mesures de celles qui
+sont attribuables à des facteurs externes. Par exemple, en biologie,
+elle peut aider à évaluer la stabilité des marqueurs biologiques chez un
+patient. En économie, elle peut révéler les variations de comportement
+d’un consommateur au fil du temps.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour définir la variance intra-individuelle, commençons par
+comprendre ce que nous cherchons à mesurer. Imaginons que nous avons
+plusieurs mesures d’une même variable pour un individu donné. Nous
+voulons quantifier à quel point ces mesures varient autour de la moyenne
+de cet individu.</p>
+<p>Formellement, soit <span class="math inline">\(X_{ij}\)</span> la
+mesure <span class="math inline">\(j\)</span> pour l’individu <span
+class="math inline">\(i\)</span>, où <span class="math inline">\(i = 1,
+\ldots, n\)</span> et <span class="math inline">\(j = 1, \ldots,
+k_i\)</span>. La moyenne de l’individu <span
+class="math inline">\(i\)</span> est donnée par : <span
+class="math display">\[\mu_i = \frac{1}{k_i} \sum_{j=1}^{k_i}
+X_{ij}\]</span></p>
+<p>La variance intra-individuelle pour l’individu <span
+class="math inline">\(i\)</span> est alors définie comme : <span
+class="math display">\[\sigma_i^2 = \frac{1}{k_i} \sum_{j=1}^{k_i}
+(X_{ij} - \mu_i)^2\]</span></p>
+<p>En d’autres termes, la variance intra-individuelle est la moyenne des
+carrés des écarts entre chaque mesure et la moyenne de l’individu.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème important lié à la variance intra-individuelle est le
+théorème de la somme des carrés. Ce théorème permet de décomposer la
+variance totale en une composante intra-individuelle et une composante
+inter-individuelle.</p>
+<p>Commençons par comprendre ce que nous cherchons à démontrer. Nous
+voulons montrer que la variance totale peut être exprimée comme la somme
+de la variance intra-individuelle et de la variance
+inter-individuelle.</p>
+<p>Formellement, soit <span class="math inline">\(\mu\)</span> la
+moyenne globale de toutes les mesures. La variance totale est donnée par
+: <span class="math display">\[\sigma^2 = \frac{1}{N} \sum_{i=1}^n
+\sum_{j=1}^{k_i} (X_{ij} - \mu)^2\]</span> où <span
+class="math inline">\(N = \sum_{i=1}^n k_i\)</span> est le nombre total
+de mesures.</p>
+<p>La variance inter-individuelle est définie comme : <span
+class="math display">\[\sigma_{\text{inter}}^2 = \frac{1}{n}
+\sum_{i=1}^n (\mu_i - \mu)^2\]</span></p>
+<p>Le théorème de la somme des carrés stipule que : <span
+class="math display">\[\sigma^2 = \frac{1}{N} \sum_{i=1}^n
+\sum_{j=1}^{k_i} (X_{ij} - \mu_i)^2 + \frac{1}{N} \sum_{i=1}^n k_i
+(\mu_i - \mu)^2\]</span></p>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la somme des carrés, nous commençons par
+décomposer l’écart <span class="math inline">\((X_{ij} - \mu)\)</span>
+en deux parties : <span class="math display">\[X_{ij} - \mu = (X_{ij} -
+\mu_i) + (\mu_i - \mu)\]</span></p>
+<p>En élevant au carré et en prenant la moyenne, nous obtenons : <span
+class="math display">\[\frac{1}{N} \sum_{i=1}^n \sum_{j=1}^{k_i} (X_{ij}
+- \mu)^2 = \frac{1}{N} \sum_{i=1}^n \sum_{j=1}^{k_i} (X_{ij} - \mu_i)^2
++ \frac{1}{N} \sum_{i=1}^n \sum_{j=1}^{k_i} (\mu_i - \mu)^2\]</span></p>
+<p>La deuxième somme peut être simplifiée comme suit : <span
+class="math display">\[\frac{1}{N} \sum_{i=1}^n \sum_{j=1}^{k_i} (\mu_i
+- \mu)^2 = \frac{1}{N} \sum_{i=1}^n k_i (\mu_i - \mu)^2\]</span></p>
+<p>Ainsi, nous avons : <span class="math display">\[\sigma^2 =
+\frac{1}{N} \sum_{i=1}^n \sum_{j=1}^{k_i} (X_{ij} - \mu_i)^2 +
+\frac{1}{N} \sum_{i=1}^n k_i (\mu_i - \mu)^2\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous listons ci-dessous quelques propriétés importantes de la
+variance intra-individuelle :</p>
+<ol>
+<li><p>La variance intra-individuelle est toujours non négative. Cela
+découle du fait que les carrés des écarts sont toujours non
+négatifs.</p></li>
+<li><p>La variance intra-individuelle est nulle si et seulement si
+toutes les mesures pour un individu donné sont égales. Cela signifie
+qu’il n’y a pas de variabilité intra-individuelle.</p></li>
+<li><p>La variance intra-individuelle est invariante par translation.
+Cela signifie que si nous ajoutons une constante à toutes les mesures
+d’un individu, la variance intra-individuelle reste inchangée.</p></li>
+</ol>
+<p>Pour prouver la propriété (iii), supposons que nous ajoutons une
+constante <span class="math inline">\(c\)</span> à toutes les mesures de
+l’individu <span class="math inline">\(i\)</span>. La nouvelle moyenne
+devient : <span class="math display">\[\mu_i&#39; = \mu_i +
+c\]</span></p>
+<p>La nouvelle variance intra-individuelle est : <span
+class="math display">\[\sigma_i&#39;^2 = \frac{1}{k_i} \sum_{j=1}^{k_i}
+(X_{ij} + c - \mu_i - c)^2 = \frac{1}{k_i} \sum_{j=1}^{k_i} (X_{ij} -
+\mu_i)^2 = \sigma_i^2\]</span></p>
+<p>Ainsi, la variance intra-individuelle reste inchangée.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

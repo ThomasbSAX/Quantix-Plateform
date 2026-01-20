@@ -1,0 +1,306 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Les Coefficients de Legendre : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Les Coefficients de Legendre : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les coefficients de Legendre, du nom d’Adrien-Marie Legendre
+(1752-1833), sont des éléments fondamentaux dans l’analyse mathématique,
+particulièrement dans le domaine des séries orthogonales. Ils émergent
+naturellement dans la résolution de l’équation différentielle de
+Legendre, qui est une forme particulière de l’équation de Laplace en
+coordonnées sphériques. Ces coefficients jouent un rôle crucial dans la
+physique théorique, notamment en mécanique quantique et en théorie du
+potentiel.</p>
+<p>L’étude des coefficients de Legendre permet de décomposer des
+fonctions complexes en séries convergentes, facilitant ainsi leur
+analyse et leur compréhension. Leur importance réside dans leur capacité
+à représenter des fonctions de manière orthogonale, ce qui est essentiel
+pour résoudre des problèmes de physique et d’ingénierie.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir les coefficients de Legendre, commençons par comprendre
+ce que nous cherchons à représenter. Supposons que nous ayons une
+fonction <span class="math inline">\(f(x)\)</span> définie sur
+l’intervalle <span class="math inline">\([-1, 1]\)</span>. Nous voulons
+exprimer cette fonction comme une série infinie de polynômes
+orthogonaux, appelés polynômes de Legendre <span
+class="math inline">\(P_n(x)\)</span>.</p>
+<p>Les coefficients de Legendre <span class="math inline">\(a_n\)</span>
+sont les quantités qui permettent cette décomposition. Ils sont définis
+par l’intégrale suivante :</p>
+<div class="definition">
+<p>Les coefficients de Legendre <span class="math inline">\(a_n\)</span>
+d’une fonction <span class="math inline">\(f(x)\)</span> sont donnés par
+: <span class="math display">\[a_n = \frac{2n + 1}{2} \int_{-1}^{1} f(x)
+P_n(x) \, dx\]</span> où <span class="math inline">\(P_n(x)\)</span> est
+le polynôme de Legendre de degré <span
+class="math inline">\(n\)</span>.</p>
+</div>
+<p>Une autre manière d’exprimer cette définition est : <span
+class="math display">\[a_n = \langle f, P_n \rangle_{L^2[-1,
+1]}\]</span> où <span class="math inline">\(\langle \cdot, \cdot
+\rangle_{L^2[-1, 1]}\)</span> désigne le produit scalaire dans l’espace
+<span class="math inline">\(L^2[-1, 1]\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié aux coefficients de Legendre est le
+théorème de convergence des séries de Legendre. Ce théorème stipule que
+sous certaines conditions, la série de Legendre converge vers la
+fonction originale.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f(x)\)</span> une fonction continue
+sur l’intervalle <span class="math inline">\([-1, 1]\)</span> et
+supposons que la série <span class="math display">\[\sum_{n=0}^{\infty}
+a_n^2\]</span> est convergente. Alors, la série de Legendre <span
+class="math display">\[\sum_{n=0}^{\infty} a_n P_n(x)\]</span> converge
+uniformément vers <span class="math inline">\(f(x)\)</span> sur
+l’intervalle <span class="math inline">\([-1, 1]\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de convergence des séries de Legendre, nous
+utilisons plusieurs propriétés des polynômes de Legendre. Tout d’abord,
+rappelons que les polynômes de Legendre forment une base orthonormale
+dans l’espace <span class="math inline">\(L^2[-1, 1]\)</span>. Cela
+signifie que : <span class="math display">\[\int_{-1}^{1} P_n(x) P_m(x)
+\, dx = \delta_{nm}\]</span> où <span
+class="math inline">\(\delta_{nm}\)</span> est le symbole de
+Kronecker.</p>
+<p>La preuve du théorème repose sur l’inégalité de Bessel, qui stipule
+que pour toute fonction <span class="math inline">\(f(x)\)</span> dans
+<span class="math inline">\(L^2[-1, 1]\)</span>, nous avons : <span
+class="math display">\[\sum_{n=0}^{\infty} a_n^2 \leq \|f\|_{L^2[-1,
+1]}^2\]</span> où <span class="math inline">\(\|f\|_{L^2[-1,
+1]}\)</span> est la norme de <span class="math inline">\(f\)</span> dans
+<span class="math inline">\(L^2[-1, 1]\)</span>.</p>
+<p>En utilisant cette inégalité et le fait que la série <span
+class="math inline">\(\sum_{n=0}^{\infty} a_n^2\)</span> est
+convergente, nous pouvons conclure que la série de Legendre converge
+uniformément vers <span class="math inline">\(f(x)\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Les coefficients de Legendre possèdent plusieurs propriétés
+importantes :</p>
+<ul>
+<li><p><strong>Orthonormalité</strong> : Les polynômes de Legendre sont
+orthonormaux dans <span class="math inline">\(L^2[-1, 1]\)</span>. Cela
+signifie que : <span class="math display">\[\int_{-1}^{1} P_n(x) P_m(x)
+\, dx = \delta_{nm}\]</span></p></li>
+<li><p><strong>Relation de récurrence</strong> : Les polynômes de
+Legendre satisfont une relation de récurrence : <span
+class="math display">\[(n+1) P_{n+1}(x) = (2n + 1) x P_n(x) - n
+P_{n-1}(x)\]</span></p></li>
+<li><p><strong>Propriété de symétrie</strong> : Les polynômes de
+Legendre sont soit pairs, soit impairs. Plus précisément : <span
+class="math display">\[P_n(-x) = (-1)^n P_n(x)\]</span></p></li>
+</ul>
+<p>Chacune de ces propriétés peut être démontrée en utilisant les
+définitions et théorèmes précédents. Par exemple, la relation de
+récurrence peut être obtenue en utilisant l’équation différentielle de
+Legendre et des techniques d’analyse classique.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les coefficients de Legendre sont un outil puissant dans l’analyse
+mathématique et la physique théorique. Leur capacité à décomposer des
+fonctions en séries convergentes les rend indispensables pour résoudre
+une variété de problèmes complexes. En comprenant leurs définitions,
+théorèmes et propriétés, nous pouvons mieux apprécier leur rôle
+fondamental dans les mathématiques modernes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

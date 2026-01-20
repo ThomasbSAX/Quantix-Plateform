@@ -1,0 +1,367 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Complexité des problèmes dans la classe PP</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Complexité des problèmes dans la classe PP</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La théorie de la complexité computationnelle s’intéresse à classer
+les problèmes selon leur difficulté algorithmique. Parmi les classes de
+complexité bien étudiées, la classe PP (Probabilistic Polynomial) occupe
+une place particulière. Elle englobe les problèmes pour lesquels un
+algorithme probabiliste peut fournir une réponse correcte avec une
+probabilité strictement supérieure à la moitié, en temps polynomial.</p>
+<p>L’émergence de la classe PP est motivée par le besoin de modéliser
+des problèmes où l’incertitude et la randomisation jouent un rôle
+crucial. Par exemple, des problèmes en statistique, en apprentissage
+automatique ou encore en cryptographie peuvent naturellement tomber dans
+cette classe. Comprendre la structure de PP permet non seulement
+d’identifier les limites des algorithmes probabilistes, mais aussi de
+mieux appréhender les relations entre différentes classes de
+complexité.</p>
+<p>Dans ce chapitre, nous explorons en détail la classe PP, ses
+définitions fondamentales, ses théorèmes clés et les propriétés qui en
+découlent. Nous nous efforcerons de fournir une compréhension
+approfondie tout en mettant en lumière l’élégance et la puissance des
+outils mathématiques utilisés.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour définir formellement la classe PP, commençons par comprendre ce
+que nous cherchons à capturer. Imaginons un problème de décision où nous
+devons déterminer si une propriété donnée est vraie ou fausse pour une
+instance particulière. Supposons que nous disposions d’un algorithme
+qui, en utilisant des bits aléatoires, peut donner une réponse correcte
+avec une probabilité strictement supérieure à 0.5. Si cet algorithme
+fonctionne en temps polynomial, alors le problème appartient à PP.</p>
+<p>Formellement, nous définissons la classe PP comme suit :</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(L\)</span> un langage sur un
+alphabet fini <span class="math inline">\(\Sigma\)</span>. On dit que
+<span class="math inline">\(L\)</span> appartient à PP si et seulement
+s’il existe une machine de Turing probabiliste <span
+class="math inline">\(M\)</span>, un polynôme <span
+class="math inline">\(p\)</span> et une fonction <span
+class="math inline">\(q : \mathbb{N} \rightarrow \mathbb{N}\)</span>
+tels que pour tout <span class="math inline">\(x \in \Sigma^*\)</span>,
+les conditions suivantes sont satisfaites :</p>
+<ol>
+<li><p><span class="math inline">\(M\)</span> s’arrête en un nombre
+d’étapes borné par <span class="math inline">\(p(|x|)\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(x \in L\)</span>, la
+probabilité que <span class="math inline">\(M\)</span> accepte <span
+class="math inline">\(x\)</span> est strictement supérieure à
+0.5.</p></li>
+<li><p>Pour tout <span class="math inline">\(x \notin L\)</span>, la
+probabilité que <span class="math inline">\(M\)</span> accepte <span
+class="math inline">\(x\)</span> est inférieure ou égale à 0.5.</p></li>
+</ol>
+</div>
+<p>Une autre manière de formuler cette définition est d’utiliser des
+quantificateurs :</p>
+<div class="definition">
+<p>Un langage <span class="math inline">\(L\)</span> appartient à PP si
+et seulement s’il existe une machine de Turing probabiliste <span
+class="math inline">\(M\)</span>, un polynôme <span
+class="math inline">\(p\)</span> et une fonction <span
+class="math inline">\(q : \mathbb{N} \rightarrow \mathbb{N}\)</span>
+tels que pour tout <span class="math inline">\(x \in \Sigma^*\)</span>,
+il existe une distribution de probabilité <span
+class="math inline">\(D_x\)</span> sur les séquences aléatoires de
+longueur <span class="math inline">\(q(|x|)\)</span> telle que : <span
+class="math display">\[\forall x \in L, \Pr_{r \leftarrow D_x}[M(x, r) =
+1] &gt; 0.5\]</span> <span class="math display">\[\forall x \notin L,
+\Pr_{r \leftarrow D_x}[M(x, r) = 1] \leq 0.5\]</span> où <span
+class="math inline">\(M(x, r)\)</span> désigne l’exécution de la machine
+<span class="math inline">\(M\)</span> sur l’entrée <span
+class="math inline">\(x\)</span> avec les bits aléatoires <span
+class="math inline">\(r\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental concernant la classe PP est le suivant :</p>
+<div class="theorem">
+<p>La classe PP est incluse dans la classe P#P. Autrement dit, tout
+problème dans PP peut être résolu par une machine de Turing déterministe
+en temps polynomial utilisant un oracle pour la classe #P.</p>
+</div>
+<p>Pour comprendre ce théorème, commençons par expliquer intuitivement
+ce que nous cherchons à démontrer. La classe P#P est la classe des
+problèmes qui peuvent être résolus en temps polynomial par une machine
+de Turing déterministe utilisant un oracle pour la classe #P, qui compte
+le nombre de certifications acceptées par une machine de Turing non
+déterministe en temps polynomial. Si nous pouvons montrer que tout
+problème dans PP peut être résolu par une telle machine, alors PP est
+inclus dans P#P.</p>
+<p>Formellement, le théorème peut être énoncé comme suit :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(L\)</span> un langage dans PP. Alors
+il existe une machine de Turing déterministe <span
+class="math inline">\(M&#39;\)</span>, un polynôme <span
+class="math inline">\(p\)</span> et une fonction <span
+class="math inline">\(q : \mathbb{N} \rightarrow \mathbb{N}\)</span>
+tels que pour tout <span class="math inline">\(x \in \Sigma^*\)</span>,
+la machine <span class="math inline">\(M&#39;\)</span> utilise un oracle
+pour #P et décide si <span class="math inline">\(x \in L\)</span> en un
+nombre d’étapes borné par <span
+class="math inline">\(p(|x|)\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de l’inclusion de PP dans P#P, nous
+procédons comme suit :</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(L\)</span> un
+langage dans PP. Par définition, il existe une machine de Turing
+probabiliste <span class="math inline">\(M\)</span>, un polynôme <span
+class="math inline">\(p\)</span> et une fonction <span
+class="math inline">\(q : \mathbb{N} \rightarrow \mathbb{N}\)</span>
+tels que pour tout <span class="math inline">\(x \in \Sigma^*\)</span>,
+les conditions (i), (ii) et (iii) de la définition de PP sont
+satisfaites.</p>
+<p>Considérons une machine de Turing déterministe <span
+class="math inline">\(M&#39;\)</span> qui utilise un oracle pour #P.
+Pour décider si <span class="math inline">\(x \in L\)</span>, la machine
+<span class="math inline">\(M&#39;\)</span> procède comme suit :</p>
+<ol>
+<li><p>Pour chaque séquence aléatoire <span
+class="math inline">\(r\)</span> de longueur <span
+class="math inline">\(q(|x|)\)</span>, la machine <span
+class="math inline">\(M&#39;\)</span> simule l’exécution de <span
+class="math inline">\(M(x, r)\)</span>.</p></li>
+<li><p>La machine <span class="math inline">\(M&#39;\)</span> utilise
+l’oracle pour #P afin de compter le nombre de séquences aléatoires <span
+class="math inline">\(r\)</span> telles que <span
+class="math inline">\(M(x, r)\)</span> accepte.</p></li>
+<li><p>Si ce nombre est strictement supérieur à <span
+class="math inline">\(2^{q(|x|)-1}\)</span>, alors <span
+class="math inline">\(M&#39;\)</span> accepte <span
+class="math inline">\(x\)</span>; sinon, elle rejette.</p></li>
+</ol>
+<p>Par construction, la machine <span
+class="math inline">\(M&#39;\)</span> utilise un nombre polynomial
+d’étapes pour chaque séquence aléatoire et utilise l’oracle pour #P une
+seule fois. Par conséquent, <span class="math inline">\(M&#39;\)</span>
+décide si <span class="math inline">\(x \in L\)</span> en temps
+polynomial. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Plusieurs propriétés importantes découlent de la définition de PP
+:</p>
+<ol>
+<li><p><strong>Inclusion dans PSPACE</strong> : Tout langage dans PP est
+aussi dans PSPACE. Cela découle du fait que les machines de Turing
+probabilistes peuvent être simulées par des machines de Turing non
+déterministes en utilisant l’espace polynomial.</p></li>
+<li><p><strong>Relations avec d’autres classes</strong> : PP est contenu
+dans la classe P#P, comme démontré par le théorème précédent. De plus,
+PP contient la classe RP (Randomized Polynomial), qui est la classe des
+problèmes pour lesquels une réponse affirmative peut être vérifiée avec
+une probabilité d’erreur bornée.</p></li>
+<li><p><strong>Problèmes typiques</strong> : Des problèmes comme le
+problème de l’énumération des solutions acceptées par une machine de
+Turing non déterministe en temps polynomial peuvent être montrés comme
+étant dans PP.</p></li>
+</ol>
+<p>Chacune de ces propriétés peut être démontrée en utilisant des
+techniques similaires à celles utilisées pour le théorème principal. Par
+exemple, pour montrer que PP est contenu dans PSPACE, on peut simuler
+une machine de Turing probabiliste par une machine de Turing non
+déterministe en utilisant l’espace polynomial pour stocker les séquences
+aléatoires et les résultats des simulations.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

@@ -1,0 +1,316 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Loi de Poisson a posteriori</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Loi de Poisson a posteriori</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La loi de Poisson, initialement introduite par Siméon Denis Poisson
+au début du XIXe siècle, est une distribution discrète qui modélise le
+nombre d’événements se produisant dans un intervalle de temps ou
+d’espace fixe, à une moyenne connue. Cependant, en statistiques
+bayésiennes, il est souvent nécessaire de considérer cette loi sous un
+angle différent : celui de l’inférence a posteriori.</p>
+<p>L’émergence de la loi de Poisson a posteriori est motivée par le
+besoin de prendre en compte l’incertitude sur le paramètre <span
+class="math inline">\(\lambda\)</span> (le taux moyen d’occurrence des
+événements) dans un cadre probabiliste cohérent. Cette approche est
+indispensable dans de nombreux domaines, tels que l’analyse des risques,
+la biologie des populations, et les télécommunications, où il est
+crucial de quantifier l’incertitude sur les paramètres du modèle.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant d’introduire formellement la loi de Poisson a posteriori, il
+est essentiel de comprendre ce que nous cherchons à capturer. Imaginons
+que nous observions un certain nombre d’événements dans une période
+donnée, et que nous souhaitons inférer le taux moyen <span
+class="math inline">\(\lambda\)</span> de ces événements. La loi a
+posteriori nous permet de mettre à jour notre croyance sur <span
+class="math inline">\(\lambda\)</span> en incorporant les données
+observées.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+suivant une loi de Poisson de paramètre <span
+class="math inline">\(\lambda\)</span>, c’est-à-dire que <span
+class="math display">\[P(X = k) = \frac{\lambda^k
+e^{-\lambda}}{k!}\]</span> pour tout entier <span
+class="math inline">\(k \geq 0\)</span>.</p>
+<p>Supposons que nous avons une a priori sur <span
+class="math inline">\(\lambda\)</span>, notée <span
+class="math inline">\(\pi(\lambda)\)</span>. Si nous observons <span
+class="math inline">\(X = k\)</span>, la loi a posteriori de <span
+class="math inline">\(\lambda\)</span> est donnée par <span
+class="math display">\[\pi(\lambda | X = k) = \frac{P(X = k | \lambda)
+\pi(\lambda)}{\int_0^\infty P(X = k | \lambda&#39;) \pi(\lambda&#39;)
+d\lambda&#39;}\]</span></p>
+</div>
+<p>En particulier, si nous choisissons une a priori Gamma de paramètres
+<span class="math inline">\(\alpha\)</span> et <span
+class="math inline">\(\beta\)</span>, c’est-à-dire <span
+class="math display">\[\pi(\lambda) =
+\frac{\beta^\alpha}{\Gamma(\alpha)} \lambda^{\alpha - 1} e^{-\beta
+\lambda},\]</span> alors la loi a posteriori est également une loi
+Gamma, avec des paramètres mis à jour : <span
+class="math display">\[\pi(\lambda | X = k) = \frac{(\beta + 1)^{\alpha
++ k}}{\Gamma(\alpha + k)} \lambda^{\alpha + k - 1} e^{-(\beta + 1)
+\lambda}.\]</span></p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un résultat central concernant la loi de Poisson a posteriori est le
+théorème suivant, qui montre que sous une a priori Gamma, la loi a
+posteriori conserve sa forme.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X \sim
+\text{Poisson}(\lambda)\)</span> et <span class="math inline">\(\lambda
+\sim \text{Gamma}(\alpha, \beta)\)</span>. Alors la loi a posteriori de
+<span class="math inline">\(\lambda\)</span> conditionnellement à <span
+class="math inline">\(X = k\)</span> est <span
+class="math display">\[\pi(\lambda | X = k) = \text{Gamma}(\alpha + k,
+\beta + 1).\]</span></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Nous commençons par écrire la loi a posteriori en
+utilisant le théorème de Bayes : <span
+class="math display">\[\pi(\lambda | X = k) \propto P(X = k | \lambda)
+\pi(\lambda).\]</span></p>
+<p>En substituant les expressions pour <span class="math inline">\(P(X =
+k | \lambda)\)</span> et <span
+class="math inline">\(\pi(\lambda)\)</span>, nous obtenons <span
+class="math display">\[\pi(\lambda | X = k) \propto \frac{\lambda^k
+e^{-\lambda}}{k!} \cdot \frac{\beta^\alpha}{\Gamma(\alpha)}
+\lambda^{\alpha - 1} e^{-\beta \lambda}.\]</span></p>
+<p>En combinant les termes, nous avons <span
+class="math display">\[\pi(\lambda | X = k) \propto
+\frac{\beta^\alpha}{k! \Gamma(\alpha)} \lambda^{\alpha + k - 1}
+e^{-(\beta + 1) \lambda}.\]</span></p>
+<p>En reconnaissant la forme de la loi Gamma, nous pouvons réécrire cela
+comme <span class="math display">\[\pi(\lambda | X = k) = \frac{(\beta +
+1)^{\alpha + k}}{\Gamma(\alpha + k)} \lambda^{\alpha + k - 1} e^{-(\beta
++ 1) \lambda},\]</span> ce qui achève la preuve. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La loi de Poisson a posteriori possède plusieurs propriétés
+intéressantes, que nous détaillons ci-dessous.</p>
+<ol>
+<li><p><strong>Conjugaison</strong> : La loi Gamma est une a priori
+conjuguée pour la loi de Poisson. Cela signifie que si l’a priori est
+Gamma, alors l’a posteriori est également Gamma.</p></li>
+<li><p><strong>Moyenne et variance</strong> : Si <span
+class="math inline">\(\lambda \sim \text{Gamma}(\alpha, \beta)\)</span>,
+alors l’espérance et la variance de <span
+class="math inline">\(\lambda\)</span> sont données par <span
+class="math display">\[E[\lambda] = \frac{\alpha}{\beta},\]</span> <span
+class="math display">\[\text{Var}(\lambda) =
+\frac{\alpha}{\beta^2}.\]</span></p></li>
+<li><p><strong>Interprétation bayésienne</strong> : La loi a posteriori
+permet de mettre à jour nos croyances sur <span
+class="math inline">\(\lambda\)</span> en incorporant les données
+observées. Cela est particulièrement utile dans un cadre d’inférence
+statistique.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La loi de Poisson a posteriori est un outil puissant pour l’inférence
+bayésienne sur le paramètre <span class="math inline">\(\lambda\)</span>
+d’une loi de Poisson. En choisissant une a priori appropriée, telle que
+la loi Gamma, nous pouvons obtenir des résultats analytiques simples et
+interprétés facilement. Cette approche est largement utilisée dans
+divers domaines pour quantifier l’incertitude sur les paramètres des
+modèles.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

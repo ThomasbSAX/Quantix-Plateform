@@ -1,0 +1,321 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’inégalité de Hoeffding : Un outil fondamental en théorie des probabilités</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’inégalité de Hoeffding : Un outil fondamental en
+théorie des probabilités</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’inégalité de Hoeffding, nommée en l’honneur du statisticien
+allemand Wassily Hoeffding, est un résultat central en théorie des
+probabilités et en statistique mathématique. Elle fournit une borne
+supérieure pour la probabilité qu’une somme de variables aléatoires
+indépendantes s’écarte significativement de sa valeur attendue. Cette
+inégalité est particulièrement utile dans l’analyse des algorithmes
+stochastiques, la théorie de l’apprentissage automatique, et les
+méthodes Monte Carlo.</p>
+<p>L’origine de cette inégalité remonte aux années 1960, lorsque
+Hoeffding a publié ses travaux sur les bornes de concentration pour les
+sommes de variables aléatoires. L’importance de cette inégalité réside
+dans sa capacité à fournir des garanties probabilistes robustes, même en
+l’absence de connaissances détaillées sur la distribution sous-jacente
+des variables aléatoires. Cela en fait un outil indispensable dans de
+nombreux domaines appliqués, où la robustesse et la fiabilité des
+résultats sont cruciales.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre l’inégalité de Hoeffding, il est essentiel de définir
+les concepts clés impliqués. Considérons une suite de variables
+aléatoires indépendantes <span class="math inline">\(X_1, X_2, \ldots,
+X_n\)</span>, chacune bornée presque sûrement. Nous cherchons à borner
+la probabilité que leur somme <span class="math inline">\(S_n = X_1 +
+X_2 + \ldots + X_n\)</span> s’écarte de son espérance <span
+class="math inline">\(\mathbb{E}[S_n]\)</span>.</p>
+<p>Formellement, nous disons qu’une variable aléatoire <span
+class="math inline">\(X\)</span> est bornée presque sûrement si et
+seulement s’il existe des constantes <span
+class="math inline">\(a\)</span> et <span
+class="math inline">\(b\)</span> telles que : <span
+class="math display">\[\forall x \in \mathbb{R}, \quad P(a \leq X \leq
+b) = 1\]</span> Cela signifie que <span class="math inline">\(X\)</span>
+prend presque sûrement ses valeurs dans l’intervalle <span
+class="math inline">\([a, b]\)</span>.</p>
+<h1 id="théorème-de-hoeffding">Théorème de Hoeffding</h1>
+<p>L’inégalité de Hoeffding peut être énoncée comme suit :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(X_1, X_2, \ldots, X_n\)</span> des
+variables aléatoires indépendantes, telles que pour tout <span
+class="math inline">\(i\)</span>, il existe <span
+class="math inline">\(a_i\)</span> et <span
+class="math inline">\(b_i\)</span> avec : <span
+class="math display">\[\forall x \in \mathbb{R}, \quad P(a_i \leq X_i
+\leq b_i) = 1\]</span> Alors, pour tout <span class="math inline">\(t
+&gt; 0\)</span>, on a : <span class="math display">\[P\left( \left|
+\frac{1}{n} \sum_{i=1}^n X_i - \mathbb{E}\left[ \frac{1}{n} \sum_{i=1}^n
+X_i \right] \right| \geq t \right) \leq 2 \exp\left( -\frac{2n^2
+t^2}{\sum_{i=1}^n (b_i - a_i)^2} \right)\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>La preuve de l’inégalité de Hoeffding repose sur des techniques
+avancées de théorie des probabilités, notamment l’utilisation de la
+fonction génératrice de moments et des inégalités exponentielles. Voici
+une esquisse de la preuve :</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons d’abord le cas où les variables <span
+class="math inline">\(X_i\)</span> sont centrées, c’est-à-dire que <span
+class="math inline">\(\mathbb{E}[X_i] = 0\)</span> pour tout <span
+class="math inline">\(i\)</span>. Nous définissons la fonction
+génératrice de moments pour chaque <span
+class="math inline">\(X_i\)</span> : <span
+class="math display">\[M_i(\lambda) = \mathbb{E}\left[ e^{\lambda X_i}
+\right]\]</span> En utilisant le fait que <span
+class="math inline">\(X_i\)</span> est bornée, nous pouvons montrer que
+: <span class="math display">\[M_i(\lambda) \leq e^{\frac{\lambda^2 (b_i
+- a_i)^2}{8}}\]</span> Ensuite, nous utilisons l’indépendance des <span
+class="math inline">\(X_i\)</span> pour obtenir la fonction génératrice
+de moments de la somme <span class="math inline">\(S_n = \sum_{i=1}^n
+X_i\)</span> : <span class="math display">\[M(\lambda) =
+\mathbb{E}\left[ e^{\lambda S_n} \right] = \prod_{i=1}^n M_i(\lambda)
+\leq e^{\frac{\lambda^2}{8} \sum_{i=1}^n (b_i - a_i)^2}\]</span> En
+appliquant l’inégalité de Chernoff, nous obtenons : <span
+class="math display">\[P(S_n \geq n t) = P\left( e^{\lambda S_n} \geq
+e^{\lambda n t} \right) \leq e^{-\lambda n t + \frac{\lambda^2}{8}
+\sum_{i=1}^n (b_i - a_i)^2}\]</span> En choisissant <span
+class="math inline">\(\lambda = \frac{4nt}{\sum_{i=1}^n (b_i -
+a_i)^2}\)</span>, nous obtenons : <span class="math display">\[P(S_n
+\geq n t) \leq e^{-\frac{2n^2 t^2}{\sum_{i=1}^n (b_i - a_i)^2}}\]</span>
+De manière similaire, nous pouvons montrer que : <span
+class="math display">\[P(S_n \leq -n t) \leq e^{-\frac{2n^2
+t^2}{\sum_{i=1}^n (b_i - a_i)^2}}\]</span> En combinant ces deux
+résultats, nous obtenons l’inégalité de Hoeffding. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>L’inégalité de Hoeffding possède plusieurs propriétés importantes et
+corollaires qui en découlent. Nous en listons quelques-uns ci-dessous
+:</p>
+<ul>
+<li><p><strong>Corollaire de la loi des grands nombres</strong> :
+L’inégalité de Hoeffding implique que, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, la probabilité que
+l’écart entre la moyenne empirique et l’espérance soit supérieur à <span
+class="math inline">\(\epsilon\)</span> décroît exponentiellement avec
+le nombre de variables <span class="math inline">\(n\)</span>.</p></li>
+<li><p><strong>Application aux algorithmes stochastiques</strong> :
+L’inégalité de Hoeffding est largement utilisée pour analyser la
+convergence des algorithmes stochastiques, tels que les méthodes de
+gradient stochastique. Elle permet de garantir que la solution obtenue
+est proche de l’optimum avec une haute probabilité.</p></li>
+<li><p><strong>Théorie de l’apprentissage automatique</strong> : Dans le
+contexte de l’apprentissage automatique, l’inégalité de Hoeffding est
+utilisée pour établir des garanties probabilistes sur les performances
+des modèles appris à partir de données. Elle permet, par exemple, de
+borner la généralisation erreur en fonction de l’erreur
+d’entraînement.</p></li>
+</ul>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’inégalité de Hoeffding est un résultat fondamental en théorie des
+probabilités et en statistique mathématique. Son importance réside dans
+sa capacité à fournir des bornes robustes pour la concentration des
+sommes de variables aléatoires indépendantes. Les applications de cette
+inégalité sont vastes et couvrent de nombreux domaines, allant des
+algorithmes stochastiques à la théorie de l’apprentissage automatique.
+En comprenant et en maîtrisant cette inégalité, les chercheurs et les
+praticiens peuvent développer des méthodes plus fiables et plus
+efficaces pour traiter des problèmes complexes dans divers domaines.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

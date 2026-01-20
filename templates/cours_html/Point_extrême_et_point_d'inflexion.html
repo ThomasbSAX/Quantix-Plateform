@@ -1,0 +1,369 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Points extrêmes et points d’inflexion : Analyse des fonctions différentiables</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Points extrêmes et points d’inflexion : Analyse des
+fonctions différentiables</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’analyse des fonctions différentiables occupe une place centrale en
+mathématiques, notamment dans l’étude des extrema locaux et des points
+d’inflexion. Ces concepts sont fondamentaux pour comprendre le
+comportement local des fonctions, que ce soit dans un cadre purement
+théorique ou appliqué. Les points extrêmes permettent de déterminer les
+maxima et minima locaux, tandis que les points d’inflexion révèlent des
+changements dans la concavité de la fonction. Ces outils sont
+indispensables en optimisation, en physique, et dans de nombreuses
+autres disciplines scientifiques.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<h2 class="unnumbered" id="point-extrême">Point extrême</h2>
+<p>Pour définir un point extrême, considérons une fonction <span
+class="math inline">\(f\)</span> définie sur un intervalle <span
+class="math inline">\(I \subseteq \mathbb{R}\)</span>. Un point extrême
+est un point où la fonction atteint soit un maximum local, soit un
+minimum local. Pédagogiquement, on peut se demander où la fonction
+"monte" ou "descend" le plus rapidement avant de changer de direction.
+Formellement, un point <span class="math inline">\(c \in I\)</span> est
+un point extrême de <span class="math inline">\(f\)</span> si :</p>
+<div class="definition">
+<p>Un point <span class="math inline">\(c \in I\)</span> est un point
+extrême de <span class="math inline">\(f : I \rightarrow
+\mathbb{R}\)</span> si et seulement si il existe un voisinage <span
+class="math inline">\(V\)</span> de <span
+class="math inline">\(c\)</span> tel que pour tout <span
+class="math inline">\(x \in V\)</span>, on a : <span
+class="math display">\[f(x) \leq f(c) \quad (\text{point maximum
+local})\]</span> ou <span class="math display">\[f(x) \geq f(c) \quad
+(\text{point minimum local})\]</span></p>
+</div>
+<h2 class="unnumbered" id="point-dinflexion">Point d’inflexion</h2>
+<p>Un point d’inflexion est un point où la concavité de la fonction
+change. Pour comprendre cela, imaginons une courbe tracée par la
+fonction <span class="math inline">\(f\)</span>. Un point d’inflexion
+est un point où la courbe "change de direction" en termes de concavité.
+Formellement, un point <span class="math inline">\(c \in I\)</span> est
+un point d’inflexion de <span class="math inline">\(f\)</span> si :</p>
+<div class="definition">
+<p>Un point <span class="math inline">\(c \in I\)</span> est un point
+d’inflexion de <span class="math inline">\(f : I \rightarrow
+\mathbb{R}\)</span> si et seulement si il existe un voisinage <span
+class="math inline">\(V\)</span> de <span
+class="math inline">\(c\)</span> tel que pour tout <span
+class="math inline">\(x \in V\)</span>, on a : <span
+class="math display">\[f&#39;&#39;(x) &gt; 0 \quad (\text{concavité vers
+le haut})\]</span> ou <span class="math display">\[f&#39;&#39;(x) &lt; 0
+\quad (\text{concavité vers le bas})\]</span> et que la concavité change
+en <span class="math inline">\(c\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-des-points-extrêmes">Théorème des
+points extrêmes</h2>
+<p>Pour déterminer les points extrêmes, on utilise souvent le théorème
+suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f : I \rightarrow
+\mathbb{R}\)</span> une fonction différentiable sur un intervalle ouvert
+<span class="math inline">\(I\)</span>. Si <span class="math inline">\(c
+\in I\)</span> est un point extrême de <span
+class="math inline">\(f\)</span>, alors : <span
+class="math display">\[f&#39;(c) = 0\]</span></p>
+</div>
+<h2 class="unnumbered" id="théorème-des-points-dinflexion">Théorème des
+points d’inflexion</h2>
+<p>Pour les points d’inflexion, on a le théorème suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f : I \rightarrow
+\mathbb{R}\)</span> une fonction deux fois différentiable sur un
+intervalle ouvert <span class="math inline">\(I\)</span>. Si <span
+class="math inline">\(c \in I\)</span> est un point d’inflexion de <span
+class="math inline">\(f\)</span>, alors : <span
+class="math display">\[f&#39;&#39;(c) = 0\]</span> et la dérivée seconde
+change de signe en <span class="math inline">\(c\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered"
+id="preuve-du-théorème-des-points-extrêmes">Preuve du théorème des
+points extrêmes</h2>
+<p>Supposons que <span class="math inline">\(c \in I\)</span> est un
+point extrême de <span class="math inline">\(f\)</span>. Sans perte de
+généralité, supposons que <span class="math inline">\(c\)</span> est un
+point minimum local. Alors, pour tout <span class="math inline">\(x \in
+V\)</span>, on a : <span class="math display">\[f(x) \geq
+f(c)\]</span></p>
+<p>Considérons la fonction <span class="math inline">\(g(x) = f(x) -
+f(c)\)</span>. Alors, <span class="math inline">\(g(c) = 0\)</span> et
+pour tout <span class="math inline">\(x \in V\)</span>, on a : <span
+class="math display">\[g(x) \geq 0\]</span></p>
+<p>Par le théorème de Rolle, il existe un point <span
+class="math inline">\(d \in (c, x)\)</span> tel que : <span
+class="math display">\[g&#39;(d) = 0\]</span></p>
+<p>Ainsi, <span class="math inline">\(f&#39;(d) = 0\)</span>. En prenant
+la limite lorsque <span class="math inline">\(d\)</span> tend vers <span
+class="math inline">\(c\)</span>, on obtient : <span
+class="math display">\[f&#39;(c) = 0\]</span></p>
+<h2 class="unnumbered"
+id="preuve-du-théorème-des-points-dinflexion">Preuve du théorème des
+points d’inflexion</h2>
+<p>Supposons que <span class="math inline">\(c \in I\)</span> est un
+point d’inflexion de <span class="math inline">\(f\)</span>. Alors, il
+existe un voisinage <span class="math inline">\(V\)</span> de <span
+class="math inline">\(c\)</span> tel que pour tout <span
+class="math inline">\(x \in V\)</span>, on a : <span
+class="math display">\[f&#39;&#39;(x) &gt; 0 \quad \text{ou} \quad
+f&#39;&#39;(x) &lt; 0\]</span></p>
+<p>De plus, la dérivée seconde change de signe en <span
+class="math inline">\(c\)</span>. Par le théorème des accroissements
+finis, il existe un point <span class="math inline">\(d \in (c,
+x)\)</span> tel que : <span class="math display">\[f&#39;&#39;(d) =
+0\]</span></p>
+<p>Ainsi, <span class="math inline">\(f&#39;&#39;(c) = 0\)</span>.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+corollaires</h1>
+<h2 class="unnumbered" id="propriétés-des-points-extrêmes">Propriétés
+des points extrêmes</h2>
+<ol>
+<li><p>Si <span class="math inline">\(f\)</span> est différentiable en
+<span class="math inline">\(c\)</span> et que <span
+class="math inline">\(f&#39;(c) = 0\)</span>, alors <span
+class="math inline">\(c\)</span> est un point extrême de <span
+class="math inline">\(f\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est deux fois
+différentiable en <span class="math inline">\(c\)</span> et que <span
+class="math inline">\(f&#39;(c) = 0\)</span> et <span
+class="math inline">\(f&#39;&#39;(c) &gt; 0\)</span>, alors <span
+class="math inline">\(c\)</span> est un point minimum local de <span
+class="math inline">\(f\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est deux fois
+différentiable en <span class="math inline">\(c\)</span> et que <span
+class="math inline">\(f&#39;(c) = 0\)</span> et <span
+class="math inline">\(f&#39;&#39;(c) &lt; 0\)</span>, alors <span
+class="math inline">\(c\)</span> est un point maximum local de <span
+class="math inline">\(f\)</span>.</p></li>
+</ol>
+<h2 class="unnumbered" id="propriétés-des-points-dinflexion">Propriétés
+des points d’inflexion</h2>
+<ol>
+<li><p>Si <span class="math inline">\(f\)</span> est deux fois
+différentiable en <span class="math inline">\(c\)</span> et que <span
+class="math inline">\(f&#39;&#39;(c) = 0\)</span>, alors <span
+class="math inline">\(c\)</span> est un point d’inflexion de <span
+class="math inline">\(f\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est trois fois
+différentiable en <span class="math inline">\(c\)</span> et que <span
+class="math inline">\(f&#39;&#39;(c) = 0\)</span> et <span
+class="math inline">\(f&#39;&#39;&#39;(c) \neq 0\)</span>, alors <span
+class="math inline">\(c\)</span> est un point d’inflexion de <span
+class="math inline">\(f\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(f\)</span> est deux fois
+différentiable en <span class="math inline">\(c\)</span> et que <span
+class="math inline">\(f&#39;&#39;(c) = 0\)</span> et la dérivée seconde
+change de signe en <span class="math inline">\(c\)</span>, alors <span
+class="math inline">\(c\)</span> est un point d’inflexion de <span
+class="math inline">\(f\)</span>.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les points extrêmes et les points d’inflexion sont des concepts
+fondamentaux en analyse des fonctions différentiables. Ils permettent de
+comprendre le comportement local des fonctions et sont indispensables
+dans de nombreuses applications scientifiques. Les théorèmes et
+propriétés présentés dans cet article fournissent des outils puissants
+pour l’étude de ces points.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

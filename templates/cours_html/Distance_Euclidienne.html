@@ -1,0 +1,330 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La distance euclidienne : une mesure fondamentale en géométrie</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La distance euclidienne : une mesure fondamentale en
+géométrie</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La distance euclidienne, du nom du mathématicien grec Euclide, est
+une notion centrale en géométrie et en analyse. Elle trouve son origine
+dans les éléments d’Euclide, où sont posées les bases de la géométrie
+plane. Cette distance est indispensable pour mesurer des longueurs entre
+points dans un espace euclidien, c’est-à-dire un espace vectoriel muni
+d’un produit scalaire.</p>
+<p>L’émergence de cette notion est liée à la volonté de quantifier
+précisément les distances dans le plan et l’espace. Elle résout le
+problème de la mesure des longueurs de manière cohérente et universelle,
+permettant ainsi de comparer des distances dans différents contextes
+géométriques. La distance euclidienne est indispensable dans de nombreux
+domaines, tels que la géométrie, l’analyse, et même l’apprentissage
+automatique, où elle est utilisée pour évaluer la similarité entre des
+points de données.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la distance euclidienne, commençons par considérer
+deux points dans le plan. Nous cherchons une mesure qui quantifie la
+longueur du segment reliant ces deux points. Cette mesure doit être
+indépendante de l’orientation et de la position des points, et doit
+respecter les propriétés fondamentales d’une distance : positivité,
+symétrie, et inégalité triangulaire.</p>
+<p>Formellement, la distance euclidienne entre deux points <span
+class="math inline">\(A = (a_1, a_2, \ldots, a_n)\)</span> et <span
+class="math inline">\(B = (b_1, b_2, \ldots, b_n)\)</span> dans un
+espace euclidien de dimension <span class="math inline">\(n\)</span> est
+définie comme suit :</p>
+<p><span class="math display">\[d(A, B) = \sqrt{\sum_{i=1}^n (a_i -
+b_i)^2}\]</span></p>
+<p>Cette définition peut être réécrite en utilisant le produit scalaire
+:</p>
+<p><span class="math display">\[d(A, B) = \sqrt{\langle A - B, A - B
+\rangle}\]</span></p>
+<p>où <span class="math inline">\(\langle \cdot, \cdot \rangle\)</span>
+désigne le produit scalaire standard.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance euclidienne est le théorème
+de Pythagore, qui stipule que dans un triangle rectangle, le carré de
+l’hypoténuse est égal à la somme des carrés des deux autres côtés. Ce
+théorème peut être généralisé en dimension supérieure pour définir la
+distance euclidienne.</p>
+<p>Formellement, le théorème de Pythagore s’énonce comme suit :</p>
+<div class="theorem">
+<p>Soient <span class="math inline">\(A, B, C\)</span> trois points dans
+un espace euclidien de dimension <span class="math inline">\(n\)</span>
+tels que le triangle <span class="math inline">\(ABC\)</span> est
+rectangle en <span class="math inline">\(C\)</span>. Alors, on a :</p>
+<p><span class="math display">\[d(A, B)^2 = d(A, C)^2 + d(B,
+C)^2\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Pythagore, nous utilisons les propriétés
+du produit scalaire et la définition de la distance euclidienne.
+Considérons trois points <span class="math inline">\(A, B, C\)</span>
+dans un espace euclidien de dimension <span
+class="math inline">\(n\)</span> tels que le triangle <span
+class="math inline">\(ABC\)</span> est rectangle en <span
+class="math inline">\(C\)</span>. Nous avons :</p>
+<p><span class="math display">\[d(A, B)^2 = \langle A - B, A - B
+\rangle\]</span></p>
+<p>En développant le produit scalaire, nous obtenons :</p>
+<p><span class="math display">\[d(A, B)^2 = \langle A - C + C - B, A - C
++ C - B \rangle\]</span></p>
+<p>En utilisant la linéarité du produit scalaire, nous avons :</p>
+<p><span class="math display">\[d(A, B)^2 = \langle A - C, A - C \rangle
++ \langle C - B, C - B \rangle + 2 \langle A - C, C - B
+\rangle\]</span></p>
+<p>Comme le triangle est rectangle en <span
+class="math inline">\(C\)</span>, les vecteurs <span
+class="math inline">\(A - C\)</span> et <span class="math inline">\(B -
+C\)</span> sont orthogonaux, ce qui implique que leur produit scalaire
+est nul :</p>
+<p><span class="math display">\[\langle A - C, B - C \rangle =
+0\]</span></p>
+<p>Ainsi, nous obtenons :</p>
+<p><span class="math display">\[d(A, B)^2 = \langle A - C, A - C \rangle
++ \langle B - C, B - C \rangle = d(A, C)^2 + d(B, C)^2\]</span></p>
+<p>Ce qui achève la preuve du théorème de Pythagore.</p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>La distance euclidienne possède plusieurs propriétés importantes, que
+nous énumérons et démontrons ci-dessous.</p>
+<ol>
+<li><p>Positivité : Pour tout point <span
+class="math inline">\(A\)</span>, on a <span class="math inline">\(d(A,
+A) = 0\)</span>.</p>
+<p>Preuve : En utilisant la définition de la distance euclidienne, nous
+avons :</p>
+<p><span class="math display">\[d(A, A) = \sqrt{\sum_{i=1}^n (a_i -
+a_i)^2} = 0\]</span></p></li>
+<li><p>Symétrie : Pour tout points <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(B\)</span>, on a <span class="math inline">\(d(A,
+B) = d(B, A)\)</span>.</p>
+<p>Preuve : En utilisant la définition de la distance euclidienne, nous
+avons :</p>
+<p><span class="math display">\[d(A, B) = \sqrt{\sum_{i=1}^n (a_i -
+b_i)^2} = \sqrt{\sum_{i=1}^n (b_i - a_i)^2} = d(B, A)\]</span></p></li>
+<li><p>Inégalité triangulaire : Pour tout points <span
+class="math inline">\(A, B, C\)</span>, on a <span
+class="math inline">\(d(A, C) \leq d(A, B) + d(B, C)\)</span>.</p>
+<p>Preuve : En utilisant la définition de la distance euclidienne et les
+propriétés du produit scalaire, nous avons :</p>
+<p><span class="math display">\[d(A, C)^2 = \langle A - C, A - C \rangle
+= \langle (A - B) + (B - C), (A - B) + (B - C) \rangle\]</span></p>
+<p>En développant le produit scalaire, nous obtenons :</p>
+<p><span class="math display">\[d(A, C)^2 = \langle A - B, A - B \rangle
++ \langle B - C, B - C \rangle + 2 \langle A - B, B - C
+\rangle\]</span></p>
+<p>En utilisant l’inégalité de Cauchy-Schwarz, nous avons :</p>
+<p><span class="math display">\[2 \langle A - B, B - C \rangle \leq 2
+\|A - B\| \|B - C\|\]</span></p>
+<p>Ainsi, nous obtenons :</p>
+<p><span class="math display">\[d(A, C)^2 \leq d(A, B)^2 + d(B, C)^2 + 2
+d(A, B) d(B, C)\]</span></p>
+<p>En prenant la racine carrée des deux côtés, nous obtenons l’inégalité
+triangulaire.</p></li>
+</ol>
+<h1 id="conclusion">Conclusion</h1>
+<p>La distance euclidienne est une notion fondamentale en géométrie et
+en analyse, avec des applications dans de nombreux domaines. Elle permet
+de quantifier précisément les distances entre points dans un espace
+euclidien, et possède des propriétés importantes telles que la
+positivité, la symétrie, et l’inégalité triangulaire. Le théorème de
+Pythagore, qui généralise la notion de distance euclidienne en dimension
+supérieure, est un résultat central en géométrie.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

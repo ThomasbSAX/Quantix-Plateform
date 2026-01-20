@@ -1,0 +1,316 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de binning par pooling</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de binning
+par pooling</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques est une technique
+fondamentale en apprentissage automatique, particulièrement dans le
+domaine du traitement des données catégorielles. L’une des méthodes les
+plus efficaces pour cette tâche est le binning par pooling, qui permet
+de transformer des données catégorielles en représentations numériques
+tout en préservant les relations sous-jacentes entre les catégories.</p>
+<p>Cette méthode émerge de la nécessité de traiter des données non
+numériques dans des modèles d’apprentissage automatique, qui sont
+souvent conçus pour fonctionner avec des entrées numériques. Le binning
+par pooling offre une solution élégante en regroupant les catégories en
+bins (ou intervalles) et en appliquant des opérations de pooling pour
+extraire des caractéristiques significatives.</p>
+<h1 id="définitions">Définitions</h1>
+<h2 id="binning">Binning</h2>
+<p>Le binning est une technique de discrétisation qui consiste à
+regrouper les valeurs d’une variable continue ou catégorielle en un
+nombre limité de bins. Formellement, soit <span
+class="math inline">\(X\)</span> une variable catégorielle prenant ses
+valeurs dans un ensemble fini <span class="math inline">\(C = \{c_1,
+c_2, \dots, c_n\}\)</span>. Un binning est une fonction <span
+class="math inline">\(B: C \rightarrow \{1, 2, \dots, k\}\)</span> qui
+associe à chaque catégorie <span class="math inline">\(c_i\)</span> un
+bin <span class="math inline">\(j\)</span>.</p>
+<p><span class="math display">\[\forall i \in \{1, 2, \dots, n\},
+\exists j \in \{1, 2, \dots, k\} \text{ tel que } B(c_i) =
+j\]</span></p>
+<h2 id="pooling">Pooling</h2>
+<p>Le pooling est une opération qui réduit la dimension d’une
+représentation en agrégeant les valeurs dans des régions spécifiques.
+Dans le contexte du binning, le pooling est appliqué aux bins pour
+extraire des caractéristiques numériques. Soit <span
+class="math inline">\(X\)</span> une variable catégorielle et <span
+class="math inline">\(B\)</span> un binning associé. Le pooling peut
+être défini comme une fonction <span class="math inline">\(P: \{1, 2,
+\dots, k\} \rightarrow \mathbb{R}^m\)</span> qui associe à chaque bin
+<span class="math inline">\(j\)</span> un vecteur de caractéristiques
+<span class="math inline">\(\mathbf{v}_j\)</span>.</p>
+<p><span class="math display">\[\forall j \in \{1, 2, \dots, k\}, P(j) =
+\mathbf{v}_j \in \mathbb{R}^m\]</span></p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-lencodage-par-binning-par-pooling">Théorème de
+l’encodage par binning par pooling</h2>
+<p>Le théorème suivant montre que l’encodage par binning par pooling
+préserve certaines propriétés des données d’origine.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> une variable catégorielle
+prenant ses valeurs dans un ensemble fini <span class="math inline">\(C
+= \{c_1, c_2, \dots, c_n\}\)</span>, et soit <span
+class="math inline">\(B\)</span> un binning associé. Soit <span
+class="math inline">\(P\)</span> une fonction de pooling. Alors,
+l’encodage par binning par pooling <span class="math inline">\(E: C
+\rightarrow \mathbb{R}^m\)</span> défini par <span
+class="math inline">\(E(c_i) = P(B(c_i))\)</span> préserve les relations
+d’ordre entre les catégories.</p>
+<p><span class="math display">\[\forall i, j \in \{1, 2, \dots, n\},
+B(c_i) = B(c_j) \Rightarrow E(c_i) = E(c_j)\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<h2 id="preuve-du-théorème-de-lencodage-par-binning-par-pooling">Preuve
+du théorème de l’encodage par binning par pooling</h2>
+<p>Pour prouver ce théorème, nous devons montrer que si deux catégories
+<span class="math inline">\(c_i\)</span> et <span
+class="math inline">\(c_j\)</span> sont dans le même bin, leurs
+encodages sont identiques.</p>
+<div class="proof">
+<p><em>Proof.</em> Soient <span class="math inline">\(c_i\)</span> et
+<span class="math inline">\(c_j\)</span> deux catégories telles que
+<span class="math inline">\(B(c_i) = B(c_j) = j\)</span>. Par définition
+de la fonction de pooling <span class="math inline">\(P\)</span>, nous
+avons:</p>
+<p><span class="math display">\[P(j) = \mathbf{v}_j\]</span></p>
+<p>Donc, les encodages de <span class="math inline">\(c_i\)</span> et
+<span class="math inline">\(c_j\)</span> sont:</p>
+<p><span class="math display">\[E(c_i) = P(B(c_i)) = P(j) =
+\mathbf{v}_j\]</span> <span class="math display">\[E(c_j) = P(B(c_j)) =
+P(j) = \mathbf{v}_j\]</span></p>
+<p>Ainsi, <span class="math inline">\(E(c_i) = E(c_j)\)</span>, ce qui
+prouve le théorème. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-linéarité">Propriété de linéarité</h2>
+<p>L’encodage par binning par pooling est linéaire en ce sens que la
+somme des encodages de deux catégories dans le même bin est égale à
+l’encodage de la somme des catégories.</p>
+<div class="corollary">
+<p>Soient <span class="math inline">\(c_i\)</span> et <span
+class="math inline">\(c_j\)</span> deux catégories telles que <span
+class="math inline">\(B(c_i) = B(c_j) = j\)</span>. Alors:</p>
+<p><span class="math display">\[E(c_i + c_j) = E(c_i) +
+E(c_j)\]</span></p>
+</div>
+<h2 id="propriété-de-scalabilité">Propriété de scalabilité</h2>
+<p>L’encodage par binning par pooling est scalable, c’est-à-dire que
+l’ajout de nouvelles catégories n’affecte pas les encodages des
+catégories existantes.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(c_{n+1}\)</span> une nouvelle
+catégorie ajoutée à l’ensemble <span class="math inline">\(C\)</span>.
+Si <span class="math inline">\(B(c_{n+1}) = j\)</span>, alors:</p>
+<p><span class="math display">\[E(c_{n+1}) = P(j)\]</span></p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>L’encodage par extraction de caractéristiques de binning par pooling
+est une technique puissante pour traiter les données catégorielles dans
+les modèles d’apprentissage automatique. En regroupant les catégories en
+bins et en appliquant des opérations de pooling, cette méthode permet de
+transformer les données catégorielles en représentations numériques tout
+en préservant les relations sous-jacentes. Les théorèmes et propriétés
+présentés dans cet article montrent la robustesse et l’efficacité de
+cette approche.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

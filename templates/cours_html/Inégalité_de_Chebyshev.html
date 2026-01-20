@@ -1,0 +1,328 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>L’inégalité de Chebyshev : Une pierre angulaire des probabilités</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">L’inégalité de Chebyshev : Une pierre angulaire des
+probabilités</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’inégalité de Chebyshev, du nom du mathématicien russe Pafnuty
+Chebyshev (1821-1894), est un résultat fondamental en théorie des
+probabilités et en statistique. Elle émerge dans le cadre de l’étude des
+distributions de probabilité, offrant une borne supérieure sur la
+probabilité qu’une variable aléatoire s’éloigne de sa moyenne. Cette
+notion est indispensable pour comprendre la concentration des mesures de
+probabilité autour de leur espérance, un concept clé dans l’analyse
+statistique et la théorie des erreurs.</p>
+<p>L’inégalité de Chebyshev trouve ses racines dans les travaux de
+Chebyshev sur la loi des grands nombres. Elle est particulièrement utile
+lorsque peu d’informations sont disponibles sur la distribution
+sous-jacente, ne nécessitant que la connaissance de l’espérance et de la
+variance. Cela en fait un outil puissant pour les applications pratiques
+où les distributions exactes sont inconnues ou difficiles à
+déterminer.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire l’inégalité de Chebyshev, considérons une variable
+aléatoire <span class="math inline">\(X\)</span> avec une espérance
+<span class="math inline">\(E[X]\)</span> et une variance <span
+class="math inline">\(\text{Var}(X)\)</span>. Nous cherchons à borner la
+probabilité que <span class="math inline">\(X\)</span> s’éloigne de son
+espérance d’une quantité donnée.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+réelle avec une espérance finie <span class="math inline">\(E[X] =
+\mu\)</span> et une variance finie <span
+class="math inline">\(\text{Var}(X) = \sigma^2\)</span>. Alors, pour
+tout <span class="math inline">\(k &gt; 0\)</span>, nous avons : <span
+class="math display">\[P(|X - \mu| \geq k\sigma) \leq
+\frac{1}{k^2}.\]</span> De manière équivalente, pour tout <span
+class="math inline">\(\epsilon &gt; 0\)</span>, nous pouvons écrire :
+<span class="math display">\[P(|X - \mu| \geq \epsilon) \leq
+\frac{\sigma^2}{\epsilon^2}.\]</span></p>
+</div>
+<p>Cette inégalité nous dit que la probabilité que <span
+class="math inline">\(X\)</span> s’éloigne de son espérance d’au moins
+<span class="math inline">\(k\)</span> écarts-types est au plus <span
+class="math inline">\(\frac{1}{k^2}\)</span>. C’est une borne
+universelle qui ne dépend que de la variance et de l’écart par rapport à
+la moyenne.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>L’inégalité de Chebyshev est souvent utilisée pour démontrer d’autres
+résultats importants en probabilité. Voici une formulation plus générale
+de l’inégalité, suivie d’une preuve détaillée.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+réelle avec une espérance finie <span class="math inline">\(E[X] =
+\mu\)</span> et une variance finie <span
+class="math inline">\(\text{Var}(X) = \sigma^2\)</span>. Alors, pour
+toute fonction <span class="math inline">\(g : \mathbb{R}^+ \rightarrow
+\mathbb{R}^+\)</span> croissante, nous avons : <span
+class="math display">\[P(g(|X - \mu|) \geq g(k\sigma)) \leq
+\frac{1}{k^2}.\]</span></p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver l’inégalité de Chebyshev, nous utilisons la définition
+de la variance et les propriétés des moments.</p>
+<div class="proof">
+<p><em>Proof.</em> Soit <span class="math inline">\(X\)</span> une
+variable aléatoire avec <span class="math inline">\(E[X] = \mu\)</span>
+et <span class="math inline">\(\text{Var}(X) = \sigma^2\)</span>.
+Considérons la variance de <span class="math inline">\(X\)</span> :
+<span class="math display">\[\sigma^2 = \text{Var}(X) = E[(X -
+\mu)^2].\]</span> Par définition de l’espérance, nous avons : <span
+class="math display">\[\sigma^2 = \int_{-\infty}^{\infty} (x - \mu)^2
+dF(x),\]</span> où <span class="math inline">\(F\)</span> est la
+fonction de répartition de <span class="math inline">\(X\)</span>.</p>
+<p>Nous voulons borner <span class="math inline">\(P(|X - \mu| \geq
+k\sigma)\)</span>. Utilisons l’inégalité de Markov, qui stipule que pour
+toute variable aléatoire non négative <span
+class="math inline">\(Y\)</span> et tout <span class="math inline">\(a
+&gt; 0\)</span>, nous avons : <span class="math display">\[P(Y \geq a)
+\leq \frac{E[Y]}{a}.\]</span> Appliquons cette inégalité à <span
+class="math inline">\(Y = (X - \mu)^2\)</span> et <span
+class="math inline">\(a = k^2\sigma^2\)</span> : <span
+class="math display">\[P((X - \mu)^2 \geq k^2\sigma^2) \leq \frac{E[(X -
+\mu)^2]}{k^2\sigma^2} = \frac{\sigma^2}{k^2\sigma^2} =
+\frac{1}{k^2}.\]</span> Puisque <span class="math inline">\((X - \mu)^2
+\geq k^2\sigma^2\)</span> est équivalent à <span
+class="math inline">\(|X - \mu| \geq k\sigma\)</span>, nous obtenons :
+<span class="math display">\[P(|X - \mu| \geq k\sigma) \leq
+\frac{1}{k^2}.\]</span> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>L’inégalité de Chebyshev possède plusieurs propriétés intéressantes
+et corollaires qui en découlent.</p>
+<ul>
+<li><p><strong>Corollaire de l’inégalité de Chebyshev</strong> : Pour
+toute variable aléatoire <span class="math inline">\(X\)</span> avec une
+espérance finie et une variance finie, nous avons : <span
+class="math display">\[P(|X - \mu| &lt; k\sigma) &gt; 1 -
+\frac{1}{k^2}.\]</span> Ce corollaire montre que la probabilité que
+<span class="math inline">\(X\)</span> soit dans l’intervalle <span
+class="math inline">\([\mu - k\sigma, \mu + k\sigma]\)</span> est au
+moins <span class="math inline">\(1 - \frac{1}{k^2}\)</span>.</p></li>
+<li><p><strong>Application à la loi des grands nombres</strong> :
+L’inégalité de Chebyshev est souvent utilisée pour démontrer la loi
+faible des grands nombres. En effet, elle montre que les moyennes
+empiriques convergent en probabilité vers l’espérance
+théorique.</p></li>
+<li><p><strong>Extension aux vecteurs aléatoires</strong> : L’inégalité
+de Chebyshev peut être généralisée à des vecteurs aléatoires. Pour un
+vecteur aléatoire <span class="math inline">\(\mathbf{X} = (X_1, X_2,
+\ldots, X_n)\)</span> avec une espérance <span
+class="math inline">\(E[\mathbf{X}] = \boldsymbol{\mu}\)</span> et une
+matrice de covariance <span class="math inline">\(\Sigma\)</span>, nous
+avons : <span class="math display">\[P(|\mathbf{X} - \boldsymbol{\mu}|_2
+\geq k\sqrt{\text{tr}(\Sigma)}) \leq \frac{1}{k^2},\]</span> où <span
+class="math inline">\(|\cdot|_2\)</span> désigne la norme
+euclidienne.</p></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>L’inégalité de Chebyshev est un résultat puissant et élégant qui
+trouve des applications dans de nombreux domaines des mathématiques et
+des sciences. Elle fournit une borne universelle sur la probabilité
+qu’une variable aléatoire s’éloigne de son espérance, ce qui est crucial
+pour l’analyse statistique et la théorie des probabilités. En comprenant
+cette inégalité, nous pouvons mieux appréhender la concentration des
+mesures de probabilité et les propriétés asymptotiques des
+estimateurs.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

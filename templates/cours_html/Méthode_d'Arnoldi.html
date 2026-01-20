@@ -1,0 +1,326 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode d’Arnoldi : Une Approche Puissante pour les Problèmes de Grande Dimension</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode d’Arnoldi : Une Approche Puissante pour les
+Problèmes de Grande Dimension</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La méthode d’Arnoldi, développée par le mathématicien allemand Jürgen
+Arnoldi dans les années 1950, est une technique numérique puissante pour
+résoudre des problèmes de grande dimension. Elle trouve ses racines dans
+la nécessité de traiter efficacement des systèmes linéaires et des
+problèmes d’algèbre linéaire où les matrices impliquées sont de grande
+taille ou même creuses. Cette méthode est particulièrement utile dans le
+contexte des problèmes d’analyse numérique et de calcul scientifique, où
+la résolution directe peut être coûteuse ou même impossible en raison
+des contraintes computationnelles.</p>
+<p>L’émergence de la méthode d’Arnoldi est motivée par le besoin de
+méthodes itératives qui peuvent approcher les valeurs propres et les
+vecteurs propres d’une matrice, sans nécessiter la diagonalisation
+complète de celle-ci. Ces approches sont indispensables dans des
+domaines tels que la dynamique des fluides, la mécanique quantique, et
+l’ingénierie des structures, où les matrices de grande dimension sont
+courantes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la méthode d’Arnoldi, il est essentiel de définir
+quelques concepts clés. Considérons une matrice <span
+class="math inline">\(A \in \mathbb{C}^{n \times n}\)</span> et un
+vecteur initial <span class="math inline">\(b \in \mathbb{C}^n\)</span>.
+L’objectif est de construire une base orthonormale <span
+class="math inline">\(V_k = \{v_1, v_2, \dots, v_k\}\)</span> de
+l’espace de Krylov <span class="math inline">\(K_k(A, b) =
+\text{span}\{b, Ab, A^2b, \dots, A^{k-1}b\}\)</span>.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(A\)</span> une matrice carrée et
+<span class="math inline">\(b\)</span> un vecteur non nul. L’espace de
+Krylov d’ordre <span class="math inline">\(k\)</span> associé à <span
+class="math inline">\(A\)</span> et <span
+class="math inline">\(b\)</span> est défini comme : <span
+class="math display">\[K_k(A, b) = \text{span}\{b, Ab, A^2b, \dots,
+A^{k-1}b\}\]</span></p>
+</div>
+<p>La méthode d’Arnoldi consiste à générer une séquence de vecteurs
+<span class="math inline">\(v_1, v_2, \dots, v_k\)</span> qui forment
+une base orthonormale de <span class="math inline">\(K_k(A, b)\)</span>.
+Cette séquence est construite de manière itérative en utilisant un
+processus d’orthogonalisation.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un des théorèmes fondamentaux liés à la méthode d’Arnoldi est le
+suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(A \in \mathbb{C}^{n \times
+n}\)</span> et <span class="math inline">\(b \in \mathbb{C}^n\)</span>
+un vecteur non nul. Alors, il existe une matrice <span
+class="math inline">\(H_k \in \mathbb{C}^{k \times k}\)</span> et une
+matrice <span class="math inline">\(V_k \in \mathbb{C}^{n \times
+k}\)</span> avec des colonnes orthonormales telles que : <span
+class="math display">\[A V_k = V_{k+1} H_k\]</span> où <span
+class="math inline">\(V_{k+1}\)</span> est obtenue en ajoutant une
+colonne à <span class="math inline">\(V_k\)</span>.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la méthode d’Arnoldi, nous procédons par
+induction sur <span class="math inline">\(k\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Base de l’induction :</strong> Pour <span
+class="math inline">\(k = 1\)</span>, nous avons <span
+class="math inline">\(V_1 = \frac{b}{\|b\|}\)</span> et <span
+class="math inline">\(H_1 = (v_1^*, A v_1)\)</span>. Il est clair que
+<span class="math inline">\(A V_1 = V_2 H_1\)</span>, où <span
+class="math inline">\(V_2\)</span> est obtenue en ajoutant une colonne à
+<span class="math inline">\(V_1\)</span>.</p>
+<p><strong>Hypothèse d’induction :</strong> Supposons que le théorème
+est vrai pour <span class="math inline">\(k = m\)</span>, c’est-à-dire
+qu’il existe <span class="math inline">\(V_m\)</span> et <span
+class="math inline">\(H_m\)</span> tels que <span
+class="math inline">\(A V_m = V_{m+1} H_m\)</span>.</p>
+<p><strong>Pas d’induction :</strong> Pour <span class="math inline">\(k
+= m + 1\)</span>, nous devons montrer qu’il existe <span
+class="math inline">\(V_{m+1}\)</span> et <span
+class="math inline">\(H_{m+1}\)</span> tels que <span
+class="math inline">\(A V_{m+1} = V_{m+2} H_{m+1}\)</span>. Nous
+définissons <span class="math inline">\(v_{m+1}\)</span> comme le
+vecteur orthogonal à <span class="math inline">\(V_m\)</span> dans
+l’espace de Krylov <span class="math inline">\(K_{m+1}(A, b)\)</span>.
+Ensuite, nous définissons <span class="math inline">\(H_{m+1}\)</span>
+en ajoutant une nouvelle ligne et une nouvelle colonne à <span
+class="math inline">\(H_m\)</span>.</p>
+<p>Par construction, nous avons : <span class="math display">\[A V_{m+1}
+= A [V_m, v_{m+1}] = [A V_m, A v_{m+1}] = [V_{m+1} H_m, V_{m+2} h_{m+1}]
+= V_{m+2} H_{m+1}\]</span> où <span
+class="math inline">\(h_{m+1}\)</span> est le dernier vecteur colonne de
+<span class="math inline">\(H_{m+1}\)</span>.</p>
+<p>Ainsi, par induction, le théorème est vrai pour tout <span
+class="math inline">\(k \geq 1\)</span>. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>La méthode d’Arnoldi possède plusieurs propriétés intéressantes qui
+en font un outil puissant pour l’analyse numérique.</p>
+<ol>
+<li><p><strong>Orthonormalité :</strong> Les vecteurs <span
+class="math inline">\(v_1, v_2, \dots, v_k\)</span> forment une base
+orthonormale de l’espace de Krylov <span class="math inline">\(K_k(A,
+b)\)</span>. Cela signifie que : <span class="math display">\[v_i^* v_j
+= \delta_{ij}\]</span> pour tout <span class="math inline">\(i, j \leq
+k\)</span>, où <span class="math inline">\(\delta_{ij}\)</span> est le
+symbole de Kronecker.</p></li>
+<li><p><strong>Projection :</strong> La méthode d’Arnoldi peut être vue
+comme une projection de la matrice <span
+class="math inline">\(A\)</span> sur l’espace de Krylov. Cette
+projection permet d’approcher les valeurs propres et les vecteurs
+propres de <span class="math inline">\(A\)</span> de manière
+efficace.</p></li>
+<li><p><strong>Stabilité Numérique :</strong> La méthode d’Arnoldi est
+relativement stable numériquement, ce qui la rend adaptée pour des
+applications pratiques où les erreurs d’arrondi peuvent être
+significatives.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La méthode d’Arnoldi est une technique puissante et polyvalente pour
+résoudre des problèmes de grande dimension en algèbre linéaire
+numérique. Son utilisation dans divers domaines scientifiques et
+ingénierie témoigne de son importance et de son efficacité. Les
+propriétés et les théorèmes associés à cette méthode en font un outil
+indispensable pour les chercheurs et les praticiens travaillant avec des
+matrices de grande taille.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

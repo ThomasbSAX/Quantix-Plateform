@@ -1,0 +1,333 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Séries de Puiseux</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Séries de Puiseux</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Les séries de Puiseux, généralisation des séries entières, émergent
+naturellement dans l’étude locale des fonctions analytiques complexes.
+Elles permettent de capturer les singularités des fonctions avec une
+précision inégalée, offrant ainsi un outil puissant pour l’analyse
+locale. Leur importance réside dans leur capacité à représenter des
+fonctions autour d’une singularité, même lorsque les séries entières
+échouent.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Nous cherchons à représenter une fonction complexe autour d’une
+singularité de manière plus générale que les séries entières. Les séries
+de Puiseux permettent d’inclure des exposants non entiers, ce qui est
+crucial pour capturer des comportements plus complexes.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\alpha \in \mathbb{C}\)</span> et
+soit <span class="math inline">\(r &gt; 0\)</span>. Une série de Puiseux
+centrée en <span class="math inline">\(\alpha\)</span> avec rayon de
+convergence <span class="math inline">\(r\)</span> est une série
+formelle de la forme <span
+class="math display">\[\sum_{k=-\infty}^{\infty} a_k (z -
+\alpha)^{k/n},\]</span> où <span class="math inline">\(n \in
+\mathbb{N}^*\)</span>, <span class="math inline">\(a_k \in
+\mathbb{C}\)</span> pour tout <span class="math inline">\(k \in
+\mathbb{Z}\)</span>, et où la série converge absolument pour tout <span
+class="math inline">\(z\)</span> tel que <span class="math inline">\(|z
+- \alpha| &lt; r^n\)</span>.</p>
+</div>
+<p>De manière équivalente, une série de Puiseux peut être écrite sous la
+forme <span class="math display">\[\sum_{k=-\infty}^{\infty} a_k
+z^{k/n},\]</span> où la série converge absolument pour tout <span
+class="math inline">\(z\)</span> tel que <span class="math inline">\(|z|
+&lt; r^n\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Nous cherchons à établir des conditions sous lesquelles une série de
+Puiseux représente une fonction analytique. Le théorème suivant, dû à
+Puiseux, est fondamental.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(f(z)\)</span> une fonction
+analytique dans un voisinage de l’origine, sauf éventuellement à
+l’origine elle-même. Alors, il existe une série de Puiseux <span
+class="math display">\[\sum_{k=-\infty}^{\infty} a_k z^{k/n},\]</span>
+qui représente <span class="math inline">\(f(z)\)</span> dans un
+voisinage de l’origine.</p>
+</div>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour démontrer le théorème de Puiseux, nous utilisons des techniques
+d’analyse complexe et la théorie des singularités.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons une fonction <span
+class="math inline">\(f(z)\)</span> analytique dans un voisinage de
+l’origine, sauf éventuellement à l’origine elle-même. Nous cherchons à
+représenter <span class="math inline">\(f(z)\)</span> par une série de
+Puiseux.</p>
+<p>1. **Définition du rayon de convergence**: Soit <span
+class="math inline">\(r &gt; 0\)</span> le plus petit rayon tel que
+<span class="math inline">\(f(z)\)</span> est analytique pour <span
+class="math inline">\(0 &lt; |z| &lt; r\)</span>.</p>
+<p>2. **Développement en série de Laurent**: Dans l’anneau <span
+class="math inline">\(0 &lt; |z| &lt; r\)</span>, la fonction <span
+class="math inline">\(f(z)\)</span> admet un développement en série de
+Laurent <span class="math display">\[f(z) = \sum_{k=-\infty}^{\infty}
+a_k z^k.\]</span></p>
+<p>3. **Extension aux exposants non entiers**: Nous devons étendre ce
+développement pour inclure des exposants non entiers. Pour cela, nous
+considérons une transformation de variable <span class="math inline">\(z
+\mapsto z^n\)</span> pour un certain <span class="math inline">\(n \in
+\mathbb{N}^*\)</span>.</p>
+<p>4. **Convergence de la série**: La série obtenue <span
+class="math display">\[\sum_{k=-\infty}^{\infty} a_k z^{k/n},\]</span>
+converge absolument pour tout <span class="math inline">\(z\)</span> tel
+que <span class="math inline">\(|z| &lt; r^n\)</span>.</p>
+<p>Ainsi, nous avons construit une série de Puiseux qui représente <span
+class="math inline">\(f(z)\)</span> dans un voisinage de
+l’origine. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons quelques propriétés importantes des séries de
+Puiseux.</p>
+<ul>
+<li><p>**Propriété de convergence**: Une série de Puiseux converge
+absolument dans un voisinage de l’origine si et seulement si les
+coefficients <span class="math inline">\(a_k\)</span> satisfont une
+condition de décroissance appropriée.</p>
+<div class="proof">
+<p><em>Proof.</em> Considérons la série <span
+class="math display">\[\sum_{k=-\infty}^{\infty} a_k z^{k/n}.\]</span>
+La convergence absolue de cette série pour <span
+class="math inline">\(|z| &lt; r^n\)</span> est équivalente à la
+condition <span class="math display">\[\sum_{k=-\infty}^{\infty} |a_k|
+r^{k/n} &lt; \infty.\]</span> Cette condition est satisfaite si les
+coefficients <span class="math inline">\(a_k\)</span> décroissent
+suffisamment rapidement. ◻</p>
+</div></li>
+<li><p>**Unicité de la représentation**: La représentation d’une
+fonction analytique par une série de Puiseux est unique.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que deux séries de Puiseux <span
+class="math display">\[\sum_{k=-\infty}^{\infty} a_k z^{k/n}\]</span> et
+<span class="math display">\[\sum_{k=-\infty}^{\infty} b_k
+z^{k/m}\]</span> représentent la même fonction analytique. Alors, en
+utilisant des techniques d’analyse complexe, on peut montrer que <span
+class="math inline">\(a_k = b_k\)</span> pour tout <span
+class="math inline">\(k\)</span>, et que <span class="math inline">\(n =
+m\)</span>. ◻</p>
+</div></li>
+<li><p>**Opérations algébriques**: Les séries de Puiseux peuvent être
+additionnées, multipliées et composées entre elles.</p>
+<div class="proof">
+<p><em>Proof.</em> Soient <span class="math display">\[f(z) =
+\sum_{k=-\infty}^{\infty} a_k z^{k/n}\]</span> et <span
+class="math display">\[g(z) = \sum_{l=-\infty}^{\infty} b_l
+z^{l/m}.\]</span> La somme <span class="math inline">\(f(z) +
+g(z)\)</span> est une série de Puiseux avec des coefficients appropriés.
+De même, le produit <span class="math inline">\(f(z) \cdot g(z)\)</span>
+est une série de Puiseux obtenue par convolution des coefficients. La
+composition <span class="math inline">\(f(g(z))\)</span> est également
+une série de Puiseux, sous certaines conditions sur les rayon de
+convergence. ◻</p>
+</div></li>
+</ul>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Les séries de Puiseux sont un outil puissant pour l’étude des
+fonctions analytiques complexes autour d’une singularité. Elles
+généralisent les séries entières et permettent de capturer des
+comportements plus complexes. Leur importance réside dans leur capacité
+à représenter des fonctions analytiques avec une précision inégalée,
+ouvrant ainsi de nouvelles perspectives en analyse complexe.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

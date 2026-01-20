@@ -1,0 +1,356 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Variance de Poisson : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Variance de Poisson : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La variance de Poisson émerge dans le cadre des processus
+stochastiques, plus précisément en tant que propriété fondamentale de la
+distribution de Poisson. Cette distribution, introduite par Siméon Denis
+Poisson au début du XIXème siècle, modélise le nombre d’événements se
+produisant dans un intervalle de temps ou d’espace fixe, à condition que
+ces événements surviennent avec une fréquence connue et indépendamment
+les uns des autres.</p>
+<p>La variance de Poisson est un concept clé pour comprendre la
+dispersion des événements dans divers domaines, tels que l’analyse des
+files d’attente, les télécommunications et même la biologie. Elle permet
+de quantifier l’écart des observations par rapport à leur moyenne,
+offrant ainsi une mesure de la variabilité inhérente aux phénomènes
+modélisés par la loi de Poisson.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour introduire la variance de Poisson, commençons par rappeler ce
+que nous cherchons à mesurer. Imaginons un processus où des événements
+se produisent de manière aléatoire et indépendante, avec une intensité
+moyenne connue. Nous voulons quantifier à quel point le nombre réel
+d’événements observé peut s’écarter de cette moyenne.</p>
+<p>La variance est une mesure de la dispersion des valeurs d’une
+variable aléatoire autour de sa moyenne. Pour une variable aléatoire
+<span class="math inline">\(X\)</span> suivant une loi de Poisson, nous
+cherchons à déterminer cette dispersion.</p>
+<div class="definition">
+<p>Soit <span class="math inline">\(\lambda &gt; 0\)</span> un paramètre
+réel. Une variable aléatoire <span class="math inline">\(X\)</span> suit
+une loi de Poisson de paramètre <span
+class="math inline">\(\lambda\)</span>, notée <span
+class="math inline">\(X \sim \mathcal{P}(\lambda)\)</span>, si sa
+fonction de masse est donnée par : <span class="math display">\[P(X = k)
+= \frac{\lambda^k e^{-\lambda}}{k!}, \quad \text{pour tout entier } k
+\geq 0.\]</span></p>
+</div>
+<div class="definition">
+<p>Soit <span class="math inline">\(X\)</span> une variable aléatoire
+suivant une loi de Poisson de paramètre <span
+class="math inline">\(\lambda\)</span>. La variance de <span
+class="math inline">\(X\)</span> est définie comme : <span
+class="math display">\[\text{Var}(X) = E[(X - E[X])^2],\]</span> où
+<span class="math inline">\(E[X]\)</span> désigne l’espérance de <span
+class="math inline">\(X\)</span>.</p>
+</div>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Nous allons maintenant établir le théorème fondamental concernant la
+variance d’une variable aléatoire de Poisson.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(X \sim
+\mathcal{P}(\lambda)\)</span>. Alors, la variance de <span
+class="math inline">\(X\)</span> est égale à son espérance : <span
+class="math display">\[\text{Var}(X) = \lambda.\]</span></p>
+</div>
+<h1 id="preuves">Preuves</h1>
+<p>Pour prouver ce théorème, nous allons d’abord calculer l’espérance de
+<span class="math inline">\(X\)</span>, puis utiliser cette espérance
+pour déterminer la variance.</p>
+<div class="proof">
+<p><em>Proof.</em> Calculons l’espérance de <span
+class="math inline">\(X\)</span>. Par définition, nous avons : <span
+class="math display">\[E[X] = \sum_{k=0}^{\infty} k P(X = k) =
+\sum_{k=0}^{\infty} k \frac{\lambda^k e^{-\lambda}}{k!}.\]</span> En
+simplifiant, nous obtenons : <span class="math display">\[E[X] = \lambda
+e^{-\lambda} \sum_{k=1}^{\infty} \frac{\lambda^{k-1}}{(k-1)!}.\]</span>
+En posant <span class="math inline">\(j = k - 1\)</span>, la somme
+devient : <span class="math display">\[\sum_{j=0}^{\infty}
+\frac{\lambda^j}{j!} = e^{\lambda}.\]</span> Ainsi, l’espérance de <span
+class="math inline">\(X\)</span> est : <span class="math display">\[E[X]
+= \lambda e^{-\lambda} e^{\lambda} = \lambda.\]</span></p>
+<p>Maintenant, calculons la variance de <span
+class="math inline">\(X\)</span>. Par définition, nous avons : <span
+class="math display">\[\text{Var}(X) = E[X^2] - (E[X])^2.\]</span>
+Calculons <span class="math inline">\(E[X^2]\)</span> : <span
+class="math display">\[E[X^2] = \sum_{k=0}^{\infty} k^2 P(X = k) =
+\sum_{k=0}^{\infty} k^2 \frac{\lambda^k e^{-\lambda}}{k!}.\]</span> En
+séparant les termes, nous obtenons : <span class="math display">\[E[X^2]
+= \lambda e^{-\lambda} \sum_{k=1}^{\infty} k
+\frac{\lambda^{k-1}}{(k-1)!}.\]</span> En utilisant le fait que <span
+class="math inline">\(k \frac{\lambda^{k-1}}{(k-1)!} = \sum_{j=0}^{k-1}
+\frac{\lambda^j}{j!}\)</span>, nous avons : <span
+class="math display">\[E[X^2] = \lambda e^{-\lambda} \sum_{k=1}^{\infty}
+\sum_{j=0}^{k-1} \frac{\lambda^j}{j!}.\]</span> En inversant les sommes,
+nous obtenons : <span class="math display">\[E[X^2] = \lambda
+e^{-\lambda} \sum_{j=0}^{\infty} \frac{\lambda^j}{j!}
+\sum_{k=j+1}^{\infty} 1.\]</span> La somme intérieure est une série
+géométrique convergente : <span
+class="math display">\[\sum_{k=j+1}^{\infty} 1 = \infty.\]</span>
+Cependant, cette approche semble incorrecte. Reprenons le calcul de
+<span class="math inline">\(E[X^2]\)</span> en utilisant une autre
+méthode.</p>
+<p>Nous savons que : <span class="math display">\[E[X(X-1)] =
+\sum_{k=0}^{\infty} k(k-1) P(X = k) = \lambda^2.\]</span> En
+développant, nous obtenons : <span class="math display">\[E[X^2] - E[X]
+= \lambda^2.\]</span> Ainsi, nous avons : <span
+class="math display">\[E[X^2] = \lambda^2 + E[X] = \lambda^2 +
+\lambda.\]</span></p>
+<p>Enfin, la variance de <span class="math inline">\(X\)</span> est :
+<span class="math display">\[\text{Var}(X) = E[X^2] - (E[X])^2 =
+\lambda^2 + \lambda - \lambda^2 = \lambda.\]</span> ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Nous allons maintenant explorer quelques propriétés et corollaires
+découlant du théorème de la variance de Poisson.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(X \sim
+\mathcal{P}(\lambda)\)</span>. Les propriétés suivantes sont vérifiées
+:</p>
+<ol>
+<li><p>La variance de <span class="math inline">\(X\)</span> est égale à
+son espérance : <span class="math inline">\(\text{Var}(X) =
+\lambda\)</span>.</p></li>
+<li><p>Pour tout <span class="math inline">\(n \in \mathbb{N}\)</span>,
+la somme de <span class="math inline">\(n\)</span> variables aléatoires
+indépendantes suivant une loi de Poisson de paramètre <span
+class="math inline">\(\lambda_i\)</span> suit une loi de Poisson de
+paramètre <span class="math inline">\(\sum_{i=1}^n \lambda_i\)</span>,
+et sa variance est la somme des variances : <span
+class="math inline">\(\text{Var}\left(\sum_{i=1}^n X_i\right) =
+\sum_{i=1}^n \lambda_i\)</span>.</p></li>
+<li><p>La variance de <span class="math inline">\(X\)</span> est
+toujours positive : <span class="math inline">\(\text{Var}(X) &gt;
+0\)</span> pour tout <span class="math inline">\(\lambda &gt;
+0\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> La propriété (i) est une conséquence directe du
+théorème de la variance de Poisson.</p>
+<p>Pour la propriété (ii), soit <span class="math inline">\(X_1, X_2,
+\ldots, X_n\)</span> des variables aléatoires indépendantes suivant des
+lois de Poisson de paramètres <span class="math inline">\(\lambda_1,
+\lambda_2, \ldots, \lambda_n\)</span> respectivement. La somme <span
+class="math inline">\(S = \sum_{i=1}^n X_i\)</span> suit une loi de
+Poisson de paramètre <span class="math inline">\(\lambda = \sum_{i=1}^n
+\lambda_i\)</span>. Par le théorème de la variance de Poisson, nous
+avons : <span class="math display">\[\text{Var}(S) = \lambda =
+\sum_{i=1}^n \lambda_i.\]</span></p>
+<p>La propriété (iii) découle du fait que <span
+class="math inline">\(\lambda &gt; 0\)</span>, et donc <span
+class="math inline">\(\text{Var}(X) = \lambda &gt; 0\)</span>. ◻</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La variance de Poisson est un concept fondamental en théorie des
+probabilités et en statistique. Elle permet de quantifier la dispersion
+des événements dans un processus de Poisson, offrant ainsi une mesure
+précise de la variabilité inhérente à ces phénomènes. Les propriétés et
+théorèmes associés à la variance de Poisson trouvent des applications
+pratiques dans divers domaines, tels que l’analyse des files d’attente
+et les télécommunications.</p>
+<p>En conclusion, la variance de Poisson est non seulement un outil
+mathématique puissant, mais aussi une clé pour comprendre et modéliser
+les phénomènes aléatoires dans le monde réel.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

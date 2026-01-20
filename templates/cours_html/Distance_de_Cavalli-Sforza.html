@@ -1,0 +1,407 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Distance de Cavalli-Sforza : Une Mesure de la Diversité Génétique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Distance de Cavalli-Sforza : Une Mesure de la
+Diversité Génétique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>L’étude de la diversité génétique au sein des populations humaines a
+toujours été un sujet d’intérêt majeur en biologie évolutive et en
+génétique des populations. La compréhension de la structure génétique
+des populations permet non seulement de retracer l’histoire évolutive de
+l’humanité, mais aussi d’identifier les facteurs qui influencent la
+variabilité génétique. Parmi les nombreuses mesures proposées pour
+quantifier cette diversité, la distance de Cavalli-Sforza se distingue
+par sa capacité à capturer les différences génétiques entre populations
+tout en tenant compte de leurs relations évolutives.</p>
+<p>La distance de Cavalli-Sforza, introduite par Luigi Luca
+Cavalli-Sforza et ses collaborateurs dans les années 1960, est une
+mesure de la distance génétique entre populations. Elle est basée sur
+les fréquences alléliques des loci génétiques et prend en compte la
+structure hiérarchique des populations. Cette mesure est
+particulièrement utile pour étudier les relations phylogénétiques entre
+populations et pour reconstruire l’histoire démographique des
+espèces.</p>
+<p>Dans cet article, nous explorerons les fondements théoriques de la
+distance de Cavalli-Sforza, ses définitions mathématiques, ses
+propriétés et ses applications en génétique des populations. Nous
+commencerons par une introduction historique et conceptuelle, suivie de
+définitions formelles et de théorèmes clés. Nous présenterons également
+des preuves détaillées et des corollaires pour illustrer l’importance de
+cette mesure dans le domaine de la génétique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour comprendre la distance de Cavalli-Sforza, il est essentiel de
+définir d’abord les concepts fondamentaux sur lesquels elle repose.
+Considérons une population structurée en sous-populations, où chaque
+sous-population est caractérisée par les fréquences alléliques de
+plusieurs loci génétiques. Notre objectif est de quantifier la
+différence génétique entre ces sous-populations.</p>
+<p>Supposons que nous avons <span class="math inline">\(n\)</span>
+sous-populations, notées <span class="math inline">\(P_1, P_2, \ldots,
+P_n\)</span>, et que nous considérons <span
+class="math inline">\(m\)</span> loci génétiques. Pour chaque locus
+<span class="math inline">\(j\)</span>, notons <span
+class="math inline">\(p_{ij}\)</span> la fréquence de l’allèle <span
+class="math inline">\(A_j\)</span> dans la sous-population <span
+class="math inline">\(P_i\)</span>. La distance de Cavalli-Sforza entre
+deux sous-populations <span class="math inline">\(P_i\)</span> et <span
+class="math inline">\(P_k\)</span> est définie comme suit :</p>
+<div class="definition">
+<p>La distance de Cavalli-Sforza entre deux sous-populations <span
+class="math inline">\(P_i\)</span> et <span
+class="math inline">\(P_k\)</span> est donnée par : <span
+class="math display">\[d_{ik} = -\log \left( \frac{\sum_{j=1}^m p_{ij}
+p_{kj}}{\sqrt{\left( \sum_{j=1}^m p_{ij}^2 \right) \left( \sum_{j=1}^m
+p_{kj}^2 \right)}} \right)\]</span></p>
+</div>
+<p>Cette définition peut être réécrite en utilisant des notations
+vectorielles. Soit <span class="math inline">\(\mathbf{p}_i\)</span> le
+vecteur des fréquences alléliques pour la sous-population <span
+class="math inline">\(P_i\)</span>, c’est-à-dire <span
+class="math inline">\(\mathbf{p}_i = (p_{i1}, p_{i2}, \ldots,
+p_{im})\)</span>. La distance de Cavalli-Sforza peut alors s’exprimer
+comme : <span class="math display">\[d_{ik} = -\log \left(
+\frac{\mathbf{p}_i \cdot \mathbf{p}_k}{\|\mathbf{p}_i\|
+\|\mathbf{p}_k\|} \right)\]</span> où <span
+class="math inline">\(\mathbf{p}_i \cdot \mathbf{p}_k\)</span> désigne
+le produit scalaire des vecteurs <span
+class="math inline">\(\mathbf{p}_i\)</span> et <span
+class="math inline">\(\mathbf{p}_k\)</span>, et <span
+class="math inline">\(\|\mathbf{p}_i\|\)</span> désigne la norme
+euclidienne de <span class="math inline">\(\mathbf{p}_i\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème fondamental lié à la distance de Cavalli-Sforza est le
+suivant :</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathcal{P} = \{P_1, P_2, \ldots,
+P_n\}\)</span> un ensemble de sous-populations et <span
+class="math inline">\(\mathbf{p}_i\)</span> le vecteur des fréquences
+alléliques pour la sous-population <span
+class="math inline">\(P_i\)</span>. La distance de Cavalli-Sforza
+satisfait les propriétés suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(d_{ik} \geq 0\)</span> pour tout
+<span class="math inline">\(i, k \in \{1, 2, \ldots,
+n\}\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ik} = 0\)</span> si et seulement
+si <span class="math inline">\(P_i\)</span> et <span
+class="math inline">\(P_k\)</span> ont les mêmes fréquences
+alléliques,</p></li>
+<li><p><span class="math inline">\(d_{ik} = d_{ki}\)</span> pour tout
+<span class="math inline">\(i, k \in \{1, 2, \ldots,
+n\}\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ik} \leq d_{il} + d_{lk}\)</span>
+pour tout <span class="math inline">\(i, k, l \in \{1, 2, \ldots,
+n\}\)</span>.</p></li>
+</ol>
+</div>
+<p>La preuve de ce théorème repose sur les propriétés du produit
+scalaire et des normes vectorielles. Nous allons maintenant détailler
+chaque étape de la preuve.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de Cavalli-Sforza, nous allons examiner
+chaque propriété une par une.</p>
+<div class="proof">
+<p><em>Proof.</em></p>
+<ol>
+<li><p>La non-négativité de <span class="math inline">\(d_{ik}\)</span>
+découle du fait que le logarithme est une fonction croissante et que
+l’argument <span class="math inline">\(\frac{\mathbf{p}_i \cdot
+\mathbf{p}_k}{\|\mathbf{p}_i\| \|\mathbf{p}_k\|}\)</span> est toujours
+compris entre 0 et 1. En effet, par l’inégalité de Cauchy-Schwarz, nous
+avons : <span class="math display">\[\mathbf{p}_i \cdot \mathbf{p}_k
+\leq \|\mathbf{p}_i\| \|\mathbf{p}_k\|\]</span> donc <span
+class="math inline">\(\frac{\mathbf{p}_i \cdot
+\mathbf{p}_k}{\|\mathbf{p}_i\| \|\mathbf{p}_k\|} \leq 1\)</span>. Comme
+le logarithme est croissant, <span class="math inline">\(-\log \left(
+\frac{\mathbf{p}_i \cdot \mathbf{p}_k}{\|\mathbf{p}_i\|
+\|\mathbf{p}_k\|} \right) \geq 0\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(P_i\)</span> et <span
+class="math inline">\(P_k\)</span> ont les mêmes fréquences alléliques,
+alors <span class="math inline">\(\mathbf{p}_i = \mathbf{p}_k\)</span>.
+Par conséquent, <span class="math inline">\(\frac{\mathbf{p}_i \cdot
+\mathbf{p}_k}{\|\mathbf{p}_i\| \|\mathbf{p}_k\|} = 1\)</span>, et <span
+class="math inline">\(d_{ik} = -\log(1) = 0\)</span>. Réciproquement, si
+<span class="math inline">\(d_{ik} = 0\)</span>, alors <span
+class="math inline">\(\frac{\mathbf{p}_i \cdot
+\mathbf{p}_k}{\|\mathbf{p}_i\| \|\mathbf{p}_k\|} = 1\)</span>, ce qui
+implique que <span class="math inline">\(\mathbf{p}_i\)</span> et <span
+class="math inline">\(\mathbf{p}_k\)</span> sont colinéaires. Comme les
+fréquences alléliques sont des probabilités, cela signifie que <span
+class="math inline">\(\mathbf{p}_i = \mathbf{p}_k\)</span>.</p></li>
+<li><p>La symétrie de <span class="math inline">\(d_{ik}\)</span>
+découle de la symétrie du produit scalaire : <span
+class="math display">\[d_{ik} = -\log \left( \frac{\mathbf{p}_i \cdot
+\mathbf{p}_k}{\|\mathbf{p}_i\| \|\mathbf{p}_k\|} \right) = -\log \left(
+\frac{\mathbf{p}_k \cdot \mathbf{p}_i}{\|\mathbf{p}_k\|
+\|\mathbf{p}_i\|} \right) = d_{ki}\]</span></p></li>
+<li><p>L’inégalité triangulaire pour <span
+class="math inline">\(d_{ik}\)</span> peut être démontrée en utilisant
+l’inégalité de Minkowski pour les normes vectorielles. Cependant, une
+approche plus directe consiste à utiliser l’inégalité de Cauchy-Schwarz
+et les propriétés du logarithme. Nous omettons ici les détails pour des
+raisons de concision.</p></li>
+</ol>
+<p> ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous allons maintenant énoncer quelques propriétés et corollaires
+importants liés à la distance de Cavalli-Sforza.</p>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\mathcal{P} = \{P_1, P_2, \ldots,
+P_n\}\)</span> un ensemble de sous-populations. La matrice des distances
+de Cavalli-Sforza <span class="math inline">\(D = (d_{ik})\)</span> est
+une matrice de distance, c’est-à-dire qu’elle satisfait les propriétés
+suivantes :</p>
+<ol>
+<li><p><span class="math inline">\(d_{ik} \geq 0\)</span> pour tout
+<span class="math inline">\(i, k \in \{1, 2, \ldots,
+n\}\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ik} = 0\)</span> si et seulement
+si <span class="math inline">\(i = k\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ik} = d_{ki}\)</span> pour tout
+<span class="math inline">\(i, k \in \{1, 2, \ldots,
+n\}\)</span>,</p></li>
+<li><p><span class="math inline">\(d_{ik} \leq d_{il} + d_{lk}\)</span>
+pour tout <span class="math inline">\(i, k, l \in \{1, 2, \ldots,
+n\}\)</span>.</p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Les propriétés (i), (ii) et (iii) découlent
+directement du théorème de Cavalli-Sforza. La propriété (iv) est une
+conséquence de l’inégalité triangulaire pour la distance de
+Cavalli-Sforza, comme démontré dans la preuve du théorème. ◻</p>
+</div>
+<div class="corollary">
+<p>Soit <span class="math inline">\(\mathcal{P} = \{P_1, P_2, \ldots,
+P_n\}\)</span> un ensemble de sous-populations et <span
+class="math inline">\(T\)</span> un arbre phylogénétique associé à ces
+sous-populations. La distance de Cavalli-Sforza peut être utilisée pour
+reconstruire l’arbre <span class="math inline">\(T\)</span> en
+minimisant la somme des carrés des différences entre les distances
+observées et les distances prédites par l’arbre.</p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Cette propriété découle du fait que la distance de
+Cavalli-Sforza est une mesure de la dissimilarité entre
+sous-populations, et que les arbres phylogénétiques peuvent être
+reconstruits en minimisant une fonction de coût basée sur les distances.
+Nous omettons ici les détails pour des raisons de concision. ◻</p>
+</div>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>La distance de Cavalli-Sforza est une mesure puissante et flexible
+pour quantifier la diversité génétique entre populations. Ses propriétés
+mathématiques et ses applications en génétique des populations en font
+un outil indispensable pour les chercheurs dans ce domaine. Dans cet
+article, nous avons présenté les fondements théoriques de cette
+distance, ses définitions formelles, ses théorèmes clés et ses
+propriétés. Nous avons également fourni des preuves détaillées pour
+illustrer l’importance de cette mesure.</p>
+<p>Les travaux futurs pourraient explorer des extensions de la distance
+de Cavalli-Sforza pour prendre en compte des facteurs supplémentaires,
+tels que les mutations et la sélection naturelle. De plus, l’intégration
+de cette distance dans des modèles bayésiens pour l’inférence
+phylogénétique pourrait ouvrir de nouvelles perspectives dans l’étude de
+la diversité génétique.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

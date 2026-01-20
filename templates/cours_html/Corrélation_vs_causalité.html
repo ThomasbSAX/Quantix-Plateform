@@ -1,0 +1,362 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Corrélation vs Causalité : Une Exploration Mathématique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Corrélation vs Causalité : Une Exploration
+Mathématique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La distinction entre corrélation et causalité est un pilier
+fondamental de l’analyse statistique et scientifique. Historiquement,
+cette distinction émerge avec les travaux pionniers de Karl Pearson au
+XIXe siècle, qui formalise la notion de corrélation. Cependant, la
+confusion entre ces deux concepts persiste, conduisant à des
+interprétations erronées dans de nombreux domaines, allant de l’économie
+à la médecine.</p>
+<p>Pourquoi cette distinction est-elle cruciale ? Parce que corrélation
+ne signifie pas causalité. Deux variables peuvent être fortement
+corrélées sans qu’il y ait de lien causal entre elles. Par exemple, la
+consommation de glace et les noyades augmentent toutes deux en été, mais
+cela ne signifie pas que la consommation de glace cause les noyades.</p>
+<p>Dans ce chapitre, nous explorerons les définitions mathématiques
+rigoureuses de la corrélation et de la causalité, ainsi que les
+théorèmes qui permettent de distinguer ces deux notions. Nous verrons
+comment les modèles statistiques et les graphes acycliques dirigés
+(DAGs) peuvent aider à établir des relations causales.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<h2 class="unnumbered" id="corrélation">Corrélation</h2>
+<p>Pour comprendre la corrélation, considérons deux variables aléatoires
+<span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>. Nous cherchons à mesurer à quel point
+ces deux variables varient ensemble. Intuitivement, si <span
+class="math inline">\(X\)</span> augmente, <span
+class="math inline">\(Y\)</span> devrait aussi augmenter (corrélation
+positive), ou diminuer (corrélation négative).</p>
+<p>La corrélation de Pearson entre <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> est définie comme :</p>
+<p><span class="math display">\[\boxed{ \rho(X, Y) = \frac{\text{Cov}(X,
+Y)}{\sigma_X \sigma_Y} }\]</span></p>
+<p>où <span class="math inline">\(\text{Cov}(X, Y) = \mathbb{E}[(X -
+\mu_X)(Y - \mu_Y)]\)</span> est la covariance entre <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span>, et <span
+class="math inline">\(\sigma_X, \sigma_Y\)</span> sont les écarts-types
+de <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> respectivement.</p>
+<p>En d’autres termes, la corrélation est le coefficient de la
+régression linéaire de <span class="math inline">\(Y\)</span> sur <span
+class="math inline">\(X\)</span>, normalisé par les écarts-types des
+variables.</p>
+<h2 class="unnumbered" id="causalité">Causalité</h2>
+<p>La causalité, en revanche, est une notion plus complexe. Elle
+implique qu’une variable <span class="math inline">\(X\)</span>
+influence directement ou indirectement une autre variable <span
+class="math inline">\(Y\)</span>. Pour formaliser cela, nous utilisons
+souvent des graphes acycliques dirigés (DAGs).</p>
+<p>Un DAG est un graphe <span class="math inline">\(G = (V, E)\)</span>
+où <span class="math inline">\(V\)</span> est l’ensemble des variables
+et <span class="math inline">\(E\)</span> est l’ensemble des arcs
+dirigés représentant les relations causales. Par exemple, si <span
+class="math inline">\(X \rightarrow Y\)</span>, cela signifie que <span
+class="math inline">\(X\)</span> cause <span
+class="math inline">\(Y\)</span>.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered" id="théorème-de-reichenbach">Théorème de
+Reichenbach</h2>
+<p>Un théorème fondamental en causalité est le théorème de Reichenbach,
+qui stipule que si deux variables <span class="math inline">\(X\)</span>
+et <span class="math inline">\(Y\)</span> sont corrélées, alors il
+existe soit un lien causal direct entre elles, soit une variable cachée
+<span class="math inline">\(Z\)</span> qui les influence toutes
+deux.</p>
+<p>Formellement, si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont corrélées, alors :</p>
+<p><span class="math display">\[\boxed{ P(X, Y) = P(X)P(Y) + \sum_{Z}
+P(X|Z)P(Z|Y)P(Y|Z) }\]</span></p>
+<p>où <span class="math inline">\(Z\)</span> est une variable
+cachée.</p>
+<h2 class="unnumbered" id="théorème-de-d-separation">Théorème de
+d-Separation</h2>
+<p>Un autre théorème important est le théorème de d-separation, qui
+permet de déterminer si deux variables sont conditionnellement
+indépendantes dans un DAG.</p>
+<p>Formellement, pour un DAG <span class="math inline">\(G\)</span> et
+un ensemble de variables <span class="math inline">\(S\)</span>, deux
+variables <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont d-séparées par <span
+class="math inline">\(S\)</span> si tous les chemins entre <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont bloqués par <span
+class="math inline">\(S\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered" id="preuve-du-théorème-de-reichenbach">Preuve du
+Théorème de Reichenbach</h2>
+<p>Pour prouver le théorème de Reichenbach, nous devons montrer que la
+corrélation entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> peut être expliquée par un lien causal
+direct ou par une variable cachée.</p>
+<p>Supposons que <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont corrélées, c’est-à-dire que <span
+class="math inline">\(P(X, Y) \neq P(X)P(Y)\)</span>. Alors, il existe
+une variable <span class="math inline">\(Z\)</span> telle que :</p>
+<p><span class="math display">\[P(X, Y|Z) = P(X|Z)P(Y|Z)\]</span></p>
+<p>Cela signifie que <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendantes conditionnellement à
+<span class="math inline">\(Z\)</span>. Par conséquent, la corrélation
+entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> peut être expliquée par <span
+class="math inline">\(Z\)</span>.</p>
+<h2 class="unnumbered" id="preuve-du-théorème-de-d-separation">Preuve du
+Théorème de d-Separation</h2>
+<p>Pour prouver le théorème de d-separation, nous devons montrer que si
+deux variables <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont d-séparées par un ensemble de
+variables <span class="math inline">\(S\)</span>, alors elles sont
+conditionnellement indépendantes.</p>
+<p>Supposons que <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont d-séparées par <span
+class="math inline">\(S\)</span>. Cela signifie que tous les chemins
+entre <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont bloqués par <span
+class="math inline">\(S\)</span>. Par conséquent, aucune information ne
+peut passer de <span class="math inline">\(X\)</span> à <span
+class="math inline">\(Y\)</span> via ces chemins, ce qui implique que
+:</p>
+<p><span class="math display">\[P(X, Y|S) = P(X|S)P(Y|S)\]</span></p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriétés-de-la-corrélation">Propriétés de
+la Corrélation</h2>
+<ol>
+<li><p>La corrélation est symétrique, c’est-à-dire que <span
+class="math inline">\(\rho(X, Y) = \rho(Y, X)\)</span>.</p></li>
+<li><p>La corrélation est bornée entre -1 et 1, c’est-à-dire que <span
+class="math inline">\(\rho(X, Y) \in [-1, 1]\)</span>.</p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont indépendantes, alors <span
+class="math inline">\(\rho(X, Y) = 0\)</span>.</p></li>
+</ol>
+<h2 class="unnumbered" id="corollaires-de-la-causalité">Corollaires de
+la Causalité</h2>
+<ol>
+<li><p>Si <span class="math inline">\(X\)</span> cause <span
+class="math inline">\(Y\)</span>, alors <span
+class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont corrélées.</p></li>
+<li><p>Si <span class="math inline">\(X\)</span> et <span
+class="math inline">\(Y\)</span> sont corrélées, cela ne signifie pas
+nécessairement que <span class="math inline">\(X\)</span> cause <span
+class="math inline">\(Y\)</span>.</p></li>
+<li><p>La causalité peut être établie en utilisant des expériences
+contrôlées ou des modèles statistiques avancés.</p></li>
+</ol>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Dans ce chapitre, nous avons exploré les notions de corrélation et de
+causalité, en fournissant des définitions mathématiques rigoureuses et
+des théorèmes fondamentaux. Nous avons vu que la corrélation ne suffit
+pas à établir une relation causale, et que des outils comme les DAGs et
+le théorème de d-separation sont essentiels pour comprendre les
+relations causales.</p>
+<p>Cette distinction est cruciale dans de nombreux domaines, et une
+compréhension approfondie de ces concepts permet d’éviter des
+interprétations erronées et de prendre des décisions éclairées.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

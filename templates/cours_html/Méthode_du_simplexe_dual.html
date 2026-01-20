@@ -1,0 +1,404 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Méthode du simplexe dual : Une approche optimale pour la programmation linéaire</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Méthode du simplexe dual : Une approche optimale pour
+la programmation linéaire</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>La programmation linéaire est un domaine fondamental des
+mathématiques appliquées, permettant de modéliser et résoudre des
+problèmes d’optimisation sous contraintes linéaires. Parmi les méthodes
+les plus efficaces pour résoudre ces problèmes, la méthode du simplexe
+occupe une place prépondérante. Introduite par George Dantzig en 1947,
+cette méthode a révolutionné la manière dont les problèmes
+d’optimisation sont abordés.</p>
+<p>Cependant, il existe une variante de cette méthode, souvent moins
+connue mais tout aussi puissante : la méthode du simplexe dual. Cette
+approche exploite la dualité en programmation linéaire pour transformer
+un problème complexe en un problème plus simple à résoudre. La dualité
+est un concept profond qui lie deux problèmes de programmation linéaire,
+l’un étant le problème primal et l’autre son dual. En exploitant cette
+relation, la méthode du simplexe dual permet de trouver des solutions
+optimales de manière plus efficace dans certains cas.</p>
+<p>Dans cet article, nous explorerons en détail la méthode du simplexe
+dual. Nous commencerons par les définitions fondamentales, suivies des
+théorèmes clés qui sous-tendent cette méthode. Nous fournirons également
+des preuves détaillées et discuterons des propriétés et corollaires
+associés.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Avant de plonger dans la méthode du simplexe dual, il est essentiel
+de comprendre les concepts fondamentaux de la programmation linéaire et
+de la dualité.</p>
+<h2 id="problème-primal">Problème Primal</h2>
+<p>Considérons un problème d’optimisation linéaire standard, appelé
+problème primal :</p>
+<p><span class="math display">\[\begin{equation}
+    \begin{aligned}
+        &amp;\text{Minimiser} &amp; &amp; \mathbf{c}^T \mathbf{x} \\
+        &amp;\text{sous les contraintes} &amp; &amp; A\mathbf{x} \geq
+\mathbf{b}, \\
+        &amp;&amp;&amp; \mathbf{x} \geq \mathbf{0}.
+    \end{aligned}
+\end{equation}\]</span></p>
+<p>Ici, <span class="math inline">\(\mathbf{c} \in \mathbb{R}^n\)</span>
+est le vecteur des coûts, <span class="math inline">\(A \in
+\mathbb{R}^{m \times n}\)</span> est la matrice des contraintes, <span
+class="math inline">\(\mathbf{b} \in \mathbb{R}^m\)</span> est le
+vecteur des ressources, et <span class="math inline">\(\mathbf{x} \in
+\mathbb{R}^n\)</span> est le vecteur des variables de décision.</p>
+<h2 id="problème-dual">Problème Dual</h2>
+<p>Le problème dual associé au problème primal est défini comme suit
+:</p>
+<p><span class="math display">\[\begin{equation}
+    \begin{aligned}
+        &amp;\text{Maximiser} &amp; &amp; \mathbf{b}^T \mathbf{y} \\
+        &amp;\text{sous les contraintes} &amp; &amp; A^T \mathbf{y} \leq
+\mathbf{c}, \\
+        &amp;&amp;&amp; \mathbf{y} \geq \mathbf{0}.
+    \end{aligned}
+\end{equation}\]</span></p>
+<p>Ici, <span class="math inline">\(\mathbf{y} \in \mathbb{R}^m\)</span>
+est le vecteur des variables duales.</p>
+<h2 id="simplexe-dual">Simplexe Dual</h2>
+<p>La méthode du simplexe dual consiste à résoudre le problème dual en
+utilisant l’algorithme du simplexe. L’idée est d’itérer à travers les
+sommets de la région réalisable du problème dual jusqu’à ce qu’une
+solution optimale soit atteinte.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<h2 id="théorème-de-dualité-faible">Théorème de Dualité Faible</h2>
+<p>Le théorème de dualité faible établit une relation fondamentale entre
+les valeurs optimales des problèmes primal et dual.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{x}\)</span> une solution
+réalisable du problème primal et <span
+class="math inline">\(\mathbf{y}\)</span> une solution réalisable du
+problème dual. Alors, <span class="math display">\[\mathbf{c}^T
+\mathbf{x} \geq \mathbf{b}^T \mathbf{y}.\]</span></p>
+</div>
+<h2 id="démonstration-du-théorème-de-dualité-faible">Démonstration du
+Théorème de Dualité Faible</h2>
+<p>Pour démontrer ce théorème, nous utilisons les contraintes des
+problèmes primal et dual.</p>
+<div class="proof">
+<p><em>Proof.</em> Puisque <span
+class="math inline">\(\mathbf{x}\)</span> est réalisable pour le
+problème primal, nous avons <span class="math inline">\(A\mathbf{x} \geq
+\mathbf{b}\)</span> et <span class="math inline">\(\mathbf{x} \geq
+\mathbf{0}\)</span>.</p>
+<p>De même, puisque <span class="math inline">\(\mathbf{y}\)</span> est
+réalisable pour le problème dual, nous avons <span
+class="math inline">\(A^T \mathbf{y} \leq \mathbf{c}\)</span> et <span
+class="math inline">\(\mathbf{y} \geq \mathbf{0}\)</span>.</p>
+<p>En multipliant les inégalités <span class="math inline">\(A\mathbf{x}
+\geq \mathbf{b}\)</span> par <span
+class="math inline">\(\mathbf{y}^T\)</span> (de la droite) et <span
+class="math inline">\(A^T \mathbf{y} \leq \mathbf{c}\)</span> par <span
+class="math inline">\(\mathbf{x}^T\)</span> (de la droite), nous
+obtenons : <span class="math display">\[\mathbf{y}^T A\mathbf{x} \geq
+\mathbf{y}^T \mathbf{b},\]</span> <span
+class="math display">\[\mathbf{x}^T A^T \mathbf{y} \leq \mathbf{x}^T
+\mathbf{c}.\]</span></p>
+<p>En remarquant que <span class="math inline">\(\mathbf{y}^T
+A\mathbf{x} = \mathbf{x}^T A^T \mathbf{y}\)</span>, nous avons : <span
+class="math display">\[\mathbf{x}^T A^T \mathbf{y} \geq \mathbf{y}^T
+\mathbf{b},\]</span> <span class="math display">\[\mathbf{x}^T A^T
+\mathbf{y} \leq \mathbf{x}^T \mathbf{c}.\]</span></p>
+<p>En combinant ces deux inégalités, nous obtenons : <span
+class="math display">\[\mathbf{y}^T \mathbf{b} \leq \mathbf{x}^T A^T
+\mathbf{y} \leq \mathbf{x}^T \mathbf{c}.\]</span></p>
+<p>Donc, <span class="math display">\[\mathbf{b}^T \mathbf{y} \leq
+\mathbf{c}^T \mathbf{x}.\]</span> ◻</p>
+</div>
+<h2 id="théorème-de-dualité-forte">Théorème de Dualité Forte</h2>
+<p>Le théorème de dualité forte affirme que si l’un des problèmes primal
+ou dual a une solution optimale, alors l’autre en a aussi une, et les
+valeurs optimales sont égales.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\mathbf{x}^*\)</span> une solution
+optimale du problème primal et <span
+class="math inline">\(\mathbf{y}^*\)</span> une solution optimale du
+problème dual. Alors, <span class="math display">\[\mathbf{c}^T
+\mathbf{x}^* = \mathbf{b}^T \mathbf{y}^*.\]</span></p>
+</div>
+<h2 id="démonstration-du-théorème-de-dualité-forte">Démonstration du
+Théorème de Dualité Forte</h2>
+<p>La démonstration de ce théorème repose sur les concepts de
+complémentarité et d’optimalité.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span
+class="math inline">\(\mathbf{x}^*\)</span> soit une solution optimale
+du problème primal. Nous devons montrer que <span
+class="math inline">\(\mathbf{y}^*\)</span> est une solution optimale du
+problème dual.</p>
+<p>Considérons les contraintes de complémentarité : <span
+class="math display">\[(A\mathbf{x}^* - \mathbf{b})^T \mathbf{y}^* =
+0,\]</span> <span class="math display">\[(\mathbf{c} - A^T
+\mathbf{y}^*)^T \mathbf{x}^* = 0.\]</span></p>
+<p>Ces conditions impliquent que pour tout <span
+class="math inline">\(i\)</span>, soit <span
+class="math inline">\(\mathbf{y}^*_i = 0\)</span> soit <span
+class="math inline">\((A\mathbf{x}^*)_i = \mathbf{b}_i\)</span>, et pour
+tout <span class="math inline">\(j\)</span>, soit <span
+class="math inline">\(\mathbf{x}^*_j = 0\)</span> soit <span
+class="math inline">\((A^T \mathbf{y}^*)_j = \mathbf{c}_j\)</span>.</p>
+<p>En utilisant ces conditions, nous pouvons montrer que <span
+class="math inline">\(\mathbf{y}^*\)</span> est une solution optimale du
+problème dual.</p>
+<p>De manière similaire, si <span
+class="math inline">\(\mathbf{y}^*\)</span> est une solution optimale du
+problème dual, nous pouvons montrer que <span
+class="math inline">\(\mathbf{x}^*\)</span> est une solution optimale du
+problème primal.</p>
+<p>Par conséquent, les valeurs optimales des problèmes primal et dual
+sont égales. ◻</p>
+</div>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<h2 id="propriété-de-complémentarité">Propriété de Complémentarité</h2>
+<p>La propriété de complémentarité est une condition nécessaire et
+suffisante pour l’optimalité dans les problèmes primal et dual.</p>
+<div class="proposition">
+<p>Une solution <span class="math inline">\((\mathbf{x}^*,
+\mathbf{y}^*)\)</span> est optimale pour les problèmes primal et dual si
+et seulement si : <span class="math display">\[(A\mathbf{x}^* -
+\mathbf{b})^T \mathbf{y}^* = 0,\]</span> <span
+class="math display">\[(\mathbf{c} - A^T \mathbf{y}^*)^T \mathbf{x}^* =
+0.\]</span></p>
+</div>
+<h2 id="démonstration-de-la-propriété-de-complémentarité">Démonstration
+de la Propriété de Complémentarité</h2>
+<p>La démonstration de cette propriété repose sur les conditions
+d’optimalité des problèmes primal et dual.</p>
+<div class="proof">
+<p><em>Proof.</em> Supposons que <span
+class="math inline">\((\mathbf{x}^*, \mathbf{y}^*)\)</span> soit une
+solution optimale pour les problèmes primal et dual. Alors, nous avons :
+<span class="math display">\[\mathbf{c}^T \mathbf{x}^* = \mathbf{b}^T
+\mathbf{y}^*.\]</span></p>
+<p>En utilisant les contraintes des problèmes primal et dual, nous
+pouvons déduire que : <span class="math display">\[(A\mathbf{x}^* -
+\mathbf{b})^T \mathbf{y}^* = 0,\]</span> <span
+class="math display">\[(\mathbf{c} - A^T \mathbf{y}^*)^T \mathbf{x}^* =
+0.\]</span></p>
+<p>Réciproquement, si ces conditions sont satisfaites, alors <span
+class="math inline">\((\mathbf{x}^*, \mathbf{y}^*)\)</span> est une
+solution optimale pour les problèmes primal et dual. ◻</p>
+</div>
+<h2 id="corollaire-de-lalgorithme-du-simplexe-dual">Corollaire de
+l’Algorithme du Simplexe Dual</h2>
+<p>L’algorithme du simplexe dual peut être utilisé pour résoudre le
+problème dual en exploitant les propriétés de complémentarité.</p>
+<div class="corollary">
+<p>L’algorithme du simplexe dual consiste à itérer à travers les sommets
+de la région réalisable du problème dual jusqu’à ce qu’une solution
+optimale soit atteinte, en utilisant les conditions de complémentarité
+pour déterminer l’optimalité.</p>
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>La méthode du simplexe dual est une approche puissante et efficace
+pour résoudre les problèmes de programmation linéaire. En exploitant la
+dualité, cette méthode permet de transformer un problème complexe en un
+problème plus simple à résoudre. Les théorèmes de dualité faible et
+forte, ainsi que les propriétés de complémentarité, fournissent une base
+solide pour comprendre et appliquer cette méthode.</p>
+<p>En conclusion, la méthode du simplexe dual est un outil indispensable
+pour les chercheurs et les praticiens en programmation linéaire, offrant
+des solutions optimales de manière efficace et élégante.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

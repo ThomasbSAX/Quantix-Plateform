@@ -1,0 +1,357 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Kernelized K-Means: An Advanced Clustering Technique</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Kernelized K-Means: An Advanced Clustering
+Technique</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>Le clustering est une tâche fondamentale en apprentissage
+automatique, visant à regrouper des données similaires. Parmi les
+algorithmes de clustering, K-Means est l’un des plus populaires en
+raison de sa simplicité et de son efficacité. Cependant, K-Means
+présente des limitations importantes, notamment sa sensibilité aux
+formes non sphériques des clusters et son incapacité à capturer des
+relations non linéaires entre les données.</p>
+<p>Pour surmonter ces limitations, l’approche Kernelized K-Means a été
+développée. Cette méthode étend le cadre de K-Means en utilisant des
+noyaux (kernels) pour projeter les données dans un espace de
+caractéristiques de dimension supérieure, où les relations non linéaires
+peuvent être capturées plus efficacement. L’utilisation de noyaux permet
+également de traiter des données qui ne sont pas linéairement séparables
+dans l’espace d’origine.</p>
+<p>Dans cet article, nous explorerons en détail la méthode Kernelized
+K-Means, en commençant par les concepts de base et en progressant vers
+des aspects plus avancés. Nous discuterons des définitions, des
+théorèmes, des preuves et des propriétés associées à cette
+technique.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Avant de plonger dans les détails techniques, il est essentiel de
+comprendre les concepts fondamentaux sur lesquels repose la méthode
+Kernelized K-Means.</p>
+<h2 class="unnumbered" id="k-means-classique">K-Means Classique</h2>
+<p>Le problème de clustering par K-Means peut être formulé comme suit :
+étant donné un ensemble de données <span class="math inline">\(X =
+\{x_1, x_2, \ldots, x_n\}\)</span> dans un espace euclidien <span
+class="math inline">\(\mathbb{R}^d\)</span>, nous cherchons à
+partitionner ces données en <span class="math inline">\(k\)</span>
+clusters <span class="math inline">\(C_1, C_2, \ldots, C_k\)</span> de
+manière à minimiser la somme des distances quadratiques
+intra-clusters.</p>
+<p>Formellement, le problème d’optimisation peut être écrit comme :</p>
+<p><span class="math display">\[\min_{C_1, C_2, \ldots, C_k}
+\sum_{i=1}^k \sum_{x \in C_i} \|x - \mu_i\|^2\]</span></p>
+<p>où <span class="math inline">\(\mu_i\)</span> est le centroïde du
+cluster <span class="math inline">\(C_i\)</span>.</p>
+<h2 class="unnumbered" id="noyaux-et-espace-de-caractéristiques">Noyaux
+et Espace de Caractéristiques</h2>
+<p>Un noyau est une fonction qui permet de calculer le produit scalaire
+entre deux vecteurs dans un espace de caractéristiques de dimension
+potentiellement infinie. Formellement, un noyau est une fonction <span
+class="math inline">\(\kappa: \mathcal{X} \times \mathcal{X} \rightarrow
+\mathbb{R}\)</span> telle que pour tout <span class="math inline">\(x, y
+\in \mathcal{X}\)</span>, il existe un espace de caractéristiques <span
+class="math inline">\(\mathcal{H}\)</span> et une application <span
+class="math inline">\(\phi: \mathcal{X} \rightarrow \mathcal{H}\)</span>
+telle que :</p>
+<p><span class="math display">\[\kappa(x, y) = \langle \phi(x), \phi(y)
+\rangle_{\mathcal{H}}\]</span></p>
+<p>Les noyaux couramment utilisés incluent le noyau gaussien, le noyau
+polynomial et le noyau sigmoïde.</p>
+<h2 class="unnumbered" id="kernelized-k-means">Kernelized K-Means</h2>
+<p>La méthode Kernelized K-Means étend le cadre de K-Means en utilisant
+un noyau pour projeter les données dans un espace de caractéristiques.
+Le problème d’optimisation devient alors :</p>
+<p><span class="math display">\[\min_{C_1, C_2, \ldots, C_k}
+\sum_{i=1}^k \sum_{x \in C_i} \|\phi(x) - \mu_i\|^2\]</span></p>
+<p>où <span class="math inline">\(\mu_i\)</span> est le centroïde du
+cluster <span class="math inline">\(C_i\)</span> dans l’espace de
+caractéristiques.</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<h2 class="unnumbered"
+id="théorème-de-représentation-des-noyaux">Théorème de Représentation
+des Noyaux</h2>
+<p>Le théorème de représentation des noyaux est fondamental pour
+comprendre comment les noyaux peuvent être utilisés dans le cadre
+Kernelized K-Means. Ce théorème stipule que pour tout noyau <span
+class="math inline">\(\kappa\)</span>, il existe un espace de
+caractéristiques <span class="math inline">\(\mathcal{H}\)</span> et une
+application <span class="math inline">\(\phi\)</span> tels que :</p>
+<p><span class="math display">\[\kappa(x, y) = \langle \phi(x), \phi(y)
+\rangle_{\mathcal{H}}\]</span></p>
+<p>Ce théorème garantit que l’utilisation de noyaux dans Kernelized
+K-Means est bien définie et peut être interprétée comme une projection
+des données dans un espace de caractéristiques.</p>
+<h2 class="unnumbered"
+id="théorème-de-convergence-de-kernelized-k-means">Théorème de
+Convergence de Kernelized K-Means</h2>
+<p>Le théorème de convergence de Kernelized K-Means est une extension du
+théorème de convergence classique pour K-Means. Il stipule que
+l’algorithme Kernelized K-Means converge vers un minimum local de la
+fonction de coût en un nombre fini d’itérations.</p>
+<p>Formellement, soit <span class="math inline">\(X\)</span> un ensemble
+de données et <span class="math inline">\(\kappa\)</span> un noyau.
+L’algorithme Kernelized K-Means converge vers un minimum local de la
+fonction de coût :</p>
+<p><span class="math display">\[\sum_{i=1}^k \sum_{x \in C_i} \|\phi(x)
+- \mu_i\|^2\]</span></p>
+<p>en un nombre fini d’itérations.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<h2 class="unnumbered"
+id="preuve-du-théorème-de-convergence-de-kernelized-k-means">Preuve du
+Théorème de Convergence de Kernelized K-Means</h2>
+<p>Pour prouver le théorème de convergence de Kernelized K-Means, nous
+suivons une approche similaire à celle utilisée pour prouver la
+convergence de l’algorithme K-Means classique.</p>
+<p>1. **Initialisation** : Choisir <span
+class="math inline">\(k\)</span> points initiaux comme centroïdes dans
+l’espace de caractéristiques.</p>
+<p>2. **Assignation** : Pour chaque point <span class="math inline">\(x
+\in X\)</span>, calculer la distance au carré au centroïde le plus
+proche dans l’espace de caractéristiques :</p>
+<p><span class="math display">\[\min_{i} \|\phi(x) - \mu_i\|^2 =
+\min_{i} (\kappa(x, x) + \kappa(\mu_i, \mu_i) - 2\kappa(x,
+\mu_i))\]</span></p>
+<p>3. **Mise à jour des Centroïdes** : Mettre à jour les centroïdes en
+calculant la moyenne des points dans chaque cluster :</p>
+<p><span class="math display">\[\mu_i = \frac{1}{|C_i|} \sum_{x \in C_i}
+\phi(x)\]</span></p>
+<p>4. **Convergence** : Répéter les étapes d’assignation et de mise à
+jour des centroïdes jusqu’à ce que la fonction de coût ne change plus
+significativement.</p>
+<p>La convergence est garantie car à chaque itération, la fonction de
+coût ne peut qu’être réduite ou rester inchangée. Comme le nombre de
+configurations possibles est fini, l’algorithme doit converger vers un
+minimum local en un nombre fini d’itérations.</p>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<h2 class="unnumbered" id="propriété-de-scalabilité">Propriété de
+Scalabilité</h2>
+<p>La méthode Kernelized K-Means est hautement scalable, car elle peut
+être implémentée efficacement en utilisant des techniques de calcul
+distribué. En particulier, l’utilisation de noyaux permet de traiter des
+données de grande dimension sans avoir à calculer explicitement la
+projection dans l’espace de caractéristiques.</p>
+<h2 class="unnumbered" id="propriété-de-robustesse">Propriété de
+Robustesse</h2>
+<p>Kernelized K-Means est robuste aux bruits et aux valeurs aberrantes,
+car l’utilisation de noyaux permet de capturer des relations non
+linéaires entre les données. Cela rend la méthode particulièrement
+adaptée aux ensembles de données complexes et bruitées.</p>
+<h2 class="unnumbered" id="corollaire-sur-les-noyaux">Corollaire sur les
+Noyaux</h2>
+<p>Le choix du noyau est crucial pour la performance de Kernelized
+K-Means. Différents noyaux peuvent capturer différentes structures dans
+les données. Par exemple, le noyau gaussien est particulièrement
+efficace pour capturer des clusters de forme complexe, tandis que le
+noyau polynomial est mieux adapté aux relations linéaires.</p>
+<h1 class="unnumbered" id="conclusion">Conclusion</h1>
+<p>Dans cet article, nous avons exploré en détail la méthode Kernelized
+K-Means, une extension puissante de l’algorithme K-Means classique. Nous
+avons discuté des définitions, des théorèmes, des preuves et des
+propriétés associées à cette technique. Kernelized K-Means offre une
+solution efficace pour le clustering de données non linéaires et
+complexes, en utilisant des noyaux pour projeter les données dans un
+espace de caractéristiques approprié.</p>
+<p>Les perspectives futures incluent l’exploration de nouveaux noyaux et
+l’amélioration des algorithmes pour traiter des ensembles de données
+encore plus grands et complexes.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

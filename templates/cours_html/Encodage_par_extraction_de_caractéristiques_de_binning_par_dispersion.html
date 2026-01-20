@@ -1,0 +1,324 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>Encodage par extraction de caractéristiques de binning par dispersion</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">Encodage par extraction de caractéristiques de binning
+par dispersion</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 id="introduction-et-motivations">Introduction et Motivations</h1>
+<p>L’encodage par extraction de caractéristiques est une technique
+fondamentale en traitement du signal et en apprentissage automatique.
+Elle permet de transformer des données brutes en caractéristiques
+significatives, facilitant ainsi l’analyse et la prise de décision.
+Parmi les méthodes d’extraction de caractéristiques, le binning par
+dispersion se distingue par sa simplicité et son efficacité.</p>
+<p>Le binning par dispersion consiste à diviser une distribution de
+données en intervalles (ou bins) et à calculer des statistiques de
+dispersion pour chaque intervalle. Cette méthode est particulièrement
+utile dans les cas où les données présentent une variabilité
+significative et où il est nécessaire de capturer cette variabilité pour
+une analyse plus approfondie.</p>
+<p>Dans cet article, nous explorons les concepts de base du binning par
+dispersion, ses définitions formelles, et les théorèmes associés. Nous
+fournissons également des preuves détaillées et des exemples pour
+illustrer l’application de cette technique.</p>
+<h1 id="définitions">Définitions</h1>
+<p>Pour comprendre le binning par dispersion, commençons par définir les
+concepts de base.</p>
+<h2 id="binning">Binning</h2>
+<p>Le binning est une technique qui consiste à diviser une distribution
+de données en intervalles disjoints et exhaustifs. Chaque intervalle est
+appelé un bin.</p>
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+réelles. Un binning de <span class="math inline">\(X\)</span> est une
+partition <span class="math inline">\(\{B_1, B_2, \ldots, B_k\}\)</span>
+de <span class="math inline">\(X\)</span> telle que :</p>
+<p><span class="math display">\[X = \bigcup_{i=1}^k B_i \quad \text{et}
+\quad B_i \cap B_j = \emptyset \quad \forall i \neq j\]</span></p>
+<h2 id="dispersion">Dispersion</h2>
+<p>La dispersion mesure la variabilité des données au sein d’un bin. Une
+mesure courante de la dispersion est l’écart-type.</p>
+<p>Soit <span class="math inline">\(B\)</span> un bin contenant les
+données <span class="math inline">\(\{x_1, x_2, \ldots, x_n\}\)</span>.
+L’écart-type de <span class="math inline">\(B\)</span> est défini par
+:</p>
+<p><span class="math display">\[\sigma_B = \sqrt{\frac{1}{n}
+\sum_{i=1}^n (x_i - \mu_B)^2}\]</span></p>
+<p>où <span class="math inline">\(\mu_B\)</span> est la moyenne des
+données dans le bin <span class="math inline">\(B\)</span>.</p>
+<h2 id="encodage-par-extraction-de-caractéristiques">Encodage par
+extraction de caractéristiques</h2>
+<p>L’encodage par extraction de caractéristiques consiste à transformer
+les données brutes en un ensemble de caractéristiques significatives.
+Dans le cas du binning par dispersion, les caractéristiques extraites
+sont les statistiques de dispersion pour chaque bin.</p>
+<h1 id="théorèmes">Théorèmes</h1>
+<p>Dans cette section, nous présentons quelques théorèmes importants
+liés au binning par dispersion.</p>
+<h2 id="théorème-de-la-variance-totale">Théorème de la variance
+totale</h2>
+<p>Le théorème de la variance totale stipule que la variance totale d’un
+ensemble de données peut être décomposée en une somme de variances
+intra-bins et inter-bins.</p>
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+partitionné en bins <span class="math inline">\(\{B_1, B_2, \ldots,
+B_k\}\)</span>. La variance totale <span
+class="math inline">\(\sigma_X^2\)</span> est donnée par :</p>
+<p><span class="math display">\[\sigma_X^2 = \sum_{i=1}^k \frac{n_i}{n}
+\sigma_{B_i}^2 + \sum_{i=1}^k \frac{n_i}{n} (\mu_{B_i} -
+\mu_X)^2\]</span></p>
+<p>où <span class="math inline">\(n_i\)</span> est le nombre de données
+dans le bin <span class="math inline">\(B_i\)</span>, <span
+class="math inline">\(\sigma_{B_i}^2\)</span> est la variance du bin
+<span class="math inline">\(B_i\)</span>, <span
+class="math inline">\(\mu_{B_i}\)</span> est la moyenne du bin <span
+class="math inline">\(B_i\)</span>, et <span
+class="math inline">\(\mu_X\)</span> est la moyenne globale de <span
+class="math inline">\(X\)</span>.</p>
+<h2 id="preuve-du-théorème-de-la-variance-totale">Preuve du théorème de
+la variance totale</h2>
+<p>Pour prouver le théorème de la variance totale, nous développons
+l’expression de la variance globale :</p>
+<p><span class="math display">\[\sigma_X^2 = \frac{1}{n} \sum_{i=1}^n
+(x_i - \mu_X)^2\]</span></p>
+<p>En remplaçant <span class="math inline">\(x_i\)</span> par <span
+class="math inline">\(\mu_{B_j} + (x_i - \mu_{B_j})\)</span> pour chaque
+<span class="math inline">\(x_i\)</span> dans le bin <span
+class="math inline">\(B_j\)</span>, nous obtenons :</p>
+<p><span class="math display">\[\sigma_X^2 = \frac{1}{n} \sum_{j=1}^k
+\sum_{i \in B_j} (\mu_{B_j} - \mu_X + x_i - \mu_{B_j})^2\]</span></p>
+<p>En développant le carré, nous avons :</p>
+<p><span class="math display">\[\sigma_X^2 = \frac{1}{n} \sum_{j=1}^k
+\sum_{i \in B_j} (\mu_{B_j} - \mu_X)^2 + 2(\mu_{B_j} - \mu_X)(x_i -
+\mu_{B_j}) + (x_i - \mu_{B_j})^2\]</span></p>
+<p>En simplifiant, nous obtenons :</p>
+<p><span class="math display">\[\sigma_X^2 = \sum_{j=1}^k \frac{n_j}{n}
+(\mu_{B_j} - \mu_X)^2 + \sum_{j=1}^k \frac{n_j}{n}
+\sigma_{B_j}^2\]</span></p>
+<h1 id="propriétés-et-corollaires">Propriétés et Corollaires</h1>
+<p>Dans cette section, nous présentons quelques propriétés et
+corollaires du binning par dispersion.</p>
+<h2 id="propriété-de-lécart-type">Propriété de l’écart-type</h2>
+<p>L’écart-type d’un bin est toujours non négatif.</p>
+<p>Soit <span class="math inline">\(B\)</span> un bin contenant les
+données <span class="math inline">\(\{x_1, x_2, \ldots, x_n\}\)</span>.
+L’écart-type de <span class="math inline">\(B\)</span> est donné par
+:</p>
+<p><span class="math display">\[\sigma_B = \sqrt{\frac{1}{n}
+\sum_{i=1}^n (x_i - \mu_B)^2} \geq 0\]</span></p>
+<h2 id="corollaire-de-la-variance-minimale">Corollaire de la variance
+minimale</h2>
+<p>La variance d’un ensemble de données est minimisée lorsque toutes les
+données sont regroupées dans un seul bin.</p>
+<p>Soit <span class="math inline">\(X\)</span> un ensemble de données
+partitionné en bins <span class="math inline">\(\{B_1, B_2, \ldots,
+B_k\}\)</span>. La variance totale <span
+class="math inline">\(\sigma_X^2\)</span> est minimisée lorsque <span
+class="math inline">\(k = 1\)</span>.</p>
+<h1 id="conclusion">Conclusion</h1>
+<p>Dans cet article, nous avons exploré les concepts de base du binning
+par dispersion, ses définitions formelles, et les théorèmes associés.
+Nous avons également fourni des preuves détaillées et des exemples pour
+illustrer l’application de cette technique.</p>
+<p>Le binning par dispersion est une méthode puissante pour extraire des
+caractéristiques significatives à partir de données brutes. Elle trouve
+des applications dans divers domaines, tels que le traitement du signal,
+l’apprentissage automatique, et l’analyse de données.</p>
+</body>
+</html>
+{% include "footer.html" %}
+

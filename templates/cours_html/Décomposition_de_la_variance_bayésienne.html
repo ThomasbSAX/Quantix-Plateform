@@ -1,0 +1,353 @@
+{% include "header.html" %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+  <!-- CSS du site -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Quantix" />
+  <meta name="dcterms.date" content="2026-01-11" />
+  <title>La Décomposition de la Variance Bayésienne</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/cours.css') }}">
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">La Décomposition de la Variance Bayésienne</h1>
+<p class="author">Quantix</p>
+<p class="date">2026-01-11</p>
+</header>
+<h1 class="unnumbered" id="introduction-et-motivations">Introduction et
+Motivations</h1>
+<p>La décomposition de la variance bayésienne est un outil fondamental
+en statistique bayésienne, permettant d’analyser les contributions
+relatives des différentes sources de variabilité dans un modèle
+statistique. Cette approche trouve ses racines dans le désir d’aller
+au-delà des simples estimations ponctuelles pour comprendre la
+distribution complète de l’incertitude. En effet, dans un cadre
+bayésien, chaque paramètre est considéré comme une variable aléatoire
+dont la distribution reflète notre état de connaissance avant et après
+l’observation des données. La décomposition de la variance permet alors
+de quantifier comment cette incertitude est répartie entre les
+différents composants du modèle.</p>
+<p>L’importance historique de cette notion réside dans sa capacité à
+fournir une analyse fine des modèles hiérarchiques et mixtes, où
+plusieurs niveaux de variabilité sont souvent présents. Par exemple,
+dans un modèle hiérarchique pour des données provenant de plusieurs
+groupes, la variance totale peut être décomposée en une composante
+intra-groupe et une composante inter-groupes. Cette décomposition est
+indispensable pour identifier les sources principales de variabilité et
+pour guider la prise de décision dans des contextes complexes.</p>
+<h1 class="unnumbered" id="définitions">Définitions</h1>
+<p>Pour introduire la notion de décomposition de la variance bayésienne,
+commençons par comprendre ce que nous cherchons à mesurer. Supposons que
+nous avons un modèle statistique où les données <span
+class="math inline">\(y\)</span> dépendent d’un paramètre <span
+class="math inline">\(\theta\)</span>, qui lui-même suit une
+distribution a priori <span class="math inline">\(\pi(\theta)\)</span>.
+Après l’observation des données, nous mettons à jour cette distribution
+a priori en une distribution a posteriori <span
+class="math inline">\(\pi(\theta | y)\)</span>. La variance de cette
+distribution a posteriori reflète l’incertitude restante sur <span
+class="math inline">\(\theta\)</span> après avoir pris en compte les
+données.</p>
+<p>Nous cherchons à décomposer cette variance totale en plusieurs
+composantes, chacune correspondant à une source de variabilité
+distincte. Par exemple, dans un modèle hiérarchique, nous pourrions
+avoir une composante de variabilité due aux différences entre les
+groupes et une autre due à la variabilité intra-groupe.</p>
+<p>Formellement, supposons que nous avons un paramètre <span
+class="math inline">\(\theta\)</span> et une statistique <span
+class="math inline">\(T(y)\)</span> qui résume les données. La variance
+totale de <span class="math inline">\(\theta\)</span> peut être
+décomposée comme suit:</p>
+<p><span class="math display">\[\text{Var}(\theta | y) = \mathbb{E}_{y}
+[\text{Var}(\theta | y)] + \text{Var}_y[\mathbb{E}[\theta |
+y]]\]</span></p>
+<p>Cependant, cette décomposition ne tient pas compte de la structure
+hiérarchique du modèle. Pour cela, nous devons introduire une
+décomposition plus fine.</p>
+<p>Soit <span class="math inline">\(\theta\)</span> un paramètre de
+niveau supérieur et <span class="math inline">\(\phi\)</span> un
+paramètre de niveau inférieur. La variance totale de <span
+class="math inline">\(\theta\)</span> peut être décomposée en:</p>
+<p><span class="math display">\[\text{Var}(\theta | y) =
+\text{Var}(\mathbb{E}[\theta | \phi, y]) + \mathbb{E}[\text{Var}(\theta
+| \phi, y)]\]</span></p>
+<p>Cette décomposition montre comment la variance totale de <span
+class="math inline">\(\theta\)</span> est répartie entre la variabilité
+due aux différences entre les valeurs de <span
+class="math inline">\(\phi\)</span> (première composante) et la
+variabilité intra-groupe (deuxième composante).</p>
+<h1 class="unnumbered" id="théorèmes">Théorèmes</h1>
+<p>Un théorème central en décomposition de la variance bayésienne est le
+théorème de la variance totale, qui généralise l’idée de décomposition
+en plusieurs niveaux. Ce théorème est une conséquence directe des
+propriétés de l’espérance et de la variance conditionnelle.</p>
+<div class="theorem">
+<p>Soit <span class="math inline">\(\theta\)</span> un paramètre
+aléatoire avec une distribution a priori <span
+class="math inline">\(\pi(\theta)\)</span>, et soit <span
+class="math inline">\(y\)</span> les données observées. Supposons que
+<span class="math inline">\(\theta\)</span> peut être décomposé en
+plusieurs composantes <span class="math inline">\(\theta_1, \ldots,
+\theta_k\)</span>. Alors, la variance totale de <span
+class="math inline">\(\theta\)</span> peut être décomposée en:</p>
+<p><span class="math display">\[\text{Var}(\theta | y) = \sum_{i=1}^k
+\text{Var}(\mathbb{E}[\theta_i | \theta_{-i}, y]) +
+\mathbb{E}[\text{Var}(\theta | \theta_1, \ldots, \theta_k,
+y)]\]</span></p>
+<p>où <span class="math inline">\(\theta_{-i}\)</span> désigne toutes
+les composantes de <span class="math inline">\(\theta\)</span> sauf la
+<span class="math inline">\(i\)</span>-ème.</p>
+</div>
+<p>La preuve de ce théorème repose sur l’application itérative du
+théorème de la variance totale classique, en tenant compte des
+dépendances conditionnelles entre les différentes composantes de <span
+class="math inline">\(\theta\)</span>.</p>
+<h1 class="unnumbered" id="preuves">Preuves</h1>
+<p>Pour prouver le théorème de la variance totale bayésienne, nous
+procédons par récurrence sur le nombre de composantes <span
+class="math inline">\(k\)</span>.</p>
+<div class="proof">
+<p><em>Proof.</em> <strong>Cas de base:</strong> Pour <span
+class="math inline">\(k = 1\)</span>, le théorème se réduit au théorème
+classique de la variance totale:</p>
+<p><span class="math display">\[\text{Var}(\theta | y) =
+\text{Var}(\mathbb{E}[\theta | y]) + \mathbb{E}[\text{Var}(\theta |
+y)]\]</span></p>
+<p><strong>Hypothèse de récurrence:</strong> Supposons que le théorème
+est vrai pour <span class="math inline">\(k = n\)</span>,
+c’est-à-dire:</p>
+<p><span class="math display">\[\text{Var}(\theta | y) = \sum_{i=1}^n
+\text{Var}(\mathbb{E}[\theta_i | \theta_{-i}, y]) +
+\mathbb{E}[\text{Var}(\theta | \theta_1, \ldots, \theta_n,
+y)]\]</span></p>
+<p><strong>Pas de récurrence:</strong> Pour <span
+class="math inline">\(k = n + 1\)</span>, nous appliquons le théorème de
+la variance totale à <span class="math inline">\(\theta_{n+1}\)</span>
+conditionnellement aux autres composantes:</p>
+<p><span class="math display">\[\text{Var}(\theta | y) =
+\text{Var}(\mathbb{E}[\theta_{n+1} | \theta_1, \ldots, \theta_n, y]) +
+\mathbb{E}[\text{Var}(\theta | \theta_1, \ldots, \theta_{n+1},
+y)]\]</span></p>
+<p>En combinant cette expression avec l’hypothèse de récurrence, nous
+obtenons:</p>
+<p><span class="math display">\[\text{Var}(\theta | y) =
+\sum_{i=1}^{n+1} \text{Var}(\mathbb{E}[\theta_i | \theta_{-i}, y]) +
+\mathbb{E}[\text{Var}(\theta | \theta_1, \ldots, \theta_{n+1},
+y)]\]</span></p>
+<p>Ce qui achève la preuve par récurrence. ◻</p>
+</div>
+<h1 class="unnumbered" id="propriétés-et-corollaires">Propriétés et
+Corollaires</h1>
+<p>Nous listons maintenant quelques propriétés importantes de la
+décomposition de la variance bayésienne.</p>
+<ol>
+<li><p><strong>Invariance par transformation:</strong> Si <span
+class="math inline">\(g\)</span> est une fonction différentiable, alors
+la variance de <span class="math inline">\(g(\theta)\)</span> peut être
+décomposée en utilisant la même structure que celle de <span
+class="math inline">\(\theta\)</span>, à condition d’appliquer les
+règles de dérivation appropriées.</p></li>
+<li><p><strong>Additivité:</strong> La variance totale est additive par
+rapport aux composantes indépendantes. Si <span
+class="math inline">\(\theta_1\)</span> et <span
+class="math inline">\(\theta_2\)</span> sont indépendants, alors:</p>
+<p><span class="math display">\[\text{Var}(\theta_1 + \theta_2 | y) =
+\text{Var}(\theta_1 | y) + \text{Var}(\theta_2 | y)\]</span></p></li>
+<li><p><strong>Interprétation hiérarchique:</strong> Dans un modèle
+hiérarchique, la décomposition de la variance permet d’identifier les
+niveaux de variabilité les plus importants. Cela est particulièrement
+utile pour la modélisation des données groupées ou
+multi-niveaux.</p></li>
+</ol>
+<p>Pour chaque propriété, une preuve détaillée peut être construite en
+utilisant les propriétés fondamentales de l’espérance et de la variance
+conditionnelle, ainsi que les règles de dérivation pour les fonctions de
+variables aléatoires.</p>
+</body>
+</html>
+{% include "footer.html" %}
+
